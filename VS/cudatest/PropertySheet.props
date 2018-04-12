@@ -1,0 +1,19 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ImportGroup Label="PropertySheets" />
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup>
+    <IncludePath>$(IncludePath)</IncludePath>
+    <LibraryPath>$(LibraryPath)</LibraryPath>
+  </PropertyGroup>
+  <ItemDefinitionGroup>
+    <Link>
+      <AdditionalLibraryDirectories>C:\Users\DELL-1600T\Google Drive\WORKS\OPENCV_CUDA_DSP\MSVS\cudatest\WpdPack\Lib\x64;C:\Users\DELL-1600T\Documents\GitHub\OPENCV_CUDA_DSP\MSVS\cudatest\WpdPack\Lib\x64;$(OPENCV_DIR)\lib\Release\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>cufft.lib;wpcap.lib;Packet.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+    <ClCompile>
+      <AdditionalIncludeDirectories>C:\ProgramData\NVIDIA Corporation\CUDA Samples\v9.0\common\inc;C:\Users\DELL-1600T\Google Drive\WORKS\OPENCV_CUDA_DSP\MSVS\cudatest\WpdPack\Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemGroup />
+</Project>
