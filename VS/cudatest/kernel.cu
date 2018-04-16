@@ -1,6 +1,5 @@
 //setx -m OPENCV_DIR D:\OpenCV\OpenCV331\opencv\build
 //setx path "%path%;D:\OpenCV\OpenCV331\opencv\build\bin\Release\"
-#include "cuda_runtime.h"
 #include "device_launch_parameters.h"
 //#include <opencv2/opencv.hpp>
 #include <stdio.h>
@@ -8,39 +7,119 @@
 #include <windows.h>
 #include <conio.h>
 #include <tchar.h>
-// includes for FFT
-#include <cuda_runtime.h>
-#include <cufft.h>
-#include <cufftXt.h>
-#define FFT_SIZE 16
-//#define 
+#define HAVE_REMOTE// for pcap
+#include "pcap.h"
+
 #define FRAME_LEN 2048
+#define MAX_IREC 4000
 #pragma comment(lib, "user32.lib")
 #pragma comment (lib, "Ws2_32.lib")
 //file mapping
 #define BUF_SIZE 256
 #define FRAME_HEADER_SIZE 34
-TCHAR szName[] = TEXT("Global\\RadarData");
-#define HAVE_REMOTE// for pcap
-#include "pcap.h"
+
 //using namespace cv;
 using namespace std;
+//#include "FFTcore.cuh"
+// includes for FFT
+#include <cuda_runtime.h>
+#include <device_launch_parameters.h>
+#include <cufft.h>
+#include <cufftXt.h>
+#include <stdio.h>
+
+__global__ void complexMulKernel(cufftComplex *res, const cufftComplex *v1, const cufftComplex *v2)
+{
+	int i = threadIdx.x;
+	res[i].x = v1[i].x * v2[i].x - v1[i].y * v2[i].y;
+	res[i].y = v1[i].x * v2[i].y + v1[i].y * v2[i].x;
+}
+class coreFFT
+{
+public:
+
+
+	cufftHandle planTL;
+	cufftHandle planNenTH;
+	//cufftHandle planImageFFT;
+	cufftComplex *dSignalTL;
+	cufftComplex *dSignalNen;
+	cufftComplex *dImageNen;
+	int mMemSizeTL;
+	int mMemSizeNen;
+	int mMemSizeImage;
+	int mTichLuySize;//16
+	int mFrameLen;
+	coreFFT(int frameLen, int ntichluy)
+	{
+		mFrameLen = frameLen;
+		mTichLuySize = ntichluy;
+		mMemSizeTL = sizeof(cufftComplex)* mTichLuySize*frameLen;
+		mMemSizeNen = sizeof(cufftComplex)*frameLen;
+		mMemSizeImage = sizeof(cufftComplex)*frameLen;
+
+		if (cufftPlan1d(&planTL, mTichLuySize, CUFFT_C2C, frameLen) != CUFFT_SUCCESS)printf("\nFFT planTL failed to init");
+		// Allocate device memory for signal tich luy
+		cudaMalloc((void **)&dSignalTL, mMemSizeTL);
+
+		if (cufftPlan1d(&planNenTH, frameLen, CUFFT_C2C, 1) != CUFFT_SUCCESS)printf("\nFFT planTL failed to init");
+		// Allocate device memory for signal nen
+		cudaMalloc((void **)&dSignalNen, mMemSizeNen);
+
+		//if (cufftPlan1d(&planImageFFT, frameLen, CUFFT_C2C, 1) != CUFFT_SUCCESS)printf("\nFFT planTL failed to init");
+		// Allocate device memory for image nen
+		cudaMalloc((void **)&dSignalNen, mMemSizeNen);
+	}
+	void exeFFTTL(cufftComplex *h_signal)
+	{
+		cudaMemcpy(dSignalTL, h_signal, mMemSizeTL, cudaMemcpyHostToDevice);
+		cufftExecC2C(planTL, dSignalTL, dSignalTL, CUFFT_FORWARD);
+		cudaMemcpy(h_signal, dSignalTL, mMemSizeTL, cudaMemcpyDeviceToHost);
+	}
+	void exeFFTNen(cufftComplex *h_signal, cufftComplex* h_image)
+	{
+		//move signal to gpu and process fft forward
+		cudaMemcpy(dSignalNen, h_signal, mMemSizeNen, cudaMemcpyHostToDevice);
+		cufftExecC2C(planNenTH, dSignalNen, dSignalNen, CUFFT_FORWARD);
+		//move image to gpu and process fft forward
+		cudaMemcpy(dImageNen, h_image, mMemSizeNen, cudaMemcpyHostToDevice);
+		cufftExecC2C(planNenTH, dImageNen, dImageNen, CUFFT_FORWARD);
+		// Element wise complext multiplication
+		complexMulKernel << <1, mFrameLen >> >(dSignalNen, dSignalNen, dImageNen);
+		//
+		cufftExecC2C(planNenTH, dSignalNen, dSignalNen, CUFFT_INVERSE);
+		cudaMemcpy(h_signal, dSignalNen, mMemSizeNen, cudaMemcpyDeviceToHost);
+	}
+	~coreFFT()
+	{
+		cufftDestroy(planTL);
+		cufftDestroy(planNenTH);
+		// cleanup memory
+		cudaFree(dSignalTL);
+		cudaFree(dSignalNen);
+		cudaFree(dImageNen);
+	}
+};
+//_______________________________________________________________________
+
 struct DataFrame// buffer for data frame
 {
 	char header[FRAME_HEADER_SIZE];
 	char dataI[FRAME_LEN];
 	char dataQ[FRAME_LEN];
-};
-#define MAX_IREC 10000
+	char image256[256];
+	bool isToFFT;
+} dataBuff[MAX_IREC];
+
 #define OUTPUT_FRAME_SIZE FRAME_LEN*2+FRAME_HEADER_SIZE
-DataFrame dataBuff[MAX_IREC];
+
 u_char outputFrame[OUTPUT_FRAME_SIZE];
-cufftHandle plan;
-int iRead=0,iRec = 1;
+
+int iProcessing=0,iReady = 1;
 void packet_handler(u_char *param, const struct pcap_pkthdr *header, const u_char *pkt_data);
 void pcapRun();
-cufftComplex *d_signal;
-int mem_size = sizeof(cufftComplex)* FFT_SIZE*FRAME_LEN;
+
+
 int mSocket;
 struct sockaddr_in si_other;
 void socketInit()
@@ -73,18 +152,7 @@ void socketDelete()
 	closesocket(mSocket);
 	WSACleanup();
 }
-void cufftInit()
-{
-	if (cufftPlan1d(&plan, FFT_SIZE, CUFFT_C2C, FRAME_LEN) != CUFFT_SUCCESS)printf("\nFFT plan failed to init");
-	// Allocate device memory for signal
-	cudaMalloc((void **)&d_signal, mem_size);
-}
-void cufftExit()
-{
-	cufftDestroy(plan);
-	// cleanup memory
-	cudaFree(d_signal);
-}
+
 DWORD WINAPI ProcessDataBuffer(LPVOID lpParam);
 void StartProcessing()
 {
@@ -97,15 +165,19 @@ void StartProcessing()
 		NULL);   // returns the thread identifier 
 
 }
+coreFFT *mFFT;
+#define FFT_SIZE 16
+int mFFTSkip = 4;
+
 int main()
 {
 
 	/* start the capture */
 	socketInit();
-	cufftInit();
+	mFFT = new coreFFT(FRAME_LEN, FFT_SIZE);
 	StartProcessing();
 	pcapRun();
-	cufftExit();
+	
     return 0;
 }
 //precompiling code for FFT
@@ -115,7 +187,6 @@ int main()
 
 void pcapRun()
 {
-
 	pcap_if_t *alldevs;
 	pcap_if_t *d;
 	pcap_t *adhandle;
@@ -155,73 +226,87 @@ void pcapRun()
 	printf("\nlistening on %s...\n", d->description);
 	pcap_loop(adhandle, 0, packet_handler, NULL);
 }
-
-void CalculateFFT(cufftComplex *h_signal)
-{
-	cudaMemcpy(d_signal, h_signal, mem_size, cudaMemcpyHostToDevice);
-	cufftExecC2C(plan, d_signal, d_signal, CUFFT_FORWARD);
-	cudaMemcpy(h_signal, d_signal, mem_size, cudaMemcpyDeviceToHost);
-}
+u_char dataOut[FRAME_LEN];
 long int nFrames = 0;
 
-u_char dataOut[FRAME_LEN];
+cufftComplex ramSignalTL[FRAME_LEN][FFT_SIZE];
+cufftComplex ramSignalNen[MAX_IREC][FRAME_LEN];
+cufftComplex ramImage[FRAME_LEN];
+
 DWORD WINAPI ProcessDataBuffer(LPVOID lpParam)
 {
-	//int oldAzi;
+
+	
 	while (true)
 	{
-		Sleep(2);
-		int iCur = (iRec>>2) - 1;
-		if (iCur < 0)iCur += MAX_IREC>>2;
-		
-		while ((iRead>>2) != iCur )
+
+		Sleep(1);
+		while (iProcessing!= iReady )
 		{
-			iRead+=4;
-			
-			if (iRead >= MAX_IREC)iRead -= MAX_IREC;
-			nFrames++;
-			cufftComplex h_signal[FRAME_LEN][FFT_SIZE];// (cufftComplex *)malloc(sizeof(cufftComplex)* FFT_SIZE);
+			iProcessing++;
 			for (int ir = 0; ir < FRAME_LEN; ir++)
 			{
-				int ia = iRead;
-				
+				ramSignalNen[iProcessing][ir].x = dataBuff[iProcessing].dataI[ir];
+				ramSignalNen[iProcessing][ir].y = dataBuff[iProcessing].dataQ[ir];
+			}
+			for (int ir = 0; ir < FRAME_LEN; ir++)
+			{
+				if (ir < 256)
+				{
+					ramImage[ir].x = dataBuff[iProcessing].image256[ir];
+				}
+				else
+				{
+					ramImage[ir].x = 0;
+				}
+				ramImage[ir].y = 0;
+			}
+			//bat dau loc nen anh guong
+			mFFT->exeFFTNen(ramSignalNen[iProcessing], ramImage);
+			
+			//tich luy fft
+			if (!dataBuff[iProcessing].isToFFT)continue;
+
+			if (iProcessing >= MAX_IREC)iProcessing -= MAX_IREC;
+			nFrames++;
+			for (int ir = 0; ir < FRAME_LEN; ir++)
+			{
+				int ia = iProcessing;
 				for (int i = 0; i < FFT_SIZE; i++)
 				{
-					h_signal[ir][i].x = dataBuff[ia].dataI[ir];
-					h_signal[ir][i].y = dataBuff[ia].dataQ[ir];
+					ramSignalTL[ir][i] = ramSignalNen[ia][ir];
 					ia--;
 					if (ia < 0)ia += MAX_IREC;
 				}
 			}
-			
-			
-			/*if ((dataBuff[iRead].azi != oldAzi + 1) && (oldAzi!=2047))
+			/*if ((dataBuff[iProcessing].azi != oldAzi + 1) && (oldAzi!=2047))
 			{
-				printf("\nAzi:%d Count:%d", dataBuff[iRead].azi, nFrames);
+				printf("\nAzi:%d Count:%d", dataBuff[iProcessing].azi, nFrames);
 				printf("Azi old:%d", oldAzi);
 			}*/
 			
-			/*oldAzi = dataBuff[iRead].azi;
+			/*oldAzi = dataBuff[iProcessing].azi;
 			*/
-			//printf("\nAzi:%d Count:%d", dataBuff[iRead].azi, nFrames);
+			//printf("\nAzi:%d Count:%d", dataBuff[iProcessing].azi, nFrames);
 			int iDisplay = 477;
+
 			if (nFrames < 50)
 			{
 				
 				printf("\nInput I:");
 				for (int i = 0; i < FFT_SIZE; i++)
 				{
-					printf("%3.2f ", h_signal[iDisplay][i].x);
+					printf("%3.2f ", ramSignalTL[iDisplay][i].x);
 				}
 				printf("\nInput Q:");
 				for (int i = 0; i < FFT_SIZE; i++)
 				{
-					printf("%3.2f ", h_signal[iDisplay][i].y);
+					printf("%3.2f ", ramSignalTL[iDisplay][i].y);
 				}
 			}
 			// perform fft
-			CalculateFFT((cufftComplex*)h_signal);
-			memcpy(outputFrame, dataBuff[iRead].header, FRAME_HEADER_SIZE);
+			mFFT->exeFFTTL((cufftComplex*)ramSignalTL);
+			memcpy(outputFrame, dataBuff[iProcessing].header, FRAME_HEADER_SIZE);
 			
 			for (int i = 0; i < FRAME_LEN; i++)
 			{
@@ -232,7 +317,7 @@ DWORD WINAPI ProcessDataBuffer(LPVOID lpParam)
 				int maxAmp = 0, indexMaxFFT = 0;
 				for (int j = 0; j<FFT_SIZE; j++)
 				{
-					int ampl = (h_signal[i][j].x * h_signal[i][j].x) + (h_signal[i][j].y * h_signal[i][j].y);
+					int ampl = (ramSignalTL[i][j].x * ramSignalTL[i][j].x) + (ramSignalTL[i][j].y * ramSignalTL[i][j].y);
 					if (ampl>maxAmp)
 					{
 						maxAmp = ampl;
@@ -251,12 +336,12 @@ DWORD WINAPI ProcessDataBuffer(LPVOID lpParam)
 				printf("\nFFT I:");
 				for (int i = 0; i < FFT_SIZE; i++)
 				{
-					printf("%3.2f ", h_signal[iDisplay][i].x);
+					printf("%3.2f ", ramSignalTL[iDisplay][i].x);
 				}
 				printf("\nFFT Q:");
 				for (int i = 0; i < FFT_SIZE; i++)
 				{
-					printf("%3.2f ", h_signal[iDisplay][i].y);
+					printf("%3.2f ", ramSignalTL[iDisplay][i].y);
 				}
 			}
 			
@@ -286,41 +371,65 @@ void packet_handler(u_char *param, const struct pcap_pkthdr *pkt_header, const u
 	//    localtime_s(&ltime, &local_tv_sec);
 	//    strftime( timestr, sizeof timestr, "%H:%M:%S", &ltime);
 
-	
 	if (pkt_header->len<1000)return;
+	//pkt_header->
 	if (((*(pkt_data + 36) << 8) | (*(pkt_data + 37))) != 5000)
 	{
 		//printf("\nport:%d",((*(pkt_data+36)<<8)|(*(pkt_data+37))));
 		return;
 	}
-	
+	int iNext = iReady + 1;
+	if (iNext >= MAX_IREC)iNext = 0;
 	u_char* data = (u_char*)pkt_data + UDP_HEADER_LEN;
 	if (data[0] == 0)		//I chanel first part
 	{
-		iRec++;
-		if (iRec >= MAX_IREC)iRec = 0;
-		memcpy(dataBuff[iRec].header, data, FRAME_HEADER_SIZE);
-		memcpy(dataBuff[iRec].dataI, data + FRAME_HEADER_SIZE, 1024);
+		
+		memcpy(dataBuff[iNext].header, data, FRAME_HEADER_SIZE);
+		memcpy(dataBuff[iNext].dataI, data + FRAME_HEADER_SIZE, 1024);
 	}
 	else if (data[0] == 2) //Q chanel first part
 	{
-		memcpy(dataBuff[iRec].dataQ, data + FRAME_HEADER_SIZE, 1024);
+		memcpy(dataBuff[iNext].dataQ, data + FRAME_HEADER_SIZE, 1024);
 	}
 	else if (data[0] == 1) //I chanel second part
 	{
-		memcpy(dataBuff[iRec].dataI+1024, data + FRAME_HEADER_SIZE, 1024);
+		memcpy(dataBuff[iNext].dataI + 1024, data + FRAME_HEADER_SIZE, 1024);
 	}
 	else if (data[0] == 3) //Q chanel second part
 	{
-		memcpy(dataBuff[iRec].dataQ+1024, data + FRAME_HEADER_SIZE, 1024);
+		memcpy(dataBuff[iNext].dataQ + 1024, data + FRAME_HEADER_SIZE, 1024);
+		dataBuff[iNext].isToFFT = ((iNext%mFFTSkip)==0);
+		iReady++;
+		if (iReady >= MAX_IREC)iReady = 0;
 	}
 	return;
-	//    printf("len:%d\n", header->len);
-	//    //printf("%.6d len:%d\n", header->ts.tv_usec, header->len);
-	//    for(short i=0;i<dataB[iRec].len;i++)
-	//    {
-	//        printf("%x-",dataB[iRec].data[i]);
-	//    }
-	//    printf("\n");
-
+}
+void packet_handler_compress(u_char *param, const struct pcap_pkthdr *pkt_header, const u_char *pkt_data)
+{
+	if (pkt_header->len<1000)return;
+	if (((*(pkt_data + 36) << 8) | (*(pkt_data + 37))) != 5000)
+	{
+		return;
+	}
+	u_char* data = (u_char*)pkt_data + UDP_HEADER_LEN;
+	if (data[0] == 0)		//I chanel first part
+	{
+		iReady++;
+		if (iReady >= MAX_IREC)iReady = 0;
+		memcpy(dataBuff[iReady].header, data, FRAME_HEADER_SIZE);
+		memcpy(dataBuff[iReady].dataI, data + FRAME_HEADER_SIZE, 1024);
+	}
+	else if (data[0] == 2) //Q chanel first part
+	{
+		memcpy(dataBuff[iReady].dataQ, data + FRAME_HEADER_SIZE, 1024);
+	}
+	else if (data[0] == 1) //I chanel second part
+	{
+		memcpy(dataBuff[iReady].dataI + 1024, data + FRAME_HEADER_SIZE, 1024);
+	}
+	else if (data[0] == 3) //Q chanel second part
+	{
+		memcpy(dataBuff[iReady].dataQ + 1024, data + FRAME_HEADER_SIZE, 1024);
+	}
+	return;
 }

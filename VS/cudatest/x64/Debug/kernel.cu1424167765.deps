@@ -320,7 +320,6 @@ c:\program files\nvidia gpu computing toolkit\cuda\v9.0\include\host_defines.h
 c:\program files\nvidia gpu computing toolkit\cuda\v9.0\include\crt/host_defines.h
 c:\program files\nvidia gpu computing toolkit\cuda\v9.0\include\device_launch_parameters.h
 c:\program files\nvidia gpu computing toolkit\cuda\v9.0\include\vector_types.h
-C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v9.0\include\cuda_runtime.h
 C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v9.0\include\device_launch_parameters.h
 C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\include\stdio.h
 C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\include\crtdefs.h
@@ -537,16 +536,6 @@ C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\include\tchar.h
 C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\include\crtdefs.h
 C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\include\mbstring.h
 C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\include\crtdefs.h
-C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v9.0\include\cuda_runtime.h
-C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v9.0\include\cufft.h
-c:\program files\nvidia gpu computing toolkit\cuda\v9.0\include\cuComplex.h
-C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\include\math.h
-c:\program files\nvidia gpu computing toolkit\cuda\v9.0\include\vector_types.h
-c:\program files\nvidia gpu computing toolkit\cuda\v9.0\include\driver_types.h
-c:\program files\nvidia gpu computing toolkit\cuda\v9.0\include\library_types.h
-C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v9.0\include\cufftXt.h
-c:\program files\nvidia gpu computing toolkit\cuda\v9.0\include\cudalibxt.h
-C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v9.0\include\cuda_runtime.h
 C:\GD\Github\Peter\VS\WpdPack\Include\pcap.h
 C:\GD\Github\Peter\VS\WpdPack\Include\pcap/pcap.h
 C:\GD\Github\Peter\VS\WpdPack\Include\pcap-stdinc.h
@@ -561,3 +550,14 @@ C:\Program Files (x86)\Windows Kits\8.1\Include\shared\ws2ipdef.h
 C:\Program Files (x86)\Windows Kits\8.1\Include\shared\in6addr.h
 C:\GD\Github\Peter\VS\WpdPack\Include\pcap/bpf.h
 C:\GD\Github\Peter\VS\WpdPack\Include\remote-ext.h
+C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v9.0\include\cuda_runtime.h
+C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v9.0\include\device_launch_parameters.h
+C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v9.0\include\cufft.h
+c:\program files\nvidia gpu computing toolkit\cuda\v9.0\include\cuComplex.h
+C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\include\math.h
+c:\program files\nvidia gpu computing toolkit\cuda\v9.0\include\vector_types.h
+c:\program files\nvidia gpu computing toolkit\cuda\v9.0\include\driver_types.h
+c:\program files\nvidia gpu computing toolkit\cuda\v9.0\include\library_types.h
+C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v9.0\include\cufftXt.h
+c:\program files\nvidia gpu computing toolkit\cuda\v9.0\include\cudalibxt.h
+C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v9.0\include\cuda_runtime.h
