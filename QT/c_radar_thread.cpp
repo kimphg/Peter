@@ -3,7 +3,7 @@
 #define MAX_IREC 500
 //#include <QGeoCoordinate>
 #include <QNmeaPositionInfoSource>
-//DataBuff dataB[MAX_IREC];
+DataBuff dataB[MAX_IREC];
 uchar udpFrameBuffer[MAX_IREC][4128];
 short iRec=0,iRead=0;
 bool *pIsDrawn;
@@ -37,7 +37,7 @@ void dataProcessingThread::ReadDataBuffer()
             break;
         }
         isDrawn = false;
-        mRadarData->processSocketData(&data[0],4128);
+        mRadarData->processSocketData(&udpFrameBuffer[iRead][0],4128);
 
         if(isRecording)
         {
@@ -531,6 +531,7 @@ void dataProcessingThread::run()
             int len = radarSocket->pendingDatagramSize();
             radarSocket->readDatagram((char*)&udpFrameBuffer[iRec][0],len);
             iRec++;
+            if(iRec>=MAX_IREC)iRec = 0;
 
         }
         //sleep(1);

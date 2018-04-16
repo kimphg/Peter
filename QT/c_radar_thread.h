@@ -24,7 +24,7 @@
 struct DataBuff// buffer for data frame
 {
     short len;
-    unsigned char data[1500];
+    unsigned char data[2500];
 };
 
 

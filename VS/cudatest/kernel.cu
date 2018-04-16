@@ -22,8 +22,8 @@
 using namespace std;
 //#include "FFTcore.cuh"
 // includes for FFT
-#include <cuda_runtime.h>
-#include <device_launch_parameters.h>
+#include "cuda_runtime.h"
+#include "device_launch_parameters.h"
 #include <cufft.h>
 #include <cufftXt.h>
 #include <stdio.h>
@@ -31,8 +31,8 @@ using namespace std;
 __global__ void complexMulKernel(cufftComplex *res, const cufftComplex *v1, const cufftComplex *v2)
 {
 	int i = threadIdx.x;
-	res[i].x = v1[i].x * v2[i].x - v1[i].y * v2[i].y;
-	res[i].y = v1[i].x * v2[i].y + v1[i].y * v2[i].x;
+	res[i].x = (v1[i].x * v2[i].x - v1[i].y * (-v2[i].y))/1000000;
+	res[i].y = (v1[i].x * (-v2[i].y) + v1[i].y * v2[i].x)/1000000;
 }
 class coreFFT
 {
@@ -43,6 +43,7 @@ public:
 	cufftHandle planNenTH;
 	//cufftHandle planImageFFT;
 	cufftComplex *dSignalTL;
+	cufftComplex *dSignalNenRes;
 	cufftComplex *dSignalNen;
 	cufftComplex *dImageNen;
 	int mMemSizeTL;
@@ -52,11 +53,20 @@ public:
 	int mFrameLen;
 	coreFFT(int frameLen, int ntichluy)
 	{
+		cudaError_t cudaStatus;
+
+		// Choose which GPU to run on, change this on a multi-GPU system.
+		cudaStatus = cudaSetDevice(0);
+		if (cudaStatus != cudaSuccess) {
+			fprintf(stderr, "cudaSetDevice failed!  Do you have a CUDA-capable GPU installed?");
+			
+		}
 		mFrameLen = frameLen;
 		mTichLuySize = ntichluy;
 		mMemSizeTL = sizeof(cufftComplex)* mTichLuySize*frameLen;
 		mMemSizeNen = sizeof(cufftComplex)*frameLen;
 		mMemSizeImage = sizeof(cufftComplex)*frameLen;
+
 
 		if (cufftPlan1d(&planTL, mTichLuySize, CUFFT_C2C, frameLen) != CUFFT_SUCCESS)printf("\nFFT planTL failed to init");
 		// Allocate device memory for signal tich luy
@@ -65,10 +75,11 @@ public:
 		if (cufftPlan1d(&planNenTH, frameLen, CUFFT_C2C, 1) != CUFFT_SUCCESS)printf("\nFFT planTL failed to init");
 		// Allocate device memory for signal nen
 		cudaMalloc((void **)&dSignalNen, mMemSizeNen);
+		cudaMalloc((void **)&dSignalNenRes, mMemSizeNen);
 
 		//if (cufftPlan1d(&planImageFFT, frameLen, CUFFT_C2C, 1) != CUFFT_SUCCESS)printf("\nFFT planTL failed to init");
 		// Allocate device memory for image nen
-		cudaMalloc((void **)&dSignalNen, mMemSizeNen);
+		cudaMalloc((void **)&dImageNen, mMemSizeNen);
 	}
 	void exeFFTTL(cufftComplex *h_signal)
 	{
@@ -85,9 +96,30 @@ public:
 		cudaMemcpy(dImageNen, h_image, mMemSizeNen, cudaMemcpyHostToDevice);
 		cufftExecC2C(planNenTH, dImageNen, dImageNen, CUFFT_FORWARD);
 		// Element wise complext multiplication
-		complexMulKernel << <1, mFrameLen >> >(dSignalNen, dSignalNen, dImageNen);
-		//
-		cufftExecC2C(planNenTH, dSignalNen, dSignalNen, CUFFT_INVERSE);
+		for (int i = 0; i < mFrameLen; i += 256)
+		{
+			complexMulKernel << <1, 256 >> >(dSignalNenRes+i, dSignalNen+i, dImageNen+i);
+		}
+		
+		/*cudaError_t cudaStatus = cudaGetLastError();
+		if (cudaStatus != cudaSuccess) {
+			fprintf(stderr, "addKernel launch failed: %s\n", cudaGetErrorString(cudaStatus));
+			
+		}*/
+
+		/*
+		cudaMemcpy(h_image, dImageNen, mMemSizeNen, cudaMemcpyDeviceToHost);
+		cudaMemcpy(h_signal, dSignalNen, mMemSizeNen, cudaMemcpyDeviceToHost);
+		for (int i = 0; i < mFrameLen; i++)
+		{
+			float x = h_image[i].x * h_signal[i].x + h_image[i].y * h_signal[i].y;
+			float y = h_signal[i].x * (-h_image[i].y) + h_signal[i].y * h_image[i].x;
+			h_signal[i].x = x/1000000.0;
+			h_signal[i].y = y/1000000.0;
+		}
+		cudaMemcpy(dSignalNenRes, h_signal, mMemSizeNen, cudaMemcpyHostToDevice);
+		*/
+		cufftExecC2C(planNenTH, dSignalNenRes,dSignalNen , CUFFT_INVERSE);
 		cudaMemcpy(h_signal, dSignalNen, mMemSizeNen, cudaMemcpyDeviceToHost);
 	}
 	~coreFFT()
@@ -235,8 +267,6 @@ cufftComplex ramImage[FRAME_LEN];
 
 DWORD WINAPI ProcessDataBuffer(LPVOID lpParam)
 {
-
-	
 	while (true)
 	{
 
@@ -244,16 +274,17 @@ DWORD WINAPI ProcessDataBuffer(LPVOID lpParam)
 		while (iProcessing!= iReady )
 		{
 			iProcessing++;
+			if (iProcessing >= MAX_IREC)iProcessing = 0;
 			for (int ir = 0; ir < FRAME_LEN; ir++)
 			{
-				ramSignalNen[iProcessing][ir].x = dataBuff[iProcessing].dataI[ir];
-				ramSignalNen[iProcessing][ir].y = dataBuff[iProcessing].dataQ[ir];
+				ramSignalNen[iProcessing][ir].x = int(dataBuff[iProcessing].dataI[ir]);
+				ramSignalNen[iProcessing][ir].y = int(dataBuff[iProcessing].dataQ[ir]);
 			}
 			for (int ir = 0; ir < FRAME_LEN; ir++)
 			{
 				if (ir < 256)
 				{
-					ramImage[ir].x = dataBuff[iProcessing].image256[ir];
+					ramImage[ir].x = ramSignalNen[iProcessing][ir+100].x;//dataBuff[iProcessing].image256[ir];
 				}
 				else
 				{
