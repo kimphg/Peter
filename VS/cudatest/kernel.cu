@@ -31,8 +31,8 @@ using namespace std;
 __global__ void complexMulKernel(cufftComplex *res, const cufftComplex *v1, const cufftComplex *v2)
 {
 	int i = threadIdx.x;
-	res[i].x = (v1[i].x * v2[i].x - v1[i].y * (-v2[i].y))/10000000;
-	res[i].y = (v1[i].x * (-v2[i].y) + v1[i].y * v2[i].x)/10000000;
+	res[i].x = (v1[i].x * v2[i].x + v1[i].y * (v2[i].y)) / 2048.0 / 2048.0;
+	res[i].y = (v1[i].x * (-v2[i].y) + v1[i].y * v2[i].x) / 2048.0 / 2048.0;
 }
 class coreFFT
 {
@@ -119,8 +119,9 @@ public:
 		}
 		cudaMemcpy(dSignalNenRes, h_signal, mMemSizeNen, cudaMemcpyHostToDevice);
 		*/
-		cufftExecC2C(planNenTH, dSignalNenRes,dSignalNen , CUFFT_INVERSE);
-		cudaMemcpy(h_signal, dSignalNen, mMemSizeNen, cudaMemcpyDeviceToHost);
+		cufftExecC2C(planNenTH, dSignalNenRes, dSignalNenRes, CUFFT_FORWARD);
+		
+		cudaMemcpy(h_signal, dSignalNenRes, mMemSizeNen, cudaMemcpyDeviceToHost);
 	}
 	~coreFFT()
 	{
@@ -284,7 +285,7 @@ DWORD WINAPI ProcessDataBuffer(LPVOID lpParam)
 			{
 				if (ir < 256)
 				{
-					ramImage[ir].x = ramSignalNen[iProcessing][ir+100].x;//dataBuff[iProcessing].image256[ir];
+					ramImage[ir].x = ramSignalNen[iProcessing][ir+500].x;//dataBuff[iProcessing].image256[ir];
 				}
 				else
 				{
@@ -294,7 +295,28 @@ DWORD WINAPI ProcessDataBuffer(LPVOID lpParam)
 			}
 			//bat dau loc nen anh guong
 			mFFT->exeFFTNen(ramSignalNen[iProcessing], ramImage);
-			
+			/*int sum = 0;
+			for (int i = 0; i < FRAME_LEN; i++)
+			{
+				int outx =  int(sqrt((ramSignalNen[iProcessing][i].x)*(ramSignalNen[iProcessing][i].x) + (ramSignalNen[iProcessing][i].y)*(ramSignalNen[iProcessing][i].y)));
+				sum += outx;
+				if (outx>255)
+					outx = 255;
+				//bien bo
+				outputFrame[i + FRAME_HEADER_SIZE] = outx;// u_char((ramSignalNen[iProcessing][i].x)*(ramSignalNen[iProcessing][i].x) + (ramSignalNen[iProcessing][i].y)*(ramSignalNen[iProcessing][i].y));
+				//kenh dopler
+				outputFrame[i + FRAME_LEN + FRAME_HEADER_SIZE] = 0;
+			}
+			if (sum / 2048.0 > 200)
+			{
+				sum = sum;
+			}*/
+			//memcpy((char*)outputFrame + FRAME_HEADER_SIZE, ramSignalNen[iProcessing],1024);
+			//memcpy((char*)outputFrame + FRAME_HEADER_SIZE + 1024, ramSignalNen[iProcessing]+1024, 1024);
+			//memcpy(outputFrame, dataBuff[iProcessing].header, FRAME_HEADER_SIZE);
+			//sendto(mSocket, (char*)outputFrame, OUTPUT_FRAME_SIZE, 0, (struct sockaddr *) &si_other, sizeof(si_other));
+			//
+			//continue;
 			//tich luy fft
 			if (!dataBuff[iProcessing].isToFFT)continue;
 
@@ -310,6 +332,7 @@ DWORD WINAPI ProcessDataBuffer(LPVOID lpParam)
 					if (ia < 0)ia += MAX_IREC;
 				}
 			}
+			
 			/*if ((dataBuff[iProcessing].azi != oldAzi + 1) && (oldAzi!=2047))
 			{
 				printf("\nAzi:%d Count:%d", dataBuff[iProcessing].azi, nFrames);
@@ -335,8 +358,11 @@ DWORD WINAPI ProcessDataBuffer(LPVOID lpParam)
 					printf("%3.2f ", ramSignalTL[iDisplay][i].y);
 				}
 			}
+			
 			// perform fft
+
 			mFFT->exeFFTTL((cufftComplex*)ramSignalTL);
+			
 			memcpy(outputFrame, dataBuff[iProcessing].header, FRAME_HEADER_SIZE);
 			
 			for (int i = 0; i < FRAME_LEN; i++)
