@@ -31,8 +31,8 @@ using namespace std;
 __global__ void complexMulKernel(cufftComplex *res, const cufftComplex *v1, const cufftComplex *v2)
 {
 	int i = threadIdx.x;
-	res[i].x = (v1[i].x * v2[i].x - v1[i].y * (-v2[i].y))/1000000;
-	res[i].y = (v1[i].x * (-v2[i].y) + v1[i].y * v2[i].x)/1000000;
+	res[i].x = (v1[i].x * v2[i].x - v1[i].y * (-v2[i].y))/10000000;
+	res[i].y = (v1[i].x * (-v2[i].y) + v1[i].y * v2[i].x)/10000000;
 }
 class coreFFT
 {
@@ -96,9 +96,9 @@ public:
 		cudaMemcpy(dImageNen, h_image, mMemSizeNen, cudaMemcpyHostToDevice);
 		cufftExecC2C(planNenTH, dImageNen, dImageNen, CUFFT_FORWARD);
 		// Element wise complext multiplication
-		for (int i = 0; i < mFrameLen; i += 256)
+		for (int i = 0; i < mFrameLen; i += 1024)
 		{
-			complexMulKernel << <1, 256 >> >(dSignalNenRes+i, dSignalNen+i, dImageNen+i);
+			complexMulKernel << <1, 1024 >> >(dSignalNenRes+i, dSignalNen+i, dImageNen+i);
 		}
 		
 		/*cudaError_t cudaStatus = cudaGetLastError();
@@ -147,7 +147,7 @@ struct DataFrame// buffer for data frame
 
 u_char outputFrame[OUTPUT_FRAME_SIZE];
 
-int iProcessing=0,iReady = 1;
+int iProcessing=0,iReady = 5;
 void packet_handler(u_char *param, const struct pcap_pkthdr *header, const u_char *pkt_data);
 void pcapRun();
 
