@@ -31,8 +31,8 @@ using namespace std;
 __global__ void complexMulKernel(cufftComplex *res, const cufftComplex *v1, const cufftComplex *v2)
 {
 	int i = threadIdx.x;
-	res[i].x = (v1[i].x * v2[i].x + v1[i].y * (v2[i].y)) / 2048.0 / 2048.0;
-	res[i].y = (v1[i].x * (-v2[i].y) + v1[i].y * v2[i].x) / 2048.0 / 2048.0;
+	res[i].x = (v1[i].x * v2[i].x + v1[i].y * (v2[i].y)) ;
+	res[i].y = (v1[i].x * (-v2[i].y) + v1[i].y * v2[i].x) ;
 }
 class coreFFT
 {
