@@ -9,9 +9,9 @@
 #include <tchar.h>
 #define HAVE_REMOTE// for pcap
 #include "pcap.h"
-
+#define HR2D_PK//
 #define FRAME_LEN 2048
-#define MAX_IREC 4000
+#define MAX_IREC 2000
 #pragma comment(lib, "user32.lib")
 #pragma comment (lib, "Ws2_32.lib")
 //file mapping
@@ -199,8 +199,8 @@ void StartProcessing()
 
 }
 coreFFT *mFFT;
-#define FFT_SIZE 16
-int mFFTSkip = 4;
+#define FFT_SIZE 32
+int mFFTSkip = 5;
 
 int main()
 {
@@ -265,7 +265,7 @@ long int nFrames = 0;
 cufftComplex ramSignalTL[FRAME_LEN][FFT_SIZE];
 cufftComplex ramSignalNen[MAX_IREC][FRAME_LEN];
 cufftComplex ramImage[FRAME_LEN];
-
+int curAzi = 0;
 DWORD WINAPI ProcessDataBuffer(LPVOID lpParam)
 {
 	while (true)
@@ -294,7 +294,7 @@ DWORD WINAPI ProcessDataBuffer(LPVOID lpParam)
 				ramImage[ir].y = 0;
 			}
 			//bat dau loc nen anh guong
-			mFFT->exeFFTNen(ramSignalNen[iProcessing], ramImage);
+			//mFFT->exeFFTNen(ramSignalNen[iProcessing], ramImage);
 			/*int sum = 0;
 			for (int i = 0; i < FRAME_LEN; i++)
 			{
@@ -362,7 +362,10 @@ DWORD WINAPI ProcessDataBuffer(LPVOID lpParam)
 			// perform fft
 
 			mFFT->exeFFTTL((cufftComplex*)ramSignalTL);
-			
+			dataBuff[iProcessing].header[2] = curAzi >> 8;
+			dataBuff[iProcessing].header[3] = curAzi ;
+			curAzi++;
+			if (curAzi > 4096)curAzi = 0;
 			memcpy(outputFrame, dataBuff[iProcessing].header, FRAME_HEADER_SIZE);
 			
 			for (int i = 0; i < FRAME_LEN; i++)
@@ -382,7 +385,7 @@ DWORD WINAPI ProcessDataBuffer(LPVOID lpParam)
 					}
 				}
 				outputFrame[i + FRAME_HEADER_SIZE] = u_char(sqrt(float(maxAmp)) / float(FFT_SIZE));
-				outputFrame[i + FRAME_LEN + FRAME_HEADER_SIZE] = u_char(indexMaxFFT);
+				outputFrame[i + FRAME_LEN + FRAME_HEADER_SIZE] = u_char(indexMaxFFT>>1);
 			}
 			sendto(mSocket, (char*)outputFrame, OUTPUT_FRAME_SIZE, 0, (struct sockaddr *) &si_other, sizeof(si_other));
 			//printf(" max FFT:%d",indexMaxFFT);
@@ -438,15 +441,17 @@ void packet_handler(u_char *param, const struct pcap_pkthdr *pkt_header, const u
 	int iNext = iReady + 1;
 	if (iNext >= MAX_IREC)iNext = 0;
 	u_char* data = (u_char*)pkt_data + UDP_HEADER_LEN;
-	if (data[0] == 0)		//I chanel first part
+	if (data[0] == 1)		//I chanel first part
 	{
-		
+		dataBuff[iNext].isToFFT = ((iNext%mFFTSkip) == 0);
 		memcpy(dataBuff[iNext].header, data, FRAME_HEADER_SIZE);
 		memcpy(dataBuff[iNext].dataI, data + FRAME_HEADER_SIZE, 1024);
 	}
 	else if (data[0] == 2) //Q chanel first part
 	{
 		memcpy(dataBuff[iNext].dataQ, data + FRAME_HEADER_SIZE, 1024);
+		iReady++;
+		if (iReady >= MAX_IREC)iReady = 0;
 	}
 	else if (data[0] == 1) //I chanel second part
 	{
@@ -455,7 +460,6 @@ void packet_handler(u_char *param, const struct pcap_pkthdr *pkt_header, const u
 	else if (data[0] == 3) //Q chanel second part
 	{
 		memcpy(dataBuff[iNext].dataQ + 1024, data + FRAME_HEADER_SIZE, 1024);
-		dataBuff[iNext].isToFFT = ((iNext%mFFTSkip)==0);
 		iReady++;
 		if (iReady >= MAX_IREC)iReady = 0;
 	}
