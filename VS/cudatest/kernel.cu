@@ -365,7 +365,7 @@ DWORD WINAPI ProcessDataBuffer(LPVOID lpParam)
 			dataBuff[iProcessing].header[2] = curAzi >> 8;
 			dataBuff[iProcessing].header[3] = curAzi ;
 			curAzi++;
-			if (curAzi > 4096)curAzi = 0;
+			if (curAzi >= 4096)curAzi = 0;
 			memcpy(outputFrame, dataBuff[iProcessing].header, FRAME_HEADER_SIZE);
 			
 			for (int i = 0; i < FRAME_LEN; i++)
