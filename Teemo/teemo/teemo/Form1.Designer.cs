@@ -65,11 +65,14 @@
             // 
             // button2
             // 
-            this.button2.Location = new System.Drawing.Point(373, 140);
+            this.button2.BackgroundImage = global::teemo.Properties.Resources.tai_hinh_nen_tuong_teemo_trong_lien_minh_huyen_thoai_8;
+            this.button2.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch;
+            this.button2.Font = new System.Drawing.Font("Microsoft Sans Serif", 16F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.button2.Location = new System.Drawing.Point(361, 140);
             this.button2.Name = "button2";
-            this.button2.Size = new System.Drawing.Size(131, 46);
+            this.button2.Size = new System.Drawing.Size(164, 136);
             this.button2.TabIndex = 2;
-            this.button2.Text = "Run hidden";
+            this.button2.Text = "Hide";
             this.button2.UseVisualStyleBackColor = true;
             this.button2.Click += new System.EventHandler(this.button2_Click);
             // 
@@ -104,7 +107,7 @@
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MaximizeBox = false;
             this.Name = "Form1";
-            this.Text = "Form1";
+            this.Text = "Teemo";
             this.ResumeLayout(false);
 
         }
