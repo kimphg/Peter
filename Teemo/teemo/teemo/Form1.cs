@@ -41,7 +41,8 @@ namespace teemo
                 // Initialize menuItem1
                 var menuItem = new System.Windows.Forms.MenuItem();
                 menuItem.Index = 0;
-                menuItem.Text = drive.ToString();
+                menuItem.Text = drive.ToString() ;
+                if (drive.IsReady) menuItem.Text += " " + drive.VolumeLabel + " " + drive.TotalSize/1000000+"MB";
                 menuItem.Click += new System.EventHandler(this.menuItem_Click);
                 contextMenu1.MenuItems.Add(menuItem);
                 listBox2.Items.Add(drive);
@@ -57,7 +58,10 @@ namespace teemo
 
         private void menuItem_Click(object sender, EventArgs e)
         {
-            throw new NotImplementedException();
+            MenuItem item = sender as MenuItem;
+            string[] list = item.Text.Split(' ');
+            string letter = list[0];
+            RemoveDriveLetter(letter);
         }
 
         [DllImport("kernel32.dll", SetLastError = true, CallingConvention = CallingConvention.StdCall)]
@@ -206,7 +210,7 @@ namespace teemo
             this.Show();
             this.WindowState = FormWindowState.Normal;
         }
-        private const int CP_NOCLOSE_BUTTON = 0x200;
+        /*private const int CP_NOCLOSE_BUTTON = 0x200;
         protected override CreateParams CreateParams
         {
             get
@@ -215,7 +219,7 @@ namespace teemo
                 myCp.ClassStyle = myCp.ClassStyle | CP_NOCLOSE_BUTTON;
                 return myCp;
             }
-        }
+        }*/
 
         private void button1_Click(object sender, EventArgs e)
         {
@@ -296,6 +300,11 @@ namespace teemo
                 SetVolumeMountPoint(letter.ToString()+":\\", volumeName);
                 letter++;
             }
+        }
+
+        private void button2_Click(object sender, EventArgs e)
+        {
+            this.WindowState = FormWindowState.Minimized;
         }
 
     }
