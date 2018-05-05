@@ -1647,7 +1647,7 @@ void Mainwindow::InitTimer()
     //syncTimer1s.moveToThread(t);
 
     connect(&scrUpdateTimer, SIGNAL(timeout()), this, SLOT(UpdateRadarData()));
-    scrUpdateTimer.start(30);//ENVDEP
+    scrUpdateTimer.start(20);//ENVDEP
     scrUpdateTimer.moveToThread(t2);
     //connect(t2,SIGNAL(finished()),t2,SLOT(deleteLater()));
 

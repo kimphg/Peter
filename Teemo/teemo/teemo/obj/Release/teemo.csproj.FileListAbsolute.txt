@@ -1,0 +1,8 @@
+C:\GD\Github\Peter\Teemo\teemo\teemo\bin\Release\teemo.exe
+C:\GD\Github\Peter\Teemo\teemo\teemo\bin\Release\teemo.pdb
+C:\GD\Github\Peter\Teemo\teemo\teemo\obj\Release\teemo.Form1.resources
+C:\GD\Github\Peter\Teemo\teemo\teemo\obj\Release\teemo.Properties.Resources.resources
+C:\GD\Github\Peter\Teemo\teemo\teemo\obj\Release\teemo.csproj.GenerateResource.Cache
+C:\GD\Github\Peter\Teemo\teemo\teemo\obj\Release\teemo.exe
+C:\GD\Github\Peter\Teemo\teemo\teemo\obj\Release\teemo.pdb
+C:\GD\Github\Peter\Teemo\teemo\teemo\obj\Release\teemo.csprojResolveAssemblyReference.cache

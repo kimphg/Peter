@@ -375,7 +375,7 @@ DWORD WINAPI ProcessDataBuffer(LPVOID lpParam)
 					i = i;
 				}
 				int maxAmp = 0, indexMaxFFT = 0;
-				for (int j = 0; j<FFT_SIZE; j++)
+				for (int j = 1; j<FFT_SIZE-1; j++)
 				{
 					int ampl = (ramSignalTL[i][j].x * ramSignalTL[i][j].x) + (ramSignalTL[i][j].y * ramSignalTL[i][j].y);
 					if (ampl>maxAmp)
