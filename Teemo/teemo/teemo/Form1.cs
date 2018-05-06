@@ -30,7 +30,7 @@ namespace teemo
             button4.Hide();
             //button4.BringToFront();
             button4.KeyDown += button4_KeyDown;
-            notifyIcon.MouseClick += notifyIcon_MouseClick;
+            //notifyIcon.MouseClick += notifyIcon_MouseClick;
 
             
         }
@@ -236,7 +236,8 @@ namespace teemo
                 notifyIcon.BalloonTipIcon = ToolTipIcon.Info;
                 notifyIcon.BalloonTipText = "Teemo hidden mode";
                 notifyIcon.ShowBalloonTip(500);
-                this.Hide();
+                this.ShowInTaskbar = false;
+                //this.Hide();
             }
 
             else 
