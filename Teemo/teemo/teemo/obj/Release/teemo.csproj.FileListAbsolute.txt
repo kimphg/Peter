@@ -6,3 +6,4 @@ C:\GD\Github\Peter\Teemo\teemo\teemo\obj\Release\teemo.csproj.GenerateResource.C
 C:\GD\Github\Peter\Teemo\teemo\teemo\obj\Release\teemo.exe
 C:\GD\Github\Peter\Teemo\teemo\teemo\obj\Release\teemo.pdb
 C:\GD\Github\Peter\Teemo\teemo\teemo\obj\Release\teemo.csprojResolveAssemblyReference.cache
+C:\GD\Github\Peter\Teemo\teemo\teemo\bin\Release\teemo.exe.config
