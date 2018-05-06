@@ -63,9 +63,9 @@ namespace teemo.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap tai_hinh_nen_tuong_teemo_trong_lien_minh_huyen_thoai_8 {
+        internal static System.Drawing.Bitmap temooIcon {
             get {
-                object obj = ResourceManager.GetObject("tai-hinh-nen-tuong-teemo-trong-lien-minh-huyen-thoai-8", resourceCulture);
+                object obj = ResourceManager.GetObject("temooIcon", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }

@@ -32,7 +32,7 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup>
-    <ApplicationIcon>lock.ico</ApplicationIcon>
+    <ApplicationIcon>untitled_ZdO_icon.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -79,6 +79,7 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="lock.ico" />
+    <Content Include="untitled_ZdO_icon.ico" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

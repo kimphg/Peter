@@ -13,6 +13,7 @@ namespace teemo
     public partial class Form1 : Form
     {
         ContextMenu contextMenu1 = new System.Windows.Forms.ContextMenu();
+        List<string> listDrv = new List<string>(); 
         public Form1()
         {
 
@@ -23,14 +24,40 @@ namespace teemo
             
             UpdateDriveLetters();
             notifyIcon.ContextMenu = contextMenu1;
+            this.FormClosed += Form1_FormClosed;
             //.contextMenu1.contextMenu1.
             //var volumes = GetMountPoints("C:");
+            button4.Hide();
+            //button4.BringToFront();
+            button4.KeyDown += button4_KeyDown;
+            notifyIcon.MouseClick += notifyIcon_MouseClick;
+
             
+        }
+
+        void notifyIcon_MouseClick(object sender, MouseEventArgs e)
+        {
+            setHidden(false);
+        }
+
+        void button4_KeyDown(object sender, KeyEventArgs e)
+        {
+            
+
+            // Determine whether the keystroke is a number from the top of the keyboard.
+            if (e.KeyCode == Keys.Delete) button4.Hide();
+            
+        }
+
+        void Form1_FormClosed(object sender, FormClosedEventArgs e)
+        {
+            notifyIcon.Visible = false;
         }
 
         private void UpdateDriveLetters()
         {
-            listBox2.Items.Clear();
+            //listBox2.Items.Clear();
+            listDrv.Clear();
             listBox1.Items.Clear();
             contextMenu1.MenuItems.Clear();
             var driveInfo = System.IO.DriveInfo.GetDrives();
@@ -45,7 +72,7 @@ namespace teemo
                 if (drive.IsReady) menuItem.Text += " " + drive.VolumeLabel + " " + drive.TotalSize/1000000+"MB";
                 menuItem.Click += new System.EventHandler(this.menuItem_Click);
                 contextMenu1.MenuItems.Add(menuItem);
-                listBox2.Items.Add(drive);
+                listDrv.Add(drive.ToString());
             }
             var volumes = GetVolumes();
             foreach (var volume in volumes)
@@ -178,8 +205,13 @@ namespace teemo
                 GetVolumeNameForVolumeMountPoint(letterstring, volumeName, (uint)MAX_PATH);
                 if (volumeName.ToString().Contains(volume))
                 {
+                    //DeleteVolumeMountPoint(letterstring);
+                    
                     if (!DeleteVolumeMountPoint(letterstring))
-                        Marshal.ThrowExceptionForHR(Marshal.GetHRForLastWin32Error());
+                    { 
+                        //Marshal.ThrowExceptionForHR(Marshal.GetHRForLastWin32Error()); 
+                        MessageBox.Show("Lỗi cmnr, thử chạy Admin xem!");
+                    }
                     return;
                 }
                 letter++;
@@ -190,25 +222,35 @@ namespace teemo
         }
         private void Form1_Resize(object sender, EventArgs e)
         {
-            if (FormWindowState.Minimized == this.WindowState)
+            if (this.WindowState == FormWindowState.Minimized) setHidden(true);
+        }
+
+        private void setHidden(bool hidden)
+        {
+            if(hidden)
+            
             {
+                this.WindowState = FormWindowState.Minimized;
+                //button4.Show();
                 notifyIcon.Visible = true;
                 notifyIcon.BalloonTipIcon = ToolTipIcon.Info;
-                notifyIcon.BalloonTipText = "Teemo minimized ";
-                notifyIcon.ShowBalloonTip(3000);
+                notifyIcon.BalloonTipText = "Teemo hidden mode";
+                notifyIcon.ShowBalloonTip(500);
                 this.Hide();
             }
 
-            else if (FormWindowState.Normal == this.WindowState)
+            else 
             {
+                this.WindowState = FormWindowState.Normal;
                 notifyIcon.Visible = false;
+                this.Show();
             }
         }
 
         private void notifyIcon_MouseDoubleClick(object sender, MouseEventArgs e)
         {
-            this.Show();
-            this.WindowState = FormWindowState.Normal;
+           
+            setHidden(false);
         }
         /*private const int CP_NOCLOSE_BUTTON = 0x200;
         protected override CreateParams CreateParams
@@ -235,42 +277,6 @@ namespace teemo
             UpdateDriveLetters();
         }
 
-        private void hideDriveInRegistry(string p)
-        {
-            //subkey nodrive in HKEY_CURRENT_USER
-            string nodrive = "Software\\Microsoft\\Windows\\CurrentVersion\\Policies\\Explorer";
-            RegistryKey rKey1 = Registry.CurrentUser.CreateSubKey(nodrive);
-
-            //create DWORD 'NoDrives' with value 4. for hiding drive C
-            rKey1.SetValue("NoDrives",
-            Convert.ToInt32(p, 16), RegistryValueKind.DWord);
-            rKey1.Close();
-
-            /*
-            //give a message
-            MessageBox.Show("Drive " + comboBox1.Text +
-            ":\\ successful concealed ", "Drive Conceal",
-            MessageBoxButtons.OK, MessageBoxIcon.Information);
-                    
-            //add logs history
-            listBox1.Items.Add("Drive " + comboBox1.Text + ":\\ Hidden");
-            listBox1.Items.Add("On " + currentDay);
-            listBox1.Items.Add("");
-            */
-            //need restart to take effect
-            restart();
-        }
-        private void restart()
-        {
-            // menghentikan process explorer
-            Process p = new Process();
-            foreach (System.Diagnostics.Process exe in System.Diagnostics.Process.GetProcesses())
-            {
-                if (exe.ProcessName == "explorer")
-
-                    exe.Kill();
-            }
-        }
 
         private void button3_Click(object sender, EventArgs e)
         {
@@ -292,13 +298,28 @@ namespace teemo
             char letter = 'D';
             while(letter!='Z')
             {
-                foreach (var item in listBox2.Items)
+                bool alreadyExist = false;
+                
+                foreach (var item in listDrv)
                 {
-                    string existingLetter = item.ToString();
-                    if (existingLetter.Contains(letter.ToString())) continue;
+                    string existingLetter = item;
+                    if (existingLetter.Contains(letter.ToString()))
+                    {
+                        alreadyExist = true;
+                        break;
+                    }
                 }
-                SetVolumeMountPoint(letter.ToString()+":\\", volumeName);
-                letter++;
+                if (alreadyExist == true)
+                {
+                    letter++;
+                    continue;
+                }
+                if (!SetVolumeMountPoint(letter.ToString() + ":\\", volumeName))
+                {
+                    //MessageBox.Show("Ko đặt dc tên ổ" + letter.ToString() + volumeName);
+                    return;
+                }
+                
             }
         }
 
@@ -307,5 +328,11 @@ namespace teemo
             this.WindowState = FormWindowState.Minimized;
         }
 
+        private void button4_Click(object sender, EventArgs e)
+        {
+            
+            //this.setHidden(true);
+        }
+        
     }
 }
