@@ -89,6 +89,7 @@ namespace teemo
             string[] list = item.Text.Split(' ');
             string letter = list[0];
             RemoveDriveLetter(letter);
+            UpdateDriveLetters();
         }
 
         [DllImport("kernel32.dll", SetLastError = true, CallingConvention = CallingConvention.StdCall)]
@@ -230,21 +231,23 @@ namespace teemo
             if(hidden)
             
             {
-                this.WindowState = FormWindowState.Minimized;
+                this.Location = new Point(-2000, -2000);
+                //this.WindowState = FormWindowState.Minimized;
                 //button4.Show();
                 notifyIcon.Visible = true;
                 notifyIcon.BalloonTipIcon = ToolTipIcon.Info;
-                notifyIcon.BalloonTipText = "Teemo hidden mode";
+                notifyIcon.BalloonTipText = "Teemo running";
                 notifyIcon.ShowBalloonTip(500);
                 this.ShowInTaskbar = false;
                 //this.Hide();
             }
-
             else 
             {
+                this.Location = new Point(200, 200);
                 this.WindowState = FormWindowState.Normal;
                 notifyIcon.Visible = false;
-                this.Show();
+                
+                //this.Show();
             }
         }
 
