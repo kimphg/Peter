@@ -1,4 +1,4 @@
-﻿Build started 5/7/2018 4:53:55 PM.
+﻿Build started 5/7/2018 6:05:37 PM.
      1>Project "C:\GD\Github\Peter\VS\cudatest\cudatest.vcxproj" on node 2 (Build target(s)).
      1>C:\Program Files (x86)\MSBuild\Microsoft.Cpp\v4.0\V120\Microsoft.CppBuild.targets(381,5): warning MSB8028: The intermediate directory (x64\Release\) contains files shared from another project (cudatest.vcxproj).  This can lead to incorrect clean and rebuild behavior.
      1>AddCudaCompileDeps:
@@ -6,14 +6,15 @@
      1>Project "C:\GD\Github\Peter\VS\cudatest\cudatest.vcxproj" (1) is building "C:\GD\Github\Peter\VS\cudatest\cudatest.vcxproj" (1:2) on node 2 (CudaBuildCore target(s)).
      1>CudaBuildCore:
          Compiling CUDA source file kernel.cu...
-         cmd.exe /C "C:\Users\Phuong-T1600\AppData\Local\Temp\tmp9e0af8abb0b24d5fa66d7920226f6d74.cmd"
+         cmd.exe /C "C:\Users\Phuong-T1600\AppData\Local\Temp\tmp68b475c12c8f4a6ca96f9c262135e407.cmd"
          "C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v9.0\bin\nvcc.exe" -gencode=arch=compute_30,code=\"sm_30,compute_30\" --use-local-env --cl-version 2013 -ccbin "C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\x86_amd64" -x cu  -I"C:\ProgramData\NVIDIA Corporation\CUDA Samples\v9.0\common\inc" -I"C:\Users\DELL-1600T\Google Drive\WORKS\OPENCV_CUDA_DSP\MSVS\cudatest\WpdPack\Include" -I"C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v9.0\include" -I"C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v9.0\include"     --keep-dir x64\Release -maxrregcount=0  --machine 64 --compile -cudart static     -DWIN32 -DWIN64 -DNDEBUG -D_CONSOLE -D_MBCS -Xcompiler "/EHsc /W3 /nologo /O2 /FS /Zi  /MD " -o x64\Release\kernel.cu.obj "C:\GD\Github\Peter\VS\cudatest\kernel.cu"
          
          C:\GD\Github\Peter\VS\cudatest>"C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v9.0\bin\nvcc.exe" -gencode=arch=compute_30,code=\"sm_30,compute_30\" --use-local-env --cl-version 2013 -ccbin "C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\x86_amd64" -x cu  -I"C:\ProgramData\NVIDIA Corporation\CUDA Samples\v9.0\common\inc" -I"C:\Users\DELL-1600T\Google Drive\WORKS\OPENCV_CUDA_DSP\MSVS\cudatest\WpdPack\Include" -I"C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v9.0\include" -I"C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v9.0\include"     --keep-dir x64\Release -maxrregcount=0  --machine 64 --compile -cudart static     -DWIN32 -DWIN64 -DNDEBUG -D_CONSOLE -D_MBCS -Xcompiler "/EHsc /W3 /nologo /O2 /FS /Zi  /MD " -o x64\Release\kernel.cu.obj "C:\GD\Github\Peter\VS\cudatest\kernel.cu" 
          kernel.cu
      1>C:/GD/Github/Peter/VS/cudatest/kernel.cu(176): warning C4244: '=' : conversion from 'SOCKET' to 'int', possible loss of data
-     1>C:/GD/Github/Peter/VS/cudatest/kernel.cu(420): warning C4244: 'initializing' : conversion from 'float' to 'int', possible loss of data
-     1>C:/GD/Github/Peter/VS/cudatest/kernel.cu(436): warning C4244: 'initializing' : conversion from 'float' to 'int', possible loss of data
+     1>C:/GD/Github/Peter/VS/cudatest/kernel.cu(425): warning C4244: 'initializing' : conversion from 'double' to 'int', possible loss of data
+     1>C:/GD/Github/Peter/VS/cudatest/kernel.cu(428): warning C4244: 'initializing' : conversion from 'float' to 'int', possible loss of data
+     1>C:/GD/Github/Peter/VS/cudatest/kernel.cu(444): warning C4244: 'initializing' : conversion from 'float' to 'int', possible loss of data
      1>Done Building Project "C:\GD\Github\Peter\VS\cudatest\cudatest.vcxproj" (CudaBuildCore target(s)).
      1>Link:
          C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\x86_amd64\link.exe /ERRORREPORT:PROMPT /OUT:"C:\GD\Github\Peter\VS\x64\Release\cudaCv.exe" /NOLOGO /LIBPATH:C:\GD\Github\Peter\VS\WpdPack\Lib\x64 /LIBPATH:"C:\Users\Phuong-1600\Google Drive\WORKS\OPENCV_CUDA_DSP\MSVS\cudatest\WpdPack\Lib\x64" /LIBPATH:"C:\Users\DELL-1600T\Google Drive\WORKS\OPENCV_CUDA_DSP\MSVS\cudatest\WpdPack\Lib\x64" /LIBPATH:"C:\Users\DELL-1600T\Documents\GitHub\OPENCV_CUDA_DSP\MSVS\cudatest\WpdPack\Lib\x64" /LIBPATH:\lib\Release\ /LIBPATH:"C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v9.0\lib\x64" cudart.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib cufft.lib wpcap.lib Packet.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /DEBUG /PDB:"C:\GD\Github\Peter\VS\x64\Release\cudaCv.pdb" /SUBSYSTEM:CONSOLE /OPT:REF /OPT:ICF /LTCG /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"C:\GD\Github\Peter\VS\x64\Release\cudaCv.lib" /MACHINE:X64 x64\Release\kernel.cu.obj
@@ -31,4 +32,4 @@
 
 Build succeeded.
 
-Time Elapsed 00:00:06.56
+Time Elapsed 00:00:03.40
