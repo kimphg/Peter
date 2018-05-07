@@ -2158,6 +2158,7 @@ void Mainwindow::on_actionRecording_toggled(bool arg1)
 {
     if(arg1)
     {
+
         QDateTime now = QDateTime::currentDateTime();
         QString filename = now.toString("dd.MM_hh.mm.ss")+
                 "_"+ui->label_range_resolution->text()+

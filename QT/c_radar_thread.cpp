@@ -729,6 +729,8 @@ void dataProcessingThread::listenToRadar()
 
 void dataProcessingThread::startRecord(QString fileName)
 {
+    QByteArray array("aa");
+    //radarSocket->writeDatagram()
     signRecFile.setFileName(fileName);
     signRecFile.open(QIODevice::WriteOnly);
     isRecording = true;

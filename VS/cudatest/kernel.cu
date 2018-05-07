@@ -11,7 +11,7 @@
 #include "pcap.h"
 #define HR2D_PK//
 #define FRAME_LEN 2048
-#define MAX_IREC 2000
+#define MAX_IREC 2400
 #pragma comment(lib, "user32.lib")
 #pragma comment (lib, "Ws2_32.lib")
 //file mapping
@@ -85,6 +85,11 @@ public:
 	{
 		cudaMemcpy(dSignalTL, h_signal, mMemSizeTL, cudaMemcpyHostToDevice);
 		cufftExecC2C(planTL, dSignalTL, dSignalTL, CUFFT_FORWARD);
+		
+		if (cudaGetLastError() != cudaSuccess) {
+			fprintf(stderr, "FFT kernel launch failed: %s\n", cudaGetErrorString(cudaGetLastError()));
+			return;
+		}
 		cudaMemcpy(h_signal, dSignalTL, mMemSizeTL, cudaMemcpyDeviceToHost);
 	}
 	void exeFFTNen(cufftComplex *h_signal, cufftComplex* h_image)
@@ -148,13 +153,14 @@ struct DataFrame// buffer for data frame
 
 u_char outputFrame[OUTPUT_FRAME_SIZE];
 
-int iProcessing=0,iReady = 5;
+int iProcessing=0,iReady = 50;
 void packet_handler(u_char *param, const struct pcap_pkthdr *header, const u_char *pkt_data);
 void pcapRun();
 
 
 int mSocket;
-struct sockaddr_in si_other;
+struct sockaddr_in si_peter;
+struct sockaddr_in si_capin;
 void socketInit()
 {
 	WSADATA wsa;
@@ -166,18 +172,30 @@ void socketInit()
 		exit(EXIT_FAILURE);
 	}
 	printf("Initialised.\n");
-	//create socket
+	//init socket for UDP connect to Peter
 	mSocket = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
+	
 	if (mSocket == SOCKET_ERROR)
 	{
 		printf("socket() failed with error code : %d", WSAGetLastError());
 		exit(EXIT_FAILURE);
 	}
+			
+	memset((char *)&si_capin, 0, sizeof(si_capin));
+	si_capin.sin_family = AF_INET;
+	si_capin.sin_port = htons(34566);//port "127.0.0.1"
+	si_capin.sin_addr.S_un.S_addr = inet_addr("127.0.0.1");
+	int ret = bind(mSocket, (struct sockaddr *)&si_capin, sizeof(struct sockaddr));
+	if (ret==-1)
+	{
+		printf("Port busy");
+		exit(EXIT_FAILURE);
+	}
 	//setup address structure
-	memset((char *)&si_other, 0, sizeof(si_other));
-	si_other.sin_family = AF_INET;
-	si_other.sin_port = htons(34567);//port "127.0.0.1"
-	si_other.sin_addr.S_un.S_addr = inet_addr("127.0.0.1");
+	memset((char *)&si_peter, 0, sizeof(si_peter));
+	si_peter.sin_family = AF_INET;
+	si_peter.sin_port = htons(34567);//port "127.0.0.1"
+	si_peter.sin_addr.S_un.S_addr = inet_addr("127.0.0.1");
 
 }
 void socketDelete()
@@ -187,6 +205,7 @@ void socketDelete()
 }
 
 DWORD WINAPI ProcessDataBuffer(LPVOID lpParam);
+DWORD WINAPI ProcessCommandBuffer(LPVOID lpParam);
 void StartProcessing()
 {
 	CreateThread(
@@ -196,11 +215,18 @@ void StartProcessing()
 		NULL,          // argument to thread function 
 		0,                      // use default creation flags 
 		NULL);   // returns the thread identifier 
+	CreateThread(
+		NULL,                   // default security attributes
+		0,                      // use default stack size  
+		ProcessCommandBuffer,       // thread function name
+		NULL,          // argument to thread function 
+		0,                      // use default creation flags 
+		NULL);   // returns the thread identifier 
 
 }
 coreFFT *mFFT;
-#define FFT_SIZE 32
-int mFFTSkip = 5;
+#define FFT_SIZE 16
+int mFFTSkip = 1;
 
 int main()
 {
@@ -265,22 +291,53 @@ long int nFrames = 0;
 cufftComplex ramSignalTL[FRAME_LEN][FFT_SIZE];
 cufftComplex ramSignalNen[MAX_IREC][FRAME_LEN];
 cufftComplex ramImage[FRAME_LEN];
-int curAzi = 0;
+char recvDatagram[1000];
+DWORD WINAPI ProcessCommandBuffer(LPVOID lpParam)
+{
+	while (false)
+	{
+		int PeterAddrSize = sizeof (si_peter);
+		int iResult = recvfrom(mSocket, recvDatagram, 1000, 0, (struct sockaddr *) &si_peter, &PeterAddrSize);
+		if (iResult == SOCKET_ERROR) {
+			wprintf(L"recvfrom failed with error %d\n", WSAGetLastError());
+		}
+	}
+	return 0;
+}
+/*
+int datatestI[MAX_IREC];
+int datatestQ[MAX_IREC];
+int datatestA[MAX_IREC];*/
+#define BANG_KHONG 1
 DWORD WINAPI ProcessDataBuffer(LPVOID lpParam)
 {
+	int curAzi = 0;
+	
 	while (true)
 	{
-
 		Sleep(1);
+		
+		
 		while (iProcessing!= iReady )
 		{
-			iProcessing++;
-			if (iProcessing >= MAX_IREC)iProcessing = 0;
+			
 			for (int ir = 0; ir < FRAME_LEN; ir++)
 			{
-				ramSignalNen[iProcessing][ir].x = int(dataBuff[iProcessing].dataI[ir]);
-				ramSignalNen[iProcessing][ir].y = int(dataBuff[iProcessing].dataQ[ir]);
+				//ramSignalNen[iProcessing][ir].x = sqrt(double(dataBuff[iProcessing].dataI[ir])*(dataBuff[iProcessing].dataI[ir]) + double(dataBuff[iProcessing].dataQ[ir])*(dataBuff[iProcessing].dataQ[ir]));
+				/*if (ir == 260)
+				{
+					datatestI[iProcessing] = float(dataBuff[iProcessing].dataI[264]);
+					datatestQ[iProcessing] = float(dataBuff[iProcessing].dataQ[264]);
+					datatestA[iProcessing] = sqrt(double(dataBuff[iProcessing].dataI[264] * dataBuff[iProcessing].dataI[264] + dataBuff[iProcessing].dataQ[264] * dataBuff[iProcessing].dataQ[264]));
+					//ramSignalNen[iProcessing][ir].x = int(dataBuff[iProcessing].dataI[264]);
+					//ramSignalNen[iProcessing][ir].y = int(dataBuff[iProcessing].dataQ[264]);
+				}*/
+				//ramSignalNen[iProcessing][ir].x = sqrt(double(dataBuff[iProcessing].dataI[ir] * dataBuff[iProcessing].dataI[ir] + dataBuff[iProcessing].dataQ[ir] * dataBuff[iProcessing].dataQ[ir]));//int(dataBuff[iProcessing].dataI[ir]);
+				ramSignalNen[iProcessing][ir].x = float(dataBuff[iProcessing].dataI[ir]);
+				ramSignalNen[iProcessing][ir].y = float(dataBuff[iProcessing].dataQ[ir]);//0;// 
+				//ramSignalNen[iProcessing][ir].y = 0;
 			}
+			/*
 			for (int ir = 0; ir < FRAME_LEN; ir++)
 			{
 				if (ir < 256)
@@ -292,7 +349,7 @@ DWORD WINAPI ProcessDataBuffer(LPVOID lpParam)
 					ramImage[ir].x = 0;
 				}
 				ramImage[ir].y = 0;
-			}
+			}*/
 			//bat dau loc nen anh guong
 			//mFFT->exeFFTNen(ramSignalNen[iProcessing], ramImage);
 			/*int sum = 0;
@@ -314,17 +371,18 @@ DWORD WINAPI ProcessDataBuffer(LPVOID lpParam)
 			//memcpy((char*)outputFrame + FRAME_HEADER_SIZE, ramSignalNen[iProcessing],1024);
 			//memcpy((char*)outputFrame + FRAME_HEADER_SIZE + 1024, ramSignalNen[iProcessing]+1024, 1024);
 			//memcpy(outputFrame, dataBuff[iProcessing].header, FRAME_HEADER_SIZE);
-			//sendto(mSocket, (char*)outputFrame, OUTPUT_FRAME_SIZE, 0, (struct sockaddr *) &si_other, sizeof(si_other));
+			//sendto(mSocket, (char*)outputFrame, OUTPUT_FRAME_SIZE, 0, (struct sockaddr *) &si_peter, sizeof(si_peter));
 			//
 			//continue;
 			//tich luy fft
-			if (!dataBuff[iProcessing].isToFFT)continue;
+			//if (!dataBuff[iProcessing].isToFFT)continue;
 
-			if (iProcessing >= MAX_IREC)iProcessing -= MAX_IREC;
-			nFrames++;
+			//if (iProcessing >= MAX_IREC)iProcessing -= MAX_IREC;
+			//nFrames++;
+			int ia;
 			for (int ir = 0; ir < FRAME_LEN; ir++)
 			{
-				int ia = iProcessing;
+				ia = iProcessing;
 				for (int i = 0; i < FFT_SIZE; i++)
 				{
 					ramSignalTL[ir][i] = ramSignalNen[ia][ir];
@@ -342,22 +400,6 @@ DWORD WINAPI ProcessDataBuffer(LPVOID lpParam)
 			/*oldAzi = dataBuff[iProcessing].azi;
 			*/
 			//printf("\nAzi:%d Count:%d", dataBuff[iProcessing].azi, nFrames);
-			int iDisplay = 477;
-
-			if (nFrames < 50)
-			{
-				
-				printf("\nInput I:");
-				for (int i = 0; i < FFT_SIZE; i++)
-				{
-					printf("%3.2f ", ramSignalTL[iDisplay][i].x);
-				}
-				printf("\nInput Q:");
-				for (int i = 0; i < FFT_SIZE; i++)
-				{
-					printf("%3.2f ", ramSignalTL[iDisplay][i].y);
-				}
-			}
 			
 			// perform fft
 
@@ -370,12 +412,9 @@ DWORD WINAPI ProcessDataBuffer(LPVOID lpParam)
 			
 			for (int i = 0; i < FRAME_LEN; i++)
 			{
-				if (i == iDisplay)
-				{
-					i = i;
-				}
 				int maxAmp = 0, indexMaxFFT = 0;
-				for (int j = 1; j<FFT_SIZE-1; j++)
+				//for (int j = 0; j<FFT_SIZE; j++)
+				for (int j = BANG_KHONG; j<FFT_SIZE - BANG_KHONG; j++)
 				{
 					int ampl = (ramSignalTL[i][j].x * ramSignalTL[i][j].x) + (ramSignalTL[i][j].y * ramSignalTL[i][j].y);
 					if (ampl>maxAmp)
@@ -384,27 +423,25 @@ DWORD WINAPI ProcessDataBuffer(LPVOID lpParam)
 						indexMaxFFT = j;
 					}
 				}
-				outputFrame[i + FRAME_HEADER_SIZE] = u_char(sqrt(float(maxAmp)) / float(FFT_SIZE));
-				outputFrame[i + FRAME_LEN + FRAME_HEADER_SIZE] = u_char(indexMaxFFT>>1);
-			}
-			sendto(mSocket, (char*)outputFrame, OUTPUT_FRAME_SIZE, 0, (struct sockaddr *) &si_other, sizeof(si_other));
-			//printf(" max FFT:%d",indexMaxFFT);
-			
-			if (nFrames < 50)
-			{
-				
-				printf("\nFFT I:");
-				for (int i = 0; i < FFT_SIZE; i++)
+				/*if (i == 264)
 				{
-					printf("%3.2f ", ramSignalTL[iDisplay][i].x);
-				}
-				printf("\nFFT Q:");
-				for (int i = 0; i < FFT_SIZE; i++)
-				{
-					printf("%3.2f ", ramSignalTL[iDisplay][i].y);
-				}
+					datatestA[iProcessing] = u_char(sqrt(float(maxAmp)) / float(FFT_SIZE));//int(sqrt(float(maxAmp/16.0)));
+				}*/
+				//outputFrame[i + FRAME_HEADER_SIZE] = u_char(sqrt(float(maxAmp)));
+				/*if (i%2)
+				outputFrame[i + FRAME_HEADER_SIZE] = u_char(datatestI[i] + 60);
+				else
+				outputFrame[i + FRAME_HEADER_SIZE] = u_char(datatestQ[i]+60);//u_char(sqrt(float(maxAmp)) / float(1 ));*/
+				int res = sqrt(float(maxAmp)) / float(FFT_SIZE);
+				if (res > 255)res = 255;
+				outputFrame[i + FRAME_HEADER_SIZE] = res;// u_char(sqrt(float(maxAmp)) / float(FFT_SIZE));
+				outputFrame[i + FRAME_LEN + FRAME_HEADER_SIZE] = u_char(indexMaxFFT);
 			}
+			sendto(mSocket, (char*)outputFrame, OUTPUT_FRAME_SIZE, 0, (struct sockaddr *) &si_peter, sizeof(si_peter));
 			
+			//jump to next period
+			iProcessing++;
+			if (iProcessing >= MAX_IREC)iProcessing = 0;
 			
 		}
 	}
