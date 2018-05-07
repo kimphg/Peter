@@ -225,8 +225,8 @@ void StartProcessing()
 
 }
 coreFFT *mFFT;
-#define FFT_SIZE 16
-int mFFTSkip = 1;
+#define FFT_SIZE 32
+int mFFTSkip = 4;
 
 int main()
 {
@@ -308,7 +308,7 @@ DWORD WINAPI ProcessCommandBuffer(LPVOID lpParam)
 int datatestI[MAX_IREC];
 int datatestQ[MAX_IREC];
 int datatestA[MAX_IREC];*/
-#define BANG_KHONG 1
+#define BANG_KHONG 0
 DWORD WINAPI ProcessDataBuffer(LPVOID lpParam)
 {
 	int curAzi = 0;
@@ -379,6 +379,7 @@ DWORD WINAPI ProcessDataBuffer(LPVOID lpParam)
 
 			//if (iProcessing >= MAX_IREC)iProcessing -= MAX_IREC;
 			//nFrames++;
+			if (!dataBuff[iProcessing].isToFFT)continue;
 			int ia;
 			for (int ir = 0; ir < FRAME_LEN; ir++)
 			{
