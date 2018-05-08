@@ -402,7 +402,7 @@ C_radar_data::C_radar_data()
     cut_thresh = false;
     filter2of3 = false;
     is_do_bup_song = false;
-    clk_adc = 0;
+    clk_adc = 1;
     noiseAverage = 30;
     noiseVar = 0;
     krain_auto = 0.4;

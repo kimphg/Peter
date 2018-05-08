@@ -10,9 +10,10 @@
 #define HAVE_REMOTE// for pcap
 #include "pcap.h"
 #define HR2D_PK//
-#define FRAME_LEN 1024
-#define FFT_SIZE 200
-int mFFTSkip = 5;
+#define FRAME_LEN 2048
+#define FFT_SIZE 32
+#define BANG_KHONG 0
+int mFFTSkip = FFT_SIZE/8;
 
 #define MAX_IREC 2400
 #pragma comment(lib, "user32.lib")
@@ -309,7 +310,7 @@ DWORD WINAPI ProcessCommandBuffer(LPVOID lpParam)
 int datatestI[MAX_IREC];
 int datatestQ[MAX_IREC];
 int datatestA[MAX_IREC];*/
-#define BANG_KHONG 1
+
 DWORD WINAPI ProcessDataBuffer(LPVOID lpParam)
 {
 	int curAzi = 0;
@@ -413,10 +414,10 @@ DWORD WINAPI ProcessDataBuffer(LPVOID lpParam)
 			// perform fft
 
 			mFFT->exeFFTTL((cufftComplex*)ramSignalTL);
-			dataBuff[iProcessing].header[2] = curAzi >> 8;
+			/*dataBuff[iProcessing].header[2] = curAzi >> 8;
 			dataBuff[iProcessing].header[3] = curAzi ;
 			curAzi++;
-			if (curAzi >= 4096)curAzi = 0;
+			if (curAzi >= 4096)curAzi = 0;*/
 			memcpy(outputFrame, dataBuff[iProcessing].header, FRAME_HEADER_SIZE);
 			
 			for (int i = 0; i < FRAME_LEN; i++)
