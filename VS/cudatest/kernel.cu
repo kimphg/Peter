@@ -10,14 +10,12 @@
 #define HAVE_REMOTE// for pcap
 #include "pcap.h"
 #define HR2D_PK//
-#define FRAME_LEN 1024
-#define FFT_SIZE 200
-int mFFTSkip = 5;
-
+#define FRAME_LEN 2048
 #define MAX_IREC 2400
 #pragma comment(lib, "user32.lib")
 #pragma comment (lib, "Ws2_32.lib")
 //file mapping
+#define BUF_SIZE 256
 #define FRAME_HEADER_SIZE 34
 
 //using namespace cv;
@@ -227,7 +225,8 @@ void StartProcessing()
 
 }
 coreFFT *mFFT;
-
+#define FFT_SIZE 32
+int mFFTSkip = 4;
 
 int main()
 {
@@ -309,7 +308,7 @@ DWORD WINAPI ProcessCommandBuffer(LPVOID lpParam)
 int datatestI[MAX_IREC];
 int datatestQ[MAX_IREC];
 int datatestA[MAX_IREC];*/
-#define BANG_KHONG 1
+#define BANG_KHONG 0
 DWORD WINAPI ProcessDataBuffer(LPVOID lpParam)
 {
 	int curAzi = 0;
@@ -380,14 +379,7 @@ DWORD WINAPI ProcessDataBuffer(LPVOID lpParam)
 
 			//if (iProcessing >= MAX_IREC)iProcessing -= MAX_IREC;
 			//nFrames++;
-
-			if (!dataBuff[iProcessing].isToFFT)
-			{
-				//jump to next period
-				iProcessing++;
-				if (iProcessing >= MAX_IREC)iProcessing = 0;
-				continue;
-			}
+			if (!dataBuff[iProcessing].isToFFT)continue;
 			int ia;
 			for (int ir = 0; ir < FRAME_LEN; ir++)
 			{
@@ -423,8 +415,7 @@ DWORD WINAPI ProcessDataBuffer(LPVOID lpParam)
 			{
 				int maxAmp = 0, indexMaxFFT = 0;
 				//for (int j = 0; j<FFT_SIZE; j++)
-				int fftSkip = BANG_KHONG*FFT_SIZE / 16.0;
-				for (int j = fftSkip; j<FFT_SIZE - fftSkip; j++)
+				for (int j = BANG_KHONG; j<FFT_SIZE - BANG_KHONG; j++)
 				{
 					int ampl = (ramSignalTL[i][j].x * ramSignalTL[i][j].x) + (ramSignalTL[i][j].y * ramSignalTL[i][j].y);
 					if (ampl>maxAmp)
@@ -445,7 +436,7 @@ DWORD WINAPI ProcessDataBuffer(LPVOID lpParam)
 				int res = sqrt(float(maxAmp)) / float(FFT_SIZE);
 				if (res > 255)res = 255;
 				outputFrame[i + FRAME_HEADER_SIZE] = res;// u_char(sqrt(float(maxAmp)) / float(FFT_SIZE));
-				outputFrame[i + FRAME_LEN + FRAME_HEADER_SIZE] = u_char(indexMaxFFT*16.0 / (FFT_SIZE));
+				outputFrame[i + FRAME_LEN + FRAME_HEADER_SIZE] = u_char(indexMaxFFT);
 			}
 			sendto(mSocket, (char*)outputFrame, OUTPUT_FRAME_SIZE, 0, (struct sockaddr *) &si_peter, sizeof(si_peter));
 			
