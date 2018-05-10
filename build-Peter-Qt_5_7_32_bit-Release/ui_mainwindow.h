@@ -2379,7 +2379,7 @@ public:
 
         layoutWidget1 = new QWidget(groupBox_7);
         layoutWidget1->setObjectName(QStringLiteral("layoutWidget1"));
-        layoutWidget1->setGeometry(QRect(210, 90, 141, 151));
+        layoutWidget1->setGeometry(QRect(210, 90, 141, 156));
         verticalLayout = new QVBoxLayout(layoutWidget1);
         verticalLayout->setSpacing(6);
         verticalLayout->setContentsMargins(11, 11, 11, 11);
@@ -3317,7 +3317,7 @@ public:
 
         layoutWidget5 = new QWidget(groupBox_control);
         layoutWidget5->setObjectName(QStringLiteral("layoutWidget5"));
-        layoutWidget5->setGeometry(QRect(220, 20, 281, 171));
+        layoutWidget5->setGeometry(QRect(220, 20, 283, 171));
         gridLayout = new QGridLayout(layoutWidget5);
         gridLayout->setSpacing(6);
         gridLayout->setContentsMargins(11, 11, 11, 11);
@@ -3925,7 +3925,7 @@ public:
 
         layoutWidget7 = new QWidget(tab_4);
         layoutWidget7->setObjectName(QStringLiteral("layoutWidget7"));
-        layoutWidget7->setGeometry(QRect(300, 270, 203, 120));
+        layoutWidget7->setGeometry(QRect(300, 270, 203, 125));
         verticalLayout_5 = new QVBoxLayout(layoutWidget7);
         verticalLayout_5->setSpacing(6);
         verticalLayout_5->setContentsMargins(11, 11, 11, 11);
@@ -5477,7 +5477,7 @@ public:
         plainTextEdit_command_rx->setGeometry(QRect(210, 90, 671, 61));
         layoutWidget8 = new QWidget(groupBox_control_setting);
         layoutWidget8->setObjectName(QStringLiteral("layoutWidget8"));
-        layoutWidget8->setGeometry(QRect(10, 160, 491, 451));
+        layoutWidget8->setGeometry(QRect(10, 160, 491, 604));
         formLayout_10 = new QFormLayout(layoutWidget8);
         formLayout_10->setSpacing(6);
         formLayout_10->setContentsMargins(11, 11, 11, 11);
@@ -5980,7 +5980,7 @@ public:
 
         layoutWidget_2 = new QWidget(groupBox_control_setting);
         layoutWidget_2->setObjectName(QStringLiteral("layoutWidget_2"));
-        layoutWidget_2->setGeometry(QRect(510, 160, 371, 398));
+        layoutWidget_2->setGeometry(QRect(510, 160, 371, 452));
         formLayout_11 = new QFormLayout(layoutWidget_2);
         formLayout_11->setSpacing(6);
         formLayout_11->setContentsMargins(11, 11, 11, 11);
@@ -6375,7 +6375,7 @@ public:
 
         groupBox_3->setCurrentIndex(1);
         comboBox->setCurrentIndex(4);
-        tabWidget_2->setCurrentIndex(0);
+        tabWidget_2->setCurrentIndex(1);
         comboBox_3->setCurrentIndex(0);
 
 

@@ -212,8 +212,8 @@ public:
     float                   rotation_per_min ;
     trackList               mTrackList;
     plotList                plot_list;
-    bool                    isEncoderAzi;
-    int                     mEncoderAzi;
+//    bool                    isEncoderAzi;
+//    int                     mEncoderAzi;
     unsigned char           spectre[16];
     unsigned char           overload, init_time, clk_adc;
     float                   scale_ppi,scale_zoom_ppi;

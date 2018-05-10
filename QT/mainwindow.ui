@@ -14213,7 +14213,7 @@
        <x>210</x>
        <y>90</y>
        <width>141</width>
-       <height>151</height>
+       <height>156</height>
       </rect>
      </property>
      <layout class="QVBoxLayout" name="verticalLayout">
@@ -16112,7 +16112,7 @@
      </font>
     </property>
     <property name="currentIndex">
-     <number>0</number>
+     <number>1</number>
     </property>
     <property name="elideMode">
      <enum>Qt::ElideNone</enum>
@@ -20678,7 +20678,7 @@
         <rect>
          <x>220</x>
          <y>20</y>
-         <width>281</width>
+         <width>283</width>
          <height>171</height>
         </rect>
        </property>
@@ -23934,7 +23934,7 @@
         <x>300</x>
         <y>270</y>
         <width>203</width>
-        <height>120</height>
+        <height>125</height>
        </rect>
       </property>
       <layout class="QVBoxLayout" name="verticalLayout_5">
@@ -34318,7 +34318,7 @@
        <x>10</x>
        <y>160</y>
        <width>491</width>
-       <height>451</height>
+       <height>604</height>
       </rect>
      </property>
      <layout class="QFormLayout" name="formLayout_10">
@@ -37866,7 +37866,7 @@
        <x>510</x>
        <y>160</y>
        <width>371</width>
-       <height>398</height>
+       <height>452</height>
       </rect>
      </property>
      <layout class="QFormLayout" name="formLayout_11">

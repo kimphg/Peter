@@ -385,12 +385,12 @@ C_radar_data::C_radar_data()
     img_zoom_ar = NULL;
     tb_tap_k = 1;
     setZoomRectAR(10,10,1.852,10);
-    mEncoderAzi = 0;
+//    mEncoderAzi = 0;
     //img_zoom_ar->setColorTable(colorTable);
     img_ppi->fill(Qt::transparent);
     isSelfRotation = false;
     isProcessing = true;
-    isEncoderAzi  =false;
+//    isEncoderAzi  =false;
     isManualTune = false;
     isVtorih = true;
     rgs_auto = false;
@@ -464,13 +464,7 @@ void C_radar_data::setSelfRotationAzi(int value)
 }
 double C_radar_data::getCurAziRad() const
 {
-    if(isEncoderAzi)
-    {
-        double result = (trueN+(double)selfRotationAzi/(double)MAX_AZIR*PI_NHAN2);
-        if(result>PI_NHAN2)result-=PI_NHAN2;
 
-        return ( result);
-    }
     double result = (trueN+(double)curAzir/(double)MAX_AZIR*PI_NHAN2);
     if(result>PI_NHAN2)result-=PI_NHAN2;
     return ( result);
@@ -1160,14 +1154,21 @@ void C_radar_data::processSocketData(unsigned char* data,short len)
     //tb_tap[newAzi] = dataBuff[18]<<8|dataBuff[19];
     //memcpy(command_feedback,&dataBuff[RADAR_COMMAND_FEEDBACK],8);
     //memcpy(noise_level,&dataBuff[RADAR_COMMAND_FEEDBACK+8],8);
-    if(len<4128)
-        return;
-    int newAzi  = ((data[2]<<8)|data[3])/2;
+    if(isSelfRotation)
+    {
+    selfRotationAzi+=selfRotationDazi;
+    if(selfRotationAzi>=MAX_AZIR)selfRotationAzi = 0;
+    if(selfRotationAzi<0)selfRotationAzi += MAX_AZIR;
+    newAzi = selfRotationAzi;
+    }
+    else
+    {
+        int newAzi  = ((data[2]<<8)|data[3])/2;
     if(newAzi>=2048||newAzi<0)
         return;
+    }
     if(curAzir==newAzi)return;
     curAzir = newAzi;
-
     //decodeData(curAzir);
     /*for(short r_pos = 0;r_pos<range_max;r_pos++)
     {
@@ -1204,15 +1205,7 @@ void C_radar_data::SelfRotationOff()
 int C_radar_data::getNewAzi()
 {
     int newAzi;
-    if(isEncoderAzi)
-    {
-
-        selfRotationAzi-=selfRotationDazi;
-        if(selfRotationAzi>=MAX_AZIR)selfRotationAzi -= MAX_AZIR;
-        if(selfRotationAzi<0)selfRotationAzi += MAX_AZIR;
-        newAzi = selfRotationAzi;
-    }
-    else if(isSelfRotation)
+    if(isSelfRotation)
     {
         selfRotationAzi-=selfRotationDazi;
         if(selfRotationAzi>=MAX_AZIR)selfRotationAzi = 0;
