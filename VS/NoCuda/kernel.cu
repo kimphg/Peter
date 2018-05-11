@@ -13,7 +13,7 @@
 #define FRAME_LEN 2048
 #define FFT_SIZE 32
 #define BANG_KHONG 0
-int mFFTSkip = FFT_SIZE/8;
+int mFFTSkip = (FFT_SIZE/8);
 
 #define MAX_IREC 2400
 #pragma comment(lib, "user32.lib")

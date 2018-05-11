@@ -1926,7 +1926,7 @@ void Mainwindow::autoSwitchFreq()
 }
 void Mainwindow::sync1S()//period 1 second
 {
-    processing->SerialEncoderRead();
+    //processing->SerialEncoderRead();
     this->updateTargetInfo();
     if(processing->isConnected())
         setRadarState(CONNECTED);
@@ -3757,7 +3757,7 @@ void Mainwindow::on_toolButton_exit_2_clicked()
 
 void Mainwindow::on_toolButton_selfRotation_2_toggled(bool checked)
 {
-    pRadar->isEncoderAzi  = checked;
+    //pRadar->isEncoderAzi  = checked;
     if(checked)
     {
         double rate = ui->lineEdit_selfRotationRate->text().toDouble();

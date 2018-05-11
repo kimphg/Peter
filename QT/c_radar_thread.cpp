@@ -116,32 +116,7 @@ dataProcessingThread::dataProcessingThread()
     //processSerialData("!AIVDM,1,1,,A,13EoN=0P00NqIS<@6Od00?vN0D1F,0*5D");
 }
 QString str="";
-void dataProcessingThread::SerialEncoderRead()
-{
-    if(!mEncoderPort.isOpen())return;
-    QByteArray ba = mEncoderPort.readAll();
-    if(!ba.size())return;
-    if(!mRadarData->isEncoderAzi)return;
-    str.append(ba);
-    QStringList strList = str.split('$');
-    if(strList.size()>2)
-    {
-        QStringList lsstrData = strList.at(1).split('*');
-        if(lsstrData.size()==2)
-        {
 
-            int value = lsstrData.at(0).toInt();
-            int value2 = lsstrData.at(1).toInt();
-            if(value==value2)
-            {
-                if(value>0&&value<MAX_AZIR)mRadarData->setSelfRotationAzi(value);
-            }
-        }
-        str="";
-        //str.remove(0,strList.at(0).size()+strList.at(1).size()+1);
-        //SerialEncoderRead();
-    }
-}
 void dataProcessingThread::initSerialComm()
 {
     int serialBaud = 1000000;
@@ -153,12 +128,7 @@ void dataProcessingThread::initSerialComm()
     mEncoderPort.setBaudRate(serialBaud);
 
     mEncoderPort.setFlowControl(QSerialPort::NoFlowControl);
-    if(mEncoderPort.open(QIODevice::ReadWrite))
-    {
-        mRadarData->isEncoderAzi = mGlobbalConfig.getInt("isSerialEncoderEnable");
-        //connect(&mEncoderPort, &QSerialPort::readyRead, this, &dataProcessingThread::SerialEncoderRead);
-        printf("\nencoder connected");
-    }
+
     // baudrate at 38400 standart for low speed encoder and ais
     serialBaud = 38400;
     QList<QSerialPortInfo> portlist = QSerialPortInfo::availablePorts();

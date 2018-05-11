@@ -1154,6 +1154,7 @@ void C_radar_data::processSocketData(unsigned char* data,short len)
     //tb_tap[newAzi] = dataBuff[18]<<8|dataBuff[19];
     //memcpy(command_feedback,&dataBuff[RADAR_COMMAND_FEEDBACK],8);
     //memcpy(noise_level,&dataBuff[RADAR_COMMAND_FEEDBACK+8],8);
+    int newAzi =0;
     if(isSelfRotation)
     {
         selfRotationAzi+=selfRotationDazi;
