@@ -1616,8 +1616,8 @@ void Mainwindow::UpdateRadarData()
             pRadar->isClkAdcChanged = false;
         }
         pRadar->UpdateData();
+        update();
     }
-    update();
     /*QStandardItemModel* model = new QStandardItemModel(trackListPt->size(), 5);
     for (int row = 0; row < trackListPt->size(); ++row)
     {
@@ -1648,7 +1648,7 @@ void Mainwindow::InitTimer()
 
     connect(&scrUpdateTimer, SIGNAL(timeout()), this, SLOT(UpdateRadarData()));
     scrUpdateTimer.start(20);//ENVDEP
-    scrUpdateTimer.moveToThread(t2);
+    //scrUpdateTimer.moveToThread(t2);
     //connect(t2,SIGNAL(finished()),t2,SLOT(deleteLater()));
 
     connect(this,SIGNAL(destroyed()),processing,SLOT(deleteLater()));

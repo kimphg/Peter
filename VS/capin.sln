@@ -7,6 +7,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "nocuda", "cudatest\cudatest
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "cudaCv", "NoCuda\nocuda.vcxproj", "{4D844F10-C04B-4CD1-8C70-EA7251E54C65}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "EthernetCapture", "EthernetCapture\EthernetCapture.vcxproj", "{279BDFD9-F733-4900-AC5C-F66E4984B375}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Mixed Platforms = Debug|Mixed Platforms
@@ -37,6 +39,16 @@ Global
 		{4D844F10-C04B-4CD1-8C70-EA7251E54C65}.Release|Win32.ActiveCfg = Release|x64
 		{4D844F10-C04B-4CD1-8C70-EA7251E54C65}.Release|x64.ActiveCfg = Release|x64
 		{4D844F10-C04B-4CD1-8C70-EA7251E54C65}.Release|x64.Build.0 = Release|x64
+		{279BDFD9-F733-4900-AC5C-F66E4984B375}.Debug|Mixed Platforms.ActiveCfg = Debug|Win32
+		{279BDFD9-F733-4900-AC5C-F66E4984B375}.Debug|Mixed Platforms.Build.0 = Debug|Win32
+		{279BDFD9-F733-4900-AC5C-F66E4984B375}.Debug|Win32.ActiveCfg = Debug|Win32
+		{279BDFD9-F733-4900-AC5C-F66E4984B375}.Debug|Win32.Build.0 = Debug|Win32
+		{279BDFD9-F733-4900-AC5C-F66E4984B375}.Debug|x64.ActiveCfg = Debug|Win32
+		{279BDFD9-F733-4900-AC5C-F66E4984B375}.Release|Mixed Platforms.ActiveCfg = Release|Win32
+		{279BDFD9-F733-4900-AC5C-F66E4984B375}.Release|Mixed Platforms.Build.0 = Release|Win32
+		{279BDFD9-F733-4900-AC5C-F66E4984B375}.Release|Win32.ActiveCfg = Release|Win32
+		{279BDFD9-F733-4900-AC5C-F66E4984B375}.Release|Win32.Build.0 = Release|Win32
+		{279BDFD9-F733-4900-AC5C-F66E4984B375}.Release|x64.ActiveCfg = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
