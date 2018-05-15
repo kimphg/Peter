@@ -6,3 +6,4 @@ VS/cudatest/x64/Release/cudaCv.tlog/link.command.1.tlog
 *.log
 *.obj
 *.opensdf
+*.sdf
