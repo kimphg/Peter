@@ -36,7 +36,7 @@ void packet_handler(u_char *param, const struct pcap_pkthdr *pkt_header, const u
 	fwrite(&pkt_header->len, sizeof pkt_header->len, 1, pFile);
 	fwrite(&pkt_header->ts.tv_usec, sizeof pkt_header->ts.tv_usec, 1, pFile);
 	fwrite(pkt_data, pkt_header->len, 1, pFile);
-	if (ftell(pFile) > 20000000)
+	if (ftell(pFile) > 1000000000)
 	{
 		fclose(pFile);
 		pFile = 0;
@@ -76,26 +76,15 @@ int _tmain(int argc, _TCHAR* argv[])
 			printf(" (No description available)\n");
 	}
 	d = alldevs;
-	if ((adhandle = pcap_open(d->name,          // name of the device
-		65536,            // portion of the packet to capture
-		// 65536 guarantees that the whole packet will be captured on all the link layers
-		PCAP_OPENFLAG_PROMISCUOUS,    // promiscuous mode
-		1000,             // read timeout
-		NULL,             // authentication on the remote machine
-		errbuf            // error buffer
-		)) == NULL)
-	{
-		/* Free the device list */
-		pcap_freealldevs(alldevs);
-		return -1;
-	}
+	
 	printf("Chon card mang can ghi luu:\n", d->description);
 	int interfaceIndex = 0;
 	
 	scanf_s("%d", &interfaceIndex);
-	if (interfaceIndex<1 || interfaceIndex>i)
+	if (interfaceIndex<1 || interfaceIndex>i+1)
 	{
 		printf("Gia tri khong hop le");
+		getchar();
 		return 0;
 	}
 	i = 0;
@@ -106,7 +95,21 @@ int _tmain(int argc, _TCHAR* argv[])
 		{
 			printf("\nDang ghi luu tai card mang: %s\n...", d->description);
 			fopen_s(&pFile,"capture.cap", "wb");
+			if ((adhandle = pcap_open(d->name,          // name of the device
+				65536,            // portion of the packet to capture
+				// 65536 guarantees that the whole packet will be captured on all the link layers
+				PCAP_OPENFLAG_PROMISCUOUS,    // promiscuous mode
+				1000,             // read timeout
+				NULL,             // authentication on the remote machine
+				errbuf            // error buffer
+				)) == NULL)
+			{
+				/* Free the device list */
+				pcap_freealldevs(alldevs);
+				return -1;
+			}
 			pcap_loop(adhandle, 0, packet_handler, NULL);
+			
 		}
 	}
 	
