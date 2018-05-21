@@ -42,6 +42,12 @@ struct EthernetDataFrame
     ushort sport,dport;
     QByteArray dataArray;
 };
+struct dataStream
+{
+    ip_address addr;
+    QQueue <EthernetDataFrame> mCapData;
+
+};
 class DataReplay: public QThread
 {
 
@@ -53,7 +59,7 @@ public:
     int     playRate;
     bool    isPlaying;
     QTime mTimeReal;
-    QQueue <EthernetDataFrame> mCapData;
+    QList<dataStream> mCapDataList;
     void StopPlayback();
 private:
     QFile   signRepFile;

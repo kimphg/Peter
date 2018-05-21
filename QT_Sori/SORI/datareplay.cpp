@@ -7,7 +7,7 @@ DataReplay::DataReplay(QString fileName)
     if(signRepFile.isOpen()) signRepFile.close();
     signRepFile.setFileName(fileName);
     signRepFile.open(QIODevice::ReadOnly);
-    playRate = 50;
+    playRate = 500;
 
 }
 
