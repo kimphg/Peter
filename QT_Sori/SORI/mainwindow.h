@@ -2,7 +2,7 @@
 #define MAINWINDOW_H
 #include "datacapture.h"
 #include <QMainWindow>
-
+#include <QFileDialog>
 namespace Ui {
 class MainWindow;
 }
@@ -15,6 +15,10 @@ public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
 
+private slots:
+    void on_pushButton_clicked();
+
+    void timerEvent(QTimerEvent *event);
 private:
     Ui::MainWindow *ui;
 };

@@ -28,9 +28,11 @@ win32:LIBS += -L$$PWD//WpdPack/Lib/ -lPacket
 win32:LIBS += -L$$PWD//WpdPack/Lib/ -lwpcap
 SOURCES += main.cpp\
         mainwindow.cpp \
-    datacapture.cpp
+    datacapture.cpp \
+    datareplay.cpp
 
 HEADERS  += mainwindow.h \
-    datacapture.h
+    datacapture.h \
+    datareplay.h
 
 FORMS    += mainwindow.ui
