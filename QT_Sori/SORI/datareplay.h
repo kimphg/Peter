@@ -1,10 +1,13 @@
 #ifndef CAPTUREFILEREPLAY_H
 #define CAPTUREFILEREPLAY_H
+//#include "dataprocessor.h"
+#include "AIS/AIS.h"
 #include <QFile>
 #include <QThread>
 #include <stdio.h>
 #include <QQueue>
 #include <QTime>
+#include "../../QT_Peter/c_arpa_data.h"
 /* 4 bytes IP address */
 typedef struct ip_address{
     uchar byte1;
@@ -42,25 +45,31 @@ struct EthernetDataFrame
     ushort sport,dport;
     QByteArray dataArray;
 };
-struct dataStream
+struct DataSource
 {
     ip_address addr;
-    QQueue <EthernetDataFrame> mCapData;
+    QQueue <EthernetDataFrame> frameList;
+    QString aisBuffer;
+    AIS aisMessageHandler;
 
 };
 class DataReplay: public QThread
 {
-
 public:
-
+    DataSource mProcessor;
     DataReplay(QString fileName);
+//    void processDataPcap(const uchar *dataptr, int len);
+    void processDataFrame(const uchar *pkt_data, int len);
     void    run();
     void    playbackFile();
     int     playRate;
     bool    isPlaying;
+    double timeTotalms;
     QTime mTimeReal;
-    QList<dataStream> mCapDataList;
+    QList<DataSource> mSourceList;
+    void processData();
     void StopPlayback();
+    QList<AIS_object_t> m_aisList;
 private:
     QFile   signRepFile;
 };

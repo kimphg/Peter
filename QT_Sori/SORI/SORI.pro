@@ -29,10 +29,14 @@ win32:LIBS += -L$$PWD//WpdPack/Lib/ -lwpcap
 SOURCES += main.cpp\
         mainwindow.cpp \
     datacapture.cpp \
-    datareplay.cpp
+    datareplay.cpp \
+    ../../QT_Peter/c_arpa_data.cpp \
+    ../../QT_Peter/AIS/AIS.cpp
 
 HEADERS  += mainwindow.h \
     datacapture.h \
-    datareplay.h
+    datareplay.h \
+    ../../QT_Peter/c_arpa_data.h \
+    ../../QT_Peter/AIS/AIS.h
 
 FORMS    += mainwindow.ui

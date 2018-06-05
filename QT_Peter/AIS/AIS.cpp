@@ -481,15 +481,14 @@ bool AIS::ProcessNMEA(QString data)
 {
     //if(!data.contains('*'))return false;
     //int checkSum = data.split('*').at(1).toInt();
-
     QStringList fieldList = data.split(',');
     if(fieldList.size()<7)return false;
     if(!(fieldList.at(0).contains("AIVD")))return false;
-    int numOfSen = fieldList.at(1).toInt();
+    int numOfSentence = fieldList.at(1).toInt();
     int senNum = fieldList.at(2).toInt();
     int padding = fieldList.at(6).split('*').at(0).toInt();
-    if(numOfSen==1)return ProcessPayload(fieldList.at(5).toStdString().data(),padding);
-    else if(numOfSen==2)
+    if(numOfSentence==1)return ProcessPayload(fieldList.at(5).toStdString().data(),padding);
+    else if(numOfSentence==2)
     {
         if(senNum==1)
         {

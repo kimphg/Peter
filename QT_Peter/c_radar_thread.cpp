@@ -358,8 +358,6 @@ void dataProcessingThread::processARPAData(QByteArray inputdata)
         if(aisMessageHandler.ProcessNMEA(strlist.at(i)))
         {
             AIS_object_t newAisObj ;
-
-
             newAisObj.mMMSI = aisMessageHandler.get_mmsi();
 
             if(aisMessageHandler.get_type()==AIS::AIS_MSG_24_STATIC_DATA_REPORT)

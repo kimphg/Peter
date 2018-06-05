@@ -45,7 +45,7 @@
      <attribute name="title">
       <string>Replay</string>
      </attribute>
-     <widget class="QPushButton" name="pushButton">
+     <widget class="QPushButton" name="pushButton_replay">
       <property name="geometry">
        <rect>
         <x>20</x>
@@ -58,14 +58,37 @@
        <string>OpenFile</string>
       </property>
      </widget>
-     <widget class="QListWidget" name="listWidget_2">
+     <widget class="QListWidget" name="listWidget_ais_list">
       <property name="geometry">
        <rect>
         <x>20</x>
         <y>60</y>
-        <width>791</width>
+        <width>521</width>
         <height>371</height>
        </rect>
+      </property>
+     </widget>
+     <widget class="QListWidget" name="listWidget_source_list">
+      <property name="geometry">
+       <rect>
+        <x>560</x>
+        <y>60</y>
+        <width>221</width>
+        <height>371</height>
+       </rect>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_time">
+      <property name="geometry">
+       <rect>
+        <x>170</x>
+        <y>30</y>
+        <width>47</width>
+        <height>13</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>time</string>
       </property>
      </widget>
     </widget>

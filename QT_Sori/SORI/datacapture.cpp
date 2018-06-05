@@ -1,11 +1,11 @@
 #include "datacapture.h"
-
+DataReplay *globProcessingClass;
 void packet_handler(u_char *param, const struct pcap_pkthdr *pkt_header, const u_char *pkt_data)
 {
     //struct tm ltime;
     //char timestr[16];
     //time_t local_tv_sec;
-
+    globProcessingClass->processDataFrame(pkt_data,pkt_header->len);
     /*
     * unused variables
     */
@@ -37,10 +37,9 @@ void packet_handler(u_char *param, const struct pcap_pkthdr *pkt_header, const u
 }
 
 
-DataCapture::DataCapture()
+DataCapture::DataCapture(DataReplay *processingClass)
 {
-
-
+    globProcessingClass = processingClass;
 }
 
 QStringList DataCapture::getInterfacesList()

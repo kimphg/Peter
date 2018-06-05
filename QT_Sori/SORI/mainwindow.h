@@ -19,6 +19,10 @@ private slots:
     void on_pushButton_clicked();
 
     void timerEvent(QTimerEvent *event);
+    void on_listWidget_doubleClicked(const QModelIndex &index);
+
+    void on_pushButton_replay_clicked();
+
 private:
     Ui::MainWindow *ui;
 };

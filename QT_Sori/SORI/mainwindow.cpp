@@ -47,21 +47,52 @@ inline bool checkPrintable(QByteArray data)
 }
 void MainWindow::timerEvent(QTimerEvent *event)
 {
-    if(pCaptureFile->mCapData.size())
-    {
 
-        EthernetDataFrame frame = pCaptureFile->mCapData.dequeue();
-        /*int port = ((*((unsigned char*)(frame.data()+34)))<<8)+(*((unsigned char*)(frame.data()+35)));
-        if(port!=4001&&port!=4002)return;
-        QByteArray dataframe = frame.right(frame.size()-42);
-        if(!dataframe.size())return;
-        if(!checkPrintable(dataframe))
-            return;
-        //end checking
-        ip_header *ih;
-        udp_header *uh;
-        QString dataString = QString::fromLatin1(dataframe);
-        ui->listWidget_2->addItem("port:"+ QString::number(port)+"len:"+QString::number(dataframe.length())+"data:"+dataString);*/
+    if(!pCaptureFile->isPlaying)
+    {
+        ui->pushButton_replay->setDisabled(false);
+    }
+    ui->label_time->setText(QString::number(pCaptureFile->timeTotalms/1000.0));
+    int stt =0;
+    ui->listWidget_ais_list->clear();
+
+    foreach (AIS_object_t target, pCaptureFile->m_aisList) {
+        stt++;
+        if(target.isNewest)ui->listWidget_ais_list->addItem(
+                    "STT:"+QString::number(stt)
+                    +"Name:"+target.mName
+                    +"MMSI:"+QString::number(target.mMMSI)
+                    +"Lat:"+QString::number(target.mLat,'f',4)
+                    +"Lon:"+QString::number(target.mLong,'f',4));
+    }
+    stt =0;
+    ui->listWidget_source_list->clear();
+    foreach (DataSource source, pCaptureFile->mSourceList) {
+        stt++;
+        ui->listWidget_source_list->addItem(
+                    "STT:"+QString::number(stt)
+                    +"IP:"+QString::number(source.addr.byte1)
+                    +"."+QString::number(source.addr.byte2)
+                    +"."+QString::number(source.addr.byte3)
+                    +"."+QString::number(source.addr.byte4));
     }
 
+}
+DataCapture *dataCap;
+void MainWindow::on_listWidget_doubleClicked(const QModelIndex &index)
+{
+    dataCap = new DataCapture(pCaptureFile);
+    dataCap->setInterface(ui->listWidget->item(index.row())->text());
+    dataCap->start();
+
+}
+
+void MainWindow::on_pushButton_replay_clicked()
+{
+    QString fileName = QFileDialog::getOpenFileName(this,
+            tr("Output file"), NULL, tr("Data files (*.cap)"));
+    pCaptureFile = new DataReplay(fileName);
+    pCaptureFile->start();
+    this->startTimer(30);
+    ui->pushButton_replay->setDisabled(true);
 }

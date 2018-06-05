@@ -46,19 +46,27 @@ OBJECTS_DIR   = release
 SOURCES       = ..\SORI\main.cpp \
 		..\SORI\mainwindow.cpp \
 		..\SORI\datacapture.cpp \
-		..\SORI\datareplay.cpp release\moc_mainwindow.cpp
+		..\SORI\datareplay.cpp \
+		..\..\QT_Peter\c_arpa_data.cpp \
+		..\..\QT_Peter\AIS\AIS.cpp release\moc_mainwindow.cpp
 OBJECTS       = release\main.obj \
 		release\mainwindow.obj \
 		release\datacapture.obj \
 		release\datareplay.obj \
+		release\c_arpa_data.obj \
+		release\AIS.obj \
 		release\moc_mainwindow.obj
 
 DIST          =  ..\SORI\mainwindow.h \
 		..\SORI\datacapture.h \
-		..\SORI\datareplay.h ..\SORI\main.cpp \
+		..\SORI\datareplay.h \
+		..\..\QT_Peter\c_arpa_data.h \
+		..\..\QT_Peter\AIS\AIS.h ..\SORI\main.cpp \
 		..\SORI\mainwindow.cpp \
 		..\SORI\datacapture.cpp \
-		..\SORI\datareplay.cpp
+		..\SORI\datareplay.cpp \
+		..\..\QT_Peter\c_arpa_data.cpp \
+		..\..\QT_Peter\AIS\AIS.cpp
 QMAKE_TARGET  = SORI
 DESTDIR        = release\ #avoid trailing-slash linebreak
 TARGET         = SORI.exe
@@ -68,65 +76,17 @@ DESTDIR_TARGET = release\SORI.exe
 
 .SUFFIXES: .c .cpp .cc .cxx
 
-{release}.cpp{release\}.obj::
-	$(CXX) -c $(CXXFLAGS) $(INCPATH) -Forelease\ @<<
-	$<
-<<
+.cpp.obj:
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -Fo$@ $<
 
-{release}.cc{release\}.obj::
-	$(CXX) -c $(CXXFLAGS) $(INCPATH) -Forelease\ @<<
-	$<
-<<
+.cc.obj:
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -Fo$@ $<
 
-{release}.cxx{release\}.obj::
-	$(CXX) -c $(CXXFLAGS) $(INCPATH) -Forelease\ @<<
-	$<
-<<
+.cxx.obj:
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -Fo$@ $<
 
-{release}.c{release\}.obj::
-	$(CC) -c $(CFLAGS) $(INCPATH) -Forelease\ @<<
-	$<
-<<
-
-{.}.cpp{release\}.obj::
-	$(CXX) -c $(CXXFLAGS) $(INCPATH) -Forelease\ @<<
-	$<
-<<
-
-{.}.cc{release\}.obj::
-	$(CXX) -c $(CXXFLAGS) $(INCPATH) -Forelease\ @<<
-	$<
-<<
-
-{.}.cxx{release\}.obj::
-	$(CXX) -c $(CXXFLAGS) $(INCPATH) -Forelease\ @<<
-	$<
-<<
-
-{.}.c{release\}.obj::
-	$(CC) -c $(CFLAGS) $(INCPATH) -Forelease\ @<<
-	$<
-<<
-
-{..\SORI}.cpp{release\}.obj::
-	$(CXX) -c $(CXXFLAGS) $(INCPATH) -Forelease\ @<<
-	$<
-<<
-
-{..\SORI}.cc{release\}.obj::
-	$(CXX) -c $(CXXFLAGS) $(INCPATH) -Forelease\ @<<
-	$<
-<<
-
-{..\SORI}.cxx{release\}.obj::
-	$(CXX) -c $(CXXFLAGS) $(INCPATH) -Forelease\ @<<
-	$<
-<<
-
-{..\SORI}.c{release\}.obj::
-	$(CC) -c $(CFLAGS) $(INCPATH) -Forelease\ @<<
-	$<
-<<
+.c.obj:
+	$(CC) -c $(CFLAGS) $(INCPATH) -Fo$@ $<
 
 ####### Build rules
 
@@ -147,7 +107,7 @@ dist:
 	$(ZIP) SORI.zip $(SOURCES) $(DIST) ..\SORI\SORI.pro C:\Qt\Qt5.7.1\5.7\msvc2013\mkspecs\features\spec_pre.prf C:\Qt\Qt5.7.1\5.7\msvc2013\mkspecs\common\angle.conf C:\Qt\Qt5.7.1\5.7\msvc2013\mkspecs\common\msvc-base.conf C:\Qt\Qt5.7.1\5.7\msvc2013\mkspecs\common\msvc-desktop.conf C:\Qt\Qt5.7.1\5.7\msvc2013\mkspecs\qconfig.pri C:\Qt\Qt5.7.1\5.7\msvc2013\mkspecs\modules\qt_lib_3dcore.pri C:\Qt\Qt5.7.1\5.7\msvc2013\mkspecs\modules\qt_lib_3dcore_private.pri C:\Qt\Qt5.7.1\5.7\msvc2013\mkspecs\modules\qt_lib_3dextras.pri C:\Qt\Qt5.7.1\5.7\msvc2013\mkspecs\modules\qt_lib_3dextras_private.pri C:\Qt\Qt5.7.1\5.7\msvc2013\mkspecs\modules\qt_lib_3dinput.pri C:\Qt\Qt5.7.1\5.7\msvc2013\mkspecs\modules\qt_lib_3dinput_private.pri C:\Qt\Qt5.7.1\5.7\msvc2013\mkspecs\modules\qt_lib_3dlogic.pri C:\Qt\Qt5.7.1\5.7\msvc2013\mkspecs\modules\qt_lib_3dlogic_private.pri C:\Qt\Qt5.7.1\5.7\msvc2013\mkspecs\modules\qt_lib_3dquick.pri C:\Qt\Qt5.7.1\5.7\msvc2013\mkspecs\modules\qt_lib_3dquick_private.pri C:\Qt\Qt5.7.1\5.7\msvc2013\mkspecs\modules\qt_lib_3dquickextras.pri C:\Qt\Qt5.7.1\5.7\msvc2013\mkspecs\modules\qt_lib_3dquickextras_private.pri C:\Qt\Qt5.7.1\5.7\msvc2013\mkspecs\modules\qt_lib_3dquickinput.pri C:\Qt\Qt5.7.1\5.7\msvc2013\mkspecs\modules\qt_lib_3dquickinput_private.pri C:\Qt\Qt5.7.1\5.7\msvc2013\mkspecs\modules\qt_lib_3dquickrender.pri C:\Qt\Qt5.7.1\5.7\msvc2013\mkspecs\modules\qt_lib_3dquickrender_private.pri C:\Qt\Qt5.7.1\5.7\msvc2013\mkspecs\modules\qt_lib_3drender.pri C:\Qt\Qt5.7.1\5.7\msvc2013\mkspecs\modules\qt_lib_3drender_private.pri C:\Qt\Qt5.7.1\5.7\msvc2013\mkspecs\modules\qt_lib_axbase.pri C:\Qt\Qt5.7.1\5.7\msvc2013\mkspecs\modules\qt_lib_axbase_private.pri C:\Qt\Qt5.7.1\5.7\msvc2013\mkspecs\modules\qt_lib_axcontainer.pri C:\Qt\Qt5.7.1\5.7\msvc2013\mkspecs\modules\qt_lib_axcontainer_private.pri C:\Qt\Qt5.7.1\5.7\msvc2013\mkspecs\modules\qt_lib_axserver.pri C:\Qt\Qt5.7.1\5.7\msvc2013\mkspecs\modules\qt_lib_axserver_private.pri C:\Qt\Qt5.7.1\5.7\msvc2013\mkspecs\modules\qt_lib_bluetooth.pri C:\Qt\Qt5.7.1\5.7\msvc2013\mkspecs\modules\qt_lib_bluetooth_private.pri C:\Qt\Qt5.7.1\5.7\msvc2013\mkspecs\modules\qt_lib_bootstrap_private.pri C:\Qt\Qt5.7.1\5.7\msvc2013\mkspecs\modules\qt_lib_clucene_private.pri C:\Qt\Qt5.7.1\5.7\msvc2013\mkspecs\modules\qt_lib_concurrent.pri C:\Qt\Qt5.7.1\5.7\msvc2013\mkspecs\modules\qt_lib_concurrent_private.pri C:\Qt\Qt5.7.1\5.7\msvc2013\mkspecs\modules\qt_lib_core.pri C:\Qt\Qt5.7.1\5.7\msvc2013\mkspecs\modules\qt_lib_core_private.pri C:\Qt\Qt5.7.1\5.7\msvc2013\mkspecs\modules\qt_lib_dbus.pri C:\Qt\Qt5.7.1\5.7\msvc2013\mkspecs\modules\qt_lib_dbus_private.pri C:\Qt\Qt5.7.1\5.7\msvc2013\mkspecs\modules\qt_lib_designer.pri C:\Qt\Qt5.7.1\5.7\msvc2013\mkspecs\modules\qt_lib_designer_private.pri C:\Qt\Qt5.7.1\5.7\msvc2013\mkspecs\modules\qt_lib_designercomponents_private.pri C:\Qt\Qt5.7.1\5.7\msvc2013\mkspecs\modules\qt_lib_gamepad.pri C:\Qt\Qt5.7.1\5.7\msvc2013\mkspecs\modules\qt_lib_gamepad_private.pri C:\Qt\Qt5.7.1\5.7\msvc2013\mkspecs\modules\qt_lib_gui.pri C:\Qt\Qt5.7.1\5.7\msvc2013\mkspecs\modules\qt_lib_gui_private.pri C:\Qt\Qt5.7.1\5.7\msvc2013\mkspecs\modules\qt_lib_help.pri C:\Qt\Qt5.7.1\5.7\msvc2013\mkspecs\modules\qt_lib_help_private.pri C:\Qt\Qt5.7.1\5.7\msvc2013\mkspecs\modules\qt_lib_location.pri C:\Qt\Qt5.7.1\5.7\msvc2013\mkspecs\modules\qt_lib_location_private.pri C:\Qt\Qt5.7.1\5.7\msvc2013\mkspecs\modules\qt_lib_multimedia.pri C:\Qt\Qt5.7.1\5.7\msvc2013\mkspecs\modules\qt_lib_multimedia_private.pri C:\Qt\Qt5.7.1\5.7\msvc2013\mkspecs\modules\qt_lib_multimediawidgets.pri C:\Qt\Qt5.7.1\5.7\msvc2013\mkspecs\modules\qt_lib_multimediawidgets_private.pri C:\Qt\Qt5.7.1\5.7\msvc2013\mkspecs\modules\qt_lib_network.pri C:\Qt\Qt5.7.1\5.7\msvc2013\mkspecs\modules\qt_lib_network_private.pri C:\Qt\Qt5.7.1\5.7\msvc2013\mkspecs\modules\qt_lib_nfc.pri C:\Qt\Qt5.7.1\5.7\msvc2013\mkspecs\modules\qt_lib_nfc_private.pri C:\Qt\Qt5.7.1\5.7\msvc2013\mkspecs\modules\qt_lib_opengl.pri C:\Qt\Qt5.7.1\5.7\msvc2013\mkspecs\modules\qt_lib_opengl_private.pri C:\Qt\Qt5.7.1\5.7\msvc2013\mkspecs\modules\qt_lib_openglextensions.pri C:\Qt\Qt5.7.1\5.7\msvc2013\mkspecs\modules\qt_lib_openglextensions_private.pri C:\Qt\Qt5.7.1\5.7\msvc2013\mkspecs\modules\qt_lib_packetprotocol_private.pri C:\Qt\Qt5.7.1\5.7\msvc2013\mkspecs\modules\qt_lib_platformsupport_private.pri C:\Qt\Qt5.7.1\5.7\msvc2013\mkspecs\modules\qt_lib_positioning.pri C:\Qt\Qt5.7.1\5.7\msvc2013\mkspecs\modules\qt_lib_positioning_private.pri C:\Qt\Qt5.7.1\5.7\msvc2013\mkspecs\modules\qt_lib_printsupport.pri C:\Qt\Qt5.7.1\5.7\msvc2013\mkspecs\modules\qt_lib_printsupport_private.pri C:\Qt\Qt5.7.1\5.7\msvc2013\mkspecs\modules\qt_lib_purchasing.pri C:\Qt\Qt5.7.1\5.7\msvc2013\mkspecs\modules\qt_lib_purchasing_private.pri C:\Qt\Qt5.7.1\5.7\msvc2013\mkspecs\modules\qt_lib_qml.pri C:\Qt\Qt5.7.1\5.7\msvc2013\mkspecs\modules\qt_lib_qml_private.pri C:\Qt\Qt5.7.1\5.7\msvc2013\mkspecs\modules\qt_lib_qmldebug_private.pri C:\Qt\Qt5.7.1\5.7\msvc2013\mkspecs\modules\qt_lib_qmldevtools_private.pri C:\Qt\Qt5.7.1\5.7\msvc2013\mkspecs\modules\qt_lib_qmltest.pri C:\Qt\Qt5.7.1\5.7\msvc2013\mkspecs\modules\qt_lib_qmltest_private.pri C:\Qt\Qt5.7.1\5.7\msvc2013\mkspecs\modules\qt_lib_qtmultimediaquicktools_private.pri C:\Qt\Qt5.7.1\5.7\msvc2013\mkspecs\modules\qt_lib_quick.pri C:\Qt\Qt5.7.1\5.7\msvc2013\mkspecs\modules\qt_lib_quick_private.pri C:\Qt\Qt5.7.1\5.7\msvc2013\mkspecs\modules\qt_lib_quickcontrols2.pri C:\Qt\Qt5.7.1\5.7\msvc2013\mkspecs\modules\qt_lib_quickcontrols2_private.pri C:\Qt\Qt5.7.1\5.7\msvc2013\mkspecs\modules\qt_lib_quickparticles_private.pri C:\Qt\Qt5.7.1\5.7\msvc2013\mkspecs\modules\qt_lib_quicktemplates2_private.pri C:\Qt\Qt5.7.1\5.7\msvc2013\mkspecs\modules\qt_lib_quickwidgets.pri C:\Qt\Qt5.7.1\5.7\msvc2013\mkspecs\modules\qt_lib_quickwidgets_private.pri C:\Qt\Qt5.7.1\5.7\msvc2013\mkspecs\modules\qt_lib_script.pri C:\Qt\Qt5.7.1\5.7\msvc2013\mkspecs\modules\qt_lib_script_private.pri C:\Qt\Qt5.7.1\5.7\msvc2013\mkspecs\modules\qt_lib_scripttools.pri C:\Qt\Qt5.7.1\5.7\msvc2013\mkspecs\modules\qt_lib_scripttools_private.pri C:\Qt\Qt5.7.1\5.7\msvc2013\mkspecs\modules\qt_lib_scxml.pri C:\Qt\Qt5.7.1\5.7\msvc2013\mkspecs\modules\qt_lib_scxml_private.pri C:\Qt\Qt5.7.1\5.7\msvc2013\mkspecs\modules\qt_lib_sensors.pri C:\Qt\Qt5.7.1\5.7\msvc2013\mkspecs\modules\qt_lib_sensors_private.pri C:\Qt\Qt5.7.1\5.7\msvc2013\mkspecs\modules\qt_lib_serialbus.pri C:\Qt\Qt5.7.1\5.7\msvc2013\mkspecs\modules\qt_lib_serialbus_private.pri C:\Qt\Qt5.7.1\5.7\msvc2013\mkspecs\modules\qt_lib_serialport.pri C:\Qt\Qt5.7.1\5.7\msvc2013\mkspecs\modules\qt_lib_serialport_private.pri C:\Qt\Qt5.7.1\5.7\msvc2013\mkspecs\modules\qt_lib_sql.pri C:\Qt\Qt5.7.1\5.7\msvc2013\mkspecs\modules\qt_lib_sql_private.pri C:\Qt\Qt5.7.1\5.7\msvc2013\mkspecs\modules\qt_lib_svg.pri C:\Qt\Qt5.7.1\5.7\msvc2013\mkspecs\modules\qt_lib_svg_private.pri C:\Qt\Qt5.7.1\5.7\msvc2013\mkspecs\modules\qt_lib_testlib.pri C:\Qt\Qt5.7.1\5.7\msvc2013\mkspecs\modules\qt_lib_testlib_private.pri C:\Qt\Qt5.7.1\5.7\msvc2013\mkspecs\modules\qt_lib_uiplugin.pri C:\Qt\Qt5.7.1\5.7\msvc2013\mkspecs\modules\qt_lib_uitools.pri C:\Qt\Qt5.7.1\5.7\msvc2013\mkspecs\modules\qt_lib_uitools_private.pri C:\Qt\Qt5.7.1\5.7\msvc2013\mkspecs\modules\qt_lib_webchannel.pri C:\Qt\Qt5.7.1\5.7\msvc2013\mkspecs\modules\qt_lib_webchannel_private.pri C:\Qt\Qt5.7.1\5.7\msvc2013\mkspecs\modules\qt_lib_webengine.pri C:\Qt\Qt5.7.1\5.7\msvc2013\mkspecs\modules\qt_lib_webengine_private.pri C:\Qt\Qt5.7.1\5.7\msvc2013\mkspecs\modules\qt_lib_webenginecore.pri C:\Qt\Qt5.7.1\5.7\msvc2013\mkspecs\modules\qt_lib_webenginecore_private.pri C:\Qt\Qt5.7.1\5.7\msvc2013\mkspecs\modules\qt_lib_webenginecoreheaders_private.pri C:\Qt\Qt5.7.1\5.7\msvc2013\mkspecs\modules\qt_lib_webenginewidgets.pri C:\Qt\Qt5.7.1\5.7\msvc2013\mkspecs\modules\qt_lib_webenginewidgets_private.pri C:\Qt\Qt5.7.1\5.7\msvc2013\mkspecs\modules\qt_lib_websockets.pri C:\Qt\Qt5.7.1\5.7\msvc2013\mkspecs\modules\qt_lib_websockets_private.pri C:\Qt\Qt5.7.1\5.7\msvc2013\mkspecs\modules\qt_lib_webview.pri C:\Qt\Qt5.7.1\5.7\msvc2013\mkspecs\modules\qt_lib_webview_private.pri C:\Qt\Qt5.7.1\5.7\msvc2013\mkspecs\modules\qt_lib_widgets.pri C:\Qt\Qt5.7.1\5.7\msvc2013\mkspecs\modules\qt_lib_widgets_private.pri C:\Qt\Qt5.7.1\5.7\msvc2013\mkspecs\modules\qt_lib_winextras.pri C:\Qt\Qt5.7.1\5.7\msvc2013\mkspecs\modules\qt_lib_winextras_private.pri C:\Qt\Qt5.7.1\5.7\msvc2013\mkspecs\modules\qt_lib_xml.pri C:\Qt\Qt5.7.1\5.7\msvc2013\mkspecs\modules\qt_lib_xml_private.pri C:\Qt\Qt5.7.1\5.7\msvc2013\mkspecs\modules\qt_lib_xmlpatterns.pri C:\Qt\Qt5.7.1\5.7\msvc2013\mkspecs\modules\qt_lib_xmlpatterns_private.pri C:\Qt\Qt5.7.1\5.7\msvc2013\mkspecs\modules\qt_lib_zlib_private.pri C:\Qt\Qt5.7.1\5.7\msvc2013\mkspecs\features\qt_functions.prf C:\Qt\Qt5.7.1\5.7\msvc2013\mkspecs\features\qt_config.prf C:\Qt\Qt5.7.1\5.7\msvc2013\mkspecs\features\win32\qt_config.prf C:\Qt\Qt5.7.1\5.7\msvc2013\mkspecs\win32-msvc2013\qmake.conf C:\Qt\Qt5.7.1\5.7\msvc2013\mkspecs\features\spec_post.prf C:\Qt\Qt5.7.1\5.7\msvc2013\mkspecs\features\exclusive_builds.prf C:\Qt\Qt5.7.1\5.7\msvc2013\mkspecs\features\toolchain.prf C:\Qt\Qt5.7.1\5.7\msvc2013\mkspecs\features\default_pre.prf C:\Qt\Qt5.7.1\5.7\msvc2013\mkspecs\features\win32\default_pre.prf C:\Qt\Qt5.7.1\5.7\msvc2013\mkspecs\features\resolve_config.prf C:\Qt\Qt5.7.1\5.7\msvc2013\mkspecs\features\exclusive_builds_post.prf C:\Qt\Qt5.7.1\5.7\msvc2013\mkspecs\features\default_post.prf C:\Qt\Qt5.7.1\5.7\msvc2013\mkspecs\features\build_pass.prf C:\Qt\Qt5.7.1\5.7\msvc2013\mkspecs\features\qml_debug.prf C:\Qt\Qt5.7.1\5.7\msvc2013\mkspecs\features\win32\rtti.prf C:\Qt\Qt5.7.1\5.7\msvc2013\mkspecs\features\precompile_header.prf C:\Qt\Qt5.7.1\5.7\msvc2013\mkspecs\features\warn_on.prf C:\Qt\Qt5.7.1\5.7\msvc2013\mkspecs\features\qt.prf C:\Qt\Qt5.7.1\5.7\msvc2013\mkspecs\features\resources.prf C:\Qt\Qt5.7.1\5.7\msvc2013\mkspecs\features\moc.prf C:\Qt\Qt5.7.1\5.7\msvc2013\mkspecs\features\win32\opengl.prf C:\Qt\Qt5.7.1\5.7\msvc2013\mkspecs\features\uic.prf C:\Qt\Qt5.7.1\5.7\msvc2013\mkspecs\features\file_copies.prf C:\Qt\Qt5.7.1\5.7\msvc2013\mkspecs\features\win32\windows.prf C:\Qt\Qt5.7.1\5.7\msvc2013\mkspecs\features\testcase_targets.prf C:\Qt\Qt5.7.1\5.7\msvc2013\mkspecs\features\exceptions.prf C:\Qt\Qt5.7.1\5.7\msvc2013\mkspecs\features\yacc.prf C:\Qt\Qt5.7.1\5.7\msvc2013\mkspecs\features\lex.prf ..\SORI\SORI.pro C:\Qt\Qt5.7.1\5.7\msvc2013\lib\qtmain.prl C:\Qt\Qt5.7.1\5.7\msvc2013\lib\Qt5Widgets.prl C:\Qt\Qt5.7.1\5.7\msvc2013\lib\Qt5Gui.prl C:\Qt\Qt5.7.1\5.7\msvc2013\lib\Qt5Core.prl  NO_PCH_SOURCES RESOURCES HEADERS SOURCES OBJECTIVE_SOURCES FORMS YACCSOURCES YACCSOURCES LEXSOURCES 
 
 clean: compiler_clean 
-	-$(DEL_FILE) release\main.obj release\mainwindow.obj release\datacapture.obj release\datareplay.obj release\moc_mainwindow.obj
+	-$(DEL_FILE) release\main.obj release\mainwindow.obj release\datacapture.obj release\datareplay.obj release\c_arpa_data.obj release\AIS.obj release\moc_mainwindow.obj
 	-$(DEL_FILE) release\SORI.exp
 
 distclean: clean 
@@ -437,6 +397,7 @@ release\main.obj: ..\SORI\main.cpp ../SORI/mainwindow.h \
 		C:\Qt\Qt5.7.1\5.7\msvc2013\include\QtWidgets\qdesktopwidget.h \
 		C:\Qt\Qt5.7.1\5.7\msvc2013\include\QtGui\qguiapplication.h \
 		C:\Qt\Qt5.7.1\5.7\msvc2013\include\QtGui\qinputmethod.h
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -Forelease\main.obj ..\SORI\main.cpp
 
 release\mainwindow.obj: ..\SORI\mainwindow.cpp ../SORI/mainwindow.h \
 		../SORI/datacapture.h \
@@ -601,11 +562,14 @@ release\mainwindow.obj: ..\SORI\mainwindow.cpp ../SORI/mainwindow.h \
 		C:\Qt\Qt5.7.1\5.7\msvc2013\include\QtWidgets\QTabWidget \
 		C:\Qt\Qt5.7.1\5.7\msvc2013\include\QtWidgets\QWidget \
 		../SORI/datareplay.h \
+		..\SORI\AIS\AIS.h \
+		C:\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\QString \
 		C:\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\QFile \
 		C:\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\QQueue \
 		C:\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qqueue.h \
 		C:\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\QTime \
 		C:\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qdatetime.h
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -Forelease\mainwindow.obj ..\SORI\mainwindow.cpp
 
 release\datacapture.obj: ..\SORI\datacapture.cpp ../SORI/datacapture.h \
 		C:\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\QThread \
@@ -666,12 +630,13 @@ release\datacapture.obj: ..\SORI\datacapture.cpp ../SORI/datacapture.h \
 		..\SORI\WpdPack\Include\pcap\bpf.h \
 		..\SORI\WpdPack\Include\Win32-Extensions.h \
 		..\SORI\WpdPack\Include\remote-ext.h
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -Forelease\datacapture.obj ..\SORI\datacapture.cpp
 
 release\datareplay.obj: ..\SORI\datareplay.cpp ../SORI/datareplay.h \
-		C:\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\QFile \
-		C:\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qfile.h \
-		C:\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qfiledevice.h \
-		C:\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qiodevice.h \
+		..\SORI\AIS\AIS.h \
+		C:\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\QString \
+		C:\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qstring.h \
+		C:\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qchar.h \
 		C:\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qglobal.h \
 		C:\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qconfig.h \
 		C:\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qfeatures.h \
@@ -694,16 +659,18 @@ release\datareplay.obj: ..\SORI\datareplay.cpp ../SORI/datareplay.h \
 		C:\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qmutex.h \
 		C:\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qnumeric.h \
 		C:\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qversiontagging.h \
-		C:\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qobject.h \
-		C:\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qobjectdefs.h \
-		C:\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qnamespace.h \
-		C:\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qobjectdefs_impl.h \
-		C:\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qstring.h \
-		C:\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qchar.h \
 		C:\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qbytearray.h \
 		C:\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qrefcount.h \
+		C:\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qnamespace.h \
 		C:\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qarraydata.h \
 		C:\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qstringbuilder.h \
+		C:\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\QFile \
+		C:\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qfile.h \
+		C:\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qfiledevice.h \
+		C:\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qiodevice.h \
+		C:\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qobject.h \
+		C:\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qobjectdefs.h \
+		C:\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qobjectdefs_impl.h \
 		C:\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qlist.h \
 		C:\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qalgorithms.h \
 		C:\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qiterator.h \
@@ -734,10 +701,100 @@ release\datareplay.obj: ..\SORI\datareplay.cpp ../SORI/datareplay.h \
 		..\SORI\WpdPack\Include\IP6_misc.h \
 		..\SORI\WpdPack\Include\pcap\bpf.h \
 		..\SORI\WpdPack\Include\Win32-Extensions.h \
-		..\SORI\WpdPack\Include\remote-ext.h \
-		C:\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\QString
+		..\SORI\WpdPack\Include\remote-ext.h
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -Forelease\datareplay.obj ..\SORI\datareplay.cpp
+
+release\c_arpa_data.obj: ..\..\QT_Peter\c_arpa_data.cpp ../../QT_Peter/c_arpa_data.h \
+		C:\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\QDateTime \
+		C:\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qdatetime.h \
+		C:\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qstring.h \
+		C:\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qchar.h \
+		C:\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qglobal.h \
+		C:\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qconfig.h \
+		C:\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qfeatures.h \
+		C:\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qsystemdetection.h \
+		C:\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qprocessordetection.h \
+		C:\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qcompilerdetection.h \
+		C:\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qtypeinfo.h \
+		C:\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qtypetraits.h \
+		C:\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qisenum.h \
+		C:\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qsysinfo.h \
+		C:\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qlogging.h \
+		C:\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qflags.h \
+		C:\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qatomic.h \
+		C:\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qbasicatomic.h \
+		C:\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qatomic_bootstrap.h \
+		C:\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qgenericatomic.h \
+		C:\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qatomic_cxx11.h \
+		C:\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qatomic_msvc.h \
+		C:\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qglobalstatic.h \
+		C:\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qmutex.h \
+		C:\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qnumeric.h \
+		C:\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qversiontagging.h \
+		C:\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qbytearray.h \
+		C:\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qrefcount.h \
+		C:\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qnamespace.h \
+		C:\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qarraydata.h \
+		C:\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qstringbuilder.h \
+		C:\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qshareddata.h \
+		C:\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qhash.h \
+		C:\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qiterator.h \
+		C:\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qlist.h \
+		C:\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qalgorithms.h \
+		C:\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qhashfunctions.h \
+		C:\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qpair.h \
+		C:\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qbytearraylist.h \
+		C:\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qstringlist.h \
+		C:\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qregexp.h \
+		C:\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qstringmatcher.h \
+		C:\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\QStringList
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -Forelease\c_arpa_data.obj ..\..\QT_Peter\c_arpa_data.cpp
+
+release\AIS.obj: ..\..\QT_Peter\AIS\AIS.cpp ../../QT_Peter/AIS/AIS.h \
+		C:\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\QString \
+		C:\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qstring.h \
+		C:\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qchar.h \
+		C:\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qglobal.h \
+		C:\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qconfig.h \
+		C:\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qfeatures.h \
+		C:\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qsystemdetection.h \
+		C:\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qprocessordetection.h \
+		C:\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qcompilerdetection.h \
+		C:\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qtypeinfo.h \
+		C:\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qtypetraits.h \
+		C:\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qisenum.h \
+		C:\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qsysinfo.h \
+		C:\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qlogging.h \
+		C:\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qflags.h \
+		C:\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qatomic.h \
+		C:\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qbasicatomic.h \
+		C:\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qatomic_bootstrap.h \
+		C:\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qgenericatomic.h \
+		C:\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qatomic_cxx11.h \
+		C:\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qatomic_msvc.h \
+		C:\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qglobalstatic.h \
+		C:\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qmutex.h \
+		C:\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qnumeric.h \
+		C:\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qversiontagging.h \
+		C:\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qbytearray.h \
+		C:\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qrefcount.h \
+		C:\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qnamespace.h \
+		C:\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qarraydata.h \
+		C:\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qstringbuilder.h \
+		C:\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\QStringList \
+		C:\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qstringlist.h \
+		C:\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qlist.h \
+		C:\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qalgorithms.h \
+		C:\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qiterator.h \
+		C:\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qhashfunctions.h \
+		C:\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qpair.h \
+		C:\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qbytearraylist.h \
+		C:\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qregexp.h \
+		C:\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qstringmatcher.h
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -Forelease\AIS.obj ..\..\QT_Peter\AIS\AIS.cpp
 
 release\moc_mainwindow.obj: release\moc_mainwindow.cpp 
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -Forelease\moc_mainwindow.obj release\moc_mainwindow.cpp
 
 ####### Install
 

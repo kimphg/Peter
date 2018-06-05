@@ -14,6 +14,7 @@
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QButtonGroup>
 #include <QtWidgets/QHeaderView>
+#include <QtWidgets/QLabel>
 #include <QtWidgets/QListWidget>
 #include <QtWidgets/QMainWindow>
 #include <QtWidgets/QMenuBar>
@@ -32,8 +33,10 @@ public:
     QWidget *tab;
     QListWidget *listWidget;
     QWidget *tab_2;
-    QPushButton *pushButton;
-    QListWidget *listWidget_2;
+    QPushButton *pushButton_replay;
+    QListWidget *listWidget_ais_list;
+    QListWidget *listWidget_source_list;
+    QLabel *label_time;
     QMenuBar *menuBar;
     QStatusBar *statusBar;
 
@@ -55,12 +58,18 @@ public:
         tabWidget->addTab(tab, QString());
         tab_2 = new QWidget();
         tab_2->setObjectName(QStringLiteral("tab_2"));
-        pushButton = new QPushButton(tab_2);
-        pushButton->setObjectName(QStringLiteral("pushButton"));
-        pushButton->setGeometry(QRect(20, 20, 80, 21));
-        listWidget_2 = new QListWidget(tab_2);
-        listWidget_2->setObjectName(QStringLiteral("listWidget_2"));
-        listWidget_2->setGeometry(QRect(20, 60, 791, 371));
+        pushButton_replay = new QPushButton(tab_2);
+        pushButton_replay->setObjectName(QStringLiteral("pushButton_replay"));
+        pushButton_replay->setGeometry(QRect(20, 20, 80, 21));
+        listWidget_ais_list = new QListWidget(tab_2);
+        listWidget_ais_list->setObjectName(QStringLiteral("listWidget_ais_list"));
+        listWidget_ais_list->setGeometry(QRect(20, 60, 521, 371));
+        listWidget_source_list = new QListWidget(tab_2);
+        listWidget_source_list->setObjectName(QStringLiteral("listWidget_source_list"));
+        listWidget_source_list->setGeometry(QRect(560, 60, 221, 371));
+        label_time = new QLabel(tab_2);
+        label_time->setObjectName(QStringLiteral("label_time"));
+        label_time->setGeometry(QRect(170, 30, 47, 13));
         tabWidget->addTab(tab_2, QString());
         MainWindow->setCentralWidget(centralWidget);
         menuBar = new QMenuBar(MainWindow);
@@ -83,7 +92,8 @@ public:
     {
         MainWindow->setWindowTitle(QApplication::translate("MainWindow", "MainWindow", Q_NULLPTR));
         tabWidget->setTabText(tabWidget->indexOf(tab), QApplication::translate("MainWindow", "Record", Q_NULLPTR));
-        pushButton->setText(QApplication::translate("MainWindow", "OpenFile", Q_NULLPTR));
+        pushButton_replay->setText(QApplication::translate("MainWindow", "OpenFile", Q_NULLPTR));
+        label_time->setText(QApplication::translate("MainWindow", "time", Q_NULLPTR));
         tabWidget->setTabText(tabWidget->indexOf(tab_2), QApplication::translate("MainWindow", "Replay", Q_NULLPTR));
     } // retranslateUi
 
