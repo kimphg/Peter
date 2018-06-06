@@ -354,7 +354,7 @@ void dataProcessingThread::processARPAData(QByteArray inputdata)
     QStringList strlist = messageStringbuffer.split("\r\n");
     if(strlist.size() <= 1)return;
 
-    for(int i = 0;i<strlist.size();i++)
+    for(int i = 0;i<strlist.size()-1;i++)
         if(aisMessageHandler.ProcessNMEA(strlist.at(i)))
         {
             AIS_object_t newAisObj ;
@@ -409,23 +409,23 @@ void dataProcessingThread::processARPAData(QByteArray inputdata)
                     if(newAisObj.mLat==0)newAisObj.mLat = obj.mLat;
                     if(newAisObj.mLong==0)newAisObj.mLong = obj.mLong;
                     if(newAisObj.mDst.isEmpty())
-                        newAisObj.mDst      = obj.mDst;
+                        newAisObj.mDst       = obj.mDst;
                     if(!newAisObj.mImo)
-                        newAisObj.mImo      = obj.mImo;
+                        newAisObj.mImo       = obj.mImo;
                     if(!newAisObj.mType)
                         newAisObj.mType      = obj.mType;
                     if(!newAisObj.mBow)
-                        newAisObj.mBow      = obj.mBow;
+                        newAisObj.mBow       = obj.mBow;
                     if(!newAisObj.mStern)
-                        newAisObj.mStern      = obj.mStern;
+                        newAisObj.mStern     = obj.mStern;
                     if(!newAisObj.mStarboard)
-                        newAisObj.mStarboard      = obj.mStarboard;
+                        newAisObj.mStarboard = obj.mStarboard;
                     if(!newAisObj.mPort)
                         newAisObj.mPort      = obj.mPort;
                     if(!newAisObj.mSog)
-                        newAisObj.mSog      = obj.mSog;
+                        newAisObj.mSog       = obj.mSog;
                     if(!newAisObj.mCog)
-                        newAisObj.mCog      = obj.mCog;
+                        newAisObj.mCog       = obj.mCog;
                     i.setValue(obj);
                     break;
                 }
