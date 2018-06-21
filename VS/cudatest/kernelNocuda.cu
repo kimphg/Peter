@@ -335,38 +335,11 @@ void packet_handler(u_char *param, const struct pcap_pkthdr *pkt_header, const u
 	}
 	else if (data[0] == 3) //Q chanel second part
 	{
-		memcpy(dataBuff[iNext].dataQ + 1024, data + FRAME_HEADER_SIZE, 1024);
+		memcpy(dataBuff[iNext].header, data, FRAME_HEADER_SIZE);
+		memcpy(dataBuff[iNext].dataI, data + FRAME_HEADER_SIZE, 1024);
+		memset(dataBuff[iNext].dataQ, 0, 1024);
 		iReady++;
 		if (iReady >= MAX_IREC)iReady = 0;
-	}
-	return;
-}
-void packet_handler_compress(u_char *param, const struct pcap_pkthdr *pkt_header, const u_char *pkt_data)
-{
-	if (pkt_header->len<1000)return;
-	if (((*(pkt_data + 36) << 8) | (*(pkt_data + 37))) != 5000)
-	{
-		return;
-	}
-	u_char* data = (u_char*)pkt_data + UDP_HEADER_LEN;
-	if (data[0] == 0)		//I chanel first part
-	{
-		iReady++;
-		if (iReady >= MAX_IREC)iReady = 0;
-		memcpy(dataBuff[iReady].header, data, FRAME_HEADER_SIZE);
-		memcpy(dataBuff[iReady].dataI, data + FRAME_HEADER_SIZE, 1024);
-	}
-	else if (data[0] == 2) //Q chanel first part
-	{
-		memcpy(dataBuff[iReady].dataQ, data + FRAME_HEADER_SIZE, 1024);
-	}
-	else if (data[0] == 1) //I chanel second part
-	{
-		memcpy(dataBuff[iReady].dataI + 1024, data + FRAME_HEADER_SIZE, 1024);
-	}
-	else if (data[0] == 3) //Q chanel second part
-	{
-		memcpy(dataBuff[iReady].dataQ + 1024, data + FRAME_HEADER_SIZE, 1024);
 	}
 	return;
 }
