@@ -11,7 +11,7 @@
 #include "pcap.h"
 #define HR2D_PK//
 #define FRAME_LEN 2048
-#define FFT_SIZE 32
+#define FFT_SIZE 256
 #define BANG_KHONG 0
 int mFFTSkip = (FFT_SIZE/8);
 

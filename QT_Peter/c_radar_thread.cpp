@@ -109,28 +109,17 @@ dataProcessingThread::dataProcessingThread()
     commandSendTimer.start(100);
     connect(&readUdpBuffTimer, &QTimer::timeout, this, &dataProcessingThread::ReadDataBuffer);
     readUdpBuffTimer.start(10);
-
-    //connect(&readSerialTimer, &QTimer::timeout, this, &dataProcessingThread::SerialDataRead);
-    //readSerialTimer.start(20);
     initSerialComm();
-    //processSerialData("!AIVDM,1,1,,A,13EoN=0P00NqIS<@6Od00?vN0D1F,0*5D");
 }
 QString str="";
 
 void dataProcessingThread::initSerialComm()
 {
-    int serialBaud = 1000000;
-    //baurate 1Mbps for highspeed encoder
-    QString SerialEncoder1Mb =  mGlobbalConfig.getString("serialEncoder1Mb");
-    //mEncoderPort = new QSerialPort(this);
-    QString qstr = SerialEncoder1Mb;
-    mEncoderPort.setPortName(qstr);
-    mEncoderPort.setBaudRate(serialBaud);
+    int serialBaud ;
 
-    mEncoderPort.setFlowControl(QSerialPort::NoFlowControl);
 
-    // baudrate at 38400 standart for low speed encoder and ais
-    serialBaud = 38400;
+    // baudrate at 4800 standart for low speed encoder and ais
+    serialBaud = 4800;
     QList<QSerialPortInfo> portlist = QSerialPortInfo::availablePorts();
     for(int i = 0;i<portlist.size();i++)
     {
@@ -141,11 +130,12 @@ void dataProcessingThread::initSerialComm()
             newport->setPortName(qstr);
             newport->setBaudRate(serialBaud);
             newport->open(QIODevice::ReadWrite);
-            //connect(newport, &QSerialPort::readyRead, this, &dataProcessingThread::SerialDataRead);
             serialPorts.push_back(newport);
+            printf("\nOpen serial %d:",portlist.size());
+            printf((char*)qstr.data());
         }
     }
-    printf("Serial available:%d\n",portlist.size());
+
 }
 bool  dataProcessingThread::getPosition(double *lat,double *lon)
 {
