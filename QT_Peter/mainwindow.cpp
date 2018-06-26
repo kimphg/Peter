@@ -3446,7 +3446,6 @@ void Mainwindow::on_toolButton_selfRotation_toggled(bool checked)
     if(checked)
     {
         double rate = ui->lineEdit_selfRotationRate->text().toDouble();
-        rate = rate/MAX_AZIR;
         pRadar->SelfRotationOn(rate);
     }
     else

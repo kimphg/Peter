@@ -10,10 +10,11 @@
 #define HAVE_REMOTE// for pcap
 #include "pcap.h"
 #define HR2D_PK//
-#define FRAME_LEN 2048
+#define FRAME_LEN 1024
+#define OUTPUT_FRAME_LEN 2048
 #define FFT_SIZE 256
 #define BANG_KHONG 0
-int mFFTSkip = (FFT_SIZE/8);
+int mFFTSkip = (FFT_SIZE/10);
 
 #define MAX_IREC 2400
 #pragma comment(lib, "user32.lib")
@@ -152,7 +153,7 @@ struct DataFrame// buffer for data frame
 	bool isToFFT;
 } dataBuff[MAX_IREC];
 
-#define OUTPUT_FRAME_SIZE FRAME_LEN*2+FRAME_HEADER_SIZE
+#define OUTPUT_FRAME_SIZE OUTPUT_FRAME_LEN*2+FRAME_HEADER_SIZE
 
 u_char outputFrame[OUTPUT_FRAME_SIZE];
 
@@ -434,19 +435,10 @@ DWORD WINAPI ProcessDataBuffer(LPVOID lpParam)
 						indexMaxFFT = j;
 					}
 				}
-				/*if (i == 264)
-				{
-					datatestA[iProcessing] = u_char(sqrt(float(maxAmp)) / float(FFT_SIZE));//int(sqrt(float(maxAmp/16.0)));
-				}*/
-				//outputFrame[i + FRAME_HEADER_SIZE] = u_char(sqrt(float(maxAmp)));
-				/*if (i%2)
-				outputFrame[i + FRAME_HEADER_SIZE] = u_char(datatestI[i] + 60);
-				else
-				outputFrame[i + FRAME_HEADER_SIZE] = u_char(datatestQ[i]+60);//u_char(sqrt(float(maxAmp)) / float(1 ));*/
 				int res = sqrt(float(maxAmp)) / float(FFT_SIZE);
 				if (res > 255)res = 255;
 				outputFrame[i + FRAME_HEADER_SIZE] = res;// u_char(sqrt(float(maxAmp)) / float(FFT_SIZE));
-				outputFrame[i + FRAME_LEN + FRAME_HEADER_SIZE] = u_char(indexMaxFFT*16.0 / (FFT_SIZE));
+				outputFrame[i + OUTPUT_FRAME_LEN + FRAME_HEADER_SIZE] = u_char(indexMaxFFT*16.0 / (FFT_SIZE));
 			}
 			sendto(mSocket, (char*)outputFrame, OUTPUT_FRAME_SIZE, 0, (struct sockaddr *) &si_peter, sizeof(si_peter));
 			

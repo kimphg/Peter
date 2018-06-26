@@ -24421,7 +24421,7 @@
           <set>Qt::ImhNone</set>
          </property>
          <property name="text">
-          <string>-400</string>
+          <string>6</string>
          </property>
          <property name="maxLength">
           <number>20</number>

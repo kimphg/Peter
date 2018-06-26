@@ -20,7 +20,7 @@
 #pragma comment (lib, "Ws2_32.lib")
 //file mapping
 #define FRAME_HEADER_SIZE 34
-
+bool isUnsigned = false;
 //using namespace cv;
 using namespace std;
 
@@ -33,6 +33,7 @@ struct DataFrame// buffer for data frame
 	char header[FRAME_HEADER_SIZE];
 	char dataI[FRAME_LEN];
 	char dataQ[FRAME_LEN];
+	char dataUnsign[FRAME_LEN];
 	char image256[256];
 	bool isToFFT;
 } dataBuff[MAX_IREC];
@@ -247,7 +248,11 @@ DWORD WINAPI ProcessDataBuffer(LPVOID lpParam)
 			
 			
 			memcpy(outputFrame, dataBuff[iProcessing].header, FRAME_HEADER_SIZE);
-			
+			if(isUnsigned)
+			{
+				memcpy(outputFrame + FRAME_HEADER_SIZE, dataBuff[iProcessing].dataUnsign, FRAME_LEN);
+			}
+			else 
 			for (int i = 0; i < FRAME_LEN; i++)
 			{
 				int maxAmp = 0, indexMaxFFT = 0;
@@ -319,6 +324,7 @@ void packet_handler(u_char *param, const struct pcap_pkthdr *pkt_header, const u
 	u_char* data = (u_char*)pkt_data + UDP_HEADER_LEN;
 	if (data[0] == 1)		//I chanel first part
 	{
+		isUnsigned = false;
 		//dataBuff[iNext].isToFFT = ((iNext%mFFTSkip) == 0);
 		memcpy(dataBuff[iNext].header, data, FRAME_HEADER_SIZE);
 		memcpy(dataBuff[iNext].dataI, data + FRAME_HEADER_SIZE, 1024);
@@ -329,15 +335,13 @@ void packet_handler(u_char *param, const struct pcap_pkthdr *pkt_header, const u
 		iReady++;
 		if (iReady >= MAX_IREC)iReady = 0;
 	}
-	else if (data[0] == 1) //I chanel second part
+	else if (data[0] == 3) //tin hieu gia lien tuc
 	{
-		memcpy(dataBuff[iNext].dataI + 1024, data + FRAME_HEADER_SIZE, 1024);
-	}
-	else if (data[0] == 3) //Q chanel second part
-	{
+		isUnsigned = true;
 		memcpy(dataBuff[iNext].header, data, FRAME_HEADER_SIZE);
-		memcpy(dataBuff[iNext].dataI, data + FRAME_HEADER_SIZE, 1024);
-		memset(dataBuff[iNext].dataQ, 0, 1024);
+		//memcpy(dataBuff[iNext].dataI, data + FRAME_HEADER_SIZE, 1024);
+		//memset(dataBuff[iNext].dataQ, 0, 1024);
+		memcpy(dataBuff[iNext].dataUnsign, data + FRAME_HEADER_SIZE, FRAME_LEN);
 		iReady++;
 		if (iReady >= MAX_IREC)iReady = 0;
 	}

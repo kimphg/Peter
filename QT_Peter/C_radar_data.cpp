@@ -1140,6 +1140,33 @@ void C_radar_data::ProcessData(unsigned short azi)
     }
     return ;
 }
+void C_radar_data::ProcessRound()
+{
+    if(cur_timeMSecs)
+    {
+        qint64 newtime = QDateTime::currentMSecsSinceEpoch();
+        qint64 dtime = newtime - cur_timeMSecs;
+        if(dtime<60000)
+        {
+            rot_period_sec = (dtime/1000.0);
+
+        }
+        rotation_per_min = 60.0/rot_period_sec;
+        cur_timeMSecs = newtime;
+        if(isSelfRotation)
+        {
+            double rateError = rotation_per_min/selfRotationRate;
+            selfRotationDazi/=rateError;
+        }
+        if(init_time)init_time--;
+    }
+    else
+    {
+        cur_timeMSecs = QDateTime::currentMSecsSinceEpoch();
+    }
+
+
+}
 void C_radar_data::processSocketData(unsigned char* data,short len)
 {
 
@@ -1158,8 +1185,16 @@ void C_radar_data::processSocketData(unsigned char* data,short len)
     if(isSelfRotation)
     {
         selfRotationAzi+=selfRotationDazi;
-        if(selfRotationAzi>=MAX_AZIR)selfRotationAzi = 0;
-        if(selfRotationAzi<0)selfRotationAzi += MAX_AZIR;
+        if(selfRotationAzi>=MAX_AZIR)
+        {
+            selfRotationAzi -= MAX_AZIR;
+            ProcessRound();
+        }
+        if(selfRotationAzi<0)
+        {
+            selfRotationAzi += MAX_AZIR;
+            ProcessRound();
+        }
         newAzi = selfRotationAzi;
     }
     else
@@ -1186,16 +1221,21 @@ void C_radar_data::processSocketData(unsigned char* data,short len)
     }
     return;
 }
-void C_radar_data::SelfRotationOn( double dazi)
+void C_radar_data::SelfRotationOn( double rate)
 {
     isSelfRotation = true;
     printf("\nself rotation");
     SelfRotationReset();
-    selfRotationDazi = dazi;
+    selfRotationDazi = 2;
+    cur_timeMSecs =0;
+    selfRotationRate = rate;
+    if(selfRotationRate<1)selfRotationRate=1;
+    ProcessRound();
 }
 void C_radar_data::SelfRotationReset()
 {
     //selfRotationAzi = 0;
+
     selfRotationAzi = 0;
 }
 void C_radar_data::SelfRotationOff()
@@ -1283,30 +1323,8 @@ void C_radar_data::ProcessDataFrame()
     }
     if(curAzir==0)
     {
-        if(cur_timeMSecs)
-        {
-            qint64 newtime = QDateTime::currentMSecsSinceEpoch();
-            qint64 dtime = newtime - cur_timeMSecs;
-            if(dtime<20000)
-            {
-                if(!rot_period_sec)
-                {
-                    rot_period_sec = (dtime/1000.0);
-                }
-                else
-                {
-                    rot_period_sec += ((dtime/1000.0)-rot_period_sec);
-                }
-                rotation_per_min = 60.0/rot_period_sec;
-            }
-            cur_timeMSecs = newtime;
-        }
-        else
-        {
-            cur_timeMSecs = QDateTime::currentMSecsSinceEpoch();
-        }
+        ProcessRound();
 
-        if(init_time)init_time--;
     }
 }
 short drawnazi = 0;

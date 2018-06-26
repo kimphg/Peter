@@ -6520,7 +6520,7 @@ public:
         toolButton_set_zoom_ar_size->setText(QApplication::translate("MainWindow", "C\341\272\255p nh\341\272\255t k\303\255ch th\306\260\341\273\233c", Q_NULLPTR));
         toolButton_selfRotation->setText(QApplication::translate("MainWindow", "T\341\272\241o gi\341\272\243 quay \304\203ng ten", Q_NULLPTR));
         toolButton_selfRotation_2->setText(QApplication::translate("MainWindow", "Encoder", Q_NULLPTR));
-        lineEdit_selfRotationRate->setText(QApplication::translate("MainWindow", "-400", Q_NULLPTR));
+        lineEdit_selfRotationRate->setText(QApplication::translate("MainWindow", "6", Q_NULLPTR));
         toolButton_set_default->setText(QApplication::translate("MainWindow", "C\303\240i \304\221\341\272\267t m\341\272\267c \304\221\341\273\213nh", Q_NULLPTR));
         toolButton_dobupsong->setText(QApplication::translate("MainWindow", "\304\220o b\303\272p s\303\263ng", Q_NULLPTR));
         tabWidget_2->setTabText(tabWidget_2->indexOf(tab_4), QApplication::translate("MainWindow", "C\303\240i \304\221\341\272\267t", Q_NULLPTR));

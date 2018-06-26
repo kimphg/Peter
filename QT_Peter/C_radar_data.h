@@ -285,7 +285,7 @@ public:
     bool getDoubleFilter() const;
     void setDoubleFilter(bool value);
 
-    void SelfRotationOn(double dazi);
+    void SelfRotationOn(double rate);
     void SelfRotationOff();
     void SelfRotationReset();
     void drawRamp(double azi);
@@ -302,7 +302,7 @@ public:
 private:
     float hsTap ;
     QVector<QRgb> colorTable;
-    double      selfRotationDazi;
+    double      selfRotationDazi,selfRotationRate;
     double      selfRotationAzi;
     float       k_rain_auto,k_gain_auto;
     bool        isVtorih;
@@ -329,6 +329,7 @@ private:
     //void initZoomAR(int a0, int r0);
     bool DrawZoomAR(int a,int r,short val,short dopler,short sled);
     int getNewAzi();
+    void ProcessRound();
 public:
     //void drawZoomAR();
     float getNoiseAverage() const;
