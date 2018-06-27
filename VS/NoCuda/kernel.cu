@@ -12,7 +12,7 @@
 #define HR2D_PK//
 #define FRAME_LEN 1024
 #define OUTPUT_FRAME_LEN 2048
-#define FFT_SIZE 256
+#define FFT_SIZE 32
 #define BANG_KHONG 0
 int mFFTSkip = (FFT_SIZE/10);
 
@@ -435,7 +435,7 @@ DWORD WINAPI ProcessDataBuffer(LPVOID lpParam)
 						indexMaxFFT = j;
 					}
 				}
-				int res = sqrt(float(maxAmp)) / float(FFT_SIZE);
+				int res = sqrt(float(maxAmp) / float(FFT_SIZE));
 				if (res > 255)res = 255;
 				outputFrame[i + FRAME_HEADER_SIZE] = res;// u_char(sqrt(float(maxAmp)) / float(FFT_SIZE));
 				outputFrame[i + OUTPUT_FRAME_LEN + FRAME_HEADER_SIZE] = u_char(indexMaxFFT*16.0 / (FFT_SIZE));

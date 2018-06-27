@@ -4990,7 +4990,7 @@ release\mainwindow.obj: ..\QT_Peter\mainwindow.cpp ../QT_Peter/mainwindow.h \
 		..\..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtGui\QPixmap \
 		../QT_Peter/dialogcommandlog.h \
 		../QT_Peter/statuswindow.h \
-		ui_mainwindow.h \
+		..\QT_Peter\ui_mainwindow.h \
 		..\..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtWidgets\QAction \
 		..\..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtWidgets\qaction.h \
 		..\..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtWidgets\qactiongroup.h \
@@ -7064,7 +7064,7 @@ release\dialogdocumentation.obj: ..\QT_Peter\dialogdocumentation.cpp ../QT_Peter
 		..\..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qfiledevice.h \
 		..\..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtGui\qvector2d.h \
 		..\..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtGui\qtouchdevice.h \
-		ui_dialogdocumentation.h \
+		..\QT_Peter\ui_dialogdocumentation.h \
 		..\..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\QVariant \
 		..\..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtWidgets\QAction \
 		..\..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtWidgets\qaction.h \
@@ -7255,7 +7255,7 @@ release\dialogaisinfo.obj: ..\QT_Peter\dialogaisinfo.cpp ../QT_Peter/dialogaisin
 		..\..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\QDateTime \
 		..\..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qdatetime.h \
 		..\..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\QStringList \
-		ui_dialogaisinfo.h \
+		..\QT_Peter\ui_dialogaisinfo.h \
 		..\..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\QVariant \
 		..\..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtWidgets\QAction \
 		..\..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtWidgets\qaction.h \
@@ -7401,7 +7401,7 @@ release\dialogcommandlog.obj: ..\QT_Peter\dialogcommandlog.cpp ../QT_Peter/dialo
 		..\..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\qfiledevice.h \
 		..\..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtGui\qvector2d.h \
 		..\..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtGui\qtouchdevice.h \
-		ui_dialogcommandlog.h \
+		..\QT_Peter\ui_dialogcommandlog.h \
 		..\..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\QVariant \
 		..\..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtWidgets\QAction \
 		..\..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtWidgets\qaction.h \
@@ -7788,7 +7788,7 @@ release\statuswindow.obj: ..\QT_Peter\statuswindow.cpp ../QT_Peter/statuswindow.
 		..\..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtGui\qtouchdevice.h \
 		..\..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtWidgets\qtabwidget.h \
 		..\..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtGui\qicon.h \
-		ui_statuswindow.h \
+		..\QT_Peter\ui_statuswindow.h \
 		..\..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtCore\QVariant \
 		..\..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtWidgets\QAction \
 		..\..\..\..\Qt\Qt5.7.1\5.7\msvc2013\include\QtWidgets\qaction.h \

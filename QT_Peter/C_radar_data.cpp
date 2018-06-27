@@ -1158,7 +1158,7 @@ void C_radar_data::ProcessRound()
             double rateError = rotation_per_min/selfRotationRate;
             selfRotationDazi/=rateError;
         }
-        if(init_time)init_time--;
+        else if(init_time)init_time--;//todo: add later
     }
     else
     {
@@ -1170,7 +1170,18 @@ void C_radar_data::ProcessRound()
 void C_radar_data::processSocketData(unsigned char* data,short len)
 {
 
-    //clk_adc = 1;
+    unsigned char n_clk_adc = data[4];
+    sn_stat = data[5]<<8+data[6];
+
+    if(clk_adc != n_clk_adc)
+    {
+        // clock adc
+
+        clk_adc = n_clk_adc;
+        isClkAdcChanged = true;
+        resetData();
+
+    }
     //isClkAdcChanged = true;
 
     //moduleVal = dataBuff[3];//
@@ -1199,7 +1210,15 @@ void C_radar_data::processSocketData(unsigned char* data,short len)
     }
     else
     {
-        int newAzi  = ((data[2]<<8)|data[3])/2;
+        unsigned short gray  = ((data[2]<<8)|data[3])/2;
+        unsigned short result = gray & 64;
+        result |= (gray ^ (result >> 1)) & 32;
+        result |= (gray ^ (result >> 1)) & 16;
+        result |= (gray ^ (result >> 1)) & 8;
+        result |= (gray ^ (result >> 1)) & 4;
+        result |= (gray ^ (result >> 1)) & 2;
+        result |= (gray ^ (result >> 1)) & 1;
+        newAzi = result;
         if(newAzi>=2048||newAzi<0)
             return;
     }

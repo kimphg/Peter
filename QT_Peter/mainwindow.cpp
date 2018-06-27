@@ -2043,7 +2043,7 @@ void Mainwindow::sync1S()//period 1 second
         ui->label_sn_param->setText(QString::number((((pRadar->sn_stat)&0xff))));
         break;
     case 2:
-        ui->label_sn_type->setText(QString::fromUtf8("Mã M"));
+        ui->label_sn_type->setText(QString::fromUtf8("Giả liên tục"));
         value = ((pRadar->sn_stat)&0xff);
         if(value<5)
         {
@@ -2065,7 +2065,7 @@ void Mainwindow::sync1S()//period 1 second
         ui->label_sn_pulsew->setText(QString::number(((value-15.0)*(pow(2,pRadar->clk_adc))/10.0),'f',1));
         break;
     case 1:
-        ui->label_sn_type->setText(QString::fromUtf8("Mã baker"));
+        ui->label_sn_type->setText(QString::fromUtf8("Mã xung"));
         ui->label_sn_param->setText(QString::number((((pRadar->sn_stat)&0xff))));
         break;
     default:

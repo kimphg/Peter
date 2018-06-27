@@ -37,12 +37,16 @@ void dataProcessingThread::ReadDataBuffer()
             break;
         }
         isDrawn = false;
-        mRadarData->processSocketData(&udpFrameBuffer[iRead][0],4128);
-
-        if(isRecording)
+        unsigned short dataLen = 4128;
+        if(!isPlaying)
         {
-            signRecFile.write((char*)&pData->len,2);
-            signRecFile.write((char*)&pData->data[0],pData->len);
+            mRadarData->processSocketData(&udpFrameBuffer[iRead][0],dataLen);
+
+            if(isRecording)
+            {
+                signRecFile.write((char*)&dataLen);
+                signRecFile.write((char*)&udpFrameBuffer[iRead][0],4128);
+            }
         }
         iRead++;
         if(iRead>=MAX_IREC)iRead=0;
@@ -289,7 +293,10 @@ void dataProcessingThread::playbackRadarData()
             QByteArray buff;
             buff.resize(len);
             signRepFile.read(buff.data(),len);
-            if(len>500)mRadarData->assembleDataFrame((unsigned char*)buff.data(),buff.size());
+            if(len>500){
+                //mRadarData->assembleDataFrame((unsigned char*)buff.data(),buff.size());
+                 mRadarData->processSocketData((unsigned char*)buff.data(),4128);
+            }
             else processSerialData(buff);
             if(isRecording)
             {
