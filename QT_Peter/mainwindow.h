@@ -3,8 +3,10 @@
 
 #define _CRT_SECURE_NO_WARNINGS
 #define _WINSOCKAPI_
-#define SCR_W 1920
-#define SCR_H 1080
+//#define SCR_W 1920
+//#define SCR_H 1080
+#define SCR_W 1280
+#define SCR_H 1024
 #define SCR_LEFT_MARGIN 550
 #define HR_FILE_EXTENSION ".r2d"
 //#include <qse>

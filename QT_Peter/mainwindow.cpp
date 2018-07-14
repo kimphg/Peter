@@ -527,8 +527,8 @@ Mainwindow::Mainwindow(QWidget *parent) :
 
 void Mainwindow::DrawSignal(QPainter *p)
 {
-    QRectF signRect(DISPLAY_RES-(scrCtX-dx),DISPLAY_RES-(scrCtY-dy),width(),height());
-    QRectF screen(0,0,width(),height());
+    QRectF signRect(DISPLAY_RES-(scrCtX-dx),DISPLAY_RES-(scrCtY-dy),SCR_W,SCR_H);
+    QRectF screen(0,0,width(),SCR_H);
     p->drawImage(screen,*pRadar->img_ppi,signRect,Qt::AutoColor);
 
 }
@@ -1100,9 +1100,9 @@ void Mainwindow::paintEvent(QPaintEvent *event)
     p.setRenderHint(QPainter::Antialiasing, true);
     if(pMap)
     {
-        p.drawPixmap(scrCtX-scrCtY,0,height(),height(),
+        p.drawPixmap(scrCtX-scrCtY,0,SCR_H,SCR_H,
                      *pMap,
-                     dxMap,dyMap,height(),height());
+                     dxMap,dyMap,SCR_H,SCR_H);
     }
     //draw signal
     DrawSignal(&p);
@@ -1306,7 +1306,7 @@ void Mainwindow::InitSetting()
     osmap = new CMap();
     SetGPS(mGlobbalConfig.getDouble("mLat"), mGlobbalConfig.getDouble("mLon"));
     osmap->setCenterPos(mLat,mLon);
-    osmap->setImgSize(height(),height());
+    osmap->setImgSize(SCR_H,SCR_H);
     osmap->SetType(0);
     mMapOpacity = mGlobbalConfig.getDouble("mMapOpacity");
     //config.setMapOpacity(value/50.0);
@@ -1370,8 +1370,8 @@ void Mainwindow::InitSetting()
 
     //vnmap.setUp(config.m_config.lat(), config.m_config.lon(), 200,config.m_config.mapFilename.data());
     if(pMap)delete pMap;
-    pMap = new QPixmap(height(),height());
-    pViewFrame = new QPixmap(width(),height());
+    pMap = new QPixmap(SCR_H,SCR_H);
+    pViewFrame = new QPixmap(SCR_W,SCR_H);
     setMouseMode(MouseDrag,true);
     DrawMap();
     update();
@@ -1481,12 +1481,12 @@ void Mainwindow::DrawViewFrame(QPainter* p)
     //plot center azi
     centerAzi = processing->getSelsynAzi()+mTrueN2 ;
     if(centerAzi>360)centerAzi-=360;
-    if(CalcAziContour(centerAzi,&point[0],&point[2],&point[1],height()-70))
+    if(CalcAziContour(centerAzi,&point[0],&point[2],&point[1],SCR_H-70))
     {
         p->setPen(QPen(Qt::yellow,8,Qt::SolidLine,Qt::FlatCap,Qt::MiterJoin));
         //            p->drawLine(point2,point0);
-        CalcAziContour(centerAzi-10,&point[0],&point[3],&point[5],height());
-        CalcAziContour(centerAzi+10,&point[2],&point[3],&point[5],height());
+        CalcAziContour(centerAzi-10,&point[0],&point[3],&point[5],SCR_H);
+        CalcAziContour(centerAzi+10,&point[2],&point[3],&point[5],SCR_H);
         ui->label_debug->setText(QString::number(processing->mazi)
                                  +":"+QString::number(processing->realazi1)
                                  +":"+QString::number(processing->realazi2));
@@ -1496,7 +1496,7 @@ void Mainwindow::DrawViewFrame(QPainter* p)
         //                        QString::number(azi,'f',2));
     }
     //plot cur azi
-    if(CalcAziContour(azi,&point[0],&point[1],&point[2],height()-70))
+    if(CalcAziContour(azi,&point[0],&point[1],&point[2],SCR_H-70))
     {
         p->setPen(QPen(Qt::red,4));
         p->drawLine(point[2],point[0]);
@@ -1511,9 +1511,9 @@ void Mainwindow::DrawViewFrame(QPainter* p)
         QPainter pt(pViewFrame);
         pt.setRenderHint(QPainter::Antialiasing);
         //draw view frame
-        short d = height()-50;
+        short d = SCR_H-50;
         QPen penBackground(QColor(40,60,100,255));
-        short linewidth = 0.6*height();
+        short linewidth = 0.6*SCR_H;
         penBackground.setWidth(linewidth/10);
         pt.setPen(penBackground);
         for (short i=linewidth/12;i<linewidth;i+=linewidth/6)
@@ -1523,8 +1523,8 @@ void Mainwindow::DrawViewFrame(QPainter* p)
         penBackground.setWidth(0);
         pt.setPen(penBackground);
         pt.setBrush(QColor(40,60,100,255));
-        pt.drawRect(scrCtX+scrCtY,0,width()-scrCtX-scrCtY,height());
-        pt.drawRect(0,0,scrCtX-scrCtY,height());
+        pt.drawRect(scrCtX+scrCtY,0,SCR_W-scrCtX-scrCtY,SCR_H);
+        pt.drawRect(0,0,scrCtX-scrCtY,SCR_H);
         pt.setBrush(Qt::NoBrush);
 
         QPen pengrid(QColor(255,255,50,255));
@@ -2388,13 +2388,13 @@ void Mainwindow::setScaleRange(double srange)
 {
     if(mDistanceUnit==0)
     {
-        mScale = (height()/2.0-5.0)/(rangeRatio*srange );
+        mScale = (SCR_H/2.0-5.0)/(rangeRatio*srange );
         ringStep = srange/6.0f;
         ui->label_range->setText(QString::number(srange)+strDistanceUnit);
     }
     else if(mDistanceUnit==1)
     {
-        mScale = (height()/2.0-5.0)/(rangeRatio*srange );
+        mScale = (SCR_H/2.0-5.0)/(rangeRatio*srange );
         ringStep = srange/5;
         ui->label_range->setText(QString::number(srange)+strDistanceUnit);
     }

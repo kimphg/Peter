@@ -1560,21 +1560,37 @@ void C_radar_data::procTracks(unsigned short curA)
 }
 void C_radar_data::kmxyToPolarDeg(double x, double y, double *azi, double *range)
 {
-    if(y==0)return;
-    *azi = atanf(x/y);
-    if(y<0)*azi+=PI;
-    if(*azi<0)*azi += PI_NHAN2;
-    *range = sqrt(x*x+y*y);
-    *azi = *azi*DEG_RAD;
+    if(!y)
+    {
+        *azi = x>0? PI_CHIA2:(PI_NHAN2-PI_CHIA2);
+        *azi = *azi*DEG_RAD;
+        *range = abs(x);
+    }
+    else
+    {
+        *azi = atanf(x/y);
+        if(y<0)*azi+=PI;
+        if(*azi<0)*azi += PI_NHAN2;
+        *range = sqrt(x*x+y*y);
+        *azi = *azi*DEG_RAD;
+    }
 
 }
 void C_radar_data::addTrackManual(double x,double y)
 {
-    if(y==0)return;
-    float azi = atanf(x/y);//tinh azi,range
-    if(y<0)azi+=PI;
-    if(azi<0)azi += PI_NHAN2;
-    float range = sqrt(x*x+y*y);
+    float azi,range;
+    if(!y)
+    {
+        azi = x>0? PI_CHIA2:(PI_NHAN2-PI_CHIA2);
+        range = abs(x);
+    }
+    else
+    {
+         azi = atanf(x/y);//tinh azi,range
+        if(y<0)azi+=PI;
+        if(azi<0)azi += PI_NHAN2;
+         range = sqrt(x*x+y*y);
+    }
     object_t newobj;
     newobj.az = azi;
     newobj.rg = range;

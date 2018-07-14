@@ -475,8 +475,8 @@
    <widget class="QCustomGroupBox" name="groupBox_2">
     <property name="geometry">
      <rect>
-      <x>1490</x>
-      <y>930</y>
+      <x>1200</x>
+      <y>950</y>
       <width>211</width>
       <height>141</height>
      </rect>
@@ -1000,7 +1000,7 @@
     <property name="geometry">
      <rect>
       <x>10</x>
-      <y>560</y>
+      <y>270</y>
       <width>271</width>
       <height>331</height>
      </rect>
@@ -4711,7 +4711,7 @@
    <widget class="QCustomGroupBox" name="groupBox_4">
     <property name="geometry">
      <rect>
-      <x>10</x>
+      <x>190</x>
       <y>900</y>
       <width>271</width>
       <height>171</height>
@@ -6169,8 +6169,8 @@
    <widget class="QCustomGroupBox" name="groupBox_5">
     <property name="geometry">
      <rect>
-      <x>1710</x>
-      <y>380</y>
+      <x>1100</x>
+      <y>20</y>
       <width>201</width>
       <height>341</height>
      </rect>
@@ -8064,8 +8064,8 @@
    <widget class="QCustomGroupBox" name="groupBox_7">
     <property name="geometry">
      <rect>
-      <x>1550</x>
-      <y>10</y>
+      <x>10</x>
+      <y>0</y>
       <width>361</width>
       <height>261</height>
      </rect>
@@ -16060,8 +16060,8 @@
    <widget class="QCustomGroupBox" name="groupBox_10">
     <property name="geometry">
      <rect>
-      <x>290</x>
-      <y>560</y>
+      <x>560</x>
+      <y>10</y>
       <width>251</width>
       <height>101</height>
      </rect>
@@ -16100,7 +16100,7 @@
    <widget class="QCustomTabWidget" name="tabWidget_2">
     <property name="geometry">
      <rect>
-      <x>10</x>
+      <x>1380</x>
       <y>10</y>
       <width>531</width>
       <height>541</height>
@@ -16112,7 +16112,7 @@
      </font>
     </property>
     <property name="currentIndex">
-     <number>1</number>
+     <number>0</number>
     </property>
     <property name="elideMode">
      <enum>Qt::ElideNone</enum>
@@ -24563,8 +24563,8 @@
    <widget class="QCustomGroupBox" name="groupBox_11">
     <property name="geometry">
      <rect>
-      <x>1710</x>
-      <y>930</y>
+      <x>1430</x>
+      <y>920</y>
       <width>201</width>
       <height>141</height>
      </rect>
@@ -25469,10 +25469,10 @@
    <widget class="QCustomGroupBox" name="groupBox_14">
     <property name="geometry">
      <rect>
-      <x>550</x>
-      <y>920</y>
-      <width>161</width>
-      <height>151</height>
+      <x>10</x>
+      <y>940</y>
+      <width>171</width>
+      <height>131</height>
      </rect>
     </property>
     <property name="title">
@@ -25547,7 +25547,7 @@
    <widget class="QCustomGroupBox" name="groupBox_16">
     <property name="geometry">
      <rect>
-      <x>550</x>
+      <x>380</x>
       <y>10</y>
       <width>161</width>
       <height>171</height>
@@ -27436,10 +27436,10 @@
    <widget class="QCustomGroupBox" name="groupBox_18">
     <property name="geometry">
      <rect>
-      <x>290</x>
-      <y>670</y>
-      <width>251</width>
-      <height>401</height>
+      <x>1640</x>
+      <y>560</y>
+      <width>171</width>
+      <height>341</height>
      </rect>
     </property>
     <property name="title">
@@ -27668,8 +27668,8 @@
    <widget class="QCustomGroupBox" name="groupBox_6">
     <property name="geometry">
      <rect>
-      <x>1620</x>
-      <y>720</y>
+      <x>1330</x>
+      <y>590</y>
       <width>291</width>
       <height>211</height>
      </rect>
@@ -33380,8 +33380,8 @@
    <widget class="QCustomGroupBox" name="groupBox_control_setting">
     <property name="geometry">
      <rect>
-      <x>550</x>
-      <y>290</y>
+      <x>430</x>
+      <y>280</y>
       <width>891</width>
       <height>631</height>
      </rect>
@@ -33851,7 +33851,7 @@
      <property name="geometry">
       <rect>
        <x>210</x>
-       <y>10</y>
+       <y>30</y>
        <width>671</width>
        <height>71</height>
       </rect>
@@ -40532,6 +40532,21 @@
     <zorder>plainTextEdit_command_rx</zorder>
     <zorder>layoutWidget_2</zorder>
    </widget>
+   <zorder>groupBox_2</zorder>
+   <zorder>groupBox_3</zorder>
+   <zorder>groupBox_4</zorder>
+   <zorder>groupBox_5</zorder>
+   <zorder>groupBox_7</zorder>
+   <zorder>groupBox_10</zorder>
+   <zorder>tabWidget_2</zorder>
+   <zorder>groupBox_11</zorder>
+   <zorder>groupBox_14</zorder>
+   <zorder>groupBox_16</zorder>
+   <zorder>groupBox_17</zorder>
+   <zorder>groupBox_18</zorder>
+   <zorder>groupBox_6</zorder>
+   <zorder>groupBox_control_setting</zorder>
+   <zorder>layoutWidget</zorder>
   </widget>
  </widget>
  <layoutdefault spacing="6" margin="11"/>

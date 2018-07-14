@@ -391,7 +391,7 @@ public:
         centralWidget->setObjectName(QStringLiteral("centralWidget"));
         groupBox_2 = new QCustomGroupBox(centralWidget);
         groupBox_2->setObjectName(QStringLiteral("groupBox_2"));
-        groupBox_2->setGeometry(QRect(1490, 930, 211, 141));
+        groupBox_2->setGeometry(QRect(1200, 950, 211, 141));
         gridLayout_3 = new QGridLayout(groupBox_2);
         gridLayout_3->setSpacing(6);
         gridLayout_3->setContentsMargins(11, 11, 11, 11);
@@ -497,7 +497,7 @@ public:
 
         groupBox_3 = new QTabWidget(centralWidget);
         groupBox_3->setObjectName(QStringLiteral("groupBox_3"));
-        groupBox_3->setGeometry(QRect(10, 560, 271, 331));
+        groupBox_3->setGeometry(QRect(10, 270, 271, 331));
         groupBox_3->setFont(font);
         groupBox_3->setStyleSheet(QStringLiteral("background-color: rgb(30, 50, 70);color:rgb(30, 50, 70);font: 12pt \"MS Shell Dlg 2\";"));
         tab = new QWidget();
@@ -1055,7 +1055,7 @@ public:
         groupBox_3->addTab(tab2, QString());
         groupBox_4 = new QCustomGroupBox(centralWidget);
         groupBox_4->setObjectName(QStringLiteral("groupBox_4"));
-        groupBox_4->setGeometry(QRect(10, 900, 271, 171));
+        groupBox_4->setGeometry(QRect(190, 900, 271, 171));
         QPalette palette10;
         QBrush brush13(QColor(3, 3, 2, 255));
         brush13.setStyle(Qt::SolidPattern);
@@ -1270,7 +1270,7 @@ public:
 
         groupBox_5 = new QCustomGroupBox(centralWidget);
         groupBox_5->setObjectName(QStringLiteral("groupBox_5"));
-        groupBox_5->setGeometry(QRect(1710, 380, 201, 341));
+        groupBox_5->setGeometry(QRect(1100, 20, 201, 341));
         groupBox_5->setAutoFillBackground(false);
         groupBox_5->setTitle(QString::fromUtf8("\304\220o t\341\273\215a \304\221\341\273\231"));
         gridLayout_7 = new QGridLayout(groupBox_5);
@@ -1574,7 +1574,7 @@ public:
 
         groupBox_7 = new QCustomGroupBox(centralWidget);
         groupBox_7->setObjectName(QStringLiteral("groupBox_7"));
-        groupBox_7->setGeometry(QRect(1550, 10, 361, 261));
+        groupBox_7->setGeometry(QRect(10, 0, 361, 261));
         groupBox_7->setFont(font2);
         groupBox_7->setAutoFillBackground(false);
         groupBox_7->setTitle(QString::fromUtf8("Th\303\264ng tin m\341\273\245c ti\303\252u"));
@@ -2656,7 +2656,7 @@ public:
 
         groupBox_10 = new QCustomGroupBox(centralWidget);
         groupBox_10->setObjectName(QStringLiteral("groupBox_10"));
-        groupBox_10->setGeometry(QRect(290, 560, 251, 101));
+        groupBox_10->setGeometry(QRect(560, 10, 251, 101));
         label_status_warning = new QToolButton(groupBox_10);
         label_status_warning->setObjectName(QStringLiteral("label_status_warning"));
         label_status_warning->setGeometry(QRect(10, 30, 231, 61));
@@ -2666,7 +2666,7 @@ public:
         label_status_warning->setCheckable(false);
         tabWidget_2 = new QCustomTabWidget(centralWidget);
         tabWidget_2->setObjectName(QStringLiteral("tabWidget_2"));
-        tabWidget_2->setGeometry(QRect(10, 10, 531, 541));
+        tabWidget_2->setGeometry(QRect(1380, 10, 531, 541));
         tabWidget_2->setFont(font2);
         tabWidget_2->setElideMode(Qt::ElideNone);
         tabWidget_2->setTabBarAutoHide(true);
@@ -4071,7 +4071,7 @@ public:
         tabWidget_2->addTab(tab_8, QString());
         groupBox_11 = new QCustomGroupBox(centralWidget);
         groupBox_11->setObjectName(QStringLiteral("groupBox_11"));
-        groupBox_11->setGeometry(QRect(1710, 930, 201, 141));
+        groupBox_11->setGeometry(QRect(1430, 920, 201, 141));
         gridLayout_11 = new QGridLayout(groupBox_11);
         gridLayout_11->setSpacing(6);
         gridLayout_11->setContentsMargins(11, 11, 11, 11);
@@ -4198,7 +4198,7 @@ public:
 
         groupBox_14 = new QCustomGroupBox(centralWidget);
         groupBox_14->setObjectName(QStringLiteral("groupBox_14"));
-        groupBox_14->setGeometry(QRect(550, 920, 161, 151));
+        groupBox_14->setGeometry(QRect(10, 940, 171, 131));
         gridLayout_13 = new QGridLayout(groupBox_14);
         gridLayout_13->setSpacing(6);
         gridLayout_13->setContentsMargins(11, 11, 11, 11);
@@ -4232,7 +4232,7 @@ public:
 
         groupBox_16 = new QCustomGroupBox(centralWidget);
         groupBox_16->setObjectName(QStringLiteral("groupBox_16"));
-        groupBox_16->setGeometry(QRect(550, 10, 161, 171));
+        groupBox_16->setGeometry(QRect(380, 10, 161, 171));
         gridLayout_14 = new QGridLayout(groupBox_16);
         gridLayout_14->setSpacing(6);
         gridLayout_14->setContentsMargins(11, 11, 11, 11);
@@ -4512,7 +4512,7 @@ public:
 
         groupBox_18 = new QCustomGroupBox(centralWidget);
         groupBox_18->setObjectName(QStringLiteral("groupBox_18"));
-        groupBox_18->setGeometry(QRect(290, 670, 251, 401));
+        groupBox_18->setGeometry(QRect(1640, 560, 171, 341));
         gridLayout_16 = new QGridLayout(groupBox_18);
         gridLayout_16->setSpacing(6);
         gridLayout_16->setContentsMargins(11, 11, 11, 11);
@@ -4610,7 +4610,7 @@ public:
 
         groupBox_6 = new QCustomGroupBox(centralWidget);
         groupBox_6->setObjectName(QStringLiteral("groupBox_6"));
-        groupBox_6->setGeometry(QRect(1620, 720, 291, 211));
+        groupBox_6->setGeometry(QRect(1330, 590, 291, 211));
         groupBox_6->setAutoFillBackground(false);
         groupBox_6->setTitle(QString::fromUtf8("Tham s\341\273\221 ra \304\221a"));
         gridLayout_6 = new QGridLayout(groupBox_6);
@@ -5355,7 +5355,7 @@ public:
 
         groupBox_control_setting = new QCustomGroupBox(centralWidget);
         groupBox_control_setting->setObjectName(QStringLiteral("groupBox_control_setting"));
-        groupBox_control_setting->setGeometry(QRect(550, 290, 891, 631));
+        groupBox_control_setting->setGeometry(QRect(430, 280, 891, 631));
         label_command_2 = new QLabel(groupBox_control_setting);
         label_command_2->setObjectName(QStringLiteral("label_command_2"));
         label_command_2->setGeometry(QRect(10, 30, 161, 31));
@@ -5416,7 +5416,7 @@ public:
         toolButton_set_command->setGeometry(QRect(610, 570, 171, 41));
         plainTextEdit_command_tx = new QPlainTextEdit(groupBox_control_setting);
         plainTextEdit_command_tx->setObjectName(QStringLiteral("plainTextEdit_command_tx"));
-        plainTextEdit_command_tx->setGeometry(QRect(210, 10, 671, 71));
+        plainTextEdit_command_tx->setGeometry(QRect(210, 30, 671, 71));
         label_command_5 = new QLabel(groupBox_control_setting);
         label_command_5->setObjectName(QStringLiteral("label_command_5"));
         label_command_5->setGeometry(QRect(10, 100, 161, 31));
@@ -6365,6 +6365,21 @@ public:
         plainTextEdit_command_rx->raise();
         layoutWidget_2->raise();
         MainWindow->setCentralWidget(centralWidget);
+        groupBox_2->raise();
+        groupBox_3->raise();
+        groupBox_4->raise();
+        groupBox_5->raise();
+        groupBox_7->raise();
+        groupBox_10->raise();
+        tabWidget_2->raise();
+        groupBox_11->raise();
+        groupBox_14->raise();
+        groupBox_16->raise();
+        groupBox_17->raise();
+        groupBox_18->raise();
+        groupBox_6->raise();
+        groupBox_control_setting->raise();
+        layoutWidget->raise();
 #ifndef QT_NO_SHORTCUT
         label_sea->setBuddy(horizontalSlider_sea);
         label_rain->setBuddy(horizontalSlider_rain);
@@ -6375,7 +6390,7 @@ public:
 
         groupBox_3->setCurrentIndex(1);
         comboBox->setCurrentIndex(4);
-        tabWidget_2->setCurrentIndex(1);
+        tabWidget_2->setCurrentIndex(0);
         comboBox_3->setCurrentIndex(0);
 
 
