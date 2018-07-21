@@ -39,7 +39,9 @@ SOURCES += main.cpp\
     AIS/AIS.cpp \
     dialogaisinfo.cpp \
     dialogcommandlog.cpp \
-    statuswindow.cpp
+    statuswindow.cpp \
+    dialogcommandset.cpp \
+    dialogmenudisplay.cpp
 
 
 HEADERS  += mainwindow.h \
@@ -61,13 +63,17 @@ HEADERS  += mainwindow.h \
     AIS/AIS.h \
     dialogaisinfo.h \
     dialogcommandlog.h \
-    statuswindow.h
+    statuswindow.h \
+    dialogcommandset.h \
+    dialogmenudisplay.h
 
 FORMS    += mainwindow.ui \
     dialogdocumentation.ui \
     dialogaisinfo.ui \
     dialogcommandlog.ui \
-    statuswindow.ui
+    statuswindow.ui \
+    dialogcommandset.ui \
+    dialogmenudisplay.ui
 #win32:CONFIG(release, debug|release): LIBS += -L$$PWD/shapelib/ -lshapelib
 #else:unix: LIBS += -L$$PWD\shapelib\ -lshapelib
 #INCLUDEPATH += $$PWD/shapelib

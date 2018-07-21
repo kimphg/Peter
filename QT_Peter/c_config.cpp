@@ -1,7 +1,7 @@
 
 #include "c_config.h"
-CConfig         mGlobbalConfig;
-
+//CConfig         mGlobbalConfig;
+QHash<QString, QString> CConfig::hashData = *(new QHash<QString, QString>);
 void CConfig::setValue(QString key, double value)
 {
     QString strValue = QString::number(value);
@@ -40,7 +40,7 @@ QString CConfig::getString(QString key)
 
 CConfig::CConfig(void)
 {
-
+    //hashData.;
     readFile();
 }
 
@@ -49,7 +49,7 @@ CConfig::~CConfig(void)
 }
 
 void CConfig::SaveToFile()
-{
+{/*
     QHash<QString, QString>::const_iterator it = hashData.constBegin();
     QXmlStreamAttributes attr;
     while (it != hashData.constEnd()) {
@@ -63,7 +63,7 @@ void CConfig::SaveToFile()
     writer.writeEmptyElement(XML_ELEM_NAME);
     writer.writeAttributes(attr);
     writer.writeEndElement();
-    xmlFile.close();
+    xmlFile.close();*/
 
 }
 
@@ -79,8 +79,10 @@ void CConfig::setDefault()
 }
 
 void CConfig::readFile() {
+
     QFile xmlFile(HR_CONFIG_FILE);
     xmlFile.open(QIODevice::ReadOnly);
+    QXmlStreamReader xml;
     xml.setDevice(&xmlFile);
 
     while (xml.readNextStartElement())

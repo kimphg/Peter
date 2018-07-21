@@ -1310,17 +1310,17 @@ void Mainwindow::InitSetting()
     osmap->SetType(0);
     mMapOpacity = mGlobbalConfig.getDouble("mMapOpacity");
     //config.setMapOpacity(value/50.0);
-    ui->horizontalSlider_map_brightness->setValue(mMapOpacity*50);
-    ui->toolButton_xl_nguong_3->setChecked(true);
+//    ui->horizontalSlider_map_brightness->setValue(mMapOpacity*50);
+//    ui->toolButton_xl_nguong_3->setChecked(true);
     ui->groupBox_control->setHidden(true);
-    ui->groupBox_control_setting->setHidden(true);
+//    ui->groupBox_control_setting->setHidden(true);
     setMouseTracking(true);
     //initGraphicView();21.433170, 106.624043
     //init the guard zone
     gz1.isActive = 0;
     gz2.isActive = 0;
     gz3.isActive = 0;
-    ui->groupBox_3->setCurrentIndex(0);
+//    ui->groupBox_3->setCurrentIndex(0);
     ui->tabWidget_2->setCurrentIndex(2);
     QRect rec = QApplication::desktop()->screenGeometry(0);
     setFixedSize(SCR_W,SCR_H);
@@ -1352,9 +1352,9 @@ void Mainwindow::InitSetting()
     //ui->horizontalSlider_2->setValue(config.m_config.cfarThresh);
 
     ui->horizontalSlider_brightness->setValue(ui->horizontalSlider_brightness->maximum()/3.5);
-    ui->horizontalSlider_gain->setValue(ui->horizontalSlider_gain->maximum());
-    ui->horizontalSlider_rain->setValue(ui->horizontalSlider_rain->minimum());
-    ui->horizontalSlider_sea->setValue(ui->horizontalSlider_sea->minimum());
+//    ui->horizontalSlider_gain->setValue(ui->horizontalSlider_gain->maximum());
+//    ui->horizontalSlider_rain->setValue(ui->horizontalSlider_rain->minimum());
+//    ui->horizontalSlider_sea->setValue(ui->horizontalSlider_sea->minimum());
     //ui->comboBox_radar_resolution->setCurrentIndex(0);
     connect(ui->textEdit_heading, SIGNAL(returnPressed()),ui->toolButton_set_heading,SIGNAL(clicked()));
     connect(ui->lineEdit_byte_1, SIGNAL(returnPressed()),ui->toolButton_send_command,SIGNAL(clicked()));

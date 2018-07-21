@@ -6,6 +6,7 @@
 #include <QGeoPositionInfo>
 #include "c_radar_data.h"
 #include "c_arpa_data.h"
+#include "c_config.h"
 #include "AIS/AIS.h"
 #include <vector>
 #include <QFile>

@@ -7,7 +7,7 @@
 //#define SCR_H 1080
 #define SCR_W 1280
 #define SCR_H 1024
-#define SCR_LEFT_MARGIN 550
+#define SCR_LEFT_MARGIN 100
 #define HR_FILE_EXTENSION ".r2d"
 //#include <qse>
 #include "dialogdocumentation.h"
@@ -367,15 +367,15 @@ private slots:
 
     void on_toolButton_sled_reset_clicked();
 
-    void on_toolButton_ais_name_toggled(bool checked);
+//    void on_toolButton_ais_name_toggled(bool checked);
 
-    void on_toolButton_filter2of3_toggled(bool checked);
+//    void on_toolButton_filter2of3_toggled(bool checked);
 
-    void on_toolButton_dobupsong_clicked();
+//    void on_toolButton_dobupsong_clicked();
 
     void on_toolButton_dobupsong_toggled(bool checked);
 
-    void on_toolButton_set_commands_toggled(bool checked);
+//    void on_toolButton_set_commands_toggled(bool checked);
 
     void on_toolButton_set_commands_clicked();
 

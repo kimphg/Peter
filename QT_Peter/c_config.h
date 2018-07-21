@@ -19,18 +19,17 @@ class CConfig
 public:
     CConfig(void);
     ~CConfig(void);
-    QHash<QString, QString> hashData;
-    void    setValue(QString key, double value);
-    void    setValue(QString key,QString value);
-    double  getDouble(QString key);
-    QString getString(QString key);
-    int     getInt(QString key);
-    void    setDefault();
+    static QHash<QString, QString> hashData;
+    static void    setValue(QString key, double value);
+    static void    setValue(QString key,QString value);
+    static double  getDouble(QString key);
+    static QString getString(QString key);
+    static int     getInt(QString key);
+    static void    setDefault();
+    //static QXmlStreamReader xml;
 private:
-    QXmlStreamReader xml;
-
-    void readFile();
-    void SaveToFile();
+    static void readFile();
+    static void SaveToFile();
 };
 
 #endif

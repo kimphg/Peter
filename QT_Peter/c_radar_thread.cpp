@@ -8,7 +8,7 @@ uchar udpFrameBuffer[MAX_IREC][4128];
 short iRec=0,iRead=0;
 bool *pIsDrawn;
 bool *pIsPlaying;
-extern CConfig         mGlobbalConfig;
+//CConfig         mGlobbalConfig;
 QNmeaPositionInfoSource *geoLocation = NULL;
 //QTimer readDataBuff;
 dataProcessingThread::~dataProcessingThread()
