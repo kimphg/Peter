@@ -2,7 +2,7 @@
 #define DIALOGCOMMANDSET_H
 
 #include <QDialog>
-
+#include <c_config.h>
 namespace Ui {
 class DialogCommandSet;
 }
@@ -17,6 +17,8 @@ public:
 
 private slots:
     void on_buttonBox_accepted();
+
+    void on_pushButton_save_clicked();
 
 private:
     Ui::DialogCommandSet *ui;

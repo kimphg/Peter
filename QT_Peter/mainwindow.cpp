@@ -43,7 +43,7 @@ double                      centerAzi=0;
 double                      temperature[255];
 int         curTempIndex = 0;
 double      rangeRatio = 1;
-extern CConfig         mGlobbalConfig;
+//extern CConfig         mGlobbalConfig;
 QStringList     warningList;
 QString         strDistanceUnit;
 short selectedTargetIndex;
@@ -1123,15 +1123,16 @@ void Mainwindow::paintEvent(QPaintEvent *event)
     //ve luoi cu ly phuong vi
 
     DrawViewFrame(&p);
-    DrawZoomArea(&p);
+    DrawIADArea(&p);
 
     //    updateTargets();
 }
-void Mainwindow::DrawZoomArea(QPainter* p)
+void Mainwindow::DrawIADArea(QPainter* p)
 {
-    QRect rect = ui->tabWidget_2->geometry();
+    if(ui->tabWidget_iad->isHidden())return;
+    QRect rect = ui->tabWidget_iad->geometry();
     rect.adjust(4,30,-5,-5);
-    if(ui->tabWidget_2->currentIndex()==2)
+    if(ui->tabWidget_iad->currentIndex()==0)
     {
         p->setPen(QPen(Qt::black));
         p->setBrush(QBrush(Qt::black));
@@ -1160,21 +1161,21 @@ void Mainwindow::DrawZoomArea(QPainter* p)
         }
 
     }
-    else if(ui->tabWidget_2->currentIndex()==6)
+    else if(ui->tabWidget_iad->currentIndex()==4)
     {
         //C_radar_data *prad = pRadar;
         if(mRangeLevel>2)
         {
-            short zoom_size = ui->tabWidget_2->width()/pRadar->scale_zoom_ppi*pRadar->scale_ppi;
+            short zoom_size = ui->tabWidget_iad->width()/pRadar->scale_zoom_ppi*pRadar->scale_ppi;
             p->setPen(QPen(QColor(255,255,255,200),0,Qt::DashLine));
             p->drawRect(mousePointerX-zoom_size/2.0,mousePointerY-zoom_size/2.0,zoom_size,zoom_size);
         }
         p->drawImage(rect,*pRadar->img_zoom_ppi,pRadar->img_zoom_ppi->rect());
 
     }
-    else if(ui->tabWidget_2->currentIndex()==3)
+    else if(ui->tabWidget_iad->currentIndex()==1)
     {
-        QRect rect = ui->tabWidget_2->geometry();
+        QRect rect = ui->tabWidget_iad->geometry();
 
         p->setPen(QPen(Qt::black));
         p->setBrush(QBrush(Qt::black));
@@ -1183,7 +1184,7 @@ void Mainwindow::DrawZoomArea(QPainter* p)
                      pRadar->img_histogram->rect());
 
     }
-    else if(ui->tabWidget_2->currentIndex()==4)
+    else if(ui->tabWidget_iad->currentIndex()==2)
     {
 
 
@@ -1193,15 +1194,15 @@ void Mainwindow::DrawZoomArea(QPainter* p)
         p->drawImage(rect,*pRadar->img_spectre,
                      pRadar->img_spectre->rect());
     }
-    else if(ui->tabWidget_2->currentIndex()==5)
+    else if(ui->tabWidget_iad->currentIndex()==3)
     {
-        if(ui->toolButton_scope->isChecked()==false)pRadar->drawRamp();
+        if(ui->toolButton_scope_2->isChecked()==false)pRadar->drawRamp();
         QRect rect1 = rect;
         rect1.adjust(0,0,0,-rect.height()/2);
         //        pengrid.setWidth(10);
         //        p->setPen(pengrid);
         p->drawImage(rect1,*pRadar->img_RAmp);
-        double rampos = ui->horizontalSlider_ramp_pos->value()/(double(ui->horizontalSlider_ramp_pos->maximum()));
+        double rampos = ui->horizontalSlider_ramp_pos_2->value()/(double(ui->horizontalSlider_ramp_pos_2->maximum()));
         QRect rect2 = rect;
         rect2.adjust(0,rect.height()/2,0,0);
         int zoomw = rect2.width()/2;
@@ -1251,7 +1252,7 @@ void Mainwindow::SaveBinFile()
 void Mainwindow::setDistanceUnit(int unit)//0:NM, 1:KM
 {
     mDistanceUnit = unit;
-    mGlobbalConfig.setValue("mDistanceUnit",mDistanceUnit);
+    CConfig::setValue("mDistanceUnit",mDistanceUnit);
     if(mDistanceUnit==0)
     {
         rangeRatio = 1.852;
@@ -1270,45 +1271,30 @@ void Mainwindow::setDistanceUnit(int unit)//0:NM, 1:KM
 }
 void Mainwindow::InitSetting()
 {
-    mMaxTapMayThu = mGlobbalConfig.getInt("mMaxTapMayThu");
-    mRangeLevel = mGlobbalConfig.getInt("mRangeLevel");
+    mMaxTapMayThu = CConfig::getInt("mMaxTapMayThu");
+    mRangeLevel = CConfig::getInt("mRangeLevel");
     assert(mRangeLevel>=0&&mRangeLevel<8);
-    setDistanceUnit(mGlobbalConfig.getInt("mDistanceUnit"));
+    setDistanceUnit(CConfig::getInt("mDistanceUnit"));
     assert(mDistanceUnit>=0&&mDistanceUnit<2);
-    mR0Command = mGlobbalConfig.getString("mR0Command");
-    mR1Command = mGlobbalConfig.getString("mR1Command");
-    mR2Command = mGlobbalConfig.getString("mR2Command");
-    mR3Command = mGlobbalConfig.getString("mR3Command");
-    mR4Command = mGlobbalConfig.getString("mR4Command");
-    mR5Command = mGlobbalConfig.getString("mR5Command");
-    mR6Command = mGlobbalConfig.getString("mR6Command");
-    mR7Command = mGlobbalConfig.getString("mR7Command");
-    mRxCommand = mGlobbalConfig.getString("mRxCommand");
-    mTxCommand = mGlobbalConfig.getString("mTxCommand");
-    mFreq1Command = mGlobbalConfig.getString("mFreq1Command");
-    mFreq2Command = mGlobbalConfig.getString("mFreq2Command");
-    mFreq3Command = mGlobbalConfig.getString("mFreq3Command");
-    mFreq4Command = mGlobbalConfig.getString("mFreq4Command");
-    mFreq5Command = mGlobbalConfig.getString("mFreq5Command");
-    mFreq6Command = mGlobbalConfig.getString("mFreq6Command");
-    mTrueN2 = mGlobbalConfig.getDouble("mTrueN2");
-    mTrueN = mGlobbalConfig.getDouble("mTrueN");
+
+    mTrueN2 = CConfig::getDouble("mTrueN2");
+    mTrueN = CConfig::getDouble("mTrueN");
 
     pRadar->setTrueN(mTrueN);
-    ui->textEdit_heading->setText(mGlobbalConfig.getString("mTrueN"));
-    ui->textEdit_heading_2->setText(mGlobbalConfig.getString("mTrueN2"));
-    mZoomSizeAz = mGlobbalConfig.getDouble("mZoomSizeAz");
+    ui->textEdit_heading->setText(CConfig::getString("mTrueN"));
+    ui->textEdit_heading_2->setText(CConfig::getString("mTrueN2"));
+    mZoomSizeAz = CConfig::getDouble("mZoomSizeAz");
     ui->textEdit_size_ar_a->setText(QString::number(mZoomSizeAz));
-    mZoomSizeRg = mGlobbalConfig.getDouble("mZoomSizeRg");
+    mZoomSizeRg = CConfig::getDouble("mZoomSizeRg");
     ui->textEdit_size_ar_r->setText(QString::number(mZoomSizeRg));
     pRadar->setTrueN(mTrueN);
     //load map
     osmap = new CMap();
-    SetGPS(mGlobbalConfig.getDouble("mLat"), mGlobbalConfig.getDouble("mLon"));
+    SetGPS(CConfig::getDouble("mLat"), CConfig::getDouble("mLon"));
     osmap->setCenterPos(mLat,mLon);
     osmap->setImgSize(SCR_H,SCR_H);
     osmap->SetType(0);
-    mMapOpacity = mGlobbalConfig.getDouble("mMapOpacity");
+    mMapOpacity = CConfig::getDouble("mMapOpacity");
     //config.setMapOpacity(value/50.0);
 //    ui->horizontalSlider_map_brightness->setValue(mMapOpacity*50);
 //    ui->toolButton_xl_nguong_3->setChecked(true);
@@ -1321,7 +1307,8 @@ void Mainwindow::InitSetting()
     gz2.isActive = 0;
     gz3.isActive = 0;
 //    ui->groupBox_3->setCurrentIndex(0);
-    ui->tabWidget_2->setCurrentIndex(2);
+    ui->tabWidget_iad->setCurrentIndex(0);
+    ui->tabWidget_menu->setCurrentIndex(0);
     QRect rec = QApplication::desktop()->screenGeometry(0);
     setFixedSize(SCR_W,SCR_H);
     if((rec.height()==SCR_H)&&(rec.width()==SCR_W))
@@ -1375,6 +1362,12 @@ void Mainwindow::InitSetting()
     setMouseMode(MouseDrag,true);
     DrawMap();
     update();
+    // hide menu
+    ui->tabWidget_menu->setGeometry(200,-800,ui->tabWidget_menu->width(),ui->tabWidget_menu->height());
+    ui->tabWidget_menu->hide();
+    //hide iad
+    ui->tabWidget_iad->setGeometry(200,-800,ui->tabWidget_iad->width(),ui->tabWidget_iad->height());
+    ui->tabWidget_iad->hide();
 }
 void Mainwindow::ReloadSetting()
 {
@@ -1616,8 +1609,9 @@ void Mainwindow::UpdateRadarData()
             pRadar->isClkAdcChanged = false;
         }
         pRadar->UpdateData();
-        update();
+
     }
+    update();
     /*QStandardItemModel* model = new QStandardItemModel(trackListPt->size(), 5);
     for (int row = 0; row < trackListPt->size(); ++row)
     {
@@ -1850,17 +1844,17 @@ void Mainwindow::updateTargetInfo()
                 //printf("\ntrackId:%d",trackId);
                 double mLat,mLon;
                 this->ConvKmToWGS(trackListPt->at(trackId).estX*pRadar->scale_ppi/mScale,trackListPt->at(trackId).estY*pRadar->scale_ppi/mScale,&mLon,&mLat);
-                ui->label_data_id->setText(QString::number(trackListPt->at(trackId).idCount));
+                //ui->label_data_id->setText(QString::number(trackListPt->at(trackId).idCount));
                 float tmpazi = trackListPt->at(trackId).estA*DEG_RAD;
                 if(tmpazi<0)tmpazi+=360;
-                ui->label_data_type->setText("Radar");
+                //ui->label_data_type->setText("Radar");
                 ui->label_data_range->setText(QString::number(trackListPt->at(trackId).estR*pRadar->scale_ppi/mScale/1.852f,'f',2)+"Nm");
                 ui->label_data_azi->setText( QString::number(tmpazi,'f',2)+QString::fromLocal8Bit("\260"));
                 ui->label_data_lat->setText( QString::number((short)mLat)+QString::fromLocal8Bit("\260")+QString::number((mLat-(short)mLat)*60,'f',2)+"'N");
                 ui->label_data_long->setText(QString::number((short)mLon)+QString::fromLocal8Bit("\260")+QString::number((mLon-(short)mLon)*60,'f',2)+"'E");
                 ui->label_data_speed->setText(QString::number(trackListPt->at(trackId).speed,'f',2)+"Kn");
                 ui->label_data_heading->setText(QString::number(trackListPt->at(trackId).heading*DEG_RAD)+QString::fromLocal8Bit("\260"));
-                ui->label_data_dopler->setText(QString::number(trackListPt->at(trackId).dopler));
+               // ui->label_data_dopler->setText(QString::number(trackListPt->at(trackId).dopler));
             }
         }
 
@@ -1883,15 +1877,15 @@ void Mainwindow::updateTargetInfo()
     */}
     else if(selectedTargetType==NOTARGET)
     {
-        ui->label_data_id->setText("--");
-        ui->label_data_type->setText("--");
+        //ui->label_data_id->setText("--");
+        //ui->label_data_type->setText("--");
         ui->label_data_range->setText("--");
         ui->label_data_azi->setText( "--");
         ui->label_data_lat->setText( "--");
         ui->label_data_long->setText("--");
         ui->label_data_speed->setText("--");
         ui->label_data_heading->setText("--");
-        ui->label_data_dopler->setText("--");
+        //ui->label_data_dopler->setText("--");
     }
 }
 void Mainwindow::autoSwitchFreq()
@@ -1950,7 +1944,7 @@ void Mainwindow::sync1S()//period 1 second
     // display radar temperature:
     temperature[pRadar->tempType] = pRadar->moduleVal;
 
-    ui->label_noiseAverrage->setText(QString::number(pRadar->getNoiseAverage(),'f',1));
+//    ui->label_noiseAverrage->setText(QString::number(pRadar->getNoiseAverage(),'f',1));
     ui->label_temp->setText(QString::number(pRadar->tempType)
                             +"|"+QString::number(pRadar->moduleVal,'f',0)
                             + QString::fromLocal8Bit("\260 C"));
@@ -2410,35 +2404,35 @@ void Mainwindow::UpdateScale()
         {
         case 0:
             setScaleRange(1.5);
-            if(isAdaptSn) sendToRadarString(mR0Command);
+            if(isAdaptSn) sendToRadarString(CConfig::getString("mR0Command"));
             break;
         case 1:
             setScaleRange(3);
-            if(isAdaptSn) sendToRadarString(mR1Command);
+            if(isAdaptSn) sendToRadarString(CConfig::getString("mR1Command"));
             break;
         case 2:
             setScaleRange(6);
-            if(isAdaptSn) sendToRadarString(mR2Command);
+            if(isAdaptSn) sendToRadarString(CConfig::getString("mR2Command"));
             break;
         case 3:
             setScaleRange(12);
-            if(isAdaptSn) sendToRadarString(mR3Command);
+            if(isAdaptSn) sendToRadarString(CConfig::getString("mR3Command"));
             break;
         case 4:
             setScaleRange(24);
-            if(isAdaptSn) sendToRadarString(mR4Command);
+            if(isAdaptSn) sendToRadarString(CConfig::getString("mR4Command"));
             break;
         case 5:
             setScaleRange(48);
-            if(isAdaptSn) sendToRadarString(mR5Command);
+            if(isAdaptSn) sendToRadarString(CConfig::getString("mR5Command"));
             break;
         case 6:
             setScaleRange(96);
-            if(isAdaptSn) sendToRadarString(mR6Command);
+            if(isAdaptSn) sendToRadarString(CConfig::getString("mR6Command"));
             break;
         case 7:
             setScaleRange(192);
-            if(isAdaptSn) sendToRadarString(mR7Command);
+            if(isAdaptSn) sendToRadarString(CConfig::getString("mR7Command"));
             break;
         default:
             setScaleRange(48);
@@ -2451,35 +2445,35 @@ void Mainwindow::UpdateScale()
         {
         case 0:
             setScaleRange(2.5);
-            if(isAdaptSn) sendToRadarString(mR0Command);
+            if(isAdaptSn) sendToRadarString(CConfig::getString("mR0Command"));
             break;
         case 1:
             setScaleRange(5);
-            if(isAdaptSn) sendToRadarString(mR1Command);
+            if(isAdaptSn) sendToRadarString(CConfig::getString("mR1Command"));
             break;
         case 2:
             setScaleRange(10);
-            if(isAdaptSn) sendToRadarString(mR2Command);
+            if(isAdaptSn) sendToRadarString(CConfig::getString("mR2Command"));
             break;
         case 3:
             setScaleRange(20);
-            if(isAdaptSn) sendToRadarString(mR3Command);
+            if(isAdaptSn) sendToRadarString(CConfig::getString("mR3Command"));
             break;
         case 4:
             setScaleRange(50);
-            if(isAdaptSn) sendToRadarString(mR4Command);
+            if(isAdaptSn) sendToRadarString(CConfig::getString("mR4Command"));
             break;
         case 5:
             setScaleRange(100);
-            if(isAdaptSn) sendToRadarString(mR5Command);
+            if(isAdaptSn) sendToRadarString(CConfig::getString("mR5Command"));
             break;
         case 6:
             setScaleRange(200);
-            if(isAdaptSn) sendToRadarString(mR6Command);
+            if(isAdaptSn) sendToRadarString(CConfig::getString("mR6Command"));
             break;
         case 7:
             setScaleRange(400);
-            if(isAdaptSn) sendToRadarString(mR7Command);
+            if(isAdaptSn) sendToRadarString(CConfig::getString("mR7Command"));
             break;
         default:
             break;
@@ -2640,20 +2634,20 @@ void Mainwindow::setCodeType(short index)// chuyen ma
 
 void Mainwindow::on_horizontalSlider_gain_valueChanged(int value)
 {
-    pRadar->kgain = 7-(float)value/(ui->horizontalSlider_gain->maximum())*10;
-    ui->label_gain->setText("Gain:"+QString::number(-pRadar->kgain));
+//    pRadar->kgain = 7-(float)value/(ui->horizontalSlider_gain->maximum())*10;
+//    ui->label_gain->setText("Gain:"+QString::number(-pRadar->kgain));
     //printf("pRadar->kgain %f \n",pRadar->kgain);
 }
 
 void Mainwindow::on_horizontalSlider_rain_valueChanged(int value)
 {
-    pRadar->krain = (float)value/(ui->horizontalSlider_rain->maximum()+ui->horizontalSlider_rain->maximum()/3);
-    ui->label_rain->setText("Rain:" + QString::number(pRadar->krain,'f',2));
+//    pRadar->krain = (float)value/(ui->horizontalSlider_rain->maximum()+ui->horizontalSlider_rain->maximum()/3);
+//    ui->label_rain->setText("Rain:" + QString::number(pRadar->krain,'f',2));
 }
 
 void Mainwindow::on_horizontalSlider_sea_valueChanged(int value)
 {
-    pRadar->ksea = (float)value/(ui->horizontalSlider_sea->maximum());
+//    pRadar->ksea = (float)value/(ui->horizontalSlider_sea->maximum());
     //ui->label_rain->setText("Rain:" + QString::number(-pRadar->krain));
 }
 
@@ -2737,15 +2731,15 @@ void Mainwindow::on_toolButton_xl_nguong_toggled(bool checked)
     pRadar->setAutorgs(checked);
     if(checked)
     {
-        ui->horizontalSlider_gain->setVisible(false);
-        ui->horizontalSlider_rain->setVisible(false);
-        ui->horizontalSlider_sea->setVisible(false);
+//        ui->horizontalSlider_gain->setVisible(false);
+//        ui->horizontalSlider_rain->setVisible(false);
+//        ui->horizontalSlider_sea->setVisible(false);
     }
     else
     {
-        ui->horizontalSlider_gain->setVisible(true);
-        ui->horizontalSlider_rain->setVisible(true);
-        ui->horizontalSlider_sea->setVisible(true);
+//        ui->horizontalSlider_gain->setVisible(true);
+//        ui->horizontalSlider_rain->setVisible(true);
+//        ui->horizontalSlider_sea->setVisible(true);
     }
 }
 
@@ -2925,7 +2919,7 @@ void Mainwindow::on_toolButton_send_command_clicked()
 void Mainwindow::on_toolButton_zoom_in_clicked()
 {
     if(mRangeLevel >0) mRangeLevel-=1;
-    mGlobbalConfig.setValue("mRangeLevel",mRangeLevel);
+    CConfig::setValue("mRangeLevel",mRangeLevel);
     UpdateScale();
     DrawMap();
 }
@@ -2933,7 +2927,7 @@ void Mainwindow::on_toolButton_zoom_in_clicked()
 void Mainwindow::on_toolButton_zoom_out_clicked()
 {
     if(mRangeLevel <7) mRangeLevel+=1;
-    mGlobbalConfig.setValue("mRangeLevel",mRangeLevel);
+    CConfig::setValue("mRangeLevel",mRangeLevel);
     UpdateScale();
     DrawMap();
 }
@@ -2962,8 +2956,8 @@ void Mainwindow::SetGPS(double lat,double lon)
 {
     mLat = lat;
     mLon = lon;
-    mGlobbalConfig.setValue("mLat",mLat);
-    mGlobbalConfig.setValue("mLon",mLon);
+    CConfig::setValue("mLat",mLat);
+    CConfig::setValue("mLon",mLon);
     ui->text_latInput_2->setText(QString::number(mLat,'f',5));
     ui->text_longInput_2->setText(QString::number(mLon,'f',5));
     osmap->setCenterPos(mLat, mLon);
@@ -2983,8 +2977,8 @@ void Mainwindow::on_toolButton_set_heading_clicked()
 
     mTrueN = ui->textEdit_heading->text().toFloat();
     mTrueN2 = ui->textEdit_heading_2->text().toFloat();
-    mGlobbalConfig.setValue("mTrueN",mTrueN);
-    mGlobbalConfig.setValue("mTrueN2",mTrueN2);
+    CConfig::setValue("mTrueN",mTrueN);
+    CConfig::setValue("mTrueN2",mTrueN2);
     pRadar->setTrueN(mTrueN);
 
 }
@@ -3090,14 +3084,14 @@ void Mainwindow::on_toolButton_delete_target_clicked()
 void Mainwindow::on_toolButton_tx_clicked()
 {
     //processing->radTxOn();
-    sendToRadarString(mTxCommand);
+    sendToRadarString(CConfig::getString("mTxCommand"));
 }
 
 
 void Mainwindow::on_toolButton_tx_off_clicked()
 {
     //processing->radTxOff();
-    sendToRadarString(mRxCommand);
+    sendToRadarString(CConfig::getString("mRxCommand"));
 }
 
 void Mainwindow::on_toolButton_filter2of3_clicked(bool checked)
@@ -3435,7 +3429,7 @@ void Mainwindow::on_comboBox_3_currentIndexChanged(int index)
 void Mainwindow::on_horizontalSlider_map_brightness_valueChanged(int value)
 {
     mMapOpacity = value/50.0;
-    mGlobbalConfig.setValue("mMapOpacity",mMapOpacity);
+    CConfig::setValue("mMapOpacity",mMapOpacity);
     DrawMap();
 }
 
@@ -3531,33 +3525,33 @@ void Mainwindow::on_toolButton_setRangeUnit_clicked()
 
 void Mainwindow::on_toolButton_tx_2_clicked()
 {
-    sendToRadarString(mFreq1Command);
+    sendToRadarString(CConfig::getString("mFreq1Command"));
 
 }
 
 void Mainwindow::on_toolButton_tx_3_clicked()
 {
-    sendToRadarString(mFreq2Command);
+    sendToRadarString(CConfig::getString("mFreq2Command"));
 }
 
 void Mainwindow::on_toolButton_tx_4_clicked()
 {
-    sendToRadarString(mFreq3Command);
+    sendToRadarString(CConfig::getString("mFreq3Command"));
 }
 
 void Mainwindow::on_toolButton_tx_5_clicked()
 {
-    sendToRadarString(mFreq4Command);
+    sendToRadarString(CConfig::getString("mFreq4Command"));
 }
 
 void Mainwindow::on_toolButton_tx_6_clicked()
 {
-    sendToRadarString(mFreq5Command);
+    sendToRadarString(CConfig::getString("mFreq5Command"));
 }
 
 void Mainwindow::on_toolButton_tx_7_clicked()
 {
-    sendToRadarString(mFreq6Command);
+    sendToRadarString(CConfig::getString("mFreq6Command"));
 }
 
 void Mainwindow::on_toolButton_gps_update_auto_clicked()
@@ -3565,8 +3559,8 @@ void Mainwindow::on_toolButton_gps_update_auto_clicked()
     double lat,lon;
     if(processing->getPosition(&lat,&lon))
     {
-        mGlobbalConfig.setValue("mLat",lat);
-        mGlobbalConfig.setValue("mLon",lon);
+        CConfig::setValue("mLat",lat);
+        CConfig::setValue("mLon",lon);
         SetGPS(lat, lon);
     }
     else
@@ -3582,8 +3576,8 @@ void Mainwindow::on_toolButton_set_zoom_ar_size_clicked()
 {
     mZoomSizeRg = ui->textEdit_size_ar_r->text().toDouble();
     mZoomSizeAz = ui->textEdit_size_ar_a->text().toDouble();
-    mGlobbalConfig.setValue("mZoomSizeRg",mZoomSizeRg);
-    mGlobbalConfig.setValue("mZoomSizeAz",mZoomSizeAz);
+    CConfig::setValue("mZoomSizeRg",mZoomSizeRg);
+    CConfig::setValue("mZoomSizeAz",mZoomSizeAz);
 }
 
 void Mainwindow::on_toolButton_advanced_control_clicked()
@@ -3597,43 +3591,43 @@ void Mainwindow::on_toolButton_advanced_control_clicked()
 
 
 void Mainwindow::on_toolButton_set_command_clicked()
-{
-    mR0Command = ui->plainTextEdit_range_0->toPlainText();
-    mR1Command = ui->plainTextEdit_range_1->toPlainText();
-    mR2Command = ui->plainTextEdit_range_2->toPlainText();
-    mR3Command = ui->plainTextEdit_range_3->toPlainText();
-    mR4Command = ui->plainTextEdit_range_4->toPlainText();
-    mR5Command = ui->plainTextEdit_range_5->toPlainText();
-    mR6Command = ui->plainTextEdit_range_6->toPlainText();
-    mR7Command = ui->plainTextEdit_range_7->toPlainText();
-    mRxCommand = ui->plainTextEdit_command_rx->toPlainText();
-    mTxCommand = ui->plainTextEdit_command_tx->toPlainText();
-    mGlobbalConfig.setValue("mR0Command",mR0Command);
-    mGlobbalConfig.setValue("mR1Command",mR1Command);
-    mGlobbalConfig.setValue("mR2Command",mR2Command);
-    mGlobbalConfig.setValue("mR3Command",mR3Command);
-    mGlobbalConfig.setValue("mR4Command",mR4Command);
-    mGlobbalConfig.setValue("mR5Command",mR5Command);
-    mGlobbalConfig.setValue("mR6Command",mR6Command);
-    mGlobbalConfig.setValue("mR7Command",mR7Command);
-    mGlobbalConfig.setValue("mRxCommand",mRxCommand);
-    mGlobbalConfig.setValue("mTxCommand",mTxCommand);
+{/*
+    CConfig::getString("mR0Command") = ui->plainTextEdit_range_0->toPlainText();
+    CConfig::getString("mR1Command") = ui->plainTextEdit_range_1->toPlainText();
+    CConfig::getString("mR2Command") = ui->plainTextEdit_range_2->toPlainText();
+    CConfig::getString("mR3Command") = ui->plainTextEdit_range_3->toPlainText();
+    CConfig::getString("mR4Command") = ui->plainTextEdit_range_4->toPlainText();
+    CConfig::getString("mR5Command") = ui->plainTextEdit_range_5->toPlainText();
+    CConfig::getString("mR6Command") = ui->plainTextEdit_range_6->toPlainText();
+    CConfig::getString("mR7Command") = ui->plainTextEdit_range_7->toPlainText();
+    CConfig::getString("mRxCommand") = ui->plainTextEdit_command_rx->toPlainText();
+    CConfig::getString("mTxCommand") = ui->plainTextEdit_command_tx->toPlainText();
+    CConfig::setValue("CConfig::getString("mR0Command")",CConfig::getString("mR0Command"));
+    CConfig::setValue("CConfig::getString("mR1Command")",CConfig::getString("mR1Command"));
+    CConfig::setValue("CConfig::getString("mR2Command")",CConfig::getString("mR2Command"));
+    CConfig::setValue("CConfig::getString("mR3Command")",CConfig::getString("mR3Command"));
+    CConfig::setValue("CConfig::getString("mR4Command")",CConfig::getString("mR4Command"));
+    CConfig::setValue("CConfig::getString("mR5Command")",CConfig::getString("mR5Command"));
+    CConfig::setValue("CConfig::getString("mR6Command")",CConfig::getString("mR6Command"));
+    CConfig::setValue("CConfig::getString("mR7Command")",CConfig::getString("mR7Command"));
+    CConfig::setValue("CConfig::getString("mRxCommand")",CConfig::getString("mRxCommand"));
+    CConfig::setValue("CConfig::getString("mTxCommand")",CConfig::getString("mTxCommand"));
     //
-    mFreq1Command =  ui->plainTextEdit_freq_1->toPlainText();
-    mFreq2Command =  ui->plainTextEdit_freq_2->toPlainText();
-    mFreq3Command =  ui->plainTextEdit_freq_3->toPlainText();
-    mFreq4Command =  ui->plainTextEdit_freq_4->toPlainText();
-    mFreq5Command =  ui->plainTextEdit_freq_5->toPlainText();
-    mFreq6Command =  ui->plainTextEdit_freq_6->toPlainText();
+    CConfig::getString("mFreq1Command") =  ui->plainTextEdit_freq_1->toPlainText();
+    CConfig::getString("mFreq2Command") =  ui->plainTextEdit_freq_2->toPlainText();
+    CConfig::getString("mFreq3Command") =  ui->plainTextEdit_freq_3->toPlainText();
+    CConfig::getString("mFreq4Command") =  ui->plainTextEdit_freq_4->toPlainText();
+    CConfig::getString("mFreq5Command") =  ui->plainTextEdit_freq_5->toPlainText();
+    CConfig::getString("mFreq6Command") =  ui->plainTextEdit_freq_6->toPlainText();
     //
-    mGlobbalConfig.setValue("mFreq1Command",mFreq1Command);
-    mGlobbalConfig.setValue("mFreq2Command",mFreq2Command);
-    mGlobbalConfig.setValue("mFreq3Command",mFreq3Command);
-    mGlobbalConfig.setValue("mFreq4Command",mFreq4Command);
-    mGlobbalConfig.setValue("mFreq5Command",mFreq5Command);
-    mGlobbalConfig.setValue("mFreq6Command",mFreq6Command);
+    CConfig::setValue("CConfig::getString("mFreq1Command")",CConfig::getString("mFreq1Command"));
+    CConfig::setValue("CConfig::getString("mFreq2Command")",CConfig::getString("mFreq2Command"));
+    CConfig::setValue("CConfig::getString("mFreq3Command")",CConfig::getString("mFreq3Command"));
+    CConfig::setValue("CConfig::getString("mFreq4Command")",CConfig::getString("mFreq4Command"));
+    CConfig::setValue("CConfig::getString("mFreq5Command")",CConfig::getString("mFreq5Command"));
+    CConfig::setValue("CConfig::getString("mFreq6Command")",CConfig::getString("mFreq6Command"));
     ui->groupBox_control_setting->setHidden(true);
-    ui->toolButton_set_commands->setChecked(false);
+    ui->toolButton_set_commands->setChecked(false);*/
 
 }
 
@@ -3649,7 +3643,7 @@ void Mainwindow::on_toolButton_auto_freq_toggled(bool checked)
 
 void Mainwindow::on_toolButton_set_default_clicked()
 {
-    mGlobbalConfig.setDefault();
+    CConfig::setDefault();
 }
 
 
@@ -3658,7 +3652,7 @@ void Mainwindow::on_toolButton_heading_update_clicked()
 {
     if(processing->isHeadingAvaible)
     {
-        mTrueN = processing->getHeading()+mGlobbalConfig.getDouble("mTrueN3");
+        mTrueN = processing->getHeading()+CConfig::getDouble("mTrueN3");
         if(mTrueN>=360)mTrueN-=360;
         ui->label_compass_value->setText(QString::number(processing->getHeading(),'f',1));
         ui->textEdit_heading->setText(QString::number(mTrueN));
@@ -3684,20 +3678,7 @@ void Mainwindow::on_toolButton_sled_reset_clicked()
     pRadar->resetSled();
 }
 
-void Mainwindow::on_toolButton_ais_name_toggled(bool checked)
-{
 
-}
-
-void Mainwindow::on_toolButton_filter2of3_toggled(bool checked)
-{
-
-}
-
-void Mainwindow::on_toolButton_dobupsong_clicked()
-{
-
-}
 
 void Mainwindow::on_toolButton_dobupsong_toggled(bool checked)
 {
@@ -3709,30 +3690,13 @@ void Mainwindow::on_toolButton_dobupsong_toggled(bool checked)
     }
 }
 
-void Mainwindow::on_toolButton_set_commands_toggled(bool checked)
-{
-
-}
 
 void Mainwindow::on_toolButton_set_commands_clicked()
 {
-    ui->groupBox_control_setting->setHidden(false);
-    ui->plainTextEdit_range_0->setPlainText(mR0Command);
-    ui->plainTextEdit_range_1->setPlainText(mR1Command);
-    ui->plainTextEdit_range_2->setPlainText(mR2Command);
-    ui->plainTextEdit_range_3->setPlainText(mR3Command);
-    ui->plainTextEdit_range_4->setPlainText(mR4Command);
-    ui->plainTextEdit_range_5->setPlainText(mR5Command);
-    ui->plainTextEdit_range_6->setPlainText(mR6Command);
-    ui->plainTextEdit_range_7->setPlainText(mR7Command);
-    ui->plainTextEdit_command_rx->setPlainText(mRxCommand);
-    ui->plainTextEdit_command_tx->setPlainText(mTxCommand);
-    ui->plainTextEdit_freq_1->setPlainText(mFreq1Command);
-    ui->plainTextEdit_freq_2->setPlainText(mFreq2Command);
-    ui->plainTextEdit_freq_3->setPlainText(mFreq3Command);
-    ui->plainTextEdit_freq_4->setPlainText(mFreq4Command);
-    ui->plainTextEdit_freq_5->setPlainText(mFreq5Command);
-    ui->plainTextEdit_freq_6->setPlainText(mFreq6Command);
+    DialogCommandSet *dlg=new DialogCommandSet();
+    dlg->setModal(false);
+    dlg->showNormal();
+
 }
 
 void Mainwindow::on_toolButton_command_log_toggled(bool checked)
@@ -3780,4 +3744,51 @@ void Mainwindow::on_toolButton_tx_2_toggled(bool checked)
 void Mainwindow::on_toolButton_tx_2_clicked(bool checked)
 {
 
+}
+
+void Mainwindow::on_toolButton_menu_clicked()
+{
+    if(ui->tabWidget_menu->isHidden())
+    {
+        ui->tabWidget_menu->setHidden(false);
+        ui->tabWidget_menu->setGeometry(550,180,ui->tabWidget_menu->width(),ui->tabWidget_menu->height());
+        ui->tabWidget_menu->setCurrentIndex(0);
+    }
+    else
+    {
+        ui->tabWidget_menu->setGeometry(200,-800,ui->tabWidget_menu->width(),ui->tabWidget_menu->height());
+        ui->tabWidget_menu->setHidden(true);
+    }
+}
+
+void Mainwindow::on_toolButton_iad_clicked()
+{
+    if(ui->tabWidget_iad->isHidden())
+    {
+        ui->tabWidget_iad->setHidden(false);
+        ui->tabWidget_iad->setGeometry(5,180,ui->tabWidget_iad->width(),ui->tabWidget_iad->height());
+        ui->tabWidget_iad->setCurrentIndex(0);
+    }
+    else
+    {
+        ui->tabWidget_iad->setGeometry(200,-800,ui->tabWidget_iad->width(),ui->tabWidget_iad->height());
+        ui->tabWidget_iad->setHidden(true);
+    }
+}
+
+void Mainwindow::on_tabWidget_menu_tabBarClicked(int index)
+{
+    if(ui->tabWidget_menu->count()-1==index)
+    {
+        ui->tabWidget_menu->setHidden(true);
+    }
+
+}
+
+void Mainwindow::on_tabWidget_iad_tabBarClicked(int index)
+{
+    if(ui->tabWidget_iad->count()-1==index)
+    {
+        ui->tabWidget_iad->setHidden(true);
+    }
 }

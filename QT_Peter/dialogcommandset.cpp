@@ -6,6 +6,24 @@ DialogCommandSet::DialogCommandSet(QWidget *parent) :
     ui(new Ui::DialogCommandSet)
 {
     ui->setupUi(this);
+
+    ui->groupBox_control_setting->setHidden(false);
+    ui->plainTextEdit_range_8->setPlainText (       CConfig::getString("mR0Command"));
+    ui->plainTextEdit_range_9->setPlainText (       CConfig::getString("mR1Command"));
+    ui->plainTextEdit_range_10->setPlainText(       CConfig::getString("mR2Command"));
+    ui->plainTextEdit_range_11->setPlainText(       CConfig::getString("mR3Command"));
+    ui->plainTextEdit_range_12->setPlainText(       CConfig::getString("mR4Command"));
+    ui->plainTextEdit_range_13->setPlainText(       CConfig::getString("mR5Command"));
+    ui->plainTextEdit_range_14->setPlainText(       CConfig::getString("mR6Command"));
+    ui->plainTextEdit_range_15->setPlainText(       CConfig::getString("mR7Command"));
+    ui->plainTextEdit_command_rx_2->setPlainText(   CConfig::getString("mRxCommand"));
+    ui->plainTextEdit_command_tx_2->setPlainText(   CConfig::getString("mTxCommand"));
+    ui->plainTextEdit_freq_7->setPlainText( CConfig::getString("mFreq1Command"));
+    ui->plainTextEdit_freq_8->setPlainText( CConfig::getString("mFreq2Command"));
+    ui->plainTextEdit_freq_9->setPlainText( CConfig::getString("mFreq3Command"));
+    ui->plainTextEdit_freq_10->setPlainText(CConfig::getString("mFreq4Command"));
+    ui->plainTextEdit_freq_11->setPlainText(CConfig::getString("mFreq5Command"));
+    ui->plainTextEdit_freq_12->setPlainText(CConfig::getString("mFreq6Command"));
 }
 
 DialogCommandSet::~DialogCommandSet()
@@ -15,7 +33,7 @@ DialogCommandSet::~DialogCommandSet()
 
 void DialogCommandSet::on_buttonBox_accepted()
 {
-    mR0Command = ui->plainTextEdit_range_0->toPlainText();
+    /*mR0Command = ui->plainTextEdit_range_0->toPlainText();
     mR1Command = ui->plainTextEdit_range_1->toPlainText();
     mR2Command = ui->plainTextEdit_range_2->toPlainText();
     mR3Command = ui->plainTextEdit_range_3->toPlainText();
@@ -26,16 +44,16 @@ void DialogCommandSet::on_buttonBox_accepted()
 
     mRxCommand = ui->plainTextEdit_command_rx->toPlainText();
     mTxCommand = ui->plainTextEdit_command_tx->toPlainText();
-    mGlobbalConfig.setValue("mR0Command",mR0Command);
-    mGlobbalConfig.setValue("mR1Command",mR1Command);
-    mGlobbalConfig.setValue("mR2Command",mR2Command);
-    mGlobbalConfig.setValue("mR3Command",mR3Command);
-    mGlobbalConfig.setValue("mR4Command",mR4Command);
-    mGlobbalConfig.setValue("mR5Command",mR5Command);
-    mGlobbalConfig.setValue("mR6Command",mR6Command);
-    mGlobbalConfig.setValue("mR7Command",mR7Command);
-    mGlobbalConfig.setValue("mRxCommand",mRxCommand);
-    mGlobbalConfig.setValue("mTxCommand",mTxCommand);
+    CConfig::setValue("mR0Command",mR0Command);
+    CConfig::setValue("mR1Command",mR1Command);
+    CConfig::setValue("mR2Command",mR2Command);
+    CConfig::setValue("mR3Command",mR3Command);
+    CConfig::setValue("mR4Command",mR4Command);
+    CConfig::setValue("mR5Command",mR5Command);
+    CConfig::setValue("mR6Command",mR6Command);
+    CConfig::setValue("mR7Command",mR7Command);
+    CConfig::setValue("mRxCommand",mRxCommand);
+    CConfig::setValue("mTxCommand",mTxCommand);
     //
     mFreq1Command =  ui->plainTextEdit_freq_1->toPlainText();
     mFreq2Command =  ui->plainTextEdit_freq_2->toPlainText();
@@ -44,13 +62,53 @@ void DialogCommandSet::on_buttonBox_accepted()
     mFreq5Command =  ui->plainTextEdit_freq_5->toPlainText();
     mFreq6Command =  ui->plainTextEdit_freq_6->toPlainText();
     //
-    mGlobbalConfig.setValue("mFreq1Command",mFreq1Command);
-    mGlobbalConfig.setValue("mFreq2Command",mFreq2Command);
-    mGlobbalConfig.setValue("mFreq3Command",mFreq3Command);
-    mGlobbalConfig.setValue("mFreq4Command",mFreq4Command);
-    mGlobbalConfig.setValue("mFreq5Command",mFreq5Command);
-    mGlobbalConfig.setValue("mFreq6Command",mFreq6Command);
+    CConfig::setValue("mFreq1Command",mFreq1Command);
+    CConfig::setValue("mFreq2Command",mFreq2Command);
+    CConfig::setValue("mFreq3Command",mFreq3Command);
+    CConfig::setValue("mFreq4Command",mFreq4Command);
+    CConfig::setValue("mFreq5Command",mFreq5Command);
+    CConfig::setValue("mFreq6Command",mFreq6Command);
     ui->groupBox_control_setting->setHidden(true);
-    ui->toolButton_set_commands->setChecked(false);
+    ui->toolButton_set_commands->setChecked(false);*/
+
+}
+
+void DialogCommandSet::on_pushButton_save_clicked()
+{
+    QString mR0Command = ui->plainTextEdit_range_8->toPlainText();
+    QString mR1Command = ui->plainTextEdit_range_9->toPlainText();
+    QString mR2Command = ui->plainTextEdit_range_10->toPlainText();
+    QString mR3Command = ui->plainTextEdit_range_11->toPlainText();
+    QString mR4Command = ui->plainTextEdit_range_12->toPlainText();
+    QString mR5Command = ui->plainTextEdit_range_13->toPlainText();
+    QString mR6Command = ui->plainTextEdit_range_14->toPlainText();
+    QString mR7Command = ui->plainTextEdit_range_15->toPlainText();
+
+    QString mRxCommand = ui->plainTextEdit_command_rx_2->toPlainText();
+    QString mTxCommand = ui->plainTextEdit_command_tx_2->toPlainText();
+    CConfig::setValue("mR0Command",mR0Command);
+    CConfig::setValue("mR1Command",mR1Command);
+    CConfig::setValue("mR2Command",mR2Command);
+    CConfig::setValue("mR3Command",mR3Command);
+    CConfig::setValue("mR4Command",mR4Command);
+    CConfig::setValue("mR5Command",mR5Command);
+    CConfig::setValue("mR6Command",mR6Command);
+    CConfig::setValue("mR7Command",mR7Command);
+    CConfig::setValue("mRxCommand",mRxCommand);
+    CConfig::setValue("mTxCommand",mTxCommand);
+    //
+    QString mFreq1Command =  ui->plainTextEdit_freq_7->toPlainText();
+    QString mFreq2Command =  ui->plainTextEdit_freq_8->toPlainText();
+    QString mFreq3Command =  ui->plainTextEdit_freq_9->toPlainText();
+    QString mFreq4Command =  ui->plainTextEdit_freq_10->toPlainText();
+    QString mFreq5Command =  ui->plainTextEdit_freq_11->toPlainText();
+    QString mFreq6Command =  ui->plainTextEdit_freq_12->toPlainText();
+    //
+    CConfig::setValue("mFreq1Command",mFreq1Command);
+    CConfig::setValue("mFreq2Command",mFreq2Command);
+    CConfig::setValue("mFreq3Command",mFreq3Command);
+    CConfig::setValue("mFreq4Command",mFreq4Command);
+    CConfig::setValue("mFreq5Command",mFreq5Command);
+    CConfig::setValue("mFreq6Command",mFreq6Command);
 
 }

@@ -14,15 +14,16 @@ public:
     dataProcessingThread *processing;
 protected:
     void highLight();
-    void resetView();
+    void SetTransparent(bool transp);
     void hoverEnter(QHoverEvent *event);
     void hoverLeave(QHoverEvent *event);
     void hoverMove(QHoverEvent *event);
     bool event(QEvent *event);
     void paintEvent(QPaintEvent *);
+
 signals:
 
-public slots:
+
 };
 
 #endif // QCUSTOM_TAB_WIDGET_H

@@ -7,7 +7,7 @@
 //#define SCR_H 1080
 #define SCR_W 1280
 #define SCR_H 1024
-#define SCR_LEFT_MARGIN 100
+#define SCR_LEFT_MARGIN 5
 #define HR_FILE_EXTENSION ".r2d"
 //#include <qse>
 #include "dialogdocumentation.h"
@@ -28,6 +28,7 @@
 #include <jtarget.h>
 #include "Cmap/cmap.h"
 #include "dialogcommandlog.h"
+#include "dialogcommandset.h"
 //#include <jviewport.h>
 //#include "ctarget.h"
 //#include "radarcontroldialog.h"
@@ -391,6 +392,14 @@ private slots:
 
     void on_toolButton_tx_2_clicked(bool checked);
 
+    void on_toolButton_menu_clicked();
+
+    void on_toolButton_iad_clicked();
+
+    void on_tabWidget_menu_tabBarClicked(int index);
+
+    void on_tabWidget_iad_tabBarClicked(int index);
+
 private:
     void initActionsConnections();
     void initGraphicView();
@@ -398,7 +407,7 @@ private:
     void ConvWGSToKm(double *x, double *y, double m_Long, double m_Lat);
     void ConvKmToWGS(double x, double y, double *m_Long, double *m_Lat);
     void setScaleRange(double srange);
-    void DrawZoomArea(QPainter *p);
+    void DrawIADArea(QPainter *p);
     bool isInsideViewZone(short x, short y);
     void UpdateMouseStat(QPainter *p);
     void setMouseMode(mouseMode mode, bool isOn);

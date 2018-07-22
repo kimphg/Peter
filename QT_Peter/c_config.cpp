@@ -1,39 +1,40 @@
 
 #include "c_config.h"
 //CConfig         mGlobbalConfig;
-QHash<QString, QString> CConfig::hashData = *(new QHash<QString, QString>);
+QHash<QString, QString> CConfig::mHashData = CConfig::readFile();
+
 void CConfig::setValue(QString key, double value)
 {
     QString strValue = QString::number(value);
-    hashData.insert(key, strValue);
+    mHashData.insert(key, strValue);
     SaveToFile();
 }
 
 void CConfig::setValue(QString key, QString value)
 {
-    hashData.insert(key, value);
+    mHashData.insert(key, value);
     SaveToFile();
 }
 
 double CConfig::getDouble(QString key)
 {
-    if(hashData.find(key)!=hashData.end())
-    return hashData.value(key).toDouble();
+    if(mHashData.find(key)!=mHashData.end())
+    return mHashData.value(key).toDouble();
     else return 0;
 }
 int CConfig::getInt(QString key)
 {
-    if(hashData.find(key)!=hashData.end())
-    return hashData.value(key).toInt();
+    if(mHashData.find(key)!=mHashData.end())
+    return mHashData.value(key).toInt();
     else return 0;
 }
 QString CConfig::getString(QString key)
 {
-    if(hashData.find(key)!=hashData.end())
-    return hashData.value(key);
+    if(mHashData.find(key)!=mHashData.end())
+    return mHashData.value(key);
     else
     {
-        hashData.insert(key,"0");
+        mHashData.insert(key,"0");
         return QString::number(0);
     }
 }
@@ -49,10 +50,10 @@ CConfig::~CConfig(void)
 }
 
 void CConfig::SaveToFile()
-{/*
-    QHash<QString, QString>::const_iterator it = hashData.constBegin();
+{
+    QHash<QString, QString>::const_iterator it = mHashData.constBegin();
     QXmlStreamAttributes attr;
-    while (it != hashData.constEnd()) {
+    while (it != mHashData.constEnd()) {
         attr.append(it.key(),it.value());
         ++it;
     }
@@ -63,7 +64,7 @@ void CConfig::SaveToFile()
     writer.writeEmptyElement(XML_ELEM_NAME);
     writer.writeAttributes(attr);
     writer.writeEndElement();
-    xmlFile.close();*/
+    xmlFile.close();
 
 }
 
@@ -78,13 +79,13 @@ void CConfig::setDefault()
 
 }
 
-void CConfig::readFile() {
+QHash<QString, QString> CConfig::readFile() {
 
     QFile xmlFile(HR_CONFIG_FILE);
     xmlFile.open(QIODevice::ReadOnly);
     QXmlStreamReader xml;
     xml.setDevice(&xmlFile);
-
+    QHash<QString, QString> hashData;
     while (xml.readNextStartElement())
     {
         if(xml.name()==XML_ELEM_NAME)
@@ -106,5 +107,6 @@ void CConfig::readFile() {
         }
     }
     xmlFile.close();
+    return hashData;
 }
 
