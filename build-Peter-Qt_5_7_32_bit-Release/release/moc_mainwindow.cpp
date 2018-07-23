@@ -20,7 +20,7 @@
 QT_BEGIN_MOC_NAMESPACE
 struct qt_meta_stringdata_Mainwindow_t {
     QByteArrayData data[121];
-    char stringdata0[3522];
+    char stringdata0[3507];
 };
 #define QT_MOC_LITERAL(idx, ofs, len) \
     Q_STATIC_BYTE_ARRAY_DATA_HEADER_INITIALIZER_WITH_OFFSET(len, \
@@ -139,17 +139,17 @@ QT_MOC_LITERAL(106, 3038, 36), // "on_toolButton_heading_update_..."
 QT_MOC_LITERAL(107, 3075, 26), // "on_toolButton_sled_clicked"
 QT_MOC_LITERAL(108, 3102, 26), // "on_toolButton_sled_toggled"
 QT_MOC_LITERAL(109, 3129, 32), // "on_toolButton_sled_reset_clicked"
-QT_MOC_LITERAL(110, 3162, 30), // "on_toolButton_ais_name_toggled"
-QT_MOC_LITERAL(111, 3193, 32), // "on_toolButton_filter2of3_toggled"
-QT_MOC_LITERAL(112, 3226, 31), // "on_toolButton_dobupsong_clicked"
-QT_MOC_LITERAL(113, 3258, 31), // "on_toolButton_dobupsong_toggled"
-QT_MOC_LITERAL(114, 3290, 34), // "on_toolButton_set_commands_to..."
-QT_MOC_LITERAL(115, 3325, 34), // "on_toolButton_set_commands_cl..."
-QT_MOC_LITERAL(116, 3360, 33), // "on_toolButton_command_log_tog..."
-QT_MOC_LITERAL(117, 3394, 28), // "on_toolButton_exit_2_clicked"
-QT_MOC_LITERAL(118, 3423, 36), // "on_toolButton_selfRotation_2_..."
-QT_MOC_LITERAL(119, 3460, 34), // "on_toolButton_selfRotation_cl..."
-QT_MOC_LITERAL(120, 3495, 26) // "on_toolButton_tx_2_toggled"
+QT_MOC_LITERAL(110, 3162, 31), // "on_toolButton_dobupsong_toggled"
+QT_MOC_LITERAL(111, 3194, 34), // "on_toolButton_set_commands_cl..."
+QT_MOC_LITERAL(112, 3229, 33), // "on_toolButton_command_log_tog..."
+QT_MOC_LITERAL(113, 3263, 28), // "on_toolButton_exit_2_clicked"
+QT_MOC_LITERAL(114, 3292, 36), // "on_toolButton_selfRotation_2_..."
+QT_MOC_LITERAL(115, 3329, 34), // "on_toolButton_selfRotation_cl..."
+QT_MOC_LITERAL(116, 3364, 26), // "on_toolButton_tx_2_toggled"
+QT_MOC_LITERAL(117, 3391, 26), // "on_toolButton_menu_clicked"
+QT_MOC_LITERAL(118, 3418, 25), // "on_toolButton_iad_clicked"
+QT_MOC_LITERAL(119, 3444, 31), // "on_tabWidget_menu_tabBarClicked"
+QT_MOC_LITERAL(120, 3476, 30) // "on_tabWidget_iad_tabBarClicked"
 
     },
     "Mainwindow\0UpdateScale\0\0setCodeType\0"
@@ -249,17 +249,17 @@ QT_MOC_LITERAL(120, 3495, 26) // "on_toolButton_tx_2_toggled"
     "on_toolButton_sled_clicked\0"
     "on_toolButton_sled_toggled\0"
     "on_toolButton_sled_reset_clicked\0"
-    "on_toolButton_ais_name_toggled\0"
-    "on_toolButton_filter2of3_toggled\0"
-    "on_toolButton_dobupsong_clicked\0"
     "on_toolButton_dobupsong_toggled\0"
-    "on_toolButton_set_commands_toggled\0"
     "on_toolButton_set_commands_clicked\0"
     "on_toolButton_command_log_toggled\0"
     "on_toolButton_exit_2_clicked\0"
     "on_toolButton_selfRotation_2_toggled\0"
     "on_toolButton_selfRotation_clicked\0"
-    "on_toolButton_tx_2_toggled"
+    "on_toolButton_tx_2_toggled\0"
+    "on_toolButton_menu_clicked\0"
+    "on_toolButton_iad_clicked\0"
+    "on_tabWidget_menu_tabBarClicked\0"
+    "on_tabWidget_iad_tabBarClicked"
 };
 #undef QT_MOC_LITERAL
 
@@ -384,17 +384,17 @@ static const uint qt_meta_data_Mainwindow[] = {
      108,    1,  786,    2, 0x08 /* Private */,
      109,    0,  789,    2, 0x08 /* Private */,
      110,    1,  790,    2, 0x08 /* Private */,
-     111,    1,  793,    2, 0x08 /* Private */,
-     112,    0,  796,    2, 0x08 /* Private */,
-     113,    1,  797,    2, 0x08 /* Private */,
-     114,    1,  800,    2, 0x08 /* Private */,
-     115,    0,  803,    2, 0x08 /* Private */,
-     116,    1,  804,    2, 0x08 /* Private */,
-     117,    0,  807,    2, 0x08 /* Private */,
-     118,    1,  808,    2, 0x08 /* Private */,
-     119,    0,  811,    2, 0x08 /* Private */,
-     120,    1,  812,    2, 0x08 /* Private */,
-      93,    1,  815,    2, 0x08 /* Private */,
+     111,    0,  793,    2, 0x08 /* Private */,
+     112,    1,  794,    2, 0x08 /* Private */,
+     113,    0,  797,    2, 0x08 /* Private */,
+     114,    1,  798,    2, 0x08 /* Private */,
+     115,    0,  801,    2, 0x08 /* Private */,
+     116,    1,  802,    2, 0x08 /* Private */,
+      93,    1,  805,    2, 0x08 /* Private */,
+     117,    0,  808,    2, 0x08 /* Private */,
+     118,    0,  809,    2, 0x08 /* Private */,
+     119,    1,  810,    2, 0x08 /* Private */,
+     120,    1,  813,    2, 0x08 /* Private */,
 
  // slots: parameters
     QMetaType::Void,
@@ -504,10 +504,6 @@ static const uint qt_meta_data_Mainwindow[] = {
     QMetaType::Void, QMetaType::Bool,   37,
     QMetaType::Void,
     QMetaType::Void, QMetaType::Bool,   37,
-    QMetaType::Void, QMetaType::Bool,   37,
-    QMetaType::Void,
-    QMetaType::Void, QMetaType::Bool,   37,
-    QMetaType::Void, QMetaType::Bool,   37,
     QMetaType::Void,
     QMetaType::Void, QMetaType::Bool,   37,
     QMetaType::Void,
@@ -515,6 +511,10 @@ static const uint qt_meta_data_Mainwindow[] = {
     QMetaType::Void,
     QMetaType::Void, QMetaType::Bool,   37,
     QMetaType::Void, QMetaType::Bool,   37,
+    QMetaType::Void,
+    QMetaType::Void,
+    QMetaType::Void, QMetaType::Int,    4,
+    QMetaType::Void, QMetaType::Int,    4,
 
        0        // eod
 };
@@ -631,18 +631,18 @@ void Mainwindow::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, 
         case 103: _t->on_toolButton_sled_clicked(); break;
         case 104: _t->on_toolButton_sled_toggled((*reinterpret_cast< bool(*)>(_a[1]))); break;
         case 105: _t->on_toolButton_sled_reset_clicked(); break;
-        case 106: _t->on_toolButton_ais_name_toggled((*reinterpret_cast< bool(*)>(_a[1]))); break;
-        case 107: _t->on_toolButton_filter2of3_toggled((*reinterpret_cast< bool(*)>(_a[1]))); break;
-        case 108: _t->on_toolButton_dobupsong_clicked(); break;
-        case 109: _t->on_toolButton_dobupsong_toggled((*reinterpret_cast< bool(*)>(_a[1]))); break;
-        case 110: _t->on_toolButton_set_commands_toggled((*reinterpret_cast< bool(*)>(_a[1]))); break;
-        case 111: _t->on_toolButton_set_commands_clicked(); break;
-        case 112: _t->on_toolButton_command_log_toggled((*reinterpret_cast< bool(*)>(_a[1]))); break;
-        case 113: _t->on_toolButton_exit_2_clicked(); break;
-        case 114: _t->on_toolButton_selfRotation_2_toggled((*reinterpret_cast< bool(*)>(_a[1]))); break;
-        case 115: _t->on_toolButton_selfRotation_clicked(); break;
-        case 116: _t->on_toolButton_tx_2_toggled((*reinterpret_cast< bool(*)>(_a[1]))); break;
-        case 117: _t->on_toolButton_tx_2_clicked((*reinterpret_cast< bool(*)>(_a[1]))); break;
+        case 106: _t->on_toolButton_dobupsong_toggled((*reinterpret_cast< bool(*)>(_a[1]))); break;
+        case 107: _t->on_toolButton_set_commands_clicked(); break;
+        case 108: _t->on_toolButton_command_log_toggled((*reinterpret_cast< bool(*)>(_a[1]))); break;
+        case 109: _t->on_toolButton_exit_2_clicked(); break;
+        case 110: _t->on_toolButton_selfRotation_2_toggled((*reinterpret_cast< bool(*)>(_a[1]))); break;
+        case 111: _t->on_toolButton_selfRotation_clicked(); break;
+        case 112: _t->on_toolButton_tx_2_toggled((*reinterpret_cast< bool(*)>(_a[1]))); break;
+        case 113: _t->on_toolButton_tx_2_clicked((*reinterpret_cast< bool(*)>(_a[1]))); break;
+        case 114: _t->on_toolButton_menu_clicked(); break;
+        case 115: _t->on_toolButton_iad_clicked(); break;
+        case 116: _t->on_tabWidget_menu_tabBarClicked((*reinterpret_cast< int(*)>(_a[1]))); break;
+        case 117: _t->on_tabWidget_iad_tabBarClicked((*reinterpret_cast< int(*)>(_a[1]))); break;
         default: ;
         }
     }
