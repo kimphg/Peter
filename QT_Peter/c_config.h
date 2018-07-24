@@ -22,9 +22,9 @@ public:
     static QHash<QString, QString> mHashData;
     static void    setValue(QString key, double value);
     static void    setValue(QString key,QString value);
-    static double  getDouble(QString key);
-    static QString getString(QString key);
-    static int     getInt(QString key);
+    static double  getDouble(QString key, double defaultValue=0);
+    static QString getString(QString key, QString defaultValue="0");
+    static int     getInt(QString key, int defaultValue=0);
     static void    setDefault();
     //static QXmlStreamReader xml;
 private:

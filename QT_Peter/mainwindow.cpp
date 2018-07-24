@@ -3556,8 +3556,8 @@ void Mainwindow::on_toolButton_tx_7_clicked()
 
 void Mainwindow::on_toolButton_gps_update_auto_clicked()
 {
-    double lat,lon;
-    if(processing->getPosition(&lat,&lon))
+    double lat,lon,direction;
+    if(processing->getPosition(&lat,&lon,&direction))
     {
         CConfig::setValue("mLat",lat);
         CConfig::setValue("mLon",lon);
@@ -3791,4 +3791,9 @@ void Mainwindow::on_tabWidget_iad_tabBarClicked(int index)
     {
         ui->tabWidget_iad->setHidden(true);
     }
+}
+
+void Mainwindow::on_toolButton_xl_nguong_3_clicked()
+{
+
 }

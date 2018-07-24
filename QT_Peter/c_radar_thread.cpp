@@ -1,5 +1,6 @@
 #include "c_config.h"
 #include "c_radar_thread.h"
+#include "c_gps_parser.h"
 #define MAX_IREC 500
 //#include <QGeoCoordinate>
 #include <QNmeaPositionInfoSource>
@@ -100,11 +101,26 @@ dataProcessingThread::dataProcessingThread()
     mRadarData = new C_radar_data();
     isPlaying = false;
     radarSocket = new QUdpSocket(this);
-    int port = 34567;
+    navSocket = new QUdpSocket(this);
+    int port = CConfig::getInt("radarDataPort",34567);
     while(port<34700)
     {
         if(radarSocket->bind(port))
         {
+            break;
+        }
+        port++;
+    }
+    port = CConfig::getInt("navDataPort",30000);
+    while(port<30100)
+    {
+        if(navSocket->bind(port))
+        {
+            geoLocation = new QNmeaPositionInfoSource(QNmeaPositionInfoSource::RealTimeMode,this);
+            geoLocation->setDevice(navSocket);
+
+            geoLocation->startUpdates();
+            connect(navSocket,SIGNAL(readyRead()),this, SLOT(ReadNavData()));
             break;
         }
         port++;
@@ -114,6 +130,20 @@ dataProcessingThread::dataProcessingThread()
     connect(&readUdpBuffTimer, &QTimer::timeout, this, &dataProcessingThread::ReadDataBuffer);
     readUdpBuffTimer.start(10);
     initSerialComm();
+}
+void dataProcessingThread::ReadNavData()
+{
+    while(navSocket->hasPendingDatagrams())
+    {
+        int len = radarSocket->pendingDatagramSize();
+        QByteArray data;
+        data.resize(len);
+        radarSocket->readDatagram(data.data(),len);
+        CGPSParser gpsParser(QString::da);
+        gpsParser.
+    }
+
+    return;
 }
 QString str="";
 
@@ -141,13 +171,16 @@ void dataProcessingThread::initSerialComm()
     }
 
 }
-bool  dataProcessingThread::getPosition(double *lat,double *lon)
+bool  dataProcessingThread::getPosition(double *lat,double *lon, double *heading)
 {
     if(!geoLocation)return false;
 
     QGeoPositionInfo location = geoLocation->lastKnownPosition();
+    if(!location.isValid())return false ;
     *lat = location.coordinate().latitude();
     *lon = location.coordinate().longitude();
+    *heading = location.attribute(QGeoPositionInfo::Direction);
+
     return true;
 }
 

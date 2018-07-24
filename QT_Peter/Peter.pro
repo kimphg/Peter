@@ -41,7 +41,8 @@ SOURCES += main.cpp\
     dialogcommandlog.cpp \
     statuswindow.cpp \
     dialogcommandset.cpp \
-    dialogmenudisplay.cpp
+    dialogmenudisplay.cpp \
+    c_gps_parser.cpp
 
 
 HEADERS  += mainwindow.h \
@@ -65,7 +66,8 @@ HEADERS  += mainwindow.h \
     dialogcommandlog.h \
     statuswindow.h \
     dialogcommandset.h \
-    dialogmenudisplay.h
+    dialogmenudisplay.h \
+    c_gps_parser.h
 
 FORMS    += mainwindow.ui \
     dialogdocumentation.ui \

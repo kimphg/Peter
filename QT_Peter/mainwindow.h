@@ -400,6 +400,8 @@ private slots:
 
     void on_tabWidget_iad_tabBarClicked(int index);
 
+    void on_toolButton_xl_nguong_3_clicked();
+
 private:
     void initActionsConnections();
     void initGraphicView();

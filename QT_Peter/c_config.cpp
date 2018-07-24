@@ -16,26 +16,34 @@ void CConfig::setValue(QString key, QString value)
     SaveToFile();
 }
 
-double CConfig::getDouble(QString key)
+double CConfig::getDouble(QString key,double defaultValue )
 {
     if(mHashData.find(key)!=mHashData.end())
     return mHashData.value(key).toDouble();
-    else return 0;
+    else
+    {
+        setValue(key,defaultValue);
+        return defaultValue;
+    }
 }
-int CConfig::getInt(QString key)
+int CConfig::getInt(QString key, int defaultValue )
 {
     if(mHashData.find(key)!=mHashData.end())
     return mHashData.value(key).toInt();
-    else return 0;
+    else
+    {
+        setValue(key,defaultValue);
+        return defaultValue;
+    }
 }
-QString CConfig::getString(QString key)
+QString CConfig::getString(QString key,QString defaultValue )
 {
     if(mHashData.find(key)!=mHashData.end())
     return mHashData.value(key);
     else
     {
-        mHashData.insert(key,"0");
-        return QString::number(0);
+        setValue(key,defaultValue);
+        return defaultValue;
     }
 }
 
