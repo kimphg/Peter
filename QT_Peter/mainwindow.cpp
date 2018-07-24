@@ -11,7 +11,7 @@
 #define MAX_VIEW_RANGE_KM 50
 QStringList                 commandLogList;
 QPixmap                     *pMap=NULL;// painter cho ban do
-QPixmap                     *pViewFrame=NULL;// painter cho ban do
+//QPixmap                     *pViewFrame=NULL;// painter cho ban do
 CMap *osmap ;
 StatusWindow                *mstatWin;
 double                      mTrueN2,mTrueN;
@@ -19,11 +19,15 @@ int                         mRangeLevel = 0;
 int                         mDistanceUnit=0;//0:NM;1:KM
 double                      mZoomSizeRg = 2;
 double                      mZoomSizeAz = 10;
-double                      mLat=DEFAULT_LAT,mLon = DEFAULT_LONG;
+double                      mLat=DEFAULT_LAT,mLon = DEFAULT_LONG,mHeading = 0;
 dataProcessingThread        *processing;// thread xu ly du lieu radar
 C_radar_data                *pRadar;
 QThread                     *t2,*t1;
-
+QPen penBackground(QBrush(QColor(40 ,60 ,100,255)),60);
+QPen penOuterGrid4(QBrush(QColor(255,255,50 ,255)),4);xoay mui tau
+QPen penOuterGrid2(QBrush(QColor(255,255,50 ,255)),2);
+QPen mGridViewPen1(QBrush(QColor(150,150,150,255)),1);
+QPoint points[6];
 double                      mMapOpacity;
 int                         mMaxTapMayThu=18;
 //Q_vnmap                     vnmap;
@@ -107,6 +111,12 @@ double x2lon(short x)
 {
     float refLat = mLat*0.00872664625997;
     return (x  )/mScale/111.31949079327357f/cosf(refLat) + mLon;
+}
+inline QString demicalDegToDegMin(double demicalDeg)
+{
+    return QString::number( (short)demicalDeg) +
+           QString::fromLocal8Bit("\260")+
+           QString::number((demicalDeg-(short)demicalDeg)*60.0,'f',2);
 }
 void Mainwindow::mouseDoubleClickEvent( QMouseEvent * e )
 {
@@ -302,8 +312,8 @@ void Mainwindow::keyPressEvent(QKeyEvent *event)
             short   my=this->mapFromGlobal(QCursor::pos()).y();
             double mlat = y2lat(-(my - scrCtY+dy));
             double mlon = x2lon(mx - scrCtX+dx);
-            SetGPS(mlat,mlon);
-            DrawMap();
+            SetGPS(mlat,mlon,0);
+
             this->repaint();
 
         }
@@ -605,7 +615,7 @@ void MainWindow::openShpFile()
 Mainwindow::~Mainwindow()
 {
     delete ui;
-
+    CConfig::SaveToFile();
     if(pMap)delete pMap;
 }
 
@@ -1076,11 +1086,9 @@ void Mainwindow::UpdateMouseStat(QPainter *p)
     }
     rg/=rangeRatio;
     ui->label_cursor_range->setText(QString::number(rg,'f',2)+strDistanceUnit);
-    ui->label_cursor_azi->setText(QString::number((short)azi)+QString::fromLocal8Bit("\260")+QString::number((azi - (short)azi)*60,'f',2)+"'");
-    ui->label_cursor_lat->setText(QString::number( (short)y2lat(-(my - scrCtY+dy)))+QString::fromLocal8Bit("\260")+
-                                  QString::number(((float)y2lat(-(my - scrCtY+dy))-(short)(y2lat(-(my - scrCtY+dy))))*60,'f',2)+"'N");
-    ui->label_cursor_long->setText(QString::number( (short)x2lon(mx - scrCtX+dx))+QString::fromLocal8Bit("\260")+
-                                   QString::number(((float)x2lon(mx - scrCtX+dx)-(short)(x2lon(mx - scrCtX+dx)))*60,'f',2)+"'E");
+    ui->label_cursor_azi->setText(QString::number(azi)+QString::fromLocal8Bit("\260"));
+    ui->label_cursor_lat->setText(demicalDegToDegMin( y2lat(-(my - scrCtY+dy)))+"'N");
+    ui->label_cursor_long->setText(demicalDegToDegMin(x2lon(mx - scrCtX+dx))+"'E");
 
     if(isSelectingTarget)
     {
@@ -1290,7 +1298,7 @@ void Mainwindow::InitSetting()
     pRadar->setTrueN(mTrueN);
     //load map
     osmap = new CMap();
-    SetGPS(CConfig::getDouble("mLat"), CConfig::getDouble("mLon"));
+    SetGPS(CConfig::getDouble("mLat"), CConfig::getDouble("mLon"),0);
     osmap->setCenterPos(mLat,mLon);
     osmap->setImgSize(SCR_H,SCR_H);
     osmap->SetType(0);
@@ -1358,7 +1366,7 @@ void Mainwindow::InitSetting()
     //vnmap.setUp(config.m_config.lat(), config.m_config.lon(), 200,config.m_config.mapFilename.data());
     if(pMap)delete pMap;
     pMap = new QPixmap(SCR_H,SCR_H);
-    pViewFrame = new QPixmap(SCR_W,SCR_H);
+    //pViewFrame = new QPixmap(SCR_W,SCR_H);
     setMouseMode(MouseDrag,true);
     DrawMap();
     update();
@@ -1458,94 +1466,66 @@ void Mainwindow::DrawViewFrame(QPainter* p)
             DrawGrid(p,scrCtX-dx,scrCtY-dy);
         }
     }
-    //ve phuong vi ang ten
-    QPoint point[6];//,point1,point2,pointA,pointB;
-
-    double azi = rad2deg(pRadar->getCurAziRad());
-    double minazi = rad2deg(pRadar->getArcMinAziRad());
-    double maxazi = rad2deg(pRadar->getArcMaxAziRad());
-    if(maxazi<minazi)minazi-=360.0;
-    double dazi = maxazi-minazi;
-    //drwa arc
-    QRect rect(scrCtX-dx-50,scrCtY-dy-50,100,100);
-    p->setPen(QPen(Qt::white,2,Qt::DashLine));
-    p->drawArc(rect,16*((-maxazi+90)),dazi*16);
-
-    //plot center azi
-    centerAzi = processing->getSelsynAzi()+mTrueN2 ;
-    if(centerAzi>360)centerAzi-=360;
-    if(CalcAziContour(centerAzi,&point[0],&point[2],&point[1],SCR_H-70))
+    //fill back ground
+    p->setBrush(QColor(40,60,100,255));
+    p->drawRect(scrCtX+scrCtY,0,width()-scrCtX-scrCtY,height());
+    p->drawRect(0,0,scrCtX-scrCtY,height());
+    p->setBrush(Qt::NoBrush);
+    p->setPen(penOuterGrid4);
+    p->drawEllipse(scrCtX-scrCtY+25,25,SCR_H -50,SCR_H -50);
+    p->setPen(penBackground);
+    for (short i=60;i<650;i+=110)
     {
-        p->setPen(QPen(Qt::yellow,8,Qt::SolidLine,Qt::FlatCap,Qt::MiterJoin));
-        //            p->drawLine(point2,point0);
-        CalcAziContour(centerAzi-10,&point[0],&point[3],&point[5],SCR_H);
-        CalcAziContour(centerAzi+10,&point[2],&point[3],&point[5],SCR_H);
-        ui->label_debug->setText(QString::number(processing->mazi)
-                                 +":"+QString::number(processing->realazi1)
-                                 +":"+QString::number(processing->realazi2));
-        p->drawPolyline(&point[0],3);
-        //            p->drawText(point2.x()-25,point0.y()-10,50,20,
-        //                        Qt::AlignHCenter|Qt::AlignVCenter,
-        //                        QString::number(azi,'f',2));
+        p->drawEllipse(-i/2+(scrCtX-scrCtY)+25,-i/2+25,SCR_H -50+i,SCR_H -50+i);
     }
-    //plot cur azi
-    if(CalcAziContour(azi,&point[0],&point[1],&point[2],SCR_H-70))
+    p->setPen(penOuterGrid2);
+    QFont font10 = p->font() ;
+    font10.setPointSize(10);
+    p->setFont(font10);
+    for(short theta=0;theta<360;theta+=10)
     {
-        p->setPen(QPen(Qt::red,4));
-        p->drawLine(point[2],point[0]);
-        //            p->drawText(point2.x()-25,point0.y()-10,50,20,
-        //                        Qt::AlignHCenter|Qt::AlignVCenter,
-        //                        QString::number(azi,'f',2));
-    }
-
-    if(mouse_mode&MouseDrag)
-    {
-        pViewFrame->fill(Qt::transparent);
-        QPainter pt(pViewFrame);
-        pt.setRenderHint(QPainter::Antialiasing);
-        //draw view frame
-        short d = SCR_H-50;
-        QPen penBackground(QColor(40,60,100,255));
-        short linewidth = 0.6*SCR_H;
-        penBackground.setWidth(linewidth/10);
-        pt.setPen(penBackground);
-        for (short i=linewidth/12;i<linewidth;i+=linewidth/6)
+        if(CalcAziContour(theta,&points[0],&points[1],&points[2],SCR_H -50))
         {
-            pt.drawEllipse(-i/2+(scrCtX-scrCtY)+25,-i/2+25,d+i,d+i);
+            p->drawLine(points[1],points[2]);
+            p->drawText(points[0].x()-25,points[0].y()-10,50,20,
+                    Qt::AlignHCenter|Qt::AlignVCenter,
+                    QString::number(theta));
         }
-        penBackground.setWidth(0);
-        pt.setPen(penBackground);
-        pt.setBrush(QColor(40,60,100,255));
-        pt.drawRect(scrCtX+scrCtY,0,SCR_W-scrCtX-scrCtY,SCR_H);
-        pt.drawRect(0,0,scrCtX-scrCtY,SCR_H);
-        pt.setBrush(Qt::NoBrush);
-
-        QPen pengrid(QColor(255,255,50,255));
-        pengrid.setWidth(4);
-        pt.setPen(pengrid);
-        pt.drawEllipse(scrCtX-scrCtY+25,25,d,d);
-        pengrid.setWidth(2);
-        pt.setPen(pengrid);
-        QFont font = pt.font() ;
-        font.setPointSize(10);
-        pt.setFont(font);
-
-        //short theta;
-        for(short theta=0;theta<360;theta+=10){
-
-            if(CalcAziContour(theta,&point[0],&point[1],&point[2],d))
-            {
-                pt.drawLine(point[1],point[2]);
-                pt.drawText(point[0].x()-25,point[0].y()-10,50,20,
-                        Qt::AlignHCenter|Qt::AlignVCenter,
-                        QString::number(theta));
-            }
-
-        }
+    }
+    double aziDeg = rad2deg(pRadar->getCurAziRad());
+    //plot center azi
+    double centerAzi = processing->getSelsynAzi()+mTrueN2 ;
+    if(centerAzi>360)centerAzi-=360;
+    if(CalcAziContour(centerAzi,&points[0],&points[2],&points[1],height()-70))
+    {
+        p->setPen(QPen(Qt::yellow,8,Qt::SolidLine,Qt::RoundCap,Qt::MiterJoin));
+        p->drawLine(points[2],points[1]);
+        p->drawText(720,40,200,20,0,"Sector:  "+QString::number(centerAzi,'f',1));
+    }
+    //plot heading azi
+    if(mHeading)
+    {
+        p->setPen(QPen(Qt::cyan,6,Qt::SolidLine,Qt::RoundCap));
+        double radHeading = mHeading/180.0*PI;
+        double dX = 20*sin(radHeading);
+        double dY = 20*cos(radHeading);
+        p->drawLine(scrCtX,scrCtY,scrCtX+dX,scrCtY-dY);
+        p->drawText(720,60,200,20,0,"Heading: "+QString::number(mHeading,'f',1));
 
     }
-    p->drawPixmap(0,0,*pViewFrame);
-    //HDC dc = ui->tabWidget->getDC();
+
+    //plot cur azi
+    if(CalcAziContour(aziDeg,&points[0],&points[1],&points[2],height()-70))
+    {
+        p->setPen(QPen(Qt::red,4,Qt::SolidLine,Qt::RoundCap));
+        p->drawLine(points[2],points[1]);
+        //draw text
+        p->drawText(720,20,200,20,0,"Antenna: "+QString::number(aziDeg,'f',1));
+
+    }
+
+
+
 }
 //void Mainwindow::setScaleNM(unsigned short rangeNM)
 //{
@@ -1920,7 +1900,7 @@ void Mainwindow::autoSwitchFreq()
 }
 void Mainwindow::sync1S()//period 1 second
 {
-    //processing->SerialEncoderRead();
+    UpdateGpsData();
     this->updateTargetInfo();
     if(processing->isConnected())
         setRadarState(CONNECTED);
@@ -2952,17 +2932,20 @@ void Mainwindow::on_toolButton_zoom_out_clicked()
 
 //}
 
-void Mainwindow::SetGPS(double lat,double lon)
+void Mainwindow::SetGPS(double lat,double lon,double heading)
 {
     mLat = lat;
     mLon = lon;
+    if(heading)mHeading = heading;
     CConfig::setValue("mLat",mLat);
     CConfig::setValue("mLon",mLon);
-    ui->text_latInput_2->setText(QString::number(mLat,'f',5));
-    ui->text_longInput_2->setText(QString::number(mLon,'f',5));
+    CConfig::setValue("mGPSHeading",heading);
+    ui->label_gps_lat->setText(demicalDegToDegMin(lat)+"'N");
+    ui->label_gps_lon->setText(demicalDegToDegMin(lon)+"'E");
+    ui->label_gps_heading->setText(QString::number(heading,'f',2));
     osmap->setCenterPos(mLat, mLon);
     DrawMap();
-    update();
+    repaint();
 }
 
 //void Mainwindow::on_dial_valueChanged(int value)
@@ -2986,7 +2969,7 @@ void Mainwindow::on_toolButton_set_heading_clicked()
 void Mainwindow::on_toolButton_gps_update_clicked()
 {
 
-    SetGPS(ui->text_latInput_2->text().toFloat(),ui->text_longInput_2->text().toFloat());
+    SetGPS(ui->text_latInput_2->text().toFloat(),ui->text_longInput_2->text().toFloat(),0);
 
 }
 
@@ -3556,22 +3539,20 @@ void Mainwindow::on_toolButton_tx_7_clicked()
 
 void Mainwindow::on_toolButton_gps_update_auto_clicked()
 {
-    double lat,lon,direction;
-    if(processing->getPosition(&lat,&lon,&direction))
-    {
-        CConfig::setValue("mLat",lat);
-        CConfig::setValue("mLon",lon);
-        SetGPS(lat, lon);
-    }
-    else
-    {
-        warningList.push_back("Chưa đủ tín hiệu vệ tinh");
-    }
-
-    DrawMap();
+    UpdateGpsData();
 }
 
+void Mainwindow::UpdateGpsData()
+{
 
+    if(processing->mGpsData.size())
+    {
+        ui->groupBox_gps->setTitle(QString::fromUtf8("GPS(đã kết nối)"));
+        GPSData data = processing->mGpsData.back();
+        SetGPS(data.lat, data.lon,data.heading);
+    }
+    else ui->groupBox_gps->setTitle(QString::fromUtf8("GPS(chưa kết nối)"));
+}
 void Mainwindow::on_toolButton_set_zoom_ar_size_clicked()
 {
     mZoomSizeRg = ui->textEdit_size_ar_r->text().toDouble();

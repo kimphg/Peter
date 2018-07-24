@@ -1,6 +1,6 @@
 #include "c_config.h"
 #include "c_radar_thread.h"
-#include "c_gps_parser.h"
+
 #define MAX_IREC 500
 //#include <QGeoCoordinate>
 #include <QNmeaPositionInfoSource>
@@ -31,7 +31,7 @@ void dataProcessingThread::ReadDataBuffer()
     while(iRec!=iRead)
     {
         nread++;
-        DataBuff *pData = &dataBuff[iRead];
+        uchar *pData = &udpFrameBuffer[iRead][0];
         if(nread>400)
         {
             mRadarData->resetData();
@@ -41,12 +41,12 @@ void dataProcessingThread::ReadDataBuffer()
         unsigned short dataLen = 4128;
         if(!isPlaying)
         {
-            mRadarData->processSocketData(&udpFrameBuffer[iRead][0],dataLen);
+            mRadarData->processSocketData(pData,dataLen);
 
             if(isRecording)
             {
                 signRecFile.write((char*)&dataLen);
-                signRecFile.write((char*)&udpFrameBuffer[iRead][0],4128);
+                signRecFile.write((char*)pData,4128);
             }
         }
         iRead++;
@@ -133,14 +133,49 @@ dataProcessingThread::dataProcessingThread()
 }
 void dataProcessingThread::ReadNavData()
 {
+
     while(navSocket->hasPendingDatagrams())
     {
-        int len = radarSocket->pendingDatagramSize();
+        int len = navSocket->pendingDatagramSize();
         QByteArray data;
         data.resize(len);
-        radarSocket->readDatagram(data.data(),len);
-        CGPSParser gpsParser(QString::da);
-        gpsParser.
+        navSocket->readDatagram(data.data(),len);
+        CGPSParser gpsParser(data.toStdString());
+        if(gpsParser.isDataValid)
+        {
+            if(gpsParser.latitude)
+            {
+
+                if(gpsParser.longitude)
+                {
+                    GPSData newGPSPoint;
+
+                    newGPSPoint.lat = gpsParser.latitude;
+                    newGPSPoint.lon = gpsParser.longitude;
+                    newGPSPoint.isFixed = true;
+
+                    long long time;// UTC time in seconds
+                    time = gpsParser.UTC%100 + 60*(gpsParser.UTC%10000)/100 + 3600*(gpsParser.UTC%1000000)/10000;
+                    newGPSPoint.timeStamp = time;
+                    while(mGpsData.size()>5)
+                    {
+                        mGpsData.pop();
+                    }
+                    if(gpsParser.heading)newGPSPoint.heading = gpsParser.heading;
+                    else if(mGpsData.size()>5)
+                    {
+                        double dLat = mGpsData.back().lat - mGpsData.front().lat;
+                        double dLon = mGpsData.back().lon - mGpsData.front().lon;
+                        if(dLat!=0)newGPSPoint.heading = atan(dLon/dLat)/3.1415926535489*180.0;
+                        else
+                            newGPSPoint.heading = 180-90*(dLon>0);
+                        if(newGPSPoint.heading<0)newGPSPoint.heading+=360;
+                    }
+                    else newGPSPoint.heading = 0;
+                    mGpsData.push(newGPSPoint);
+                }
+            }
+        }
     }
 
     return;
@@ -171,7 +206,7 @@ void dataProcessingThread::initSerialComm()
     }
 
 }
-bool  dataProcessingThread::getPosition(double *lat,double *lon, double *heading)
+/*bool  dataProcessingThread::getPosition(double *lat,double *lon, double *heading)
 {
     if(!geoLocation)return false;
 
@@ -182,7 +217,7 @@ bool  dataProcessingThread::getPosition(double *lat,double *lon, double *heading
     *heading = location.attribute(QGeoPositionInfo::Direction);
 
     return true;
-}
+}*/
 
 double dataProcessingThread::getHeading() const
 {

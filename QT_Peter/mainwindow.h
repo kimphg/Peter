@@ -113,7 +113,7 @@ private:
     void DrawMap();
     void ReloadSetting();
     void SendCommandControl();
-    void SetGPS(double lat, double lon);
+    void SetGPS(double lat, double lon, double heading);
 public slots:
 //    void UpdateSetting();
 //    void UpdateSignScale();
@@ -420,6 +420,7 @@ private:
     void sendToRadarString(QString command);
     void autoSwitchFreq();
     void checkClickAIS(int xclick, int yclick);
+    void UpdateGpsData();
 };
 
 #endif // MAINWINDOW_H

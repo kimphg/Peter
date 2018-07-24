@@ -7,13 +7,13 @@ void CConfig::setValue(QString key, double value)
 {
     QString strValue = QString::number(value);
     mHashData.insert(key, strValue);
-    SaveToFile();
+    //SaveToFile();
 }
 
 void CConfig::setValue(QString key, QString value)
 {
     mHashData.insert(key, value);
-    SaveToFile();
+    //SaveToFile();
 }
 
 double CConfig::getDouble(QString key,double defaultValue )

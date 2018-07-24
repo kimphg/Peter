@@ -8,6 +8,7 @@
 #include "c_arpa_data.h"
 #include "c_config.h"
 #include "AIS/AIS.h"
+#include "c_gps_parser.h"
 #include <vector>
 #include <QFile>
 #include <QUdpSocket>
@@ -22,6 +23,14 @@
 
 #endif
 #define HR2D_UDP_PORT 5000
+using namespace std;
+struct GPSData
+{
+    double lat,lon;
+    double heading,speed;
+    long long timeStamp;
+    bool isFixed;
+};
 struct DataBuff// buffer for data frame
 {
     short len;
@@ -38,6 +47,7 @@ class dataProcessingThread:public QThread
 {
     Q_OBJECT
 public:
+    std::queue<GPSData> mGpsData;
     unsigned char    connect_timeout;
     //QMutex  mutex_data_change;
     unsigned short    playRate;
@@ -82,14 +92,14 @@ public:
     double newAzi;
     unsigned int mazi;
     unsigned int realazi1,realazi2;
-    bool getPosition(double *lat, double *lon, double *heading);
+    //bool getPosition(double *lat, double *lon, double *heading);
     double getHeading() const;
 
     bool   isHeadingAvaible;
 signals:
     void HeadingDataReceived(double heading);
 private:
-    QGeoPositionInfo mLocation;
+
     QSerialPort mEncoderPort;
     double mHeading ;
     unsigned char failureCount;

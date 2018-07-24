@@ -4,12 +4,9 @@
 #include <sstream>
 #include <stdlib.h>
 
-C_GPS_Parser::C_GPS_Parser()
-{
 
-}
 
-C_GPS_Parser::C_GPS_Parser()
+void CGPSParser::reset()
 {
     UTC                 = 0;
     latitude            = 0;
@@ -22,35 +19,36 @@ C_GPS_Parser::C_GPS_Parser()
 }
 
 // Constructor using GGA and RMC sentences only. Assigns all data.
-C_GPS_Parser::C_GPS_Parser(string sentence){
-    C_GPS_Parser();
+CGPSParser::CGPSParser(std::string sentence){
+    reset();
     isDataValid = true;
-    if (isValidGGA(sentence)) setValuesGGA(sentence);
-    else if (isValidRMC(sentence)) setValuesRMC(sentence);
+    if (isValidGGA(sentence))
+        setValuesGGA(sentence);
+    else if (isValidRMC(sentence))
+        setValuesRMC(sentence);
     else isDataValid  =false;
 }
 
 // Set values from GGA sentence
 
 // Checks if GGA sentence is valid.
-bool C_GPS_Parser::isValidGGA(const string GGASentence){
-    bool returnBool = true;
+bool CGPSParser::isValidGGA(const string GGASentence){
+
     vector<std::string> elementVector = splitStringByComma(GGASentence);
 
-    if (elementVector[0] != "$GPGGA")               returnBool = false;
-    if (elementVector.size() != 15)                 returnBool = false;
-    if (atoi(elementVector[6].c_str()) == 0)        returnBool = false;
-    if (elementVector[4].length() < MINUTE_LENGTH)  returnBool = false;
-    if (elementVector[2].length() < MINUTE_LENGTH)  returnBool = false;
-    if (atoi(elementVector[7].c_str()) == 0)        returnBool = false;
+    if (elementVector[0] != "$GPGGA")               return false;
+    if (elementVector.size() != 15)                 return false;
+    if (atoi(elementVector[6].c_str()) == 0)        return false;
+    if (elementVector[4].length() < MIN_COORD_LEN)  return false;
+    if (elementVector[2].length() < MIN_COORD_LEN)  return false;
+    if (atoi(elementVector[7].c_str()) == 0)        return false;
 
-    return returnBool;
+    return true;
 }
 
 // Input: GGA NMEA sentence
 // Output: set values in class.
-void C_GPS_Parser::setValuesGGA(string GGA){
-
+void CGPSParser::setValuesGGA(string GGA){
     vector<std::string> elementVector = splitStringByComma(GGA);
     // Assert we have a GGA sentence
     assert(elementVector[0] == "$GPGGA");
@@ -68,21 +66,20 @@ void C_GPS_Parser::setValuesGGA(string GGA){
 // RMC sentence
 
 // Check if RMC sentence is valid with NMEA standard.
-bool C_GPS_Parser::isValidRMC(const string RMCSentence){
-    bool returnBool = true;
+bool CGPSParser::isValidRMC(const string RMCSentence){
     vector<std::string> elementVector = splitStringByComma(RMCSentence);
 
-    if (elementVector[0] != "$GPRMC")               returnBool = false;
-    if (elementVector.size() != 12)                 returnBool = false;
-    if (elementVector[2] != "A")                    returnBool = false;
-    if (elementVector[3].length() < MINUTE_LENGTH)  returnBool = false;
-    if (elementVector[5].length() < MINUTE_LENGTH)  returnBool = false;
+    if (elementVector[0] != "$GPRMC")               return false;
+    if (elementVector.size() != 12)                 return false;
+    if (elementVector[2] != "A")                    return false;
+    if (elementVector[3].length() < MIN_COORD_LEN)  return false;
+    if (elementVector[5].length() < MIN_COORD_LEN)  return false;
 
-    return returnBool;
+    return true;
 
 }
 
-void C_GPS_Parser::setValuesRMC(const string RMCSentence){
+void CGPSParser::setValuesRMC(const string RMCSentence){
 
     vector<std::string> elementVector = splitStringByComma(RMCSentence);
     // Assert we have an RMC  sentence
@@ -93,7 +90,7 @@ void C_GPS_Parser::setValuesRMC(const string RMCSentence){
     if (elementVector[3] == "S") this->latitude  = -this->latitude;
     this->longitude         = getCoordinates(elementVector[5]);
     if (elementVector[5] == "W") this->longitude  = -this->longitude;
-    this->speed             = stringToDouble(elementVector[7])* KNOTS_TO_MPS;
+    this->speed             = stringToDouble(elementVector[7]);
     this->heading           = stringToDouble(elementVector[8]);
     this->date              = atoi(elementVector[9].c_str());
 
@@ -104,7 +101,7 @@ void C_GPS_Parser::setValuesRMC(const string RMCSentence){
 
 // Input: coma separated string
 // Output: Vector with all the elements in input.
-vector<string> C_GPS_Parser::splitStringByComma(string input){
+vector<string> CGPSParser::splitStringByComma(string input){
 
     vector<string>  returnVector;
     stringstream    ss(input);
@@ -125,7 +122,7 @@ double degreesToDecimal(int degrees, double minutes, int seconds )
 
     return returnDouble;
 }
-double C_GPS_Parser::stringToDouble(string inputString){
+double CGPSParser::stringToDouble(string inputString){
 
     //If string empty, return 0.
     double returnValue = 0;
@@ -136,18 +133,18 @@ double C_GPS_Parser::stringToDouble(string inputString){
     return (returnValue);
 
 }
-double C_GPS_Parser::getCoordinates(string array){
+double CGPSParser::getCoordinates(string array){
 
     double decimalDegrees = 0;
     string degreeArray;
     string minuteArray;
-
+    std::size_t dotPos = array.find('.');
     // Convert input array into two sub arrays containing the degrees and the minutes
     // Check for correct array length
-    if (array.length() > MINUTE_LENGTH){
+    if (array.length() > MIN_COORD_LEN&&dotPos){
 
-        degreeArray.assign(array.begin(), array.end() - MINUTE_LENGTH);
-        minuteArray.assign(array.end() - MINUTE_LENGTH, array.end());
+        degreeArray.assign(array.begin(), array.begin()+dotPos-2);
+        minuteArray.assign(array.begin()+dotPos-2, array.end());
 
         // Convert strings into numbers
         int degrees;

@@ -5,17 +5,17 @@
 #include <iostream>
 #include <vector>
 #include <string>
-#define MINUTE_LENGTH 9
-#define private public
+#define MIN_COORD_LEN 5
+//#define private public
 
 using namespace std;
 
-class C_GPS_Parser
+class CGPSParser
 {
 public:
-    C_GPS_Parser();
-    C_GPS_Parser(const string GGASentence,const string RMCSentence);
-    bool    isDataValid();
+
+    CGPSParser(string sentence);
+    bool    isDataValid;
     int     UTC;
     double  latitude;
     double  longitude;
@@ -41,6 +41,7 @@ private:
     double stringToDouble(const string);
     double getCoordinates(string);
 
+    void reset();
 };
 
 double degreesToDecimal(const int Degrees,const double Minutes,const int seconds = 0);
