@@ -21,7 +21,6 @@ QMAKE_CXXFLAGS_WARN_OFF -= -Wunused-parameter
 TARGET = Peter
 TEMPLATE = app
 SOURCES += main.cpp\
-    mainwindow.cpp \
     c_arpa_data.cpp \
     qcustombutton.cpp \
     qcustomframe.cpp \
@@ -42,10 +41,11 @@ SOURCES += main.cpp\
     statuswindow.cpp \
     dialogcommandset.cpp \
     dialogmenudisplay.cpp \
-    c_gps_parser.cpp
+    c_gps_parser.cpp \
+    c_mainwindow.cpp
 
 
-HEADERS  += mainwindow.h \
+HEADERS  += \
     c_arpa_data.h \
     qcustombutton.h \
     qcustomframe.h \
@@ -67,7 +67,8 @@ HEADERS  += mainwindow.h \
     statuswindow.h \
     dialogcommandset.h \
     dialogmenudisplay.h \
-    c_gps_parser.h
+    c_gps_parser.h \
+    c_mainwindow.h
 
 FORMS    += mainwindow.ui \
     dialogdocumentation.ui \

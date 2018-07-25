@@ -110,7 +110,7 @@ private:
     void DrawSignal(QPainter *p);
     void drawAisTarget(QPainter *p);
     void DrawRadarTargetByPainter(QPainter* p);
-    void DrawMap();
+
     void ReloadSetting();
     void SendCommandControl();
     void SetGPS(double lat, double lon, double heading);
@@ -126,6 +126,7 @@ public:
 //    void setScaleNM(unsigned short rangeNM);
     void drawAisTarget2(QPainter *p);
 private slots:
+    void DrawMap();
     void readBuffer();
     void sync1S();
     void sync5p();
@@ -134,7 +135,7 @@ private slots:
     void processFrame();
     void processARPA();
     void on_actionExit_triggered();
-    void UpdateRadarData();
+    void UpdateVideo();
     void PlaybackRecFile();
     void on_actionConnect_triggered();
     void on_actionTx_On_triggered();

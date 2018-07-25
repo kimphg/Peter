@@ -423,7 +423,7 @@ C_radar_data::C_radar_data()
     rotDir=Right;
     raw_map_init();
     raw_map_init_zoom();
-    setTrueN(0);
+    setAziOffset(0);
     setScalePPI(1);
     resetData();
     setScaleZoom(4);

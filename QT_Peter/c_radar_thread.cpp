@@ -116,10 +116,7 @@ dataProcessingThread::dataProcessingThread()
     {
         if(navSocket->bind(port))
         {
-            geoLocation = new QNmeaPositionInfoSource(QNmeaPositionInfoSource::RealTimeMode,this);
-            geoLocation->setDevice(navSocket);
 
-            geoLocation->startUpdates();
             connect(navSocket,SIGNAL(readyRead()),this, SLOT(ReadNavData()));
             break;
         }
@@ -153,23 +150,28 @@ void dataProcessingThread::ReadNavData()
                     newGPSPoint.lat = gpsParser.latitude;
                     newGPSPoint.lon = gpsParser.longitude;
                     newGPSPoint.isFixed = true;
-
-                    long long time;// UTC time in seconds
-                    time = gpsParser.UTC%100 + 60*(gpsParser.UTC%10000)/100 + 3600*(gpsParser.UTC%1000000)/10000;
-                    newGPSPoint.timeStamp = time;
-                    while(mGpsData.size()>5)
+                    while(mGpsData.size()>10)
                     {
                         mGpsData.pop();
                     }
-                    if(gpsParser.heading)newGPSPoint.heading = gpsParser.heading;
-                    else if(mGpsData.size()>5)
+                    if(gpsParser.heading)
+                    {
+                        newGPSPoint.heading = gpsParser.heading;
+                        //printf("\nheading:%f",newGPSPoint.heading);
+                    }
+                    else if(mGpsData.size()>3)
                     {
                         double dLat = mGpsData.back().lat - mGpsData.front().lat;
                         double dLon = mGpsData.back().lon - mGpsData.front().lon;
-                        if(dLat!=0)newGPSPoint.heading = atan(dLon/dLat)/3.1415926535489*180.0;
+                        if(dLat!=0)
+                        {
+                            newGPSPoint.heading = atan(dLon/dLat)/3.1415926535489*180.0;
+                            if(dLat<0)newGPSPoint.heading+=180;
+                        }
                         else
                             newGPSPoint.heading = 180-90*(dLon>0);
                         if(newGPSPoint.heading<0)newGPSPoint.heading+=360;
+                        if(newGPSPoint.heading>360)newGPSPoint.heading-=360;
                     }
                     else newGPSPoint.heading = 0;
                     mGpsData.push(newGPSPoint);

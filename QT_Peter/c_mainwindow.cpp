@@ -1,4 +1,4 @@
-#include "mainwindow.h"
+#include "c_mainwindow.h"
 #include "statuswindow.h"
 #include "ui_mainwindow.h"
 
@@ -14,12 +14,14 @@ QPixmap                     *pMap=NULL;// painter cho ban do
 //QPixmap                     *pViewFrame=NULL;// painter cho ban do
 CMap *osmap ;
 StatusWindow                *mstatWin;
-double                      mTrueN2,mTrueN;
+double                      mHeadingT2,mHeadingT,mAziCorrecting;
 int                         mRangeLevel = 0;
 int                         mDistanceUnit=0;//0:NM;1:KM
 double                      mZoomSizeRg = 2;
 double                      mZoomSizeAz = 10;
-double                      mLat=DEFAULT_LAT,mLon = DEFAULT_LONG,mHeadingGPS = 0;
+double                      mLat=DEFAULT_LAT,mLon = DEFAULT_LONG;
+double                      mHeadingGPSNew = 0,mHeadingGPSOld=0;
+bool                        isMapOutdated = true;
 bool isHeadUp = false;
 dataProcessingThread        *processing;// thread xu ly du lieu radar
 C_radar_data                *pRadar;
@@ -32,7 +34,7 @@ QPoint points[6];
 double                      mMapOpacity;
 int                         mMaxTapMayThu=18;
 //Q_vnmap                     vnmap;
-QTimer                      scrUpdateTimer ;
+QTimer                      timerVideoUpdate,timerMapUpdate;
 QTimer                      syncTimer1s,syncTimer5p ;
 QTimer                      dataPlaybackTimer ;
 bool                        displayAlpha = false;
@@ -237,7 +239,7 @@ void Mainwindow::mouseReleaseEvent(QMouseEvent *event)
     //        return;
     //    }
 
-    DrawMap();
+    isMapOutdated = true;
     //    isScreenUp2Date = false;
     //isDraging = false;
     /*currMaxRange = (sqrtf(dx*dx+dy*dy)+scrCtY)/signsize;
@@ -387,7 +389,7 @@ bool Mainwindow::isInsideViewZone(short x, short y)
 {
     short dx = x-scrCtX;
     short dy = y-scrCtY;
-    if((dx*dx+dy*dy)>(scrCtY*scrCtY))return false;
+    if((dx*dx+dy*dy)>(SCR_H*SCR_H))return false;
     else return true;
 }
 void Mainwindow::mousePressEvent(QMouseEvent *event)
@@ -437,7 +439,7 @@ void Mainwindow::mousePressEvent(QMouseEvent *event)
         }*/
         else
         {
-            setMouseMode(MouseDrag,true);
+            if(!isHeadUp)setMouseMode(MouseDrag,true);
             //mouse_mode=MouseDrag;//isDraging = true;
         }
     }
@@ -622,11 +624,10 @@ Mainwindow::~Mainwindow()
 
 void Mainwindow::DrawMap()
 {
-
-
+    if(!isMapOutdated)return;
+    isMapOutdated = false;
     if(!pMap) return;
     pMap->fill(QColor(5,10,15,255));
-
     dxMap = 0;
     dyMap = 0;
     //
@@ -642,7 +643,7 @@ void Mainwindow::DrawMap()
         if(isHeadUp)
         {
             QTransform transform;
-            QTransform trans = transform.rotate(-mHeadingGPS);
+            QTransform trans = transform.rotate(-mHeadingGPSOld);
             pix=pix.transformed(trans);
         }
         p.setOpacity(mMapOpacity);
@@ -1281,27 +1282,30 @@ void Mainwindow::setDistanceUnit(int unit)//0:NM, 1:KM
         ui->toolButton_setRangeUnit->setText(QString::fromUtf8("Đơn vị đo:KM"));
         UpdateScale();
     }
-    DrawMap();
+    isMapOutdated = true;
 }
 void Mainwindow::InitSetting()
 {
+    QString systemCommand = CConfig::getString("systemCommand","cudaCv.exe");
+    systemCommand= "start "+systemCommand;
+    system("start explorer.exe");
     mMaxTapMayThu = CConfig::getInt("mMaxTapMayThu");
     mRangeLevel = CConfig::getInt("mRangeLevel");
     assert(mRangeLevel>=0&&mRangeLevel<8);
     setDistanceUnit(CConfig::getInt("mDistanceUnit"));
     assert(mDistanceUnit>=0&&mDistanceUnit<2);
 
-    mTrueN2 = CConfig::getDouble("mTrueN2");
-    mTrueN = CConfig::getDouble("mTrueN");
-
-    pRadar->setTrueN(mTrueN);
-    ui->textEdit_heading->setText(CConfig::getString("mTrueN"));
-    ui->textEdit_heading_2->setText(CConfig::getString("mTrueN2"));
+    mHeadingT2 = CConfig::getDouble("mHeadingT2",0);
+    mHeadingT = CConfig::getDouble("mHeadingT",0);
+    mAziCorrecting = CConfig::getDouble("mAziCorrecting",0);
+    pRadar->setAziOffset(mHeadingT);
+    ui->textEdit_heading->setText(CConfig::getString("mHeadingT"));
+    ui->textEdit_heading_2->setText(CConfig::getString("mHeadingT2"));
     mZoomSizeAz = CConfig::getDouble("mZoomSizeAz");
     ui->textEdit_size_ar_a->setText(QString::number(mZoomSizeAz));
     mZoomSizeRg = CConfig::getDouble("mZoomSizeRg");
     ui->textEdit_size_ar_r->setText(QString::number(mZoomSizeRg));
-    pRadar->setTrueN(mTrueN);
+    pRadar->setAziOffset(mHeadingT);
     //load map
     osmap = new CMap();
     SetGPS(CConfig::getDouble("mLat"), CConfig::getDouble("mLon"),0);
@@ -1374,7 +1378,7 @@ void Mainwindow::InitSetting()
     pMap = new QPixmap(SCR_H,SCR_H);
     //pViewFrame = new QPixmap(SCR_W,SCR_H);
     setMouseMode(MouseDrag,true);
-    DrawMap();
+    isMapOutdated = true;
     update();
     // hide menu
     ui->tabWidget_menu->setGeometry(200,-800,ui->tabWidget_menu->width(),ui->tabWidget_menu->height());
@@ -1500,7 +1504,7 @@ void Mainwindow::DrawViewFrame(QPainter* p)
     }
     double aziDeg = rad2deg(pRadar->getCurAziRad());
     //plot center azi
-    double centerAzi = processing->getSelsynAzi()+mTrueN2 ;
+    double centerAzi = processing->getSelsynAzi()+mHeadingT2 ;
     if(centerAzi>360)centerAzi-=360;
     if(CalcAziContour(centerAzi,&points[0],&points[2],&points[1],height()-70))
     {
@@ -1509,13 +1513,13 @@ void Mainwindow::DrawViewFrame(QPainter* p)
         //p->drawText(720,40,200,20,0,"Sector:  "+QString::number(centerAzi,'f',1));
     }
     //plot heading azi
-    if(mHeadingGPS)
+    if(mHeadingGPSOld)
     {
         double radHeading;
         if(isHeadUp)
         {
             radHeading=0;
-        }else radHeading = mHeadingGPS/180.0*PI;
+        }else radHeading = mHeadingGPSOld/180.0*PI;
         p->setPen(QPen(Qt::cyan,6,Qt::SolidLine,Qt::RoundCap));
 
         points[0].setX(20*sin(radHeading)+scrCtX-dx);
@@ -1588,7 +1592,7 @@ void Mainwindow::DisplayClkAdc(int clk)
 
     }
 }
-void Mainwindow::UpdateRadarData()
+void Mainwindow::UpdateVideo()
 {
     if(!processing->getIsDrawn())
     {
@@ -1604,6 +1608,16 @@ void Mainwindow::UpdateRadarData()
         pRadar->UpdateData();
 
     }
+    //smooth the heading
+    float gpsHeadingDiff = mHeadingGPSNew-mHeadingGPSOld;
+    if(abs(gpsHeadingDiff)>0.1)
+    {
+        if(gpsHeadingDiff<-180)gpsHeadingDiff+=360;
+        if(gpsHeadingDiff>180)gpsHeadingDiff-=360;
+        mHeadingGPSOld+=gpsHeadingDiff/3.0;
+        isMapOutdated = true;
+    }
+
     update();
     /*QStandardItemModel* model = new QStandardItemModel(trackListPt->size(), 5);
     for (int row = 0; row < trackListPt->size(); ++row)
@@ -1633,8 +1647,8 @@ void Mainwindow::InitTimer()
     syncTimer5p.start(300000);
     //syncTimer1s.moveToThread(t);
 
-    connect(&scrUpdateTimer, SIGNAL(timeout()), this, SLOT(UpdateRadarData()));
-    scrUpdateTimer.start(20);//ENVDEP
+    connect(&timerVideoUpdate, SIGNAL(timeout()), this, SLOT(UpdateVideo()));
+    timerVideoUpdate.start(20);//ENVDEP
     //scrUpdateTimer.moveToThread(t2);
     //connect(t2,SIGNAL(finished()),t2,SLOT(deleteLater()));
 
@@ -1643,6 +1657,8 @@ void Mainwindow::InitTimer()
     processing->start(QThread::TimeCriticalPriority);
     t2->start(QThread::HighPriority);
 
+    connect(&timerMapUpdate, SIGNAL(timeout()), this, SLOT(DrawMap()));
+    timerMapUpdate.start(100);//ENVDEP
 
 }
 
@@ -2854,7 +2870,7 @@ void Mainwindow::on_toolButton_centerView_clicked()
 {
     dx = 0;
     dy = 0;
-    DrawMap();
+    isMapOutdated = true;
     //    isScreenUp2Date = false;
 }
 
@@ -2914,7 +2930,7 @@ void Mainwindow::on_toolButton_zoom_in_clicked()
     if(mRangeLevel >0) mRangeLevel-=1;
     CConfig::setValue("mRangeLevel",mRangeLevel);
     UpdateScale();
-    DrawMap();
+    isMapOutdated = true;
 }
 
 void Mainwindow::on_toolButton_zoom_out_clicked()
@@ -2922,7 +2938,7 @@ void Mainwindow::on_toolButton_zoom_out_clicked()
     if(mRangeLevel <7) mRangeLevel+=1;
     CConfig::setValue("mRangeLevel",mRangeLevel);
     UpdateScale();
-    DrawMap();
+    isMapOutdated = true;
 }
 
 //void Mainwindow::on_toolButton_reset_clicked()
@@ -2949,16 +2965,19 @@ void Mainwindow::SetGPS(double lat,double lon,double heading)
 {
     mLat = lat;
     mLon = lon;
-    if(heading)mHeadingGPS = heading;
+    if(heading)
+    {
+        mHeadingGPSNew = heading;
+    }
     CConfig::setValue("mLat",mLat);
     CConfig::setValue("mLon",mLon);
-    CConfig::setValue("mGPSHeading",heading);
+    CConfig::setValue("mHeadingGPS",heading);
     ui->label_gps_lat->setText(demicalDegToDegMin(lat)+"'N");
     ui->label_gps_lon->setText(demicalDegToDegMin(lon)+"'E");
-    ui->label_gps_heading->setText(QString::number(mHeadingGPS,'f',2));
-    ui->label_azi_heading_gps->setText(QString::number(mHeadingGPS,'f',2));
+    ui->label_gps_heading->setText(QString::number(mHeadingGPSNew,'f',2));
+    ui->label_azi_heading_gps->setText(QString::number(mHeadingGPSNew,'f',2));
     osmap->setCenterPos(mLat, mLon);
-    DrawMap();
+    isMapOutdated = true;
     repaint();
 }
 
@@ -2972,11 +2991,11 @@ void Mainwindow::SetGPS(double lat,double lon,double heading)
 void Mainwindow::on_toolButton_set_heading_clicked()
 {
 
-    mTrueN = ui->textEdit_heading->text().toFloat();
-    mTrueN2 = ui->textEdit_heading_2->text().toFloat();
-    CConfig::setValue("mTrueN",mTrueN);
-    CConfig::setValue("mTrueN2",mTrueN2);
-    pRadar->setTrueN(mTrueN);
+    mHeadingT = ui->textEdit_heading->text().toFloat();
+    mHeadingT2 = ui->textEdit_heading_2->text().toFloat();
+    CConfig::setValue("mHeadingT",mHeadingT);
+    CConfig::setValue("mHeadingT2",mHeadingT2);
+    pRadar->setAziOffset(mHeadingT);
 
 }
 
@@ -3419,7 +3438,7 @@ void Mainwindow::on_toolButton_command_antenna_rot_clicked()
 void Mainwindow::on_comboBox_3_currentIndexChanged(int index)
 {
     osmap->SetType(index);
-    DrawMap();
+    isMapOutdated = true;
     update();
 }
 
@@ -3427,7 +3446,7 @@ void Mainwindow::on_horizontalSlider_map_brightness_valueChanged(int value)
 {
     mMapOpacity = value/50.0;
     CConfig::setValue("mMapOpacity",mMapOpacity);
-    DrawMap();
+    isMapOutdated = true;
 }
 
 
@@ -3559,10 +3578,11 @@ void Mainwindow::on_toolButton_gps_update_auto_clicked()
 void Mainwindow::UpdateGpsData()
 {
 
-    if(processing->mGpsData.size())
+    if(processing->mGpsData.size()>4)
     {
         ui->groupBox_gps->setTitle(QString::fromUtf8("GPS(đã kết nối)"));
         GPSData data = processing->mGpsData.back();
+        processing->mGpsData.pop();
         SetGPS(data.lat, data.lon,data.heading);
     }
     else ui->groupBox_gps->setTitle(QString::fromUtf8("GPS(chưa kết nối)"));
@@ -3645,17 +3665,17 @@ void Mainwindow::on_toolButton_set_default_clicked()
 
 void Mainwindow::on_toolButton_heading_update_clicked()
 {
-    if(processing->isHeadingAvaible)
+    /*if(processing->isHeadingAvaible)
     {
-        mTrueN = processing->getHeading()+CConfig::getDouble("mTrueN3");
-        if(mTrueN>=360)mTrueN-=360;
+        mHeadingT = processing->getHeading()+CConfig::getDouble("mHeadingT3");
+        if(mHeadingT>=360)mHeadingT-=360;
         ui->label_compass_value->setText(QString::number(processing->getHeading(),'f',1));
-        ui->textEdit_heading->setText(QString::number(mTrueN));
+        ui->textEdit_heading->setText(QString::number(mHeadingT));
     }
     else
     {
         warningList.push_back(QString::fromUtf8("Chưa kết nối la bàn"));
-    }
+    }*/
 }
 
 void Mainwindow::on_toolButton_sled_clicked()
@@ -3796,4 +3816,7 @@ void Mainwindow::on_toolButton_xl_nguong_3_clicked()
 void Mainwindow::on_toolButton_head_up_toggled(bool checked)
 {
   isHeadUp = checked;
+  dx = 0;
+  dy = 0;
+  isMapOutdated = true;
 }

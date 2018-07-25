@@ -91,9 +91,6 @@ public:
     double newAzi;
     unsigned int mazi;
     unsigned int realazi1,realazi2;
-    //bool getPosition(double *lat, double *lon, double *heading);
-    double getHeading() const;
-
     bool   isHeadingAvaible;
 signals:
     void HeadingDataReceived(double heading);

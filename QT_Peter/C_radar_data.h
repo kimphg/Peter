@@ -260,7 +260,7 @@ public:
     void        addTrackManual(double x, double y);
     void        addTrack(object_t *mObject);
     static    void        kmxyToPolarDeg(double x, double y, double *azi, double *range);
-    void        setTrueN(double trueN_deg){
+    void        setAziOffset(double trueN_deg){
 
         while(trueN_deg<0)trueN_deg+=360;
         while(trueN_deg>=360)trueN_deg-=360;
