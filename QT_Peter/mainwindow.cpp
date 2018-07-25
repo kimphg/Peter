@@ -19,12 +19,13 @@ int                         mRangeLevel = 0;
 int                         mDistanceUnit=0;//0:NM;1:KM
 double                      mZoomSizeRg = 2;
 double                      mZoomSizeAz = 10;
-double                      mLat=DEFAULT_LAT,mLon = DEFAULT_LONG,mHeading = 0;
+double                      mLat=DEFAULT_LAT,mLon = DEFAULT_LONG,mHeadingGPS = 0;
+bool isHeadUp = false;
 dataProcessingThread        *processing;// thread xu ly du lieu radar
 C_radar_data                *pRadar;
 QThread                     *t2,*t1;
 QPen penBackground(QBrush(QColor(40 ,60 ,100,255)),60);
-QPen penOuterGrid4(QBrush(QColor(255,255,50 ,255)),4);xoay mui tau
+QPen penOuterGrid4(QBrush(QColor(255,255,50 ,255)),4);//xoay mui tau
 QPen penOuterGrid2(QBrush(QColor(255,255,50 ,255)),2);
 QPen mGridViewPen1(QBrush(QColor(150,150,150,255)),1);
 QPoint points[6];
@@ -638,7 +639,12 @@ void Mainwindow::DrawMap()
         ConvKmToWGS((double(dx))/mScale,(double(-dy))/mScale,&dLong,&dLat);
         osmap->setCenterPos(dLat,dLong);
         QPixmap pix = osmap->getImage(mScale);
-
+        if(isHeadUp)
+        {
+            QTransform transform;
+            QTransform trans = transform.rotate(-mHeadingGPS);
+            pix=pix.transformed(trans);
+        }
         p.setOpacity(mMapOpacity);
         p.drawPixmap((-pix.width()/2+pMap->width()/2),
                      (-pix.height()/2+pMap->height()/2),pix.width(),pix.height(),pix
@@ -1500,17 +1506,24 @@ void Mainwindow::DrawViewFrame(QPainter* p)
     {
         p->setPen(QPen(Qt::yellow,8,Qt::SolidLine,Qt::RoundCap,Qt::MiterJoin));
         p->drawLine(points[2],points[1]);
-        p->drawText(720,40,200,20,0,"Sector:  "+QString::number(centerAzi,'f',1));
+        //p->drawText(720,40,200,20,0,"Sector:  "+QString::number(centerAzi,'f',1));
     }
     //plot heading azi
-    if(mHeading)
+    if(mHeadingGPS)
     {
+        double radHeading;
+        if(isHeadUp)
+        {
+            radHeading=0;
+        }else radHeading = mHeadingGPS/180.0*PI;
         p->setPen(QPen(Qt::cyan,6,Qt::SolidLine,Qt::RoundCap));
-        double radHeading = mHeading/180.0*PI;
+
+        points[0].setX(20*sin(radHeading)+scrCtX-dx);
+        points[0].setY(20*cos(radHeading)+scrCtX-dx);
         double dX = 20*sin(radHeading);
         double dY = 20*cos(radHeading);
-        p->drawLine(scrCtX,scrCtY,scrCtX+dX,scrCtY-dY);
-        p->drawText(720,60,200,20,0,"Heading: "+QString::number(mHeading,'f',1));
+        p->drawLine(scrCtX-dx,scrCtY-dy,scrCtX-dx+dX,scrCtY-dy-dY);
+        //p->drawText(720,60,200,20,0,"Heading: "+QString::number(mHeadingGPS,'f',1));
 
     }
 
@@ -1520,7 +1533,7 @@ void Mainwindow::DrawViewFrame(QPainter* p)
         p->setPen(QPen(Qt::red,4,Qt::SolidLine,Qt::RoundCap));
         p->drawLine(points[2],points[1]);
         //draw text
-        p->drawText(720,20,200,20,0,"Antenna: "+QString::number(aziDeg,'f',1));
+        //p->drawText(720,20,200,20,0,"Antenna: "+QString::number(aziDeg,'f',1));
 
     }
 
@@ -2936,13 +2949,14 @@ void Mainwindow::SetGPS(double lat,double lon,double heading)
 {
     mLat = lat;
     mLon = lon;
-    if(heading)mHeading = heading;
+    if(heading)mHeadingGPS = heading;
     CConfig::setValue("mLat",mLat);
     CConfig::setValue("mLon",mLon);
     CConfig::setValue("mGPSHeading",heading);
     ui->label_gps_lat->setText(demicalDegToDegMin(lat)+"'N");
     ui->label_gps_lon->setText(demicalDegToDegMin(lon)+"'E");
-    ui->label_gps_heading->setText(QString::number(heading,'f',2));
+    ui->label_gps_heading->setText(QString::number(mHeadingGPS,'f',2));
+    ui->label_azi_heading_gps->setText(QString::number(mHeadingGPS,'f',2));
     osmap->setCenterPos(mLat, mLon);
     DrawMap();
     repaint();
@@ -3777,4 +3791,9 @@ void Mainwindow::on_tabWidget_iad_tabBarClicked(int index)
 void Mainwindow::on_toolButton_xl_nguong_3_clicked()
 {
 
+}
+
+void Mainwindow::on_toolButton_head_up_toggled(bool checked)
+{
+  isHeadUp = checked;
 }

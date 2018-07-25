@@ -402,6 +402,8 @@ private slots:
 
     void on_toolButton_xl_nguong_3_clicked();
 
+    void on_toolButton_head_up_toggled(bool checked);
+
 private:
     void initActionsConnections();
     void initGraphicView();

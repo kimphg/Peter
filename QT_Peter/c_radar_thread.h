@@ -20,7 +20,6 @@
 #include "pcap.h"
 #ifndef CONST_NM
 #define CONST_NM 1.852f
-
 #endif
 #define HR2D_UDP_PORT 5000
 using namespace std;
@@ -100,9 +99,9 @@ signals:
     void HeadingDataReceived(double heading);
 private:
 
-    QSerialPort mEncoderPort;
-    double mHeading ;
-    unsigned char failureCount;
+    QSerialPort     mEncoderPort;
+    double          mHeading ;
+    unsigned char   failureCount;
     bool  isDrawn;
     bool isXuLyThuCap;
     RadarCommandQueue radarComQ;
@@ -127,7 +126,7 @@ private slots:
     void processARPAData(QByteArray inputdata);
     void playbackRadarData();
     void SerialDataRead();
-    void gpsupdate(QGeoPositionInfo geo);
+//    void gpsupdate(QGeoPositionInfo geo);
 
     void ReadNavData();
 public slots:

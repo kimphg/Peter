@@ -10,7 +10,7 @@ short iRec=0,iRead=0;
 bool *pIsDrawn;
 bool *pIsPlaying;
 //CConfig         mGlobbalConfig;
-QNmeaPositionInfoSource *geoLocation = NULL;
+//QNmeaPositionInfoSource *geoLocation = NULL;
 //QTimer readDataBuff;
 dataProcessingThread::~dataProcessingThread()
 {
@@ -219,22 +219,13 @@ void dataProcessingThread::initSerialComm()
     return true;
 }*/
 
-double dataProcessingThread::getHeading() const
-{
-    return mHeading;
-}
 
-void dataProcessingThread::gpsupdate(QGeoPositionInfo geo)
-{
-    //geo.HorizontalAccuracy
-    return;
-}
 void dataProcessingThread::SerialDataRead()
 {
     for(std::vector<QSerialPort*>::iterator it = serialPorts.begin() ; it != serialPorts.end(); ++it)
     {
         QByteArray responseData = (*it)->readAll();
-        if(!geoLocation)
+        /*if(!geoLocation)
         {
             if(responseData.contains("$GP")&&(!responseData.contains("HDT")))
             {
@@ -254,7 +245,7 @@ void dataProcessingThread::SerialDataRead()
                 return;
 
             }
-        }
+        }*/
         if(responseData.size())
         {
             processSerialData(responseData);
