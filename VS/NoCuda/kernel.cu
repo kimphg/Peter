@@ -42,14 +42,14 @@ class coreFFT
 {
 public:
 
-
+	bool isActive;
 	cufftHandle planTL;
-	cufftHandle planNenTH;
+	//cufftHandle planNenTH;
 	//cufftHandle planImageFFT;
 	cufftComplex *dSignalTL;
-	cufftComplex *dSignalNenRes;
-	cufftComplex *dSignalNen;
-	cufftComplex *dImageNen;
+	//cufftComplex *dSignalNenRes;
+	//cufftComplex *dSignalNen;
+	//cufftComplex *dImageNen;
 	int mMemSizeTL;
 	int mMemSizeNen;
 	int mMemSizeImage;
@@ -63,27 +63,37 @@ public:
 		cudaStatus = cudaSetDevice(0);
 		if (cudaStatus != cudaSuccess) {
 			fprintf(stderr, "cudaSetDevice failed!  Do you have a CUDA-capable GPU installed?");
-			
+			isActive = false;
+			return;
+		}
+		else
+		{
+			printf("\ncudaSetDevice on ");
 		}
 		mFrameLen = frameLen;
 		mTichLuySize = ntichluy;
 		mMemSizeTL = sizeof(cufftComplex)* mTichLuySize*frameLen;
-		mMemSizeNen = sizeof(cufftComplex)*frameLen;
-		mMemSizeImage = sizeof(cufftComplex)*frameLen;
+		//mMemSizeNen = sizeof(cufftComplex)*frameLen;
+		//mMemSizeImage = sizeof(cufftComplex)*frameLen;
 
 
-		if (cufftPlan1d(&planTL, mTichLuySize, CUFFT_C2C, frameLen) != CUFFT_SUCCESS)printf("\nFFT planTL failed to init");
+		if (cufftPlan1d(&planTL, mTichLuySize, CUFFT_C2C, frameLen) != CUFFT_SUCCESS)
+		{
+			printf("\nFFT planTL failed to init");
+			isActive = false;
+			return;
+		}
 		// Allocate device memory for signal tich luy
 		cudaMalloc((void **)&dSignalTL, mMemSizeTL);
-
-		if (cufftPlan1d(&planNenTH, frameLen, CUFFT_C2C, 1) != CUFFT_SUCCESS)printf("\nFFT planTL failed to init");
+		/*
+		if (cufftPlan1d(&planNenTH, frameLen, CUFFT_C2C, 1) != CUFFT_SUCCESS)printf("\nFFT planNenTH failed to init");
 		// Allocate device memory for signal nen
 		cudaMalloc((void **)&dSignalNen, mMemSizeNen);
 		cudaMalloc((void **)&dSignalNenRes, mMemSizeNen);
-
+		*/
 		//if (cufftPlan1d(&planImageFFT, frameLen, CUFFT_C2C, 1) != CUFFT_SUCCESS)printf("\nFFT planTL failed to init");
 		// Allocate device memory for image nen
-		cudaMalloc((void **)&dImageNen, mMemSizeNen);
+		//cudaMalloc((void **)&dImageNen, mMemSizeNen);
 	}
 	void exeFFTTL(cufftComplex *h_signal)
 	{
@@ -96,7 +106,7 @@ public:
 		}
 		cudaMemcpy(h_signal, dSignalTL, mMemSizeTL, cudaMemcpyDeviceToHost);
 	}
-	void exeFFTNen(cufftComplex *h_signal, cufftComplex* h_image)
+	/*void exeFFTNen(cufftComplex *h_signal, cufftComplex* h_image)
 	{
 		//move signal to gpu and process fft forward
 		cudaMemcpy(dSignalNen, h_signal, mMemSizeNen, cudaMemcpyHostToDevice);
@@ -110,36 +120,18 @@ public:
 			complexMulKernel << <1, 1024 >> >(dSignalNenRes+i, dSignalNen+i, dImageNen+i);
 		}
 		
-		/*cudaError_t cudaStatus = cudaGetLastError();
-		if (cudaStatus != cudaSuccess) {
-			fprintf(stderr, "addKernel launch failed: %s\n", cudaGetErrorString(cudaStatus));
-			
-		}*/
-
-		/*
-		cudaMemcpy(h_image, dImageNen, mMemSizeNen, cudaMemcpyDeviceToHost);
-		cudaMemcpy(h_signal, dSignalNen, mMemSizeNen, cudaMemcpyDeviceToHost);
-		for (int i = 0; i < mFrameLen; i++)
-		{
-			float x = h_image[i].x * h_signal[i].x + h_image[i].y * h_signal[i].y;
-			float y = h_signal[i].x * (-h_image[i].y) + h_signal[i].y * h_image[i].x;
-			h_signal[i].x = x/1000000.0;
-			h_signal[i].y = y/1000000.0;
-		}
-		cudaMemcpy(dSignalNenRes, h_signal, mMemSizeNen, cudaMemcpyHostToDevice);
-		*/
 		cufftExecC2C(planNenTH, dSignalNenRes, dSignalNenRes, CUFFT_FORWARD);
 		
 		cudaMemcpy(h_signal, dSignalNenRes, mMemSizeNen, cudaMemcpyDeviceToHost);
-	}
+	}*/
 	~coreFFT()
 	{
 		cufftDestroy(planTL);
-		cufftDestroy(planNenTH);
+		//cufftDestroy(planNenTH);
 		// cleanup memory
 		cudaFree(dSignalTL);
-		cudaFree(dSignalNen);
-		cudaFree(dImageNen);
+		//cudaFree(dSignalNen);
+		//cudaFree(dImageNen);
 	}
 };
 //_______________________________________________________________________
@@ -152,7 +144,7 @@ struct DataFrame// buffer for data frame
 	char image256[256];
 	bool isToFFT;
 } dataBuff[MAX_IREC];
-
+unsigned int gyroValue = 0;
 #define OUTPUT_FRAME_SIZE OUTPUT_FRAME_LEN*2+FRAME_HEADER_SIZE
 
 u_char outputFrame[OUTPUT_FRAME_SIZE];
@@ -265,7 +257,7 @@ void pcapRun()
 	/* Print the list */
 	for (d = alldevs; d; d = d->next)
 	{
-		printf("%d. %s", ++i, d->name);
+		printf("\n%d. %s", ++i, d->name);
 		if (d->description)
 			printf(" (%s)\n", d->description);
 		else
@@ -314,7 +306,7 @@ int datatestA[MAX_IREC];*/
 
 DWORD WINAPI ProcessDataBuffer(LPVOID lpParam)
 {
-	int curAzi = 0;
+	
 	
 	while (true)
 	{
@@ -326,15 +318,7 @@ DWORD WINAPI ProcessDataBuffer(LPVOID lpParam)
 			
 			for (int ir = 0; ir < FRAME_LEN; ir++)
 			{
-				//ramSignalNen[iProcessing][ir].x = sqrt(double(dataBuff[iProcessing].dataI[ir])*(dataBuff[iProcessing].dataI[ir]) + double(dataBuff[iProcessing].dataQ[ir])*(dataBuff[iProcessing].dataQ[ir]));
-				/*if (ir == 260)
-				{
-					datatestI[iProcessing] = float(dataBuff[iProcessing].dataI[264]);
-					datatestQ[iProcessing] = float(dataBuff[iProcessing].dataQ[264]);
-					datatestA[iProcessing] = sqrt(double(dataBuff[iProcessing].dataI[264] * dataBuff[iProcessing].dataI[264] + dataBuff[iProcessing].dataQ[264] * dataBuff[iProcessing].dataQ[264]));
-					//ramSignalNen[iProcessing][ir].x = int(dataBuff[iProcessing].dataI[264]);
-					//ramSignalNen[iProcessing][ir].y = int(dataBuff[iProcessing].dataQ[264]);
-				}*/
+				
 				//ramSignalNen[iProcessing][ir].x = sqrt(double(dataBuff[iProcessing].dataI[ir] * dataBuff[iProcessing].dataI[ir] + dataBuff[iProcessing].dataQ[ir] * dataBuff[iProcessing].dataQ[ir]));//int(dataBuff[iProcessing].dataI[ir]);
 				ramSignalNen[iProcessing][ir].x = float(dataBuff[iProcessing].dataI[ir]);
 				ramSignalNen[iProcessing][ir].y = float(dataBuff[iProcessing].dataQ[ir]);//0;// 
@@ -414,28 +398,28 @@ DWORD WINAPI ProcessDataBuffer(LPVOID lpParam)
 			
 			// perform fft
 
-			mFFT->exeFFTTL((cufftComplex*)ramSignalTL);
-			/*dataBuff[iProcessing].header[2] = curAzi >> 8;
-			dataBuff[iProcessing].header[3] = curAzi ;
-			curAzi++;
-			if (curAzi >= 4096)curAzi = 0;*/
+			if (mFFT->isActive)mFFT->exeFFTTL((cufftComplex*)ramSignalTL);
+			dataBuff[iProcessing].header[32] = gyroValue >> 8;
+			dataBuff[iProcessing].header[33] = gyroValue;
+			
 			memcpy(outputFrame, dataBuff[iProcessing].header, FRAME_HEADER_SIZE);
 			
 			for (int i = 0; i < FRAME_LEN; i++)
 			{
-				int maxAmp = 0, indexMaxFFT = 0;
+				float maxAmp = 0;
+				int indexMaxFFT = 0;
 				//for (int j = 0; j<FFT_SIZE; j++)
-				int fftSkip = BANG_KHONG*FFT_SIZE / 16.0;
+				int fftSkip = BANG_KHONG*FFT_SIZE / 16;
 				for (int j = fftSkip; j<FFT_SIZE - fftSkip; j++)
 				{
-					int ampl = (ramSignalTL[i][j].x * ramSignalTL[i][j].x) + (ramSignalTL[i][j].y * ramSignalTL[i][j].y);
+					float ampl = (ramSignalTL[i][j].x * ramSignalTL[i][j].x) + (ramSignalTL[i][j].y * ramSignalTL[i][j].y);
 					if (ampl>maxAmp)
 					{
 						maxAmp = ampl;
 						indexMaxFFT = j;
 					}
 				}
-				int res = sqrt(float(maxAmp) / float(FFT_SIZE));
+				float res = sqrt(float(maxAmp) / float(FFT_SIZE));
 				if (res > 255)res = 255;
 				outputFrame[i + FRAME_HEADER_SIZE] = res;// u_char(sqrt(float(maxAmp)) / float(FFT_SIZE));
 				outputFrame[i + OUTPUT_FRAME_LEN + FRAME_HEADER_SIZE] = u_char(indexMaxFFT*16.0 / (FFT_SIZE));
@@ -471,41 +455,55 @@ void packet_handler(u_char *param, const struct pcap_pkthdr *pkt_header, const u
 	//    localtime_s(&ltime, &local_tv_sec);
 	//    strftime( timestr, sizeof timestr, "%H:%M:%S", &ltime);
 
-	if (pkt_header->len<1000)return;
-	//pkt_header->
-	if (((*(pkt_data + 36) << 8) | (*(pkt_data + 37))) != 5000)
+	if (pkt_header->len<70)return;
+	int port = ((*(pkt_data + 36) << 8) | (*(pkt_data + 37)));
+	if (port == 5000)
 	{
-		//printf("\nport:%d",((*(pkt_data+36)<<8)|(*(pkt_data+37))));
+		u_char* data = (u_char*)pkt_data + UDP_HEADER_LEN;
+		int iNext = iReady + 1;
+		if (iNext >= MAX_IREC)iNext = 0;
+		
+		if (data[0] == 1)		//I chanel first part
+		{
+			dataBuff[iNext].isToFFT = ((iNext%mFFTSkip) == 0);
+			memcpy(dataBuff[iNext].header, data, FRAME_HEADER_SIZE);
+			memcpy(dataBuff[iNext].dataI, data + FRAME_HEADER_SIZE, 1024);
+		}
+		else if (data[0] == 2) //Q chanel first part
+		{
+			memcpy(dataBuff[iNext].dataQ, data + FRAME_HEADER_SIZE, 1024);
+			iReady++;
+			if (iReady >= MAX_IREC)iReady = 0;
+		}
+		else if (data[0] == 1) //I chanel second part
+		{
+			memcpy(dataBuff[iNext].dataI + 1024, data + FRAME_HEADER_SIZE, 1024);
+		}
+		else if (data[0] == 3) //Q chanel second part
+		{
+			memcpy(dataBuff[iNext].dataQ + 1024, data + FRAME_HEADER_SIZE, 1024);
+			iReady++;
+			if (iReady >= MAX_IREC)iReady = 0;
+		}
 		return;
 	}
-	int iNext = iReady + 1;
-	if (iNext >= MAX_IREC)iNext = 0;
-	u_char* data = (u_char*)pkt_data + UDP_HEADER_LEN;
-	if (data[0] == 1)		//I chanel first part
+	else if (port == 30001)
 	{
-		dataBuff[iNext].isToFFT = ((iNext%mFFTSkip) == 0);
-		memcpy(dataBuff[iNext].header, data, FRAME_HEADER_SIZE);
-		memcpy(dataBuff[iNext].dataI, data + FRAME_HEADER_SIZE, 1024);
+		u_char* data = (u_char*)pkt_data + UDP_HEADER_LEN;
+		if (
+			(data[0] == 0x5a)
+			&& (data[1] == 0xa5)
+			&& (data[2] == 0x1a)
+			&& (data[31] == 0xaa)
+			)
+		{
+			gyroValue = ((data[6]) << 8) + data[7];
+		}
+		
 	}
-	else if (data[0] == 2) //Q chanel first part
-	{
-		memcpy(dataBuff[iNext].dataQ, data + FRAME_HEADER_SIZE, 1024);
-		iReady++;
-		if (iReady >= MAX_IREC)iReady = 0;
-	}
-	else if (data[0] == 1) //I chanel second part
-	{
-		memcpy(dataBuff[iNext].dataI + 1024, data + FRAME_HEADER_SIZE, 1024);
-	}
-	else if (data[0] == 3) //Q chanel second part
-	{
-		memcpy(dataBuff[iNext].dataQ + 1024, data + FRAME_HEADER_SIZE, 1024);
-		iReady++;
-		if (iReady >= MAX_IREC)iReady = 0;
-	}
-	return;
+	
 }
-void packet_handler_compress(u_char *param, const struct pcap_pkthdr *pkt_header, const u_char *pkt_data)
+/*void packet_handler_compress(u_char *param, const struct pcap_pkthdr *pkt_header, const u_char *pkt_data)
 {
 	if (pkt_header->len<1000)return;
 	if (((*(pkt_data + 36) << 8) | (*(pkt_data + 37))) != 5000)
@@ -533,4 +531,4 @@ void packet_handler_compress(u_char *param, const struct pcap_pkthdr *pkt_header
 		memcpy(dataBuff[iReady].dataQ + 1024, data + FRAME_HEADER_SIZE, 1024);
 	}
 	return;
-}
+}*/
