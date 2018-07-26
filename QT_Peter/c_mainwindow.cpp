@@ -141,6 +141,7 @@ void Mainwindow::mouseDoubleClickEvent( QMouseEvent * e )
 }
 void Mainwindow::sendToRadarString(QString command)
 {
+    command.replace(" ", "");
     QStringList list = command.split(';');
     for(int i=0;i<list.size();i++)
     {
@@ -151,7 +152,7 @@ void Mainwindow::sendToRadarString(QString command)
 }
 void Mainwindow::sendToRadarHS(const char* hexdata)//todo:move to radar class
 {
-    short len = strlen(hexdata)/2+1;
+    short len = strlen(hexdata)/2;
     unsigned char* sendBuff = new unsigned char[len];
     hex2bin(hexdata,sendBuff);
     processing->sendCommand(sendBuff,len);
@@ -3819,4 +3820,14 @@ void Mainwindow::on_toolButton_head_up_toggled(bool checked)
   dx = 0;
   dy = 0;
   isMapOutdated = true;
+}
+
+void Mainwindow::on_toolButton_delete_target_2_clicked()
+{
+    QStringList list = ui->textEdit_systemCommand->toPlainText().split(';');
+    for(int i=0;i<list.size();i++)
+    {
+        QByteArray ba=list.at(i).toLatin1();
+        sendToRadarHS(ba.data());
+    }
 }

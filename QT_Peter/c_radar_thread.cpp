@@ -313,7 +313,21 @@ void dataProcessingThread::PushCommandQueue()
 {
     if(radarComQ.size())
     {
-        if(checkFeedback())
+        if(radarComQ.front().bytes[1]==0xab)
+        {
+            radarSocket->writeDatagram((char*)&radarComQ.front().bytes[0],
+                    8,
+                    QHostAddress("192.168.0.44"),2572
+                    );
+        }
+        else {
+            radarSocket->writeDatagram((char*)&radarComQ.front().bytes[0],
+                    32,
+                    QHostAddress("127.0.0.1"),30000
+                    );
+        }
+        radarComQ.pop();
+        /*if(checkFeedback())
         {
             radarComQ.pop();
             failureCount = 0;
@@ -326,11 +340,8 @@ void dataProcessingThread::PushCommandQueue()
                 radarComQ.pop();
                 failureCount = 0;
             }
-        }
-        radarSocket->writeDatagram((char*)&radarComQ.front().bytes[0],
-                8,
-                QHostAddress("192.168.0.44"),2572
-                );
+        }*/
+
 
     }
 }
@@ -734,13 +745,25 @@ void dataProcessingThread::radTxOff()
 void dataProcessingThread::sendCommand(unsigned char *sendBuff, short len)
 {
     RadarCommand command;
-    if(len>8)return;
-    command.bytes[7] = 0;
-    memset(&command.bytes[0],0,8);
-    memcpy(&command.bytes[0],sendBuff,len);
-    for(int i=0;i<len-1;i++)
+    if(len>8)
     {
-        command.bytes[7]+=command.bytes[i];
+        command.bytes[31]=0;
+        memcpy(&command.bytes[0],sendBuff,len);
+        for(int i=0;i<len-1;i++)
+        {
+            command.bytes[31]+=command.bytes[i];
+        }
+    }
+    else
+    {
+        command.bytes[7] = 0;
+        memset(&command.bytes[0],0,8);
+        memcpy(&command.bytes[0],sendBuff,len);
+        for(int i=0;i<len-1;i++)
+        {
+            command.bytes[7]+=command.bytes[i];
+        }
+
     }
     if(radarComQ.size()<MAX_COMMAND_QUEUE_SIZE)radarComQ.push(command);
 }

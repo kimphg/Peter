@@ -405,6 +405,8 @@ private slots:
 
     void on_toolButton_head_up_toggled(bool checked);
 
+    void on_toolButton_delete_target_2_clicked();
+
 private:
     void initActionsConnections();
     void initGraphicView();

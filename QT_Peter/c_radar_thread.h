@@ -39,7 +39,7 @@ struct DataBuff// buffer for data frame
 
 struct  RadarCommand// radar control commmand
 {
-    unsigned char bytes[8];
+    unsigned char bytes[32];
 };
 typedef std::queue<RadarCommand> RadarCommandQueue;
 class dataProcessingThread:public QThread
