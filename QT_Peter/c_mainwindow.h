@@ -407,6 +407,27 @@ private slots:
 
     void on_toolButton_delete_target_2_clicked();
 
+    void on_toolButton_dk_1_toggled(bool checked);
+
+    void on_toolButton_dk_2_toggled(bool checked);
+
+    void on_toolButton_dk_3_toggled(bool checked);
+
+    void on_toolButton_dk_4_toggled(bool checked);
+
+    void on_toolButton_dk_5_toggled(bool checked);
+
+    void on_toolButton_dk_6_toggled(bool checked);
+
+    void on_toolButton_dk_7_toggled(bool checked);
+
+    void on_toolButton_dk_8_toggled(bool checked);
+
+    void on_toolButton_dk_9_toggled(bool checked);
+
+    void on_toolButton_dk_10_toggled(bool checked);
+
+    void UpdateDisplay();
 private:
     void initActionsConnections();
     void initGraphicView();

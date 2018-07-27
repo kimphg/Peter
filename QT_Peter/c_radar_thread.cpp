@@ -367,7 +367,7 @@ void dataProcessingThread::playbackRadarData()
             signRepFile.read(buff.data(),len);
             if(len>500){
                 //mRadarData->assembleDataFrame((unsigned char*)buff.data(),buff.size());
-                 mRadarData->processSocketData((unsigned char*)buff.data(),4128);
+                mRadarData->processSocketData((unsigned char*)buff.data(),4128);
             }
             else processSerialData(buff);
             if(isRecording)
@@ -563,9 +563,18 @@ void dataProcessingThread::run()
         while(radarSocket->hasPendingDatagrams())
         {
             int len = radarSocket->pendingDatagramSize();
+            if(len==9)
+            {
+                uchar data[9];
+                radarSocket->readDatagram((char*)&data[0],len);
+                mAntennaAzi = ((data[4]<<8)|data[5])/4096.0*360.0;
+            }
+            else
+            {
             radarSocket->readDatagram((char*)&udpFrameBuffer[iRec][0],len);
             iRec++;
             if(iRec>=MAX_IREC)iRec = 0;
+            }
 
         }
         //sleep(1);
@@ -742,30 +751,41 @@ void dataProcessingThread::radTxOff()
     //    }
 }
 
-void dataProcessingThread::sendCommand(unsigned char *sendBuff, short len)
+void dataProcessingThread::sendCommand(unsigned char *commandBuff, short len,bool queued )
 {
-    RadarCommand command;
-    if(len>8)
+    if(queued)
     {
-        command.bytes[31]=0;
-        memcpy(&command.bytes[0],sendBuff,len);
-        for(int i=0;i<len-1;i++)
+        RadarCommand command;
+        if(len>8&&len<=32&&commandBuff[0]==0xaa)
         {
-            command.bytes[31]+=command.bytes[i];
+            command.bytes[len]=0;
+            memcpy(&command.bytes[0],commandBuff,len);
+            for(int i=0;i<len;i++)
+            {
+                command.bytes[len]+=command.bytes[i];
+            }
         }
+        else
+        {
+            command.bytes[7] = 0;
+            memset(&command.bytes[0],0,8);
+            memcpy(&command.bytes[0],commandBuff,len);
+            for(int i=0;i<len-1;i++)
+            {
+                command.bytes[7]+=command.bytes[i];
+            }
+
+        }
+        if(radarComQ.size()<MAX_COMMAND_QUEUE_SIZE)radarComQ.push(command);
     }
     else
     {
-        command.bytes[7] = 0;
-        memset(&command.bytes[0],0,8);
-        memcpy(&command.bytes[0],sendBuff,len);
-        for(int i=0;i<len-1;i++)
-        {
-            command.bytes[7]+=command.bytes[i];
-        }
+        radarSocket->writeDatagram((char*)commandBuff,
+                len,
+                QHostAddress("192.168.1.253"),40002
+                );
 
     }
-    if(radarComQ.size()<MAX_COMMAND_QUEUE_SIZE)radarComQ.push(command);
 }
 
 void dataProcessingThread::listenToRadar()
@@ -775,7 +795,7 @@ void dataProcessingThread::listenToRadar()
 
 void dataProcessingThread::startRecord(QString fileName)
 {
-    QByteArray array("aa");
+    //QByteArray array("aa");
     //radarSocket->writeDatagram()
     signRecFile.setFileName(fileName);
     signRecFile.open(QIODevice::WriteOnly);

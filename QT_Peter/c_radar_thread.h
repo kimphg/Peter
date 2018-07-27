@@ -67,7 +67,7 @@ public:
     void radRequestTemp(char index);
     void radTxOn();
     void radTxOff();
-    void sendCommand(unsigned char* sendBuff,short len);
+    void sendCommand(unsigned char* commandBuff, short len, bool queued = true);
     void loadRecordDataFile(QString fileName);
     void togglePlayPause(bool play);
 
@@ -92,12 +92,14 @@ public:
     unsigned int mazi;
     unsigned int realazi1,realazi2;
     bool   isHeadingAvaible;
+    double          mAntennaAzi;
 signals:
     void HeadingDataReceived(double heading);
 private:
 
     QSerialPort     mEncoderPort;
     double          mHeading ;
+
     unsigned char   failureCount;
     bool  isDrawn;
     bool isXuLyThuCap;

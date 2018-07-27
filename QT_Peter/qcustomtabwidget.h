@@ -12,9 +12,9 @@ class QCustomTabWidget: public QTabWidget
 public:
     explicit QCustomTabWidget(QWidget *parent = 0);
     dataProcessingThread *processing;
+    void SetTransparent(bool transp);
 protected:
     void highLight();
-    void SetTransparent(bool transp);
     void hoverEnter(QHoverEvent *event);
     void hoverLeave(QHoverEvent *event);
     void hoverMove(QHoverEvent *event);

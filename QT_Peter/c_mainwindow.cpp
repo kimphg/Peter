@@ -23,6 +23,7 @@ double                      mLat=DEFAULT_LAT,mLon = DEFAULT_LONG;
 double                      mHeadingGPSNew = 0,mHeadingGPSOld=0;
 bool                        isMapOutdated = true;
 bool isHeadUp = false;
+short   mMousex =0,mMousey=0;
 dataProcessingThread        *processing;// thread xu ly du lieu radar
 C_radar_data                *pRadar;
 QThread                     *t2,*t1;
@@ -42,7 +43,7 @@ bool                        displayAlpha = false;
 short                       dxMax,dyMax;
 C_ARPA_data                 arpa_data;
 short                       scrCtX, scrCtY, dx =0,dy=0,dxMap=0,dyMap=0;
-short                       mousePointerX,mousePointerY,mouseX,mouseY;
+short                       mousePointerX,mousePointerY,mMouseLastX,mMouseLastY;
 //bool                        isDraging = false;
 bool                        isScaleChanged =true;
 double                      mScale;
@@ -130,8 +131,8 @@ void Mainwindow::mouseDoubleClickEvent( QMouseEvent * e )
     else
     {
 
-        float xRadar = (mouseX - scrCtX+dx)/pRadar->scale_ppi ;//coordinates in  radar xy system
-        float yRadar = -(mouseY - scrCtY+dy)/pRadar->scale_ppi;
+        float xRadar = (mMouseLastX - scrCtX+dx)/pRadar->scale_ppi ;//coordinates in  radar xy system
+        float yRadar = -(mMouseLastY - scrCtY+dy)/pRadar->scale_ppi;
         pRadar->addTrackManual(xRadar,yRadar);
         //ui->toolButton_manual_track->setChecked(false);
 
@@ -278,10 +279,10 @@ void Mainwindow::mouseMoveEvent(QMouseEvent *event) {
     if((mouse_mode&MouseDrag)&&(event->buttons() & Qt::LeftButton)) {
         short olddx = dx;
         short olddy = dy;
-        dx+= mouseX-event->x();
-        dy+= mouseY-event->y();
-        dxMap += mouseX-event->x();
-        dyMap += mouseY-event->y();
+        dx+= mMouseLastX-event->x();
+        dy+= mMouseLastY-event->y();
+        dxMap += mMouseLastX-event->x();
+        dyMap += mMouseLastY-event->y();
         while(dx*dx+dy*dy>dxMax*dxMax)
         {
             if(abs(dx)>abs(dy))
@@ -294,8 +295,8 @@ void Mainwindow::mouseMoveEvent(QMouseEvent *event) {
         }
         mousePointerX+= olddx - dx;
         mousePointerY+= olddy - dy;
-        mouseX=event->x();
-        mouseY=event->y();
+        mMouseLastX=event->x();
+        mMouseLastY=event->y();
         update();
     }
 }
@@ -395,29 +396,29 @@ bool Mainwindow::isInsideViewZone(short x, short y)
 }
 void Mainwindow::mousePressEvent(QMouseEvent *event)
 {
-    mouseX = (event->x());
-    mouseY = (event->y());
-    if(!isInsideViewZone(mouseX,mouseY))return;
+    mMouseLastX = (event->x());
+    mMouseLastY = (event->y());
+    if(!isInsideViewZone(mMouseLastX,mMouseLastY))return;
     if(event->buttons() & Qt::LeftButton) {
         if(mouse_mode&MouseAutoSelect)//(ui->toolButton_auto_select->isChecked())
         {
             if(isSelectingTarget)
             {
-                selZone_x2 = mouseX;
-                selZone_y2 = mouseY;
+                selZone_x2 = mMouseLastX;
+                selZone_y2 = mMouseLastY;
                 detectZone();
                 isSelectingTarget = false;
             }else
             {
-                selZone_x1 = mouseX;
-                selZone_y1 = mouseY;
+                selZone_x1 = mMouseLastX;
+                selZone_y1 = mMouseLastY;
                 isSelectingTarget = true;
             }
         }
         else if(mouse_mode&MouseScope)
         {
             double azid,rg;
-            C_radar_data::kmxyToPolarDeg((mouseX - scrCtX+dx)/mScale,-(mouseY - scrCtY+dy)/mScale,&azid,&rg);
+            C_radar_data::kmxyToPolarDeg((mMouseLastX - scrCtX+dx)/mScale,-(mMouseLastY - scrCtY+dy)/mScale,&azid,&rg);
             pRadar->drawRamp(azid);
         }
         /*else if(ui->toolButton_create_zone->isChecked())
@@ -634,9 +635,6 @@ void Mainwindow::DrawMap()
     //
     QPainter p(pMap);
 
-    if(1)
-    {
-
         double dLat, dLong;
         ConvKmToWGS((double(dx))/mScale,(double(-dy))/mScale,&dLong,&dLat);
         osmap->setCenterPos(dLat,dLong);
@@ -651,11 +649,6 @@ void Mainwindow::DrawMap()
         p.drawPixmap((-pix.width()/2+pMap->width()/2),
                      (-pix.height()/2+pMap->height()/2),pix.width(),pix.height(),pix
                      );
-    }
-    else
-    {
-        pMap->fill(QColor(10,20,30,255));
-    }
 
     //DrawGrid(&p,centerX,centerY);
     update();
@@ -690,11 +683,6 @@ void Mainwindow::DrawGrid(QPainter* p,short centerX,short centerY)
     }
 
 
-
-    //p.drawEllipse(QPoint(centerX,centerY),(int)(20*CONST_NM*scale),(int)(20*CONST_NM*scale));
-    //p.drawEllipse(QPoint(centerX,centerY),(int)(5*CONST_NM*scale),(short)(5*CONST_NM*scale));
-    //pen.setWidth(1);
-    //p->setPen(pen);
     short theta;
     short gridR = ringStep*1.852f*mScale*7;
     for(theta=0;theta<360;theta+=90){
@@ -725,7 +713,7 @@ void Mainwindow::DrawGrid(QPainter* p,short centerX,short centerY)
     }
 
     //end grid
-    p->setCompositionMode(QPainter::CompositionMode_SourceOver);
+    //p->setCompositionMode(QPainter::CompositionMode_SourceOver);
 
 
 
@@ -1073,41 +1061,25 @@ void Mainwindow::drawAisTarget2(QPainter *p)
 }
 void Mainwindow::UpdateMouseStat(QPainter *p)
 {
-    short   mx=this->mapFromGlobal(QCursor::pos()).x();
-    short   my=this->mapFromGlobal(QCursor::pos()).y();
-    if(!isInsideViewZone(mx,my))return;
+
+    if(!isInsideViewZone(mMousex,mMousey))return;
     QPen penmousePointer(QColor(0x50ffffff));
     penmousePointer.setWidth(2);
-    double azi,rg;
-    short r = sqrt((mx - scrCtX+dx)*(mx - scrCtX+dx)+(my - scrCtY+dy)*(my - scrCtY+dy));
+
+    short r = sqrt((mMousex - scrCtX+dx)*(mMousex - scrCtX+dx)+(mMousey - scrCtY+dy)*(mMousey - scrCtY+dy));
     p->setPen(penmousePointer);
     if(mouse_mode&MouseVRM)p->drawEllipse(QPoint(scrCtX-dx,scrCtY-dy),r,r);
-    if(mouse_mode&MouseELB)p->drawLine(QPoint(scrCtX-dx,scrCtY-dy),QPoint(scrCtX-dx-(scrCtX-dx-mx)*100,scrCtY-dy-(scrCtY-dy-my)*100));
-    if(ui->toolButton_measuring->isChecked())
-    {
-        C_radar_data::kmxyToPolarDeg((mx - mouseX)/mScale,-(my - mouseY)/mScale,&azi,&rg);
-
-    }
-    else
-    {
-        C_radar_data::kmxyToPolarDeg((mx - scrCtX+dx)/mScale,-(my - scrCtY+dy)/mScale,&azi,&rg);
-    }
-    rg/=rangeRatio;
-    ui->label_cursor_range->setText(QString::number(rg,'f',2)+strDistanceUnit);
-    ui->label_cursor_azi->setText(QString::number(azi)+QString::fromLocal8Bit("\260"));
-    ui->label_cursor_lat->setText(demicalDegToDegMin( y2lat(-(my - scrCtY+dy)))+"'N");
-    ui->label_cursor_long->setText(demicalDegToDegMin(x2lon(mx - scrCtX+dx))+"'E");
+    if(mouse_mode&MouseELB)p->drawLine(QPoint(scrCtX-dx,scrCtY-dy),QPoint(scrCtX-dx-(scrCtX-dx-mMousex)*100,scrCtY-dy-(scrCtY-dy-mMousey)*100));
 
     if(isSelectingTarget)
     {
-        QPen penmousePointer(QColor(0x50ffffff));
-        penmousePointer.setWidth(2);
+
         penmousePointer.setStyle(Qt::DashDotLine);
         p->setPen(penmousePointer);
-        p->drawLine(selZone_x1,selZone_y1,mx,selZone_y1);
-        p->drawLine(selZone_x1,selZone_y1,selZone_x1,my);
-        p->drawLine(selZone_x1,my,mx,my);
-        p->drawLine(mx,selZone_y1,mx,my);
+        p->drawLine(selZone_x1,selZone_y1,mMousex,selZone_y1);
+        p->drawLine(selZone_x1,selZone_y1,selZone_x1,mMousey);
+        p->drawLine(selZone_x1,mMousey,mMousex,mMousey);
+        p->drawLine(mMousex,selZone_y1,mMousex,mMousey);
     }
 }
 void Mainwindow::paintEvent(QPaintEvent *event)
@@ -1287,9 +1259,11 @@ void Mainwindow::setDistanceUnit(int unit)//0:NM, 1:KM
 }
 void Mainwindow::InitSetting()
 {
-    QString systemCommand = CConfig::getString("systemCommand","cudaCv.exe");
+    ui->tabWidget_iad->SetTransparent(true);
+    QApplication::setOverrideCursor(Qt::CrossCursor);
+    QString systemCommand = CConfig::getString("systemCommand","D:\\HR2D\\cudaCv.exe");
     systemCommand= "start "+systemCommand;
-    system("start explorer.exe");
+    system((char*)systemCommand.toStdString().data());
     mMaxTapMayThu = CConfig::getInt("mMaxTapMayThu");
     mRangeLevel = CConfig::getInt("mRangeLevel");
     assert(mRangeLevel>=0&&mRangeLevel<8);
@@ -1470,7 +1444,7 @@ void Mainwindow::DrawViewFrame(QPainter* p)
 
         if(ui->toolButton_measuring->isChecked())
         {
-            DrawGrid(p,mouseX,mouseY);
+            DrawGrid(p,mMouseLastX,mMouseLastY);
         }
         else
         {
@@ -1482,14 +1456,15 @@ void Mainwindow::DrawViewFrame(QPainter* p)
     p->drawRect(scrCtX+scrCtY,0,width()-scrCtX-scrCtY,height());
     p->drawRect(0,0,scrCtX-scrCtY,height());
     p->setBrush(Qt::NoBrush);
-    p->setPen(penOuterGrid4);
-    p->drawEllipse(scrCtX-scrCtY+25,25,SCR_H -50,SCR_H -50);
     p->setPen(penBackground);
     for (short i=60;i<650;i+=110)
     {
         p->drawEllipse(-i/2+(scrCtX-scrCtY)+25,-i/2+25,SCR_H -50+i,SCR_H -50+i);
     }
     p->setPen(penOuterGrid2);
+    p->drawEllipse(scrCtX-scrCtY+25,25,SCR_H -50,SCR_H -50);
+
+    //p->setPen(penOuterGrid2);
     QFont font10 = p->font() ;
     font10.setPointSize(10);
     p->setFont(font10);
@@ -1503,16 +1478,16 @@ void Mainwindow::DrawViewFrame(QPainter* p)
                     QString::number(theta));
         }
     }
-    double aziDeg = rad2deg(pRadar->getCurAziRad());
+    //double aziDeg = rad2deg(pRadar->getCurAziRad());
     //plot center azi
-    double centerAzi = processing->getSelsynAzi()+mHeadingT2 ;
+    /*double centerAzi = processing->getSelsynAzi()+mHeadingT2 ;
     if(centerAzi>360)centerAzi-=360;
     if(CalcAziContour(centerAzi,&points[0],&points[2],&points[1],height()-70))
     {
         p->setPen(QPen(Qt::yellow,8,Qt::SolidLine,Qt::RoundCap,Qt::MiterJoin));
         p->drawLine(points[2],points[1]);
         //p->drawText(720,40,200,20,0,"Sector:  "+QString::number(centerAzi,'f',1));
-    }
+    }*/
     //plot heading azi
     if(mHeadingGPSOld)
     {
@@ -1533,7 +1508,7 @@ void Mainwindow::DrawViewFrame(QPainter* p)
     }
 
     //plot cur azi
-    if(CalcAziContour(aziDeg,&points[0],&points[1],&points[2],height()-70))
+    if(CalcAziContour(processing->mAntennaAzi,&points[0],&points[1],&points[2],height()-70))
     {
         p->setPen(QPen(Qt::red,4,Qt::SolidLine,Qt::RoundCap));
         p->drawLine(points[2],points[1]);
@@ -1649,7 +1624,7 @@ void Mainwindow::InitTimer()
     //syncTimer1s.moveToThread(t);
 
     connect(&timerVideoUpdate, SIGNAL(timeout()), this, SLOT(UpdateVideo()));
-    timerVideoUpdate.start(20);//ENVDEP
+    timerVideoUpdate.start(30);//ENVDEP
     //scrUpdateTimer.moveToThread(t2);
     //connect(t2,SIGNAL(finished()),t2,SLOT(deleteLater()));
 
@@ -1658,11 +1633,33 @@ void Mainwindow::InitTimer()
     processing->start(QThread::TimeCriticalPriority);
     t2->start(QThread::HighPriority);
 
-    connect(&timerMapUpdate, SIGNAL(timeout()), this, SLOT(DrawMap()));
+    connect(&timerMapUpdate, SIGNAL(timeout()), this, SLOT(Update100ms()));
     timerMapUpdate.start(100);//ENVDEP
 
 }
+void Mainwindow::Update100ms()
+{
+    DrawMap();
+    mMousex=this->mapFromGlobal(QCursor::pos()).x();
+    mMousey=this->mapFromGlobal(QCursor::pos()).y();
+    this->ui->label_azi_antenna_head_true->setText(QString::number((processing->mAntennaAzi)));
+    double azi,rg;
+    if(ui->toolButton_measuring->isChecked())
+    {
+        C_radar_data::kmxyToPolarDeg((mMousex - mMouseLastX)/mScale,-(mMousey - mMouseLastY)/mScale,&azi,&rg);
 
+    }
+    else
+    {
+        C_radar_data::kmxyToPolarDeg((mMousex - scrCtX+dx)/mScale,-(mMousey - scrCtY+dy)/mScale,&azi,&rg);
+    }
+    rg/=rangeRatio;
+    ui->label_cursor_range->setText(QString::number(rg,'f',2)+strDistanceUnit);
+    ui->label_cursor_azi->setText(QString::number(azi)+QString::fromLocal8Bit("\260"));
+    ui->label_cursor_lat->setText(demicalDegToDegMin( y2lat(-(mMousey - scrCtY+dy)))+"'N");
+    ui->label_cursor_long->setText(demicalDegToDegMin(x2lon(mMousex - scrCtX+dx))+"'E");
+
+}
 void Mainwindow::InitNetwork()
 {
     m_udpSocket = new QUdpSocket(this);
@@ -1715,19 +1712,7 @@ void Mainwindow::processARPA()
     }
 
 }
-void Mainwindow::processFrame()
-{
-    //    while (udpSocket->hasPendingDatagrams()) {
-    //        unsigned short len = udpSocket->pendingDatagramSize();
-    //        QByteArray buff;
-    //        buff.resize(len);
-    //        udpSocket->readDatagram(buff.data(), len);
-    //        if((len==1422))//hr2d
-    //        {
-    //            ProcHR(&buff);
-    //        }
-    //    }
-}
+
 
 
 
@@ -1801,7 +1786,6 @@ void MainWindow::sendFrame(const char* hexdata,QHostAddress host,int port )
 */
 void Mainwindow::on_actionExit_triggered()
 {
-
     processing->stopThread();
     processing->wait();
     ExitProgram();
@@ -3132,8 +3116,8 @@ void Mainwindow::on_toolButton_create_zone_2_clicked(bool checked)
 
 void Mainwindow::on_toolButton_measuring_clicked()
 {
-    mouseX = scrCtX-dx;
-    mouseY = scrCtY-dy;
+    mMouseLastX = scrCtX-dx;
+    mMouseLastY = scrCtY-dy;
 }
 
 
@@ -3829,5 +3813,110 @@ void Mainwindow::on_toolButton_delete_target_2_clicked()
     {
         QByteArray ba=list.at(i).toLatin1();
         sendToRadarHS(ba.data());
+    }
+}
+unsigned char commandMay22[]={0xaa,0x55,0x02,0x0c,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00};
+void Mainwindow::on_toolButton_dk_1_toggled(bool checked)
+{
+    if(checked)
+    {
+        commandMay22[4]=0x01;
+        processing->sendCommand(commandMay22,12,false);
+    }
+    else
+    {
+        commandMay22[4]=0x00;
+        processing->sendCommand(commandMay22,12,false);
+    }
+}
+
+void Mainwindow::on_toolButton_dk_2_toggled(bool checked)
+{
+    if(checked)
+    {
+        commandMay22[5]=0x01;
+        processing->sendCommand(commandMay22,12,false);
+    }
+    else
+    {
+        commandMay22[5]=0x00;
+        processing->sendCommand(commandMay22,12,false);
+    }
+}
+
+void Mainwindow::on_toolButton_dk_3_toggled(bool checked)
+{
+    if(checked)
+    {
+        commandMay22[6]=0x07;
+        processing->sendCommand(commandMay22,12,false);
+    }
+}
+
+void Mainwindow::on_toolButton_dk_4_toggled(bool checked)
+{
+    if(checked)
+    {
+        commandMay22[6]=0x01;
+        processing->sendCommand(commandMay22,12,false);
+    }
+}
+
+void Mainwindow::on_toolButton_dk_5_toggled(bool checked)
+{
+    if(checked)
+    {
+        commandMay22[6]=0x02;
+        processing->sendCommand(commandMay22,12,false);
+    }
+}
+
+void Mainwindow::on_toolButton_dk_6_toggled(bool checked)
+{
+    if(checked)
+    {
+        commandMay22[6]=0x03;
+        processing->sendCommand(commandMay22,12,false);
+    }
+}
+
+void Mainwindow::on_toolButton_dk_7_toggled(bool checked)
+{
+    if(checked)
+    {
+        commandMay22[6]=0x04;
+        processing->sendCommand(commandMay22,12,false);
+    }
+}
+
+void Mainwindow::on_toolButton_dk_8_toggled(bool checked)
+{
+    if(checked)
+    {
+        commandMay22[6]=0x05;
+        processing->sendCommand(commandMay22,12,false);
+    }
+}
+
+void Mainwindow::on_toolButton_dk_9_toggled(bool checked)
+{
+    if(checked)
+    {
+        commandMay22[6]=0x06;
+        processing->sendCommand(commandMay22,12,false);
+    }
+}
+
+void Mainwindow::on_toolButton_dk_10_toggled(bool checked)
+{
+    if(checked)
+    {
+        commandMay22[8]=0x01;
+        processing->sendCommand(commandMay22,12,false);
+    }
+    else
+    {
+        commandMay22[8]=0x00;
+        processing->sendCommand(commandMay22,12,false);
     }
 }
