@@ -14866,7 +14866,7 @@
      <attribute name="title">
       <string>Máy 2-2</string>
      </attribute>
-     <widget class="QGroupBox" name="groupBox_2">
+     <widget class="QCustomGroupBox" name="groupBox_2">
       <property name="geometry">
        <rect>
         <x>340</x>
@@ -15014,7 +15014,7 @@
        </item>
       </layout>
      </widget>
-     <widget class="QGroupBox" name="groupBox_19">
+     <widget class="QCustomGroupBox" name="groupBox_19">
       <property name="geometry">
        <rect>
         <x>170</x>
@@ -15067,7 +15067,7 @@
        </item>
       </layout>
      </widget>
-     <widget class="QGroupBox" name="groupBox_21">
+     <widget class="QCustomGroupBox" name="groupBox_21">
       <property name="geometry">
        <rect>
         <x>10</x>
@@ -15139,12 +15139,12 @@
        </item>
       </layout>
      </widget>
-     <widget class="QGroupBox" name="groupBox_20">
+     <widget class="QCustomGroupBox" name="groupBox_20">
       <property name="geometry">
        <rect>
         <x>170</x>
         <y>240</y>
-        <width>151</width>
+        <width>141</width>
         <height>161</height>
        </rect>
       </property>
@@ -15211,7 +15211,7 @@
        </item>
       </layout>
      </widget>
-     <widget class="QGroupBox" name="groupBox_22">
+     <widget class="QCustomGroupBox" name="groupBox_22">
       <property name="geometry">
        <rect>
         <x>10</x>
@@ -15225,7 +15225,7 @@
       </property>
       <layout class="QVBoxLayout" name="verticalLayout_10">
        <item>
-        <widget class="QCustomButton" name="toolButton_dk_1">
+        <widget class="QToolButton" name="toolButton_dk_1">
          <property name="sizePolicy">
           <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
            <horstretch>0</horstretch>
@@ -15244,7 +15244,7 @@
         </widget>
        </item>
        <item>
-        <widget class="QCustomButton" name="toolButton_dk_12">
+        <widget class="QToolButton" name="toolButton_dk_12">
          <property name="sizePolicy">
           <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
            <horstretch>0</horstretch>
@@ -15267,7 +15267,7 @@
      <widget class="QLabel" name="label_data_range_2">
       <property name="geometry">
        <rect>
-        <x>170</x>
+        <x>180</x>
         <y>30</y>
         <width>99</width>
         <height>19</height>
@@ -16133,7 +16133,7 @@
        <string notr="true">background-color: rgb(16, 32, 64);</string>
       </property>
       <property name="text">
-       <string>Trạng thái kết nối:</string>
+       <string>Trạng thái kết nối</string>
       </property>
      </widget>
     </widget>

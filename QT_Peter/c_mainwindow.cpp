@@ -652,7 +652,8 @@ void Mainwindow::DrawMap()
         QTransform trans = transform.rotate(-mHeadingGPSOld);
         pix=pix.transformed(trans);
     }
-    pMapPainter.setOpacity(mMapOpacity);
+    if(mouse_mode&MouseDrag)pMapPainter.setOpacity(mMapOpacity/2);
+    else pMapPainter.setOpacity(mMapOpacity);
     pMapPainter.drawPixmap((-pix.width()/2+pMap->width()/2),
                  (-pix.height()/2+pMap->height()/2),pix.width(),pix.height(),pix
                  );
@@ -663,7 +664,7 @@ void Mainwindow::DrawMap()
     //p.drawRect(scrCtX+scrCtY,0,width()-scrCtX-scrCtY,height());
     //p.drawRect(0,0,scrCtX-scrCtY,height());
     //p.setCompositionMode(QPainter::CompositionMode_SourceOver);
-    pMapPainter.setOpacity(255);
+    pMapPainter.setOpacity(1);
     //grid
     if(toolButton_grid_checked)
     {
@@ -1320,7 +1321,7 @@ void Mainwindow::InitSetting()
     osmap->SetType(0);
     mMapOpacity = CConfig::getDouble("mMapOpacity");
     //config.setMapOpacity(value/50.0);
-    //    ui->horizontalSlider_map_brightness->setValue(mMapOpacity*50);
+        ui->horizontalSlider_map_brightness->setValue(mMapOpacity*50);
     //    ui->toolButton_xl_nguong_3->setChecked(true);
     ui->groupBox_control->setHidden(true);
     //    ui->groupBox_control_setting->setHidden(true);
@@ -1375,7 +1376,7 @@ void Mainwindow::InitSetting()
     connect(ui->lineEdit_byte_5, SIGNAL(returnPressed()),ui->toolButton_send_command,SIGNAL(clicked()));
     connect(ui->lineEdit_byte_6, SIGNAL(returnPressed()),ui->toolButton_send_command,SIGNAL(clicked()));
     connect(ui->lineEdit_byte_7, SIGNAL(returnPressed()),ui->toolButton_send_command,SIGNAL(clicked()));
-    setCursor(QCursor(Qt::ArrowCursor));
+    //setCursor(QCursor(Qt::ArrowCursor));
     UpdateScale();
 
 
@@ -1665,6 +1666,7 @@ void Mainwindow::Update100ms()
     this->ui->label_azi_antenna_head_true->setText(QString::number((processing->mAntennaAzi)));
     if(isInsideViewZone(mMousex,mMousey))
     {
+        QApplication::setOverrideCursor(Qt::CrossCursor);
         double azi,rg;
         if(ui->toolButton_measuring->isChecked())
         {
@@ -1680,6 +1682,10 @@ void Mainwindow::Update100ms()
         ui->label_cursor_azi->setText(QString::number(azi)+QString::fromLocal8Bit("\260"));
         ui->label_cursor_lat->setText(demicalDegToDegMin( y2lat(-(mMousey - scrCtY+dy)))+"'N");
         ui->label_cursor_long->setText(demicalDegToDegMin(x2lon(mMousex - scrCtX+dx))+"'E");
+    }
+    else
+    {
+        QApplication::setOverrideCursor(Qt::ArrowCursor);
     }
 }
 void Mainwindow::InitNetwork()
