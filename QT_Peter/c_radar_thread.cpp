@@ -555,6 +555,7 @@ void packet_handler(u_char *param, const struct pcap_pkthdr *header, const u_cha
     //    printf("\n");
 
 }
+uchar mReceiveBuff[50];
 void dataProcessingThread::run()
 {
 
@@ -563,17 +564,27 @@ void dataProcessingThread::run()
         while(radarSocket->hasPendingDatagrams())
         {
             int len = radarSocket->pendingDatagramSize();
-            if(len==9)
+            if(len<50)// control packets
             {
-                uchar data[9];
-                radarSocket->readDatagram((char*)&data[0],len);
-                mAntennaAzi = ((data[4]<<8)|data[5])/4096.0*360.0;
+                radarSocket->readDatagram((char*)&mReceiveBuff[0],len);
+                if(mReceiveBuff[0]==0xaa&&mReceiveBuff[1]==0x55)
+                {
+                    if(mReceiveBuff[2]==0x6e)
+                    {
+                        mAntennaAzi = ((mReceiveBuff[4]<<8)|mReceiveBuff[5])/11.377778;
+                    }
+                    else if(mReceiveBuff[2]==0x65)
+                    {
+                        mRadarStat.ReadStatusMessage(&mReceiveBuff[4]);
+                    }
+                }
+
             }
             else
             {
-            radarSocket->readDatagram((char*)&udpFrameBuffer[iRec][0],len);
-            iRec++;
-            if(iRec>=MAX_IREC)iRec = 0;
+                radarSocket->readDatagram((char*)&udpFrameBuffer[iRec][0],len);
+                iRec++;
+                if(iRec>=MAX_IREC)iRec = 0;
             }
 
         }
@@ -756,25 +767,13 @@ void dataProcessingThread::sendCommand(unsigned char *commandBuff, short len,boo
     if(queued)
     {
         RadarCommand command;
-        if(len>8&&len<=32&&commandBuff[0]==0xaa)
-        {
-            command.bytes[len]=0;
-            memcpy(&command.bytes[0],commandBuff,len);
-            for(int i=0;i<len;i++)
-            {
-                command.bytes[len]+=command.bytes[i];
-            }
-        }
-        else
-        {
-            command.bytes[7] = 0;
-            memset(&command.bytes[0],0,8);
-            memcpy(&command.bytes[0],commandBuff,len);
-            for(int i=0;i<len-1;i++)
-            {
-                command.bytes[7]+=command.bytes[i];
-            }
 
+        command.bytes[7] = 0;
+        memset(&command.bytes[0],0,8);
+        memcpy(&command.bytes[0],commandBuff,len);
+        for(int i=0;i<len-1;i++)
+        {
+            command.bytes[7]+=command.bytes[i];
         }
         if(radarComQ.size()<MAX_COMMAND_QUEUE_SIZE)radarComQ.push(command);
     }
@@ -784,15 +783,12 @@ void dataProcessingThread::sendCommand(unsigned char *commandBuff, short len,boo
                 len,
                 QHostAddress("192.168.1.253"),40002
                 );
-
+        radarSocket->writeDatagram((char*)commandBuff,
+                len,
+                QHostAddress("127.0.0.1"),40002
+                );
     }
 }
-
-void dataProcessingThread::listenToRadar()
-{
-
-}
-
 void dataProcessingThread::startRecord(QString fileName)
 {
     //QByteArray array("aa");
@@ -805,4 +801,15 @@ void dataProcessingThread::stopRecord()
 {
     signRecFile.close();
     isRecording = false;
+}
+
+
+radarStatus_3C::radarStatus_3C()
+{
+    isStatChange = false;
+}
+
+radarStatus_3C::~radarStatus_3C()
+{
+
 }

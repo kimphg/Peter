@@ -132,7 +132,6 @@ private slots:
     void sync5p();
     void ExitProgram();
     void gpsOption();
-    void processFrame();
     void processARPA();
     void on_actionExit_triggered();
     void UpdateVideo();
@@ -405,7 +404,7 @@ private slots:
 
     void on_toolButton_head_up_toggled(bool checked);
 
-    void on_toolButton_delete_target_2_clicked();
+//    void on_toolButton_delete_target_2_clicked();
 
     void on_toolButton_dk_1_toggled(bool checked);
 
@@ -427,7 +426,23 @@ private slots:
 
     void on_toolButton_dk_10_toggled(bool checked);
 
-    void UpdateDisplay();
+    void Update100ms();
+    void on_toolButton_dk_12_toggled(bool checked);
+
+    void on_toolButton_dk_14_toggled(bool checked);
+
+    void on_toolButton_dk_13_toggled(bool checked);
+
+    void on_toolButton_dk_15_toggled(bool checked);
+
+    void on_toolButton_dk_11_toggled(bool checked);
+
+    void on_toolButton_dk_16_toggled(bool checked);
+
+    void on_toolButton_dk_17_toggled(bool checked);
+
+    void on_toolButton_grid_toggled(bool checked);
+
 private:
     void initActionsConnections();
     void initGraphicView();
@@ -447,6 +462,7 @@ private:
     void autoSwitchFreq();
     void checkClickAIS(int xclick, int yclick);
     void UpdateGpsData();
+    void UpdateDataStatus();
 };
 
 #endif // MAINWINDOW_H

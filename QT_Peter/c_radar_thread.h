@@ -36,7 +36,38 @@ struct DataBuff// buffer for data frame
     unsigned char data[2500];
 };
 
-
+class radarStatus_3C
+{
+public:
+    radarStatus_3C();
+    ~radarStatus_3C();
+    void ReadStatusMessage(uchar* mes)
+    {
+        mTaiAngTen = mes[0];
+        mSuyGiam = mes[1];
+        mMayPhatOK = mes[2];
+        mCaoApReady = mes[3];
+        mCaoApKetNoi = mes[4];
+        isStatChange = true;
+    }
+    int     mCheDoDK;
+    bool    isStatChange ;
+    int     mCaoApReady;
+    int     mCaoApKetNoi;
+    bool    mTaiAngTen;
+    int     mSuyGiam;
+    int     mMaHieu;
+    bool    mMayPhatOK;
+    bool isStatChanged()
+    {
+        if(isStatChange)
+        {
+            isStatChange = false;
+            return true;
+        }
+        else return false;
+    }
+};
 struct  RadarCommand// radar control commmand
 {
     unsigned char bytes[32];
@@ -59,7 +90,7 @@ public:
     QTimer commandSendTimer;
     QTimer readUdpBuffTimer;
     QTimer readSerialTimer;
-
+    radarStatus_3C mRadarStat;
     void PlaybackFile();
     void startRecord(QString fileName);
     void stopRecord();
@@ -113,7 +144,7 @@ private:
     QUdpSocket      *navSocket;
     QUdpSocket      *ARPADataSocket;
     double selsynEncoderAzi;
-    void listenToRadar();
+//    void listenToRadar();
     void initSerialComm();
     void processSerialData(QByteArray inputData);
     //    bool ProcDataAIS(BYTE *szBuff, int nLeng);
