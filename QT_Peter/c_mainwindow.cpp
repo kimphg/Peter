@@ -131,10 +131,12 @@ void Mainwindow::mouseDoubleClickEvent( QMouseEvent * e )
     }
     else
     {
-
+        if(isInsideViewZone(mMouseLastX,mMouseLastY))
+        {
         float xRadar = (mMouseLastX - scrCtX+dx)/pRadar->scale_ppi ;//coordinates in  radar xy system
         float yRadar = -(mMouseLastY - scrCtY+dy)/pRadar->scale_ppi;
         pRadar->addTrackManual(xRadar,yRadar);
+        }
         //ui->toolButton_manual_track->setChecked(false);
 
     }
@@ -336,7 +338,7 @@ void Mainwindow::keyPressEvent(QKeyEvent *event)
         C_radar_data::kmxyToPolarDeg((mMousex - scrCtX+dx)/mScale,-(mMousey - scrCtY+dy)/mScale,&azid,&rg);
         int aziBinary = azid/360.0*4096;
         unsigned char command[]={0xaa,0x55,0x6a,0x08,aziBinary>>8,aziBinary,0x00,0x00,0x00,0x00,0x00,0x00};
-        processing->sendCommand(command,8,false);
+        processing->sendCommand(command,9,false);
         mZoomCenterx = mMousex;
         mZoomCentery = mMousey;
 
@@ -652,8 +654,7 @@ void Mainwindow::DrawMap()
         QTransform trans = transform.rotate(-mHeadingGPSOld);
         pix=pix.transformed(trans);
     }
-    if(mouse_mode&MouseDrag)pMapPainter.setOpacity(mMapOpacity/2);
-    else pMapPainter.setOpacity(mMapOpacity);
+    pMapPainter.setOpacity(mMapOpacity);
     pMapPainter.drawPixmap((-pix.width()/2+pMap->width()/2),
                  (-pix.height()/2+pMap->height()/2),pix.width(),pix.height(),pix
                  );
@@ -1940,11 +1941,24 @@ void Mainwindow::autoSwitchFreq()
 
 
 }//label_data_range_2
+int failCounter = 0;
 void Mainwindow::UpdateDataStatus()
 {
     if(processing->mRadarStat.isStatChanged())
     {
-        ui->label_data_range_2->setText(QString::fromUtf8("Đã kết nối"));
+        failCounter=0;
+
+        if(processing->mRadarStat.mMayPhatOK)
+        {
+            ui->label_data_range_2->setStyleSheet("background-color: rgb(10, 255, 10);");
+            ui->label_data_range_2->setText(QString::fromUtf8("Máy phát hoạt động bình thường"));
+        }
+        else
+        {
+            ui->label_data_range_2->setStyleSheet("background-color: rgb(255, 10, 10);");
+            ui->label_data_range_2->setText(QString::fromUtf8("Máy phát không hoạt động"));
+        }
+
         if(processing->mRadarStat.mTaiAngTen==1)ui->toolButton_dk_2->setChecked(true);//tai ang ten
         else if(processing->mRadarStat.mTaiAngTen==0)ui->toolButton_dk_13->setChecked(true);//tai ang ten
         if(processing->mRadarStat.mMaHieu==0)ui->toolButton_dk_11->setChecked(true);//ma hieu
@@ -1962,7 +1976,12 @@ void Mainwindow::UpdateDataStatus()
         else if(processing->mRadarStat.mCaoApKetNoi==2)ui->toolButton_dk_14->setChecked(true);//cao ap
     }
     else
-        ui->label_data_range_2->setText(QString::fromUtf8("Chưa có kết nối"));
+    {
+        if(failCounter>5)ui->label_data_range_2->setText(QString::fromUtf8("Chưa có kết nối"));
+        else
+        failCounter++;
+
+    }
 }
 void Mainwindow::sync1S()//period 1 second
 {
@@ -1988,6 +2007,7 @@ void Mainwindow::sync1S()//period 1 second
         isScaleChanged = false;
     }
     showTime();
+    /*
     // display radar temperature:
     temperature[pRadar->tempType] = pRadar->moduleVal;
 
@@ -2030,7 +2050,7 @@ void Mainwindow::sync1S()//period 1 second
         break;
     default:
         break;
-    }
+    }*/
     ui->label_debug_data->setText("Chu ky: "+QString::number(pRadar->chu_ky));
     unsigned int chuKy = 1000000/(pRadar->chu_ky*(pow(2,pRadar->clk_adc))/10.0);
 
@@ -3101,10 +3121,6 @@ void Mainwindow::on_toolButton_reset_2_clicked()
 {
     pRadar->resetSled();
 }
-
-
-
-
 void Mainwindow::on_toolButton_vet_clicked(bool checked)
 {
     pRadar->isSled = checked;
@@ -3873,7 +3889,7 @@ void Mainwindow::on_toolButton_dk_1_toggled(bool checked)
 {
     if(checked)
     {
-        commandMay22[4]=0x01;
+        commandMay22[4]=0x00;
         processing->sendCommand(commandMay22,12,false);
     }
 
@@ -3883,8 +3899,7 @@ void Mainwindow::on_toolButton_dk_2_toggled(bool checked)
 {
     if(checked)
     {
-        commandMay22[5]=0x00;
-        processing->sendCommand(commandMay22,12,false);
+
     }
 }
 
@@ -3892,8 +3907,7 @@ void Mainwindow::on_toolButton_dk_3_toggled(bool checked)
 {
     if(checked)
     {
-        commandMay22[6]=0x00;
-        processing->sendCommand(commandMay22,12,false);
+
     }
 }
 
@@ -3901,8 +3915,7 @@ void Mainwindow::on_toolButton_dk_4_toggled(bool checked)
 {
     if(checked)
     {
-        commandMay22[6]=0x06;
-        processing->sendCommand(commandMay22,12,false);
+
     }
 }
 
@@ -3910,8 +3923,7 @@ void Mainwindow::on_toolButton_dk_5_toggled(bool checked)
 {
     if(checked)
     {
-        commandMay22[6]=0x05;
-        processing->sendCommand(commandMay22,12,false);
+
     }
 }
 
@@ -3919,8 +3931,7 @@ void Mainwindow::on_toolButton_dk_6_toggled(bool checked)
 {
     if(checked)
     {
-        commandMay22[6]=0x04;
-        processing->sendCommand(commandMay22,12,false);
+
     }
 }
 
@@ -3928,8 +3939,7 @@ void Mainwindow::on_toolButton_dk_7_toggled(bool checked)
 {
     if(checked)
     {
-        commandMay22[6]=0x03;
-        processing->sendCommand(commandMay22,12,false);
+
     }
 }
 
@@ -3937,8 +3947,7 @@ void Mainwindow::on_toolButton_dk_8_toggled(bool checked)
 {
     if(checked)
     {
-        commandMay22[6]=0x02;
-        processing->sendCommand(commandMay22,12,false);
+
     }
 }
 
@@ -3946,8 +3955,7 @@ void Mainwindow::on_toolButton_dk_9_toggled(bool checked)
 {
     if(checked)
     {
-        commandMay22[6]=0x01;
-        processing->sendCommand(commandMay22,12,false);
+
     }
 }
 
@@ -3965,7 +3973,7 @@ void Mainwindow::on_toolButton_dk_12_toggled(bool checked)
 {
     if(checked)
     {
-        commandMay22[4]=0x00;
+        commandMay22[4]=0x01;
         processing->sendCommand(commandMay22,12,false);
     }
 }
@@ -4027,4 +4035,58 @@ void Mainwindow::on_toolButton_dk_17_toggled(bool checked)
 void Mainwindow::on_toolButton_grid_toggled(bool checked)
 {
     toolButton_grid_checked = checked;
+}
+
+void Mainwindow::on_toolButton_dk_4_clicked()
+{
+    commandMay22[6]=0x06;
+    processing->sendCommand(commandMay22,12,false);
+}
+
+void Mainwindow::on_toolButton_dk_3_clicked()
+{
+    commandMay22[6]=0x00;
+    processing->sendCommand(commandMay22,12,false);
+}
+
+void Mainwindow::on_toolButton_dk_5_clicked()
+{
+    commandMay22[6]=0x05;
+    processing->sendCommand(commandMay22,12,false);
+}
+
+void Mainwindow::on_toolButton_dk_6_clicked()
+{
+    commandMay22[6]=0x04;
+    processing->sendCommand(commandMay22,12,false);
+}
+
+void Mainwindow::on_toolButton_dk_7_clicked()
+{
+    commandMay22[6]=0x03;
+    processing->sendCommand(commandMay22,12,false);
+}
+
+void Mainwindow::on_toolButton_dk_8_clicked()
+{
+    commandMay22[6]=0x02;
+    processing->sendCommand(commandMay22,12,false);
+}
+
+void Mainwindow::on_toolButton_dk_9_clicked()
+{
+    commandMay22[6]=0x01;
+    processing->sendCommand(commandMay22,12,false);
+}
+
+void Mainwindow::on_toolButton_dk_2_clicked()
+{
+    commandMay22[5]=0x00;
+    processing->sendCommand(commandMay22,12,false);
+}
+
+void Mainwindow::on_toolButton_dk_13_clicked()
+{
+    commandMay22[5]=0x01;
+    processing->sendCommand(commandMay22,12,false);
 }

@@ -123,7 +123,7 @@ public:
     unsigned int mazi;
     unsigned int realazi1,realazi2;
     bool   isHeadingAvaible;
-    double          mAntennaAzi;
+    double          mAntennaAzi,mAntennaAziOld;
 signals:
     void HeadingDataReceived(double heading);
 private:

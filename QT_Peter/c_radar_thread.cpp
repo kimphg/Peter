@@ -572,6 +572,13 @@ void dataProcessingThread::run()
                     if(mReceiveBuff[2]==0x6e)
                     {
                         mAntennaAzi = ((mReceiveBuff[4]<<8)|mReceiveBuff[5])/11.377778;
+                        //printf("\nmAntennaAzi:%f",mAntennaAzi);
+                        if(abs(mAntennaAzi - mAntennaAziOld)>50)
+                        {
+                            sendCommand(&mReceiveBuff[0],len,false);
+                            mAntennaAziOld = mAntennaAzi;
+                        }
+
                     }
                     else if(mReceiveBuff[2]==0x65)
                     {
@@ -781,11 +788,23 @@ void dataProcessingThread::sendCommand(unsigned char *commandBuff, short len,boo
     {
         radarSocket->writeDatagram((char*)commandBuff,
                 len,
-                QHostAddress("192.168.1.253"),40002
+                QHostAddress("192.168.1.253"),30001
                 );
         radarSocket->writeDatagram((char*)commandBuff,
                 len,
-                QHostAddress("127.0.0.1"),40002
+                QHostAddress("192.168.1.253"),30002
+                );
+        radarSocket->writeDatagram((char*)commandBuff,
+                len,
+                QHostAddress("192.168.1.253"),30003
+                );
+        radarSocket->writeDatagram((char*)commandBuff,
+                len,
+                QHostAddress("192.168.1.253"),30004
+                );
+        radarSocket->writeDatagram((char*)commandBuff,
+                len,
+                QHostAddress("127.0.0.1"),30002
                 );
     }
 }

@@ -443,6 +443,24 @@ private slots:
 
     void on_toolButton_grid_toggled(bool checked);
 
+    void on_toolButton_dk_4_clicked();
+
+    void on_toolButton_dk_3_clicked();
+
+    void on_toolButton_dk_5_clicked();
+
+    void on_toolButton_dk_6_clicked();
+
+    void on_toolButton_dk_7_clicked();
+
+    void on_toolButton_dk_8_clicked();
+
+    void on_toolButton_dk_9_clicked();
+
+    void on_toolButton_dk_2_clicked();
+
+    void on_toolButton_dk_13_clicked();
+
 private:
     void initActionsConnections();
     void initGraphicView();
