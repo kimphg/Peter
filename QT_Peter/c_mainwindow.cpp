@@ -1603,11 +1603,11 @@ void Mainwindow::UpdateVideo()
             pRadar->isClkAdcChanged = false;
         }
         pRadar->UpdateData();
-        repaint();
+
     }
 
 
-
+    repaint();
     /*QStandardItemModel* model = new QStandardItemModel(trackListPt->size(), 5);
     for (int row = 0; row < trackListPt->size(); ++row)
     {
@@ -1626,12 +1626,10 @@ void Mainwindow::readBuffer()
 }
 void Mainwindow::InitTimer()
 {
-    processing = new dataProcessingThread();
-    pRadar = processing->mRadarData;
-
     t2 = new QThread();
 
-
+    processing = new dataProcessingThread();
+    pRadar = processing->mRadarData;
     connect(&syncTimer1s, SIGNAL(timeout()), this, SLOT(sync1S()));
     syncTimer1s.start(1000);
     connect(&syncTimer5p, SIGNAL(timeout()), this, SLOT(sync5p()));
@@ -1642,14 +1640,14 @@ void Mainwindow::InitTimer()
     timerVideoUpdate.start(30);//ENVDEP
     //scrUpdateTimer.moveToThread(t2);
     //connect(t2,SIGNAL(finished()),t2,SLOT(deleteLater()));
-    /*
+
     connect(this,SIGNAL(destroyed()),processing,SLOT(deleteLater()));
     connect(&dataPlaybackTimer,SIGNAL(timeout()),processing,SLOT(playbackRadarData()));
     processing->start(QThread::TimeCriticalPriority);
     t2->start(QThread::HighPriority);
 
     connect(&timerMapUpdate, SIGNAL(timeout()), this, SLOT(Update100ms()));
-    timerMapUpdate.start(100);//ENVDEP*/
+    timerMapUpdate.start(100);//ENVDEP
 
 }
 void Mainwindow::Update100ms()
@@ -1960,6 +1958,7 @@ void Mainwindow::UpdateDataStatus()
             ui->label_data_range_2->setStyleSheet("background-color: rgb(255, 10, 10);");
             ui->label_data_range_2->setText(QString::fromUtf8("Máy phát không hoạt động"));
         }
+
         if(processing->mRadarStat.mTaiAngTen==1)ui->toolButton_dk_2->setChecked(true);//tai ang ten
         else if(processing->mRadarStat.mTaiAngTen==0)ui->toolButton_dk_13->setChecked(true);//tai ang ten
         if(processing->mRadarStat.mMaHieu==0)ui->toolButton_dk_11->setChecked(true);//ma hieu
