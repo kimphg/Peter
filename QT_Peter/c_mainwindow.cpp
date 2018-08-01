@@ -2720,20 +2720,20 @@ void Mainwindow::setCodeType(short index)// chuyen ma
 
 void Mainwindow::on_horizontalSlider_gain_valueChanged(int value)
 {
-    //    pRadar->kgain = 7-(float)value/(ui->horizontalSlider_gain->maximum())*10;
-    //    ui->label_gain->setText("Gain:"+QString::number(-pRadar->kgain));
+        pRadar->kgain = 7-(float)value/(ui->horizontalSlider_gain->maximum())*10;
+        ui->label_gain->setText("Gain:"+QString::number(-pRadar->kgain));
     //printf("pRadar->kgain %f \n",pRadar->kgain);
 }
 
 void Mainwindow::on_horizontalSlider_rain_valueChanged(int value)
 {
-    //    pRadar->krain = (float)value/(ui->horizontalSlider_rain->maximum()+ui->horizontalSlider_rain->maximum()/3);
-    //    ui->label_rain->setText("Rain:" + QString::number(pRadar->krain,'f',2));
+        pRadar->krain = (float)value/(ui->horizontalSlider_rain->maximum()+ui->horizontalSlider_rain->maximum()/3);
+        ui->label_rain->setText("Rain:" + QString::number(pRadar->krain,'f',2));
 }
 
 void Mainwindow::on_horizontalSlider_sea_valueChanged(int value)
 {
-    //    pRadar->ksea = (float)value/(ui->horizontalSlider_sea->maximum());
+        pRadar->ksea = (float)value/(ui->horizontalSlider_sea->maximum());
     //ui->label_rain->setText("Rain:" + QString::number(-pRadar->krain));
 }
 

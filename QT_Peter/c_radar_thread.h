@@ -149,6 +149,7 @@ private:
     void processSerialData(QByteArray inputData);
     //    bool ProcDataAIS(BYTE *szBuff, int nLeng);
     bool checkFeedback();
+    void ProcessNavData(QByteArray data);
 private slots:
     void ReadDataBuffer();
     void PushCommandQueue();

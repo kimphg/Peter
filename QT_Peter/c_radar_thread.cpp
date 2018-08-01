@@ -102,8 +102,8 @@ dataProcessingThread::dataProcessingThread()
     isPlaying = false;
     radarSocket = new QUdpSocket(this);
     navSocket = new QUdpSocket(this);
-    int port = CConfig::getInt("radarDataPort",34567);
-    while(port<34700)
+    int port = CConfig::getInt("radarSocketPort",31000);
+    while(port<31100)
     {
         if(radarSocket->bind(port))
         {
@@ -111,7 +111,7 @@ dataProcessingThread::dataProcessingThread()
         }
         port++;
     }
-    port = CConfig::getInt("navDataPort",30000);
+    port = CConfig::getInt("navSocketPort",30000);
     while(port<30100)
     {
         if(navSocket->bind(port))
@@ -123,7 +123,7 @@ dataProcessingThread::dataProcessingThread()
         port++;
     }
     connect(&commandSendTimer, &QTimer::timeout, this, &dataProcessingThread::PushCommandQueue);
-    commandSendTimer.start(100);
+    commandSendTimer.start(200);
     connect(&readUdpBuffTimer, &QTimer::timeout, this, &dataProcessingThread::ReadDataBuffer);
     readUdpBuffTimer.start(10);
     initSerialComm();
@@ -137,53 +137,56 @@ void dataProcessingThread::ReadNavData()
         QByteArray data;
         data.resize(len);
         navSocket->readDatagram(data.data(),len);
-        CGPSParser gpsParser(data.toStdString());
-        if(gpsParser.isDataValid)
-        {
-            if(gpsParser.latitude)
-            {
-
-                if(gpsParser.longitude)
-                {
-                    GPSData newGPSPoint;
-
-                    newGPSPoint.lat = gpsParser.latitude;
-                    newGPSPoint.lon = gpsParser.longitude;
-                    newGPSPoint.isFixed = true;
-                    while(mGpsData.size()>10)
-                    {
-                        mGpsData.pop();
-                    }
-                    if(gpsParser.heading)
-                    {
-                        newGPSPoint.heading = gpsParser.heading;
-                        //printf("\nheading:%f",newGPSPoint.heading);
-                    }
-                    else if(mGpsData.size()>3)
-                    {
-                        double dLat = mGpsData.back().lat - mGpsData.front().lat;
-                        double dLon = mGpsData.back().lon - mGpsData.front().lon;
-                        if(dLat!=0)
-                        {
-                            newGPSPoint.heading = atan(dLon/dLat)/3.1415926535489*180.0;
-                            if(dLat<0)newGPSPoint.heading+=180;
-                        }
-                        else
-                            newGPSPoint.heading = 180-90*(dLon>0);
-                        if(newGPSPoint.heading<0)newGPSPoint.heading+=360;
-                        if(newGPSPoint.heading>360)newGPSPoint.heading-=360;
-                    }
-                    else newGPSPoint.heading = 0;
-                    mGpsData.push(newGPSPoint);
-                }
-            }
-        }
+        ProcessNavData(data);
     }
 
     return;
 }
 QString str="";
+void dataProcessingThread::ProcessNavData(QByteArray data)
+{
+    CGPSParser gpsParser(data.toStdString());
+    if(gpsParser.isDataValid)
+    {
+        if(gpsParser.latitude)
+        {
 
+            if(gpsParser.longitude)
+            {
+                GPSData newGPSPoint;
+
+                newGPSPoint.lat = gpsParser.latitude;
+                newGPSPoint.lon = gpsParser.longitude;
+                newGPSPoint.isFixed = true;
+                while(mGpsData.size()>10)
+                {
+                    mGpsData.pop();
+                }
+                if(gpsParser.heading)
+                {
+                    newGPSPoint.heading = gpsParser.heading;
+                    //printf("\nheading:%f",newGPSPoint.heading);
+                }
+                else if(mGpsData.size()>3)
+                {
+                    double dLat = mGpsData.back().lat - mGpsData.front().lat;
+                    double dLon = mGpsData.back().lon - mGpsData.front().lon;
+                    if(dLat!=0)
+                    {
+                        newGPSPoint.heading = atan(dLon/dLat)/3.1415926535489*180.0;
+                        if(dLat<0)newGPSPoint.heading+=180;
+                    }
+                    else
+                        newGPSPoint.heading = 180-90*(dLon>0);
+                    if(newGPSPoint.heading<0)newGPSPoint.heading+=360;
+                    if(newGPSPoint.heading>360)newGPSPoint.heading-=360;
+                }
+                else newGPSPoint.heading = 0;
+                mGpsData.push(newGPSPoint);
+            }
+        }
+    }
+}
 void dataProcessingThread::initSerialComm()
 {
     int serialBaud ;
@@ -344,6 +347,26 @@ void dataProcessingThread::PushCommandQueue()
 
 
     }
+    while(true)
+    {
+        object_t obj= mRadarData->GetRadarObject();
+        if(!obj.size)break;
+        QString outputData("$RATAR");
+
+        outputData+= ","+ QString::number(obj.time)
+                +","+ QString::number(obj.az/PI*180.0)//azi
+                +","+ QString::number(1.0)//maxerr of azi
+                +","+ QString::number(obj.rgKm)//
+                +","+ QString::number(obj.rangeRes);
+                //+","+ QString::number(this->mGpsData.back().lat);
+                //+","+ QString::number(this->mGpsData.back().lon);
+
+        radarSocket->writeDatagram((char*)outputData.toStdString().data(),
+                outputData.size(),
+                QHostAddress("127.0.0.1"),31001
+                );
+
+    }
 }
 void dataProcessingThread::playbackRadarData()
 {
@@ -369,7 +392,7 @@ void dataProcessingThread::playbackRadarData()
                 //mRadarData->assembleDataFrame((unsigned char*)buff.data(),buff.size());
                 mRadarData->processSocketData((unsigned char*)buff.data(),len);
             }
-            else processSerialData(buff);
+            else ProcessNavData(buff);
             if(isRecording)
             {
                 signRecFile.write((char*)&len,2);
@@ -573,7 +596,7 @@ void dataProcessingThread::run()
                     {
                         mAntennaAzi = ((mReceiveBuff[4]<<8)|mReceiveBuff[5])/11.377778;
                         //printf("\nmAntennaAzi:%f",mAntennaAzi);
-                        if(rand()%3==0)
+                        if(rand()%4==0)
                         {
                             sendCommand(&mReceiveBuff[0],len,false);
                             mAntennaAziOld = mAntennaAzi;

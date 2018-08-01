@@ -7820,7 +7820,7 @@
      <bool>false</bool>
     </property>
     <property name="currentIndex">
-     <number>1</number>
+     <number>4</number>
     </property>
     <property name="elideMode">
      <enum>Qt::ElideNone</enum>
@@ -11887,7 +11887,7 @@
          <x>220</x>
          <y>200</y>
          <width>241</width>
-         <height>72</height>
+         <height>74</height>
         </rect>
        </property>
        <layout class="QFormLayout" name="formLayout_6">
@@ -16917,7 +16917,7 @@
         <x>300</x>
         <y>270</y>
         <width>203</width>
-        <height>125</height>
+        <height>129</height>
        </rect>
       </property>
       <layout class="QVBoxLayout" name="verticalLayout_5">
@@ -21886,7 +21886,7 @@
        <string notr="true">background-color: rgb(30, 50, 70);color:rgb(30, 50, 70);font: 12pt &quot;MS Shell Dlg 2&quot;;</string>
       </property>
       <property name="currentIndex">
-       <number>0</number>
+       <number>1</number>
       </property>
       <widget class="QWidget" name="tab_7">
        <attribute name="title">

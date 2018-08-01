@@ -97,16 +97,20 @@ typedef struct  {
     unsigned short maxR,minR,ctR;
     unsigned short size;
     unsigned char maxLevel,dopler;
-    //bool isProcessed;
+    //bool isFinished;
 } plot_t;
 typedef struct  {
     float          az ,rg,x,y;
+    float          rgKm;
     short          azMin,azMax,rMin,rMax;
     short          size;
     char           dopler;
     bool           isManual;
     float          p;
     float          terrain;
+    float rangeRes;
+    float aziRes;
+    qint64          time;
 }object_t;
 typedef std::vector<plot_t> plotList;
 typedef std::vector<object_t> objectList;
@@ -342,6 +346,7 @@ public:
     double getSelfRotationAzi() const;
     void setSelfRotationAzi(int value);
     void processSocketData(unsigned char *data, short len);
+    object_t GetRadarObject();
 };
 
 //extern C_radar_data radarData;

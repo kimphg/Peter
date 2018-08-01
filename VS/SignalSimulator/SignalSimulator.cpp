@@ -49,7 +49,7 @@ void socketInit()
 	//setup address structure
 	memset((char *)&si_peter, 0, sizeof(si_peter));
 	si_peter.sin_family = AF_INET;
-	si_peter.sin_port = htons(34567);//port "127.0.0.1"
+	si_peter.sin_port = htons(31000);//port "127.0.0.1"
 	si_peter.sin_addr.S_un.S_addr = inet_addr("127.0.0.1");
 
 }
@@ -127,19 +127,25 @@ public:
 	{
 		azi = ConvXYToAziRad(x, y) / 3.141592653589*1024.0;
 		range = ConvXYToRange(x, y);
-		for (int a = azi - 5; a < azi + 5; a++)
+		int azimin = azi - 5; if (azimin < 0)azimin += 2048;
+		int azimax = azi + 5; if (azimax >=2048)azimax -= 2048;
+		int k = 0;
+		for (int a = azimin; a != azimax; a++)
 		{
+			k++;
 			if (a < 0)a += 2048;
 			if (a >= 2048) a -= 2048;
-			outputFrame[a][(int)range] = 200 * (1.0 - abs(azi - a) / 5.0);
-			outputFrame[a][(int)range + 1] = 200 * (1.0 - abs(azi - a) / 5.0);
+			outputFrame[a][(int)range] = 30 + 150 * (1.0 - abs(k-5) / 5.0);
+			outputFrame[a][(int)range + 1] = 30 + 150 * (1.0 - abs(k - 5) / 5.0);
 		}
 	}
 	void eraseSIgnal()
 	{
 		azi = ConvXYToAziRad(x, y) / 3.141592653589*1024.0;
 		range = ConvXYToRange(x, y);
-		for (int a = azi - 5; a < azi + 5; a++)
+		int azimax = azi + 5; if (azimax >= 2048)azimax -= 2048;
+		int azimin = azi - 5; if (azimin < 0)azimin += 2048;
+		for (int a = azimin; a != azimax; a++)
 		{
 			if (a < 0)a += 2048;
 			if (a>2048) a -= 2048;
