@@ -573,7 +573,7 @@ void dataProcessingThread::run()
                     {
                         mAntennaAzi = ((mReceiveBuff[4]<<8)|mReceiveBuff[5])/11.377778;
                         //printf("\nmAntennaAzi:%f",mAntennaAzi);
-                        if(rand()%4==0)
+                        if(rand()%3==0)
                         {
                             sendCommand(&mReceiveBuff[0],len,false);
                             mAntennaAziOld = mAntennaAzi;
