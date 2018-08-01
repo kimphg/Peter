@@ -5,7 +5,7 @@
 //#include <QGeoCoordinate>
 #include <QNmeaPositionInfoSource>
 DataBuff dataB[MAX_IREC];
-uchar udpFrameBuffer[MAX_IREC][4128];
+uchar udpFrameBuffer[MAX_IREC][OUTPUT_FRAME_SIZE];
 short iRec=0,iRead=0;
 bool *pIsDrawn;
 bool *pIsPlaying;
@@ -38,7 +38,7 @@ void dataProcessingThread::ReadDataBuffer()
             break;
         }
         isDrawn = false;
-        unsigned short dataLen = 4128;
+        unsigned short dataLen = OUTPUT_FRAME_SIZE;
         if(!isPlaying)
         {
             mRadarData->processSocketData(pData,dataLen);
@@ -46,7 +46,7 @@ void dataProcessingThread::ReadDataBuffer()
             if(isRecording)
             {
                 signRecFile.write((char*)&dataLen);
-                signRecFile.write((char*)pData,4128);
+                signRecFile.write((char*)pData,dataLen);
             }
         }
         iRead++;
@@ -367,7 +367,7 @@ void dataProcessingThread::playbackRadarData()
             signRepFile.read(buff.data(),len);
             if(len>500){
                 //mRadarData->assembleDataFrame((unsigned char*)buff.data(),buff.size());
-                mRadarData->processSocketData((unsigned char*)buff.data(),4128);
+                mRadarData->processSocketData((unsigned char*)buff.data(),len);
             }
             else processSerialData(buff);
             if(isRecording)
@@ -573,7 +573,7 @@ void dataProcessingThread::run()
                     {
                         mAntennaAzi = ((mReceiveBuff[4]<<8)|mReceiveBuff[5])/11.377778;
                         //printf("\nmAntennaAzi:%f",mAntennaAzi);
-                        if(abs(mAntennaAzi - mAntennaAziOld)>50)
+                        if(rand()%4==0)
                         {
                             sendCommand(&mReceiveBuff[0],len,false);
                             mAntennaAziOld = mAntennaAzi;

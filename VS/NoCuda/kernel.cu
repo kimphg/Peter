@@ -487,7 +487,7 @@ void packet_handler(u_char *param, const struct pcap_pkthdr *pkt_header, const u
 		}
 		return;
 	}
-	else if (port == 30001)
+	else if (port == 34567)
 	{
 		u_char* data = (u_char*)pkt_data + UDP_HEADER_LEN;
 		if (

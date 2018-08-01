@@ -24,6 +24,10 @@
 #ifndef PI
    #define PI                       3.14159265358979323846
 #endif
+#define FRAME_HEADER_SIZE 34
+#define HR_MAX_RESOLUTION 1024
+#define OUTPUT_FRAME_SIZE HR_MAX_RESOLUTION*2+FRAME_HEADER_SIZE
+
 #define MAX_TRACK_LEN               400
 #define MAX_TRACKS                  199
 #define ENCODER_RES                 5000

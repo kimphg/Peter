@@ -667,7 +667,7 @@ void Mainwindow::DrawMap()
     //p.setCompositionMode(QPainter::CompositionMode_SourceOver);
     pMapPainter.setOpacity(1);
     //grid
-    if(toolButton_grid_checked)
+    /*if(toolButton_grid_checked)
     {
 
         if(ui->toolButton_measuring->isChecked())
@@ -683,7 +683,7 @@ void Mainwindow::DrawMap()
     pMapPainter.setBrush(Qt::NoBrush);
     pMapPainter.setPen(penBackground);
     short i=200;
-    pMapPainter.drawEllipse(-i/2,-i/2,SCR_H+i,SCR_H+i);
+    pMapPainter.drawEllipse(-i/2,-i/2,SCR_H+i,SCR_H+i);*/
 
 }
 void Mainwindow::DrawGrid(QPainter* p,short centerX,short centerY)
@@ -811,7 +811,7 @@ void Mainwindow::DrawRadarTargetByPainter(QPainter* p)//draw radar target from p
             if(trackListPt->at(trackId).dopler==17)//diem dau dat bang tay
             {
                 p->setPen(penTargetBlue);
-                p->drawEllipse(sx-6,sy-6,12,12);
+                p->drawRect(sx-6,sy-6,12,12);
                 continue;
             }
             else if(trackListPt->at(trackId).isManual)
@@ -1471,17 +1471,30 @@ bool Mainwindow::CalcAziContour(double theta, QPoint *point0,QPoint *point1,QPoi
 void Mainwindow::DrawViewFrame(QPainter* p)
 {
 
+    if(toolButton_grid_checked)
+        {
 
+            if(ui->toolButton_measuring->isChecked())
+            {
+                DrawGrid(p,mMouseLastX,mMouseLastY);
+            }
+            else
+            {
+                DrawGrid(p,scrCtX-dx,scrCtY-dy);
+            }
+        }
     //fill back ground
-    /*p->setBrush(QColor(40,60,100,255));
-    p->drawRect(scrCtX+scrCtY,0,width()-scrCtX-scrCtY,height());
-    p->drawRect(0,0,scrCtX-scrCtY,height());
+
+    p->setBrush(QColor(24,48,64,255));
+    p->drawRect(SCR_H+SCR_LEFT_MARGIN,0,SCR_W-SCR_H-SCR_LEFT_MARGIN,SCR_H);
+    p->drawRect(0,0,SCR_LEFT_MARGIN,SCR_H);
     p->setBrush(Qt::NoBrush);
     p->setPen(penBackground);
-    for (short i=60;i<650;i+=110)
-    {
-        p->drawEllipse(-i/2+(scrCtX-scrCtY)+25,-i/2+25,SCR_H -50+i,SCR_H -50+i);
-    }*/
+//    for (short i=60;i<650;i+=110)
+//    {
+//        p->drawEllipse(-i/2+(scrCtX-scrCtY)+25,-i/2+25,SCR_H -50+i,SCR_H -50+i);
+//    }
+    p->drawEllipse(-100+SCR_LEFT_MARGIN,-100,SCR_H+200,SCR_H+200);
     p->setPen(penOuterGrid2);
     p->drawEllipse(scrCtX-scrCtY+25,25,SCR_H -50,SCR_H -50);
 
@@ -1532,6 +1545,14 @@ void Mainwindow::DrawViewFrame(QPainter* p)
     if(CalcAziContour(processing->mAntennaAzi,&points[0],&points[1],&points[2],height()-70))
     {
         p->setPen(QPen(Qt::red,4,Qt::SolidLine,Qt::RoundCap));
+        p->drawLine(points[2],points[1]);
+        //draw text
+        //p->drawText(720,20,200,20,0,"Antenna: "+QString::number(aziDeg,'f',1));
+
+    }
+    if(CalcAziContour(pRadar->getCurAziRad()/3.141592653589*180.0,&points[0],&points[1],&points[2],height()-70))
+    {
+        p->setPen(QPen(Qt::cyan,4,Qt::SolidLine,Qt::RoundCap));
         p->drawLine(points[2],points[1]);
         //draw text
         //p->drawText(720,20,200,20,0,"Antenna: "+QString::number(aziDeg,'f',1));
@@ -1605,8 +1626,6 @@ void Mainwindow::UpdateVideo()
         pRadar->UpdateData();
 
     }
-
-
     repaint();
     /*QStandardItemModel* model = new QStandardItemModel(trackListPt->size(), 5);
     for (int row = 0; row < trackListPt->size(); ++row)
@@ -3991,8 +4010,7 @@ void Mainwindow::on_toolButton_dk_13_toggled(bool checked)
 {
     if(checked)
     {
-        commandMay22[5]=0x01;
-        processing->sendCommand(commandMay22,12,false);
+
     }
 }
 

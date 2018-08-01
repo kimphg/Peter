@@ -365,7 +365,7 @@ void track_t::setManual(bool isMan)
 
 C_radar_data::C_radar_data()
 {
-    range_max = 1500;
+    range_max = HR_MAX_RESOLUTION;
     imgMode = VALUE_ORANGE_BLUE;
     brightness = 1.5;
     for(int i=0;i<255;i++)
@@ -1210,7 +1210,7 @@ void C_radar_data::processSocketData(unsigned char* data,short len)
     }
     else
     {
-        unsigned short gray  = ((data[2]<<8)|data[3])/2;
+        /*unsigned short gray  = ((data[2]<<8)|data[3])/2;
         unsigned short result = gray & 64;
         result |= (gray ^ (result >> 1)) & 32;
         result |= (gray ^ (result >> 1)) & 16;
@@ -1218,7 +1218,8 @@ void C_radar_data::processSocketData(unsigned char* data,short len)
         result |= (gray ^ (result >> 1)) & 4;
         result |= (gray ^ (result >> 1)) & 2;
         result |= (gray ^ (result >> 1)) & 1;
-        newAzi = result;
+        newAzi = result;*/
+        newAzi = ((data[2]<<8)|data[3]);
         if(newAzi>=2048||newAzi<0)
             return;
     }
@@ -1231,7 +1232,7 @@ void C_radar_data::processSocketData(unsigned char* data,short len)
         data_mem.dopler[curAzir][r_pos] = data[34+r_pos+2048];
     }*/
     memcpy(&data_mem.level[curAzir][0],data+34,range_max);
-    memcpy(&data_mem.dopler[curAzir][0],data+34+2048,range_max);
+    memcpy(&data_mem.dopler[curAzir][0],data+34+HR_MAX_RESOLUTION,range_max);
     aziToProcess.push(curAzir);
     if(!((unsigned char)(curAzir<<3)))
     {
