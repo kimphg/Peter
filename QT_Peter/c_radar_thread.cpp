@@ -45,7 +45,7 @@ void dataProcessingThread::ReadDataBuffer()
 
             if(isRecording)
             {
-                signRecFile.write((char*)&dataLen);
+                signRecFile.write((char*)&dataLen,2);
                 signRecFile.write((char*)pData,dataLen);
             }
         }
@@ -354,7 +354,7 @@ void dataProcessingThread::PushCommandQueue()
         QString outputData("$RATAR");
 
         outputData+= ","+ QString::number(obj.time)
-                +","+ QString::number(obj.az/PI*180.0)//azi
+                +","+ QString::number(obj.az/PI*180.0,'f',2)//azi
                 +","+ QString::number(1.0)//maxerr of azi
                 +","+ QString::number(obj.rgKm)//
                 +","+ QString::number(obj.rangeRes);
@@ -387,12 +387,14 @@ void dataProcessingThread::playbackRadarData()
             }
             QByteArray buff;
             buff.resize(len);
+
             signRepFile.read(buff.data(),len);
             if(len>500){
                 //mRadarData->assembleDataFrame((unsigned char*)buff.data(),buff.size());
                 mRadarData->processSocketData((unsigned char*)buff.data(),len);
             }
-            else ProcessNavData(buff);
+            else if(len)
+                ProcessNavData(buff);
             if(isRecording)
             {
                 signRecFile.write((char*)&len,2);
