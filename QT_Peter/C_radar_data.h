@@ -110,7 +110,7 @@ typedef struct  {
     float          terrain;
     float rangeRes;
     float aziRes;
-    qint64          time;
+    unsigned int          time;
 }object_t;
 typedef std::vector<plot_t> plotList;
 typedef std::vector<object_t> objectList;
@@ -220,6 +220,7 @@ public:
     float                   rotation_per_min ;
     trackList               mTrackList;
     plotList                plot_list;
+    std::list<object_t>      mObjList;
 //    bool                    isEncoderAzi;
 //    int                     mEncoderAzi;
     unsigned char           spectre[16];
@@ -241,7 +242,7 @@ public:
     void setAutorgs( bool aut);
     void                    clearPPI();
     unsigned char           moduleVal;
-    float                   trueN;
+    float                   aziOffset;
     DataOverLay             dataOver;
     unsigned char           noise_level[8];
     unsigned char           tempType,rotation_speed;
@@ -272,7 +273,7 @@ public:
 
         while(trueN_deg<0)trueN_deg+=360;
         while(trueN_deg>=360)trueN_deg-=360;
-        trueN =(trueN_deg/360.0*PI_NHAN2);
+        aziOffset =(trueN_deg/360.0*PI_NHAN2);
         raw_map_init();
         resetTrack();
     }

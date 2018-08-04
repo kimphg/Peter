@@ -22,7 +22,7 @@ unsigned char dataBuff[RADAR_DATA_HEADER_MAX + RADAR_DATA_MAX_SIZE];
 QFile *exp_file = NULL;
 
 typedef std::queue<int> aziQueue;
-std::list<object_t> mObjectsQueue;
+
 aziQueue aziToProcess;//hàng chờ các frame cần xử lý
 
 typedef struct  {
@@ -442,13 +442,13 @@ C_radar_data::~C_radar_data()
 
 double C_radar_data::getArcMaxAziRad() const
 {
-    double result = (trueN+(double)arcMaxAzi/(double)MAX_AZIR*PI_NHAN2);
+    double result = (aziOffset+(double)arcMaxAzi/(double)MAX_AZIR*PI_NHAN2);
     if(result>PI_NHAN2)result-=PI_NHAN2;
     return ( result);
 }
 double C_radar_data::getArcMinAziRad() const
 {
-    double result = (trueN+(double)arcMinAzi/(double)MAX_AZIR*PI_NHAN2);
+    double result = (aziOffset+(double)arcMinAzi/(double)MAX_AZIR*PI_NHAN2);
     if(result>PI_NHAN2)result-=PI_NHAN2;
     return (result );
 }
@@ -466,7 +466,7 @@ void C_radar_data::setSelfRotationAzi(int value)
 double C_radar_data::getCurAziRad() const
 {
 
-    double result = (trueN+(double)curAzir/(double)MAX_AZIR*PI_NHAN2);
+    double result = (aziOffset+(double)curAzir/(double)MAX_AZIR*PI_NHAN2);
     if(result>PI_NHAN2)result-=PI_NHAN2;
     return ( result);
 }
@@ -1486,13 +1486,15 @@ void C_radar_data::procPLot(plot_t* mPlot)
 
         newobject.dopler = mPlot->dopler;
         //newobject.terrain = data_mem.terrain[short(ctA)][short(ctR)];
-        newobject.az   = ctA/MAX_AZIR*PI_NHAN2+trueN;
+        newobject.az   = ctA/MAX_AZIR*PI_NHAN2+aziOffset;
         if(newobject.az>PI_NHAN2)newobject.az-=PI_NHAN2;
         newobject.rg   = ctR;
-        newobject.rgKm =  ctR*scale_ppi;
+        newobject.rgKm =  ctR*sn_scale;
         newobject.p   = -1;
-        newobject.time = QDateTime::currentMSecsSinceEpoch();
-        if(mObjectsQueue.size()<50)mObjectsQueue.push_back(newobject);
+        newobject.time = uint(QDateTime::currentMSecsSinceEpoch()/100-15000000000);
+        newobject.x = newobject.rgKm*sin( newobject.az);
+        newobject.y = newobject.rgKm*cos( newobject.az);
+        if(mObjList.size()<50)mObjList.push_back(newobject);
         /*for(short i = mPlot->minA;i!=mPlot->maxA;i++)
             {
                 if(i>=MAX_AZIR)i-=MAX_AZIR;
@@ -1535,7 +1537,7 @@ void C_radar_data::procTracks(unsigned short curA)
 
 
     //proc track
-    float azi = (float)curA/MAX_AZIR*PI_NHAN2+trueN;
+    float azi = (float)curA/MAX_AZIR*PI_NHAN2+aziOffset;
     for(unsigned short i=0;i<mTrackList.size();i++)
     {
         if(!mTrackList.at(i).state)continue;
@@ -1708,7 +1710,7 @@ void C_radar_data::drawRamp(double azi)
     img_RAmp->fill(Qt::black);
     //newobject.az   = ctA/MAX_AZIR*PI_NHAN2+trueN;
     azi/=DEG_RAD;
-    azi-=trueN;
+    azi-=aziOffset;
     if(azi<0)azi+=PI_NHAN2;
     int az = azi/PI_NHAN2*MAX_AZIR;
     for (short r_pos = 0;r_pos<RAD_M_PULSE_RES;r_pos++)
@@ -1957,10 +1959,10 @@ short zoomXmax,zoomYmax,zoomXmin,zoomYmin;
 short zoomCenterX=DISPLAY_RES,zoomCenterY=DISPLAY_RES;
 void C_radar_data::setZoomRectXY(float ctx, float cty)
 {
-    zoomXmax = ctx*4.0/scale_ppi+ZOOM_SIZE/2;
-    zoomYmax = cty*4.0/scale_ppi+ZOOM_SIZE/2;
-    zoomXmin = ctx*4.0/scale_ppi-ZOOM_SIZE/2;
-    zoomYmin = cty*4.0/scale_ppi-ZOOM_SIZE/2;
+    zoomXmax = ctx*2.0/scale_ppi+ZOOM_SIZE/2;
+    zoomYmax = cty*2.0/scale_ppi+ZOOM_SIZE/2;
+    zoomXmin = ctx*2.0/scale_ppi-ZOOM_SIZE/2;
+    zoomYmin = cty*2.0/scale_ppi-ZOOM_SIZE/2;
     raw_map_init_zoom();
 }
 
@@ -1984,7 +1986,7 @@ void C_radar_data::setZoomRectAR(float ctx, float cty,double sizeKM,double sizeD
         if(ctx>0)cta = PI_CHIA2;
         else cta = -PI_CHIA2;
     }
-    else cta = atan(ctx/cty)-trueN;
+    else cta = atan(ctx/cty)-aziOffset;
     if(cty<0)cta+=PI;
     if(cta<0)cta += PI_NHAN2;
     if(cta>PI_NHAN2)cta-=PI_NHAN2;
@@ -2039,7 +2041,7 @@ void C_radar_data::setAutorgs(bool aut)
 }
 void C_radar_data::raw_map_init()
 {
-    float theta=trueN;
+    float theta=aziOffset;
     float dTheta = 2*PI/MAX_AZIR_DRAW;
     for(short azir = 0; azir < MAX_AZIR_DRAW; azir++)
     {
@@ -2061,7 +2063,7 @@ void C_radar_data::raw_map_init()
 void C_radar_data::raw_map_init_zoom()
 {
     img_zoom_ppi->fill(Qt::black);
-    float theta=trueN;
+    float theta=aziOffset;
     float dTheta = 2*PI/MAX_AZIR_DRAW;
     for(short azir = 0; azir < MAX_AZIR_DRAW; azir++)
     {
@@ -2309,10 +2311,10 @@ void C_radar_data::resetTrack()
 object_t C_radar_data::GetRadarObject()
 {
     object_t res;
-    if(mObjectsQueue.size())
+    if(mObjList.size())
     {
-        res=mObjectsQueue.front();
-        mObjectsQueue.pop_front();
+        res=mObjList.front();
+        mObjList.pop_front();
         return res;
     }
     res.size=0;

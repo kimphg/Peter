@@ -782,6 +782,17 @@ void Mainwindow::DrawRadarTargetByPainter(QPainter* p)//draw radar target from p
     short sx,sy;
     float scale_ppi = pRadar->scale_ppi;
     //short targetId = 0;
+    std::list<object_t>* pObjList = &(pRadar->mObjList);
+    if(true)//raw objects
+    {
+        foreach (object_t obj, *pObjList) {
+            sx = obj.x*mScale + scrCtX - dx;
+            sy = -obj.y*mScale + scrCtY - dy;
+            p->setPen(penTargetBlue);
+            p->drawRect(sx-5,sy-5,10,10);
+        }
+
+    }
     trackList* trackListPt = &pRadar->mTrackList;
     if(true)//ui->toolButton_blue_tracks->isChecked())
     {
@@ -1151,13 +1162,13 @@ void Mainwindow::paintEvent(QPaintEvent *event)
 void Mainwindow::DrawIADArea(QPainter* p)
 {
     if(ui->tabWidget_iad->isHidden())return;
+    p->setCompositionMode(QPainter::CompositionMode_SourceOver);
     QRect rect = ui->tabWidget_iad->geometry();
     rect.adjust(4,30,-5,-5);
+    p->setBrush(QBrush(Qt::black));
+    p->drawRect(rect);
     if(ui->tabWidget_iad->currentIndex()==0)
     {
-        p->setPen(QPen(Qt::black));
-        p->setBrush(QBrush(Qt::black));
-        p->drawRect(rect);
         p->setPen(QPen(Qt::white,2));
         QPoint p1(rect.x(),rect.y());
         //QPoint p2(rect.x(),rect.y());
@@ -1185,22 +1196,19 @@ void Mainwindow::DrawIADArea(QPainter* p)
     else if(ui->tabWidget_iad->currentIndex()==4)
     {
         //C_radar_data *prad = pRadar;
+         p->drawImage(rect,*pRadar->img_zoom_ppi,pRadar->img_zoom_ppi->rect());
         if(mRangeLevel>2)
         {
             short zoom_size = ui->tabWidget_iad->width()/pRadar->scale_zoom_ppi*pRadar->scale_ppi;
             p->setPen(QPen(QColor(255,255,255,200),0,Qt::DashLine));
+            p->setBrush(Qt::NoBrush);
             p->drawRect(mZoomCenterx-zoom_size/2.0,mZoomCentery-zoom_size/2.0,zoom_size,zoom_size);
         }
-        p->drawImage(rect,*pRadar->img_zoom_ppi,pRadar->img_zoom_ppi->rect());
 
     }
     else if(ui->tabWidget_iad->currentIndex()==1)
     {
-        QRect rect = ui->tabWidget_iad->geometry();
 
-        p->setPen(QPen(Qt::black));
-        p->setBrush(QBrush(Qt::black));
-        p->drawRect(rect);
         p->drawImage(rect,*pRadar->img_histogram,
                      pRadar->img_histogram->rect());
 
@@ -1208,10 +1216,6 @@ void Mainwindow::DrawIADArea(QPainter* p)
     else if(ui->tabWidget_iad->currentIndex()==2)
     {
 
-
-        p->setPen(QPen(Qt::black));
-        p->setBrush(QBrush(Qt::black));
-        p->drawRect(rect);
         p->drawImage(rect,*pRadar->img_spectre,
                      pRadar->img_spectre->rect());
     }
