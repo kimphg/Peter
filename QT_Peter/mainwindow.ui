@@ -36291,7 +36291,6 @@ background-color: rgba(255, 255, 255, 0);</string>
    <zorder>groupBox_11</zorder>
    <zorder>groupBox_13</zorder>
    <zorder>toolButton_menu</zorder>
-   <zorder>tabWidget_iad</zorder>
    <zorder>toolButton_iad</zorder>
    <zorder>tabWidget_menu</zorder>
    <zorder>groupBox_17</zorder>
@@ -36299,6 +36298,7 @@ background-color: rgba(255, 255, 255, 0);</string>
    <zorder>label_azi_heading_gps</zorder>
    <zorder>label_azi_antenna_head_true</zorder>
    <zorder>toolButton_head_up</zorder>
+   <zorder>tabWidget_iad</zorder>
   </widget>
  </widget>
  <layoutdefault spacing="6" margin="11"/>

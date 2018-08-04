@@ -25,8 +25,8 @@
    #define PI                       3.14159265358979323846
 #endif
 #define FRAME_HEADER_SIZE 34
-#define HR_MAX_RESOLUTION 1024
-#define OUTPUT_FRAME_SIZE HR_MAX_RESOLUTION*2+FRAME_HEADER_SIZE
+#define RADAR_RESOLUTION 1024
+#define OUTPUT_FRAME_SIZE RADAR_RESOLUTION*2+FRAME_HEADER_SIZE
 
 #define MAX_TRACK_LEN               400
 #define MAX_TRACKS                  199
@@ -96,6 +96,7 @@ typedef struct  {
     short lastA,firstA,ctA;
     unsigned short maxR,minR,ctR;
     unsigned short size;
+    unsigned int mSumEnergy;
     unsigned char maxLevel,dopler;
     //bool isFinished;
 } plot_t;

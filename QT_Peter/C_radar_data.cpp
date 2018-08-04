@@ -366,7 +366,7 @@ void track_t::setManual(bool isMan)
 
 C_radar_data::C_radar_data()
 {
-    range_max = HR_MAX_RESOLUTION;
+    range_max = RADAR_RESOLUTION;
     imgMode = VALUE_ORANGE_BLUE;
     brightness = 1.5;
     for(int i=0;i<255;i++)
@@ -884,7 +884,7 @@ void C_radar_data::decodeData(int azi)
         }
     }
 }
-short thresh[HR_MAX_RESOLUTION];
+short thresh[RADAR_RESOLUTION];
 void C_radar_data::ProcessData(unsigned short azi)
 {
 
@@ -918,7 +918,7 @@ void C_radar_data::ProcessData(unsigned short azi)
         }
     }
     // apply the  threshholding algorithm manualy
-    memset(&thresh[0],0,HR_MAX_RESOLUTION);
+    memset(&thresh[0],0,RADAR_RESOLUTION);
     //do bup song
     if(is_do_bup_song)
     {
@@ -1035,7 +1035,7 @@ void C_radar_data::ProcessData(unsigned short azi)
         //
     }
     //auto threshold
-    memset(&thresh[0],0,HR_MAX_RESOLUTION);
+    memset(&thresh[0],0,RADAR_RESOLUTION);
 
     if(doubleFilter)
     {
@@ -1240,7 +1240,7 @@ void C_radar_data::processSocketData(unsigned char* data,short len)
         data_mem.dopler[curAzir][r_pos] = data[34+r_pos+2048];
     }*/
     memcpy(&data_mem.level[curAzir][0],data+34,range_max);
-    memcpy(&data_mem.dopler[curAzir][0],data+34+HR_MAX_RESOLUTION,range_max);
+    memcpy(&data_mem.dopler[curAzir][0],data+34+RADAR_RESOLUTION,range_max);
     aziToProcess.push(curAzir);
     if(!((unsigned char)(curAzir<<3)))
     {
@@ -1453,79 +1453,45 @@ void C_radar_data::assembleDataFrame(unsigned char* data,unsigned short dataLen)
 void C_radar_data::procPLot(plot_t* mPlot)
 {
     if(init_time)return;
-    if(mPlot->size>PLOT_MIN_SIZE)
+
+    if(mPlot->mSumEnergy<450)return;
+    printf("\nNew plot energy:%d",mPlot->mSumEnergy);
+    object_t newobject;
+    newobject.isManual = false;
+    float ctA = (float)mPlot->sumA/(float)mPlot->size;// /MAX_AZIR*PI_NHAN2+trueN;
+    float ctR = (float)mPlot->sumR/(float)mPlot->size;
+    if(ctA >= MAX_AZIR)ctA -= MAX_AZIR;
+    newobject.size = mPlot->size;
+    newobject.azMax = mPlot->lastA;
+    newobject.azMin = mPlot->firstA;
+    newobject.aziRes = 1.0;
+    newobject.rangeRes = 0.015*pow(2,clk_adc);
+    if(ctA<0|| ctR>=RADAR_RESOLUTION)
     {
-        object_t newobject;
-        newobject.isManual = false;
-        float ctA = (float)mPlot->sumA/(float)mPlot->size;// /MAX_AZIR*PI_NHAN2+trueN;
-        float ctR = (float)mPlot->sumR/(float)mPlot->size;
-        if(ctA >= MAX_AZIR)ctA -= MAX_AZIR;
-        newobject.size = mPlot->size;
-        newobject.azMax = mPlot->lastA;
-        newobject.azMin = mPlot->firstA;
-        newobject.aziRes = 1.0;
-        newobject.rangeRes = 0.015*pow(2,clk_adc);
-        //newobject.rMax = mPlot->maxR;
-        //newobject.rMin = mPlot->minR;
-        //short dr = mPlot->maxR-mPlot->minR;
-        //short da =
-        //            if(dr>PLOT_MAX_DR)
-        //            {
-        //                return;
-        //            }
-        //        float ctR = ((float)mPlot->sumR/(float)mPlot->size);//(mPlot->maxR+mPlot->minR)/2.0f;
-        if(ctA<0||ctA>MAX_AZIR|| ctR>=RAD_M_PULSE_RES)
-        {
-            return;
-        }
-        //check dopler
-        //            if(dr>2)
-        //            {
-        //                if(data_mem.dopler[short(ctA)][short(ctR)]!=data_mem.dopler[short(ctA)][short(ctR+1)])return;
-        //            }
-
-        newobject.dopler = mPlot->dopler;
-        //newobject.terrain = data_mem.terrain[short(ctA)][short(ctR)];
-        newobject.az   = ctA/MAX_AZIR*PI_NHAN2+aziOffset;
-        if(newobject.az>PI_NHAN2)newobject.az-=PI_NHAN2;
-        newobject.rg   = ctR;
-        newobject.rgKm =  ctR*sn_scale;
-        newobject.p   = -1;
-        newobject.time = uint(QDateTime::currentMSecsSinceEpoch()/100-15000000000);
-        newobject.x = newobject.rgKm*sin( newobject.az);
-        newobject.y = newobject.rgKm*cos( newobject.az);
-        if(mObjList.size()<50)mObjList.push_back(newobject);
-        /*for(short i = mPlot->minA;i!=mPlot->maxA;i++)
-            {
-                if(i>=MAX_AZIR)i-=MAX_AZIR;
-                for(short j = mPlot->minR;i!=mPlot->maxR;i++)
-                {
-                    if(data_mem.detect[i][j]&&data_mem.plotIndex[i][j]==data_mem.plotIndex[short(ctA)][short(ctR)])
-                    {
-                        data_mem.dopler_old[i][j] = newobject.dopler;
-                    }
-                }
-            }*/
-        /*if(!procObjectManual(&newobject))//check existing confirmed tracks
-        {
-            if(newobject.dopler!=0)
-            {
-                if(!procObjectAvto(&newobject))
-                {
-                    if(avtodetect)addTrack(&newobject);
-                }
-            }
-        }*/
-        if(!procObjectManual(&newobject))//check existing confirmed tracks
-        {
-            if(!procObjectAvto(&newobject))
-            {
-                if(avtodetect)addTrack(&newobject);
-            }
-        }
-
-
+        return;
     }
+    newobject.dopler = mPlot->dopler;
+    //newobject.terrain = data_mem.terrain[short(ctA)][short(ctR)];
+    newobject.az   = ctA/MAX_AZIR*PI_NHAN2+aziOffset;
+    if(newobject.az>PI_NHAN2)newobject.az-=PI_NHAN2;
+    newobject.rg   = ctR;
+    newobject.rgKm =  ctR*sn_scale;
+    newobject.p   = -1;
+    newobject.time = uint(QDateTime::currentMSecsSinceEpoch()/100-15000000000);
+    newobject.x = newobject.rgKm*sin( newobject.az);
+    newobject.y = newobject.rgKm*cos( newobject.az);
+    if(mObjList.size()<50)mObjList.push_back(newobject);
+
+    if(!procObjectManual(&newobject))//check existing confirmed tracks
+    {
+        if(!procObjectAvto(&newobject))
+        {
+            if(avtodetect)addTrack(&newobject);
+        }
+    }
+
+
+
 
 
 }
@@ -1599,10 +1565,10 @@ void C_radar_data::addTrackManual(double x,double y)
     }
     else
     {
-         azi = atanf(x/y);//tinh azi,range
+        azi = atanf(x/y);//tinh azi,range
         if(y<0)azi+=PI;
         if(azi<0)azi += PI_NHAN2;
-         range = sqrt(x*x+y*y);
+        range = sqrt(x*x+y*y);
     }
     object_t newobj;
     newobj.az = azi;
@@ -1860,6 +1826,7 @@ void C_radar_data::procPix(short proc_azi,short range)//_______signal detected, 
         }
         data_mem.plotIndex[proc_azi][range] = plotIndex;
         plot_list.at(plotIndex).size++;
+        plot_list.at(plotIndex).mSumEnergy+=data_mem.level[proc_azi][range];
         if(proc_azi<plot_list.at(plotIndex).firstA){
             plot_list.at(plotIndex).sumA    +=  proc_azi + MAX_AZIR;
             plot_list.at(plotIndex).lastA    =  proc_azi ;
@@ -1884,10 +1851,11 @@ void C_radar_data::procPix(short proc_azi,short range)//_______signal detected, 
 
         plot_t         new_plot;
         new_plot.lastA =  new_plot.firstA  = proc_azi;
-//        new_plot.isFinished = false;
+        //        new_plot.isFinished = false;
         //new_plot.ctA = proc_azi;
         //new_plot.ctR = range;
-        new_plot.maxLevel = data_mem.level[proc_azi][range];
+        //new_plot.maxLevel = data_mem.level[proc_azi][range];
+        new_plot.mSumEnergy = data_mem.level[proc_azi][range];
         new_plot.dopler = data_mem.dopler[proc_azi][range];
         //new_mark.minR = new_mark.maxR = range;
         new_plot.size =  1;
@@ -2308,15 +2276,17 @@ void C_radar_data::resetTrack()
     //        }
     //    }
 }
-object_t C_radar_data::GetRadarObject()
+void C_radar_data::ProcesstRadarObjects()
 {
-    object_t res;
-    if(mObjList.size())
-    {
-        res=mObjList.front();
-        mObjList.pop_front();
-        return res;
+//    object_t res;
+    foreach (object_t var, mObjList) {
+        var
     }
-    res.size=0;
-    return res;
+//    if(mObjList.size()>2)
+//    {
+//        res=mObjList.front();
+//        mObjList.pop_front();
+//        return res;
+//    }
+    return ;
 }
