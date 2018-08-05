@@ -125,26 +125,28 @@ public:
 	}
 	void generateSignal()
 	{
-		azi = ConvXYToAziRad(x, y) / 3.141592653589*1024.0;
+		azi = ConvXYToAziRad(x, y) / 3.141592653589*1024.0+(rand()%5);
 		range = ConvXYToRange(x, y);
-		int azimin = azi - 5; if (azimin < 0)azimin += 2048;
-		int azimax = azi + 5; if (azimax >=2048)azimax -= 2048;
+		int azimin = azi - 8; if (azimin < 0)azimin += 2048;
+		int azimax = azi + 8; if (azimax >=2048)azimax -= 2048;
 		int k = 0;
 		for (int a = azimin; a != azimax; a++)
 		{
-			k++;
+			
 			if (a < 0)a += 2048;
 			if (a >= 2048) a -= 2048;
-			outputFrame[a][(int)range] = 30 + 150 * (1.0 - abs(k-5) / 5.0);
-			outputFrame[a][(int)range + 1] = 30 + 150 * (1.0 - abs(k - 5) / 5.0);
+			int value = 160 * (1.0 - abs(k - 8.0) / 10.0);
+			outputFrame[a][(int)range] = value + 30;
+			outputFrame[a][(int)range + 1] = value + 30;
+			k++;
 		}
 	}
 	void eraseSIgnal()
 	{
-		azi = ConvXYToAziRad(x, y) / 3.141592653589*1024.0;
-		range = ConvXYToRange(x, y);
-		int azimax = azi + 5; if (azimax >= 2048)azimax -= 2048;
-		int azimin = azi - 5; if (azimin < 0)azimin += 2048;
+		//azi = ConvXYToAziRad(x, y) / 3.141592653589*1024.0;
+		//range = ConvXYToRange(x, y);
+		int azimax = azi + 8; if (azimax >= 2048)azimax -= 2048;
+		int azimin = azi - 8; if (azimin < 0)azimin += 2048;
 		for (int a = azimin; a != azimax; a++)
 		{
 			if (a < 0)a += 2048;
@@ -169,13 +171,13 @@ public:
 target_t* target1, *target2;
 void initTargets()
 {
-	target1 = new target_t(200, 300, 4, 20);
-	target2 = new target_t(200, -300, 4, 50);
+	target1 = new target_t(100, 100, 4, 40);
+	//target2 = new target_t(200, -300, 4, 50);
 }
 void updateTargets()
 {
 	target1->update();
-	target2->update();
+	//target2->update();
 }
 int _tmain(int argc, _TCHAR* argv[])
 { 
@@ -196,7 +198,7 @@ int _tmain(int argc, _TCHAR* argv[])
 			azi = 0;
 			updateTargets();
 		}
-		if (rand() % 10 == 0)regenerate(azi);
+		//if (rand() % 10 == 0)regenerate(azi);
 		sendto(mSocket, (char*)(&outputFrame[azi][0]), OUTPUT_FRAME_SIZE, 0, (struct sockaddr *) &si_peter, sizeof(si_peter));
 	}
 	socketDelete();

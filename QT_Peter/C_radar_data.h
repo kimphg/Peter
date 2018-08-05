@@ -92,28 +92,34 @@ typedef struct {
 
 
 typedef struct  {
-    unsigned int sumTer,sumA,sumR;
-    short lastA,firstA,ctA;
-    unsigned short maxR,minR,ctR;
+    short lastA,firstA;
+    unsigned short maxR,minR,sumR;
     unsigned short size;
     unsigned int mSumEnergy;
-    unsigned char maxLevel,dopler;
+    unsigned char dopler,maxLevel;
     //bool isFinished;
 } plot_t;
 typedef struct  {
-    float          az ,rg,x,y;
+    float          az ,rg,xkm,ykm;
     float          rgKm;
-    short          azMin,azMax,rMin,rMax;
+    short          dazi,drg;
     short          size;
     char           dopler;
     bool           isManual;
     float          p;
     float          terrain;
-    float rangeRes;
-    float aziRes;
-    unsigned int          time;
+    float           rangeRes;
+    float           aziRes;
+    qint64          timeMs;
 }object_t;
-typedef std::vector<plot_t> plotList;
+struct object_line
+{
+    uint        dtime;
+    object_t    obj1;
+    object_t    obj2;
+    float distance;
+    float dx,dy;
+};
 typedef std::vector<object_t> objectList;
 using Eigen::MatrixXf;
 //class matrix_t
@@ -220,8 +226,9 @@ public:
     RotationDir             rotDir;
     float                   rotation_per_min ;
     trackList               mTrackList;
-    plotList                plot_list;
-    std::list<object_t>      mObjList;
+    std::vector<plot_t>     plot_list;
+    std::list<object_t>     mObjList;
+    std::list<object_line>  mLineList;
 //    bool                    isEncoderAzi;
 //    int                     mEncoderAzi;
     unsigned char           spectre[16];
@@ -348,7 +355,7 @@ public:
     double getSelfRotationAzi() const;
     void setSelfRotationAzi(int value);
     void processSocketData(unsigned char *data, short len);
-    object_t GetRadarObject();
+    void ProcesstRadarObjects();
 };
 
 //extern C_radar_data radarData;

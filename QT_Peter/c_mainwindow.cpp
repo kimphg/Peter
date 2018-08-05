@@ -780,16 +780,32 @@ void Mainwindow::DrawRadarTargetByPainter(QPainter* p)//draw radar target from p
     //draw radar targets
     //float x,y;
     short sx,sy;
+    short sx1,sy1;
     float scale_ppi = pRadar->scale_ppi;
     //short targetId = 0;
     std::list<object_t>* pObjList = &(pRadar->mObjList);
-    if(true)//raw objects
+    p->setPen(penTargetBlue);
+    if(false)//raw objects
     {
         foreach (object_t obj, *pObjList) {
-            sx = obj.x*mScale + scrCtX - dx;
-            sy = -obj.y*mScale + scrCtY - dy;
-            p->setPen(penTargetBlue);
-            p->drawRect(sx-5,sy-5,10,10);
+            sx = obj.xkm*mScale + scrCtX - dx;
+            sy = -obj.ykm*mScale + scrCtY - dy;
+
+            p->drawPoint(sx,sy);
+            //p->drawRect(sx-5,sy-5,10,10);
+        }
+
+    }
+    if(true)//raw lines
+    {
+        foreach (object_line line, pRadar->mLineList) {
+            sx = line.obj1.xkm*mScale + scrCtX - dx;
+            sy = -line.obj1.ykm*mScale + scrCtY - dy;
+            sx1 = line.obj2.xkm*mScale + scrCtX - dx;
+            sy1 = -line.obj2.ykm*mScale + scrCtY - dy;
+            p->drawLine(sx,sy,sx1,sy1);
+
+            //p->drawRect(sx-5,sy-5,10,10);
         }
 
     }
@@ -842,8 +858,8 @@ void Mainwindow::DrawRadarTargetByPainter(QPainter* p)//draw radar target from p
                 {
                     for(uint j=0 ;j<trackListPt->at(trackId).object_list.size();j+=3)
                     {
-                        sx = trackListPt->at(trackId).object_list.at(j).x*scale_ppi + scrCtX - dx;
-                        sy = -trackListPt->at(trackId).object_list.at(j).y*scale_ppi + scrCtY - dy;
+                        sx = trackListPt->at(trackId).object_list.at(j).xkm*mScale + scrCtX - dx;
+                        sy = -trackListPt->at(trackId).object_list.at(j).ykm*mScale + scrCtY - dy;
                         p->drawPoint(sx,sy);
                     }
                     p->drawRect(sx-6,sy-6,12,12);

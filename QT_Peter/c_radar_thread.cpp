@@ -347,9 +347,10 @@ void dataProcessingThread::PushCommandQueue()
 
 
     }
-    while(true)
+    mRadarData->ProcesstRadarObjects();
+    /*while(false)// no sophia yet
     {
-        object_t obj= mRadarData->GetRadarObject();
+        object_t obj= mRadarData->ProcesstRadarObjects();
         if(!obj.size)break;
         QString outputData("$RATAR");
 
@@ -366,7 +367,7 @@ void dataProcessingThread::PushCommandQueue()
                 QHostAddress("127.0.0.1"),31001
                 );
 
-    }
+    }*/
 }
 void dataProcessingThread::playbackRadarData()
 {
