@@ -14,6 +14,7 @@
 #include <random>
 #pragma comment (lib, "Ws2_32.lib")
 int mSocket;
+unsigned char n_clk_adc = 0;
 struct sockaddr_in si_peter;
 struct sockaddr_in si_capin;
 void socketInit()
@@ -108,7 +109,7 @@ double ConvXYToAziRad(double x, double y)
 	}
 	return azi;
 }
-int targetSize = 8;
+int targetSize = 5;
 class target_t
 {
 public:
@@ -128,7 +129,7 @@ public:
 	{
 		
 		azi = ConvXYToAziRad(x, y) / 3.141592653589*1024.0+(rand()%5);
-		range = ConvXYToRange(x, y);
+		range = ConvXYToRange(x, y)/pow(2,n_clk_adc);
 		int azimin = azi - targetSize; if (azimin < 0)azimin += 2048;
 		int azimax = azi + targetSize; if (azimax >= 2048)azimax -= 2048;
 		int k = 0;
@@ -137,9 +138,9 @@ public:
 			
 			if (a < 0)a += 2048;
 			if (a >= 2048) a -= 2048;
-			int value = 160 * (1.0 - abs(k - targetSize) / (targetSize+2));
-			outputFrame[a][(int)range] = value + 30;
-			outputFrame[a][(int)range + 1] = value + 30;
+			int value = 150 * (1.0 - abs(k - targetSize) / (targetSize+1));
+			outputFrame[a][(int)range + FRAME_HEADER_SIZE] = value + int(distribution(generator));
+			outputFrame[a][(int)range + 1 + FRAME_HEADER_SIZE] = value + int(distribution(generator));
 			k++;
 		}
 	}
@@ -155,10 +156,10 @@ public:
 			if (a>2048) a -= 2048;
 			int num = int(distribution(generator));
 			if (num < 0)num = 0;
-			outputFrame[a][(int)range] = num;
+			outputFrame[a][(int)range + FRAME_HEADER_SIZE] = num;
 			num = int(distribution(generator));
 			if (num < 0)num = 0;
-			outputFrame[a][(int)range + 1] = num;
+			outputFrame[a][(int)range + 1 + FRAME_HEADER_SIZE] = num;
 		}
 	}
 	void update()
@@ -170,18 +171,22 @@ public:
 	}
 	~target_t();
 };
-target_t* target1, *target2, *target3;
+#define NUM_OF_TARG 4
+target_t* target[NUM_OF_TARG];
+
 void initTargets()
 {
-	target1 = new target_t(100, 100, 4, 40);
-	target2 = new target_t(200, -300, 4, 110);
-	target3 = new target_t(200, -350, 4, 80);
+	target[0] = new target_t(250, -300, 4, 100);
+	target[1] = new target_t(100, 100, 4, 40);
+	target[2] = new target_t(200, -300, 4, 110);
+	target[3] = new target_t(200, -350, 4, 80);
 }
 void updateTargets()
 {
-	target1->update();
-	target2->update();
-	target3->update();
+	for (int i = 0; i < NUM_OF_TARG; i++)
+	{
+		target[i]->update();
+	}
 }
 int _tmain(int argc, _TCHAR* argv[])
 { 
@@ -195,12 +200,32 @@ int _tmain(int argc, _TCHAR* argv[])
 	}
 	initTargets();
 	int dazi = 1;
+	int nPeriod = 0;
 	while (true)
 	{
+		
+		
 		Sleep(5);
 		azi += dazi;
-		if (azi>= 1500)
+		if (azi >= 2048)
 		{
+			nPeriod++;
+			if (nPeriod > 50)
+			{
+				nPeriod = 0;
+				initTargets();
+			}
+			if (nPeriod == 5)
+			{
+				n_clk_adc = 1;
+			}
+			azi = 0;
+			updateTargets();
+		}
+		/*
+		if (azi>= 900)
+		{
+			nPeriod++;
 			dazi = -1;
 			updateTargets();
 			Sleep(500);
@@ -211,9 +236,11 @@ int _tmain(int argc, _TCHAR* argv[])
 			dazi = 1;
 			updateTargets();
 			Sleep(500);
-		}
+		}*/
 		//if (rand() % 10 == 0)regenerate(azi);
+		outputFrame[azi][4] = n_clk_adc;
 		sendto(mSocket, (char*)(&outputFrame[azi][0]), OUTPUT_FRAME_SIZE, 0, (struct sockaddr *) &si_peter, sizeof(si_peter));
+		regenerate(azi);
 	}
 	socketDelete();
 	return 0;

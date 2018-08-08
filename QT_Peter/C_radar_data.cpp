@@ -23,9 +23,7 @@ QFile *exp_file = NULL;
 int sumvar = 0;
 int nNoiseCalculator = 0;
 short lastProcessAzi = 0;
-typedef std::queue<int> aziQueue;
-
-aziQueue aziToProcess;//hàng chờ các frame cần xử lý
+std::queue<int>  aziToProcess;//hàng chờ các frame cần xử lý
 
 typedef struct  {
     //processing dataaziQueue
@@ -223,9 +221,9 @@ void track_t::update()
         if(trackLen>7)//smoothing the track history
         {
             object_list.at(trackLen-4).xkm = (object_list.at(trackLen-6).xkm + object_list.at(trackLen-5).xkm
-                                            + object_list.at(trackLen-3).xkm + object_list.at(trackLen-2).xkm)/4.0;
+                                              + object_list.at(trackLen-3).xkm + object_list.at(trackLen-2).xkm)/4.0;
             object_list.at(trackLen-4).ykm = (object_list.at(trackLen-6).ykm + object_list.at(trackLen-5).ykm
-                                            + object_list.at(trackLen-3).ykm + object_list.at(trackLen-2).ykm)/4.0;;
+                                              + object_list.at(trackLen-3).ykm + object_list.at(trackLen-2).ykm)/4.0;;
 
         }
         if(trackLen<=10)
@@ -368,14 +366,15 @@ void track_t::setManual(bool isMan)
 
 C_radar_data::C_radar_data()
 {
+    isMarineMode = true;
     range_max = RADAR_RESOLUTION;
     imgMode = VALUE_ORANGE_BLUE;
     brightness = 1.5;
-//    for(int i=0;i<255;i++)
-//    {
+    //    for(int i=0;i<255;i++)
+    //    {
 
-//        colorTable.push_back((getColor(i,0,0)));
-//    }
+    //        colorTable.push_back((getColor(i,0,0)));
+    //    }
     hsTap = 0;
     tb_tap=new unsigned short[MAX_AZIR];
     img_histogram=new QImage(257,101,QImage::Format_Mono);
@@ -879,7 +878,7 @@ short threshRay[RADAR_RESOLUTION];
 void C_radar_data::ProcessData(unsigned short azi)
 {
 
-/*
+    /*
     if(isSharpEye)
     {
         for(short r_pos=5;r_pos<range_max;r_pos++)
@@ -1020,7 +1019,6 @@ void C_radar_data::ProcessData(unsigned short azi)
 
         //
     }
-    short* test = &threshRay[600];
     //auto threshold
     memset(&threshRay[0],0,RADAR_RESOLUTION*2);
 
@@ -1058,8 +1056,12 @@ void C_radar_data::ProcessData(unsigned short azi)
             {
                 data_mem.hot[azi][r_pos]++;
             }
+            if(!data_mem.hot[lastProcessAzi][r_pos])
+            {
+                cutoff = true;
+            }
         }
-        if(this->filter2of3)
+        if(filter2of3)
         {
             if(!cutoff)
             {
@@ -1084,7 +1086,7 @@ void C_radar_data::ProcessData(unsigned short azi)
         if(r_pos>RANGE_MIN)
         {
             data_mem.detect[azi][r_pos] = !cutoff;
-            if(data_mem.detect[azi][r_pos])
+            if(!cutoff)
             {
                 procPix(azi,r_pos);
                 //if(data_mem.terrain[azi][r_pos]<TERRAIN_MAX)data_mem.terrain[azi][r_pos]++;
@@ -1099,7 +1101,7 @@ void C_radar_data::ProcessData(unsigned short azi)
     memcpy(&data_mem.dopler_old[azi][0],&data_mem.dopler[azi][0],range_max);
     return ;
 }
-void C_radar_data::ProcessEach256()
+void C_radar_data::ProcessEach90Deg()
 {
     if(cur_timeMSecs)
     {
@@ -1108,7 +1110,7 @@ void C_radar_data::ProcessEach256()
         if(dtime<100000&&dtime>0)
         {
             rot_period_sec = (dtime/1000.0);
-            rotation_per_min = 7.5/rot_period_sec;
+            rotation_per_min = 15.0/rot_period_sec;
             cur_timeMSecs = newtime;
             if(isSelfRotation)
             {
@@ -1255,7 +1257,7 @@ void C_radar_data::SelfRotationOn( double rate)
     cur_timeMSecs =0;
     selfRotationRate = rate;
     if(selfRotationRate<1)selfRotationRate=1;
-    ProcessEach256();
+    ProcessEach90Deg();
 }
 void C_radar_data::SelfRotationReset()
 {
@@ -1349,7 +1351,7 @@ void C_radar_data::ProcessDataFrame()
     }
     if(curAzir==0)
     {
-        ProcessEach256();
+        ProcessEach90Deg();
 
     }
 }
@@ -1374,11 +1376,11 @@ void C_radar_data::UpdateData()
         {
             //procTracks(curAzir);
             mulOf16Azi++;
-            if(mulOf16Azi>16)// 1/8 vong quet
+            if(mulOf16Azi>32)// 1/4 vong quet
             {
                 getNoiseLevel();
                 mulOf16Azi=0;
-                ProcessEach256();
+                ProcessEach90Deg();
             }
             if(init_time)init_time--;
             for(unsigned short i = 0;i<plot_list.size();++i)
@@ -1504,7 +1506,7 @@ void C_radar_data::procPLot(plot_t* mPlot)
     object_t newobject;
     newobject.isManual = false;
     newobject.dazi = mPlot->lastA-mPlot->firstA;
-    float ctA;
+    float ctA; senter calculation
     if(abs(newobject.dazi)>(MAX_AZIR/2))//quay qua diem 0
     {
         newobject.dazi = MAX_AZIR-newobject.dazi;
@@ -1540,9 +1542,9 @@ void C_radar_data::procPLot(plot_t* mPlot)
     if(mObjList.size()<50)
     {
         mObjList.push_back(newobject);
-                printf("\nctA:%f",ctA);
-                printf(" ctR:%f",ctR);
-                printf(" energy:%d",mPlot->sumEnergy);
+//        printf("\nctA:%f",ctA);
+//        printf(" ctR:%f",ctR);
+//        printf(" energy:%d",mPlot->sumEnergy);
     }
     /*
     if(!procObjectManual(&newobject))//check existing confirmed tracks
@@ -2042,7 +2044,7 @@ void C_radar_data::setAutorgs(bool aut)
     {
         rgs_auto = true;
         krain_auto = 0.3;
-        kgain_auto  = 2.7;
+        kgain_auto  = 2;
         ksea_auto = 0;
     }else
     {
@@ -2135,11 +2137,13 @@ void C_radar_data::resetData()
     memset(data_mem.plotIndex,  0,dataLen);
     memset(data_mem.hot,        0,dataLen);
     memset(data_mem.hot_disp,   0,dataLen);
+    std::queue<int> empty;
+    std::swap( aziToProcess, empty );
     //memset(data_mem.terrain,    TERRAIN_INIT,dataLen);
     //memset(data_mem.rainLevel,  0,dataLen);
     //noiseAverage = 30;
     resetSled();
-    init_time = 20;
+    init_time = 10;
 
 }
 void C_radar_data::resetSled()
@@ -2318,6 +2322,7 @@ void C_radar_data::resetTrack()
     //        }
     //    }
 }
+#define TARGET_OBSERV_TIME 60000//ENVAR max time to save object in the memory
 void C_radar_data::ProcesstRadarObjects()
 {
     if(mObjList.size()<2)return;
@@ -2327,7 +2332,7 @@ void C_radar_data::ProcesstRadarObjects()
         mObjList.pop_front();
     }
     qint64 now_ms = QDateTime::currentMSecsSinceEpoch();
-    while(now_ms - mObjList.front().timeMs>60000)//ENVAR max time to save object in the memory
+    while(now_ms - mObjList.front().timeMs>60000)
     {
         mObjList.pop_front();
         if(mObjList.size()<2)return;
@@ -2342,7 +2347,7 @@ void C_radar_data::ProcesstRadarObjects()
             int dtime = (var2.timeMs - var1.timeMs);
             if(dtime<1000)
                 continue;//ENVAR min time between plots in a line(1s)
-            if(dtime>30000)continue;//ENVAR mav time between plots in a line(30s)
+            if(dtime>TARGET_OBSERV_TIME/2)continue;//ENVAR mav time between plots in a line(30s)
 
             bool line_exist = false;
             foreach (object_line line, mLineList) {
@@ -2353,14 +2358,18 @@ void C_radar_data::ProcesstRadarObjects()
             if(line_exist)continue;
             float dx = var2.xkm - var1.xkm;
             float dy = var2.ykm - var1.ykm;
-            float distancekm = dx*dx+dy*dy;
+            float distancekm = sqrt(dx*dx+dy*dy);
             float distanceMesA = abs(var2.az-var1.az)/(var1.aziRes+var2.aziRes);
             float distanceMesR = abs(var2.rgKm-var1.rgKm)/(var1.rangeRes+var2.rangeRes+0.00003*dtime);
             if(((distanceMesA>3)||(distanceMesR>3))||(distancekm>1.5))continue;//ENVAR max distance between plots (1.5km)
-            float speedkmh = sqrt(distancekm)/(dtime/60000.0);
-            if(speedkmh>100.0)continue;
+            float speedkmh = distancekm/(dtime/3600000.0);
+            if(isMarineMode){if(speedkmh>TARGET_MAX_SPEED_MARINE)continue;}
+            else if(speedkmh>2000)continue;
             object_line newline;
-            newline.distance = sqrt(distancekm);
+            newline.distancekm = distancekm;
+            newline.speedkmh = speedkmh;
+            newline.bearingRad = ConvXYToAziRad(dx,dy);
+            printf("\nspeed:%f,distance:%f",speedkmh,distancekm);
             if(dtime>0)
             {
                 newline.dtime = dtime;
@@ -2376,8 +2385,13 @@ void C_radar_data::ProcesstRadarObjects()
             mLineList.push_back(newline);
         }
     }
+    while(mLineList.size()>100)
+    {
+        mLineList.pop_front();
+    }
     foreach (object_line line1, mLineList)
     {
+
         foreach (object_line line2, mLineList)
         {
             if(line1.obj2.timeMs==line2.obj1.timeMs)// new track
@@ -2388,4 +2402,25 @@ void C_radar_data::ProcesstRadarObjects()
     }
 
     return ;
+}
+double C_radar_data::ConvXYToRange(double x, double y)
+{
+    return sqrt(x*x + y*y);
+
+}
+double C_radar_data::ConvXYToAziRad(double x, double y)
+{
+    double azi;
+    if (!y)
+    {
+        azi = x>0 ? PI_CHIA2 : (PI_NHAN2 - PI_CHIA2);
+
+    }
+    else
+    {
+        azi = atanf(x / y);
+        if (y<0)azi += PI;
+        if (azi<0)azi += PI_NHAN2;
+    }
+    return azi;
 }

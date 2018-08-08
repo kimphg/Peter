@@ -10,7 +10,7 @@
 #define ARMA_USE_LAPACK
 #define ARMA_USE_BLAS
 #define ARMA_BLAS_UNDERSCORE
-
+#define MODE_MARINE
 #define TRACK_STABLE_STATE          5
 #define MIN_TERRAIN                 10
 #define TRACK_CONFIRMED_SIZE        3
@@ -48,8 +48,7 @@
 #define TERRAIN_GAIN                0.9f
 #define TERRAIN_GAIN_1              0.1f
 #define TERRAIN_THRESH              0.5f
-#define TARGET_MIN_SPEED            3
-#define TARGET_MAX_SPEED            50
+#define TARGET_MAX_SPEED_MARINE            100
 #define ZOOM_SIZE                   550
 #define DISPLAY_RES_ZOOM            5120
 #define DISPLAY_SCALE_ZOOM          4
@@ -119,7 +118,9 @@ struct object_line
     uint        dtime;
     object_t    obj1;
     object_t    obj2;
-    float distance;
+    float distancekm;
+    float speedkmh;
+    float bearingRad;
     float dx,dy;
 };
 typedef std::vector<object_t> objectList;
@@ -347,8 +348,9 @@ private:
     //void initZoomAR(int a0, int r0);
     bool DrawZoomAR(int a,int r,short val,short dopler,short sled);
     int getNewAzi();
-    void ProcessEach256();
+    void ProcessEach90Deg();
 public:
+    bool isMarineMode;
     //void drawZoomAR();
     float getNoiseAverage() const;
     void setNoiseAverage(float value);
@@ -357,6 +359,8 @@ public:
     void setSelfRotationAzi(int value);
     void processSocketData(unsigned char *data, short len);
     void ProcesstRadarObjects();
+    static double ConvXYToRange(double x, double y);
+    static double ConvXYToAziRad(double x, double y);
 };
 
 //extern C_radar_data radarData;

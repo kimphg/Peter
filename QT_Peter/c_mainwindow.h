@@ -462,6 +462,8 @@ private slots:
     void on_toolButton_dk_13_clicked();
 
 private:
+
+
     void initActionsConnections();
     void initGraphicView();
     void updateTargetInfo();
