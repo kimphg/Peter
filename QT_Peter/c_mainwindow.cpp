@@ -785,7 +785,7 @@ void Mainwindow::DrawRadarTargetByPainter(QPainter* p)//draw radar target from p
     //short targetId = 0;
     std::list<object_t>* pObjList = &(pRadar->mObjList);
     p->setPen(penTargetBlue);
-    if(false)//raw objects
+    if(true)//raw objects
     {
         foreach (object_t obj, *pObjList) {
             sx = obj.xkm*mScale + scrCtX - dx;
@@ -796,6 +796,7 @@ void Mainwindow::DrawRadarTargetByPainter(QPainter* p)//draw radar target from p
         }
 
     }
+    p->setPen(penSelTarget);
     if(true)//raw lines
     {
         foreach (object_line line, pRadar->mLineList) {

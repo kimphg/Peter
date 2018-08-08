@@ -93,9 +93,11 @@ typedef struct {
 
 typedef struct  {
     short lastA,firstA;
-    unsigned short maxR,minR,sumR;
+    short maxA1,maxA2;
+    unsigned short maxR,minR;
+    unsigned int sumR;
     unsigned short size;
-    unsigned int mSumEnergy;
+    unsigned int sumEnergy;
     unsigned char dopler,maxLevel;
     //bool isFinished;
 } plot_t;
@@ -318,10 +320,9 @@ public:
     double getArcMinAziRad() const;
 private:
     float hsTap ;
-    QVector<QRgb> colorTable;
+    //QVector<QRgb> colorTable;
     double      selfRotationDazi,selfRotationRate;
     double      selfRotationAzi;
-    float       k_rain_auto,k_gain_auto;
     bool        isVtorih;
     bool        avtodetect;
     bool        doubleFilter;
@@ -346,7 +347,7 @@ private:
     //void initZoomAR(int a0, int r0);
     bool DrawZoomAR(int a,int r,short val,short dopler,short sled);
     int getNewAzi();
-    void ProcessRound();
+    void ProcessEach256();
 public:
     //void drawZoomAR();
     float getNoiseAverage() const;

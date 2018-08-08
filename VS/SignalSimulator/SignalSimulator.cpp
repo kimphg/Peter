@@ -108,6 +108,7 @@ double ConvXYToAziRad(double x, double y)
 	}
 	return azi;
 }
+int targetSize = 8;
 class target_t
 {
 public:
@@ -125,17 +126,18 @@ public:
 	}
 	void generateSignal()
 	{
+		
 		azi = ConvXYToAziRad(x, y) / 3.141592653589*1024.0+(rand()%5);
 		range = ConvXYToRange(x, y);
-		int azimin = azi - 8; if (azimin < 0)azimin += 2048;
-		int azimax = azi + 8; if (azimax >=2048)azimax -= 2048;
+		int azimin = azi - targetSize; if (azimin < 0)azimin += 2048;
+		int azimax = azi + targetSize; if (azimax >= 2048)azimax -= 2048;
 		int k = 0;
 		for (int a = azimin; a != azimax; a++)
 		{
 			
 			if (a < 0)a += 2048;
 			if (a >= 2048) a -= 2048;
-			int value = 160 * (1.0 - abs(k - 8.0) / 10.0);
+			int value = 160 * (1.0 - abs(k - targetSize) / (targetSize+2));
 			outputFrame[a][(int)range] = value + 30;
 			outputFrame[a][(int)range + 1] = value + 30;
 			k++;
@@ -145,8 +147,8 @@ public:
 	{
 		//azi = ConvXYToAziRad(x, y) / 3.141592653589*1024.0;
 		//range = ConvXYToRange(x, y);
-		int azimax = azi + 8; if (azimax >= 2048)azimax -= 2048;
-		int azimin = azi - 8; if (azimin < 0)azimin += 2048;
+		int azimax = azi + targetSize; if (azimax >= 2048)azimax -= 2048;
+		int azimin = azi - targetSize; if (azimin < 0)azimin += 2048;
 		for (int a = azimin; a != azimax; a++)
 		{
 			if (a < 0)a += 2048;
@@ -168,21 +170,23 @@ public:
 	}
 	~target_t();
 };
-target_t* target1, *target2;
+target_t* target1, *target2, *target3;
 void initTargets()
 {
 	target1 = new target_t(100, 100, 4, 40);
-	//target2 = new target_t(200, -300, 4, 50);
+	target2 = new target_t(200, -300, 4, 110);
+	target3 = new target_t(200, -350, 4, 80);
 }
 void updateTargets()
 {
 	target1->update();
-	//target2->update();
+	target2->update();
+	target3->update();
 }
 int _tmain(int argc, _TCHAR* argv[])
 { 
 	socketInit();
-	int azi = 0;
+	int azi = 200;
 	for (int i = 0; i < 2048; i++)
 	{
 		regenerate(i);
@@ -190,13 +194,23 @@ int _tmain(int argc, _TCHAR* argv[])
 		outputFrame[i][3] = i;
 	}
 	initTargets();
+	int dazi = 1;
 	while (true)
 	{
 		Sleep(5);
-		if (++azi >= 2048)
+		azi += dazi;
+		if (azi>= 1500)
 		{
-			azi = 0;
+			dazi = -1;
 			updateTargets();
+			Sleep(500);
+		}
+		else
+		if (azi <= 50)
+		{
+			dazi = 1;
+			updateTargets();
+			Sleep(500);
 		}
 		//if (rand() % 10 == 0)regenerate(azi);
 		sendto(mSocket, (char*)(&outputFrame[azi][0]), OUTPUT_FRAME_SIZE, 0, (struct sockaddr *) &si_peter, sizeof(si_peter));
