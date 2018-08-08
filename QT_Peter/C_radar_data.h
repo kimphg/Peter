@@ -91,7 +91,7 @@ typedef struct {
 
 
 typedef struct  {
-    short lastA,firstA;
+    short lastA,riseA,fallA;
     short maxA1,maxA2;
     unsigned short maxR,minR;
     unsigned int sumR;
@@ -101,6 +101,7 @@ typedef struct  {
     //bool isFinished;
 } plot_t;
 typedef struct  {
+    int uniqID;
     float          az ,rg,xkm,ykm;
     float          rgKm;
     short          dazi,drg;
@@ -302,8 +303,8 @@ public:
     }
     void        resetTrack();
     void SetHeaderLen(short len);
-    bool getDoubleFilter() const;
-    void setDoubleFilter(bool value);
+//    bool getDoubleFilter() const;
+//    void setDoubleFilter(bool value);
 
     void SelfRotationOn(double rate);
     void SelfRotationOff();
@@ -326,7 +327,7 @@ private:
     double      selfRotationAzi;
     bool        isVtorih;
     bool        avtodetect;
-    bool        doubleFilter;
+//    bool        doubleFilter;
     uint        getColor(unsigned char pvalue, unsigned char dopler, unsigned char sled);
     void        drawSgn(short azi_draw, short r_pos);
     void        drawSgnZoom(short azi_draw, short r_pos);

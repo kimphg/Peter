@@ -138,7 +138,7 @@ public:
 			
 			if (a < 0)a += 2048;
 			if (a >= 2048) a -= 2048;
-			int value = 150 * (1.0 - abs(k - targetSize) / (targetSize+1));
+			int value = 150 * (1.0 - abs(k - targetSize) / (targetSize+1.0));
 			outputFrame[a][(int)range + FRAME_HEADER_SIZE] = value + int(distribution(generator));
 			outputFrame[a][(int)range + 1 + FRAME_HEADER_SIZE] = value + int(distribution(generator));
 			k++;

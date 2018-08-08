@@ -3455,7 +3455,7 @@ void Mainwindow::on_toolButton_xl_nguong_clicked(bool checked)
 
 void Mainwindow::on_toolButton_filter2of3_2_clicked(bool checked)
 {
-    pRadar->setDoubleFilter(checked);
+    //pRadar->setDoubleFilter(checked);
 }
 
 void Mainwindow::on_toolButton_command_dopler_clicked()
