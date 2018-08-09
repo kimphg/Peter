@@ -74,6 +74,12 @@ void regenerate(int azi)
 		dataPointer[i] = num;
 		
 	}
+	for (int i = 1024; i < 2018; i++)
+	{
+		
+		dataPointer[i] = rand()%16;
+
+	}
 }
 double ConvXYToRange(double x, double y)
 {
@@ -109,13 +115,14 @@ double ConvXYToAziRad(double x, double y)
 	}
 	return azi;
 }
-int targetSize = 5;
+int targetSize = 10;
 class target_t
 {
 public:
 	double speed,x,y,azi,range;
 	double bearing;
-	target_t(double tx,double ty,double tspeed,double tbearing)
+	int dopler;
+	target_t(double tx,double ty,double tspeed,double tbearing,int dople)
 	{
 		speed = tspeed;
 			x = tx;
@@ -123,7 +130,7 @@ public:
 		bearing = tbearing/180.0*3.14159265359;
 		azi = ConvXYToAziRad(x, y)/3.141592653589*1024.0;
 		range = ConvXYToRange(x, y);
-		
+		dopler = dople;
 	}
 	void generateSignal()
 	{
@@ -139,6 +146,8 @@ public:
 			if (a < 0)a += 2048;
 			if (a >= 2048) a -= 2048;
 			int value = 150 * (1.0 - abs(k - targetSize) / (targetSize+1.0));
+			outputFrame[a][(int)range + OUTPUT_FRAME_LEN + FRAME_HEADER_SIZE] = dopler;
+			outputFrame[a][(int)range + OUTPUT_FRAME_LEN + 1 + FRAME_HEADER_SIZE] = dopler;
 			outputFrame[a][(int)range + FRAME_HEADER_SIZE] = value + int(distribution(generator));
 			outputFrame[a][(int)range + 1 + FRAME_HEADER_SIZE] = value + int(distribution(generator));
 			k++;
@@ -157,9 +166,11 @@ public:
 			int num = int(distribution(generator));
 			if (num < 0)num = 0;
 			outputFrame[a][(int)range + FRAME_HEADER_SIZE] = num;
+			outputFrame[a][(int)range + OUTPUT_FRAME_LEN + FRAME_HEADER_SIZE] = rand() % 16;
 			num = int(distribution(generator));
 			if (num < 0)num = 0;
 			outputFrame[a][(int)range + 1 + FRAME_HEADER_SIZE] = num;
+			outputFrame[a][(int)range + OUTPUT_FRAME_LEN + 1 + FRAME_HEADER_SIZE] = rand() % 16;
 		}
 	}
 	void update()
@@ -176,10 +187,10 @@ target_t* target[NUM_OF_TARG];
 
 void initTargets()
 {
-	target[0] = new target_t(250, -300, 4, 100);
-	target[1] = new target_t(100, 100, 4, 40);
-	target[2] = new target_t(200, -300, 4, 110);
-	target[3] = new target_t(200, -350, 4, 80);
+	target[0] = new target_t(250, -300, 4, 100,4);
+	target[1] = new target_t(50, 50, 4, 180,6);
+	target[2] = new target_t(200, -300, 4, 110,8);
+	target[3] = new target_t(200, -350, 4, 80,5);
 }
 void updateTargets()
 {
@@ -205,7 +216,7 @@ int _tmain(int argc, _TCHAR* argv[])
 	{
 		
 		
-		Sleep(5);
+		Sleep(3);
 		azi += dazi;
 		if (azi >= 2048)
 		{

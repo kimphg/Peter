@@ -116,7 +116,7 @@ typedef struct  {
 }object_t;
 struct object_line
 {
-    uint        dtime;
+    float        dtimeSec;
     object_t    obj1;
     object_t    obj2;
     float distancekm;
@@ -170,46 +170,14 @@ using Eigen::MatrixXf;
 //    }
 //};
 //______________________________________//
-class track_t : public JTarget{
-public:
-    track_t()
-    {
-
-    }
-    //
-    MatrixXd q1;
-    MatrixXd q2;
-    MatrixXd h;
-    MatrixXd p;
-    MatrixXd x;
-    //
-    //qint64 currentTimeMs;
-    bool isConfirmed;
-
-    objectList suspect_list,object_list;
-    char terrain;
-    double rotA_r;
-    double estX ,estY;
-    double estA, estR;
-    double mesA;
-    double mesR;
-    char state;
-    short idCount;
-    //float dTime;
-    bool isTracking,isManual,isLost;
-    char dopler;
-    //QDateTime time;
-    bool isProcessed;
-    bool isUpdated;
-    short trackLen;
-    void init(object_t *object);
-    void update();
-    void predict();
-    bool checkProb(object_t* object);
-    void setManual(bool isMan);
-
-private:
-    void stateUpdate(bool isNewPlot);
+struct track_t
+{
+    uint        dtime;
+    std::vector<object_t> objectList;
+    float accHead,accSide;
+    float bearingRad;
+    float xkm,ykm;
+    float xkmo,ykmo;
 };
 typedef std::vector<track_t> trackList;
 //______________________________________//
@@ -231,8 +199,8 @@ public:
     float                   rotation_per_min ;
     trackList               mTrackList;
     std::vector<plot_t>     plot_list;
-    std::list<object_t>     mObjList;
-    std::list<object_line>  mLineList;
+    std::vector<object_t>     mObjList;
+    std::vector<object_line>  mLineList;
 //    bool                    isEncoderAzi;
 //    int                     mEncoderAzi;
     unsigned char           spectre[16];
@@ -322,6 +290,7 @@ public:
     double getArcMinAziRad() const;
 private:
     float hsTap ;
+    qint64 now_ms ;
     //QVector<QRgb> colorTable;
     double      selfRotationDazi,selfRotationRate;
     double      selfRotationAzi;

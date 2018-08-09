@@ -382,7 +382,7 @@ void Mainwindow::detectZone()
         short tmp = selZone_y1;
         selZone_y1 = selZone_y2;
         selZone_y2 = tmp;
-    }
+    }/*
     trackList* trackListPt = &pRadar->mTrackList;
     if(true)
     {
@@ -399,7 +399,7 @@ void Mainwindow::detectZone()
             }
         }
 
-    }
+    }*/
 }
 bool Mainwindow::isInsideViewZone(short x, short y)
 {
@@ -467,7 +467,7 @@ void Mainwindow::mousePressEvent(QMouseEvent *event)
         //select radar target
         trackList* trackListPt = &pRadar->mTrackList;
         for(uint trackId=0;trackId<trackListPt->size();trackId++)
-        {
+        {/*
             if(!trackListPt->at(trackId).isConfirmed)continue;
             if(!trackListPt->at(trackId).isManual)continue;
             //if(trackListPt->at(trackId).state<5)continue;
@@ -477,7 +477,7 @@ void Mainwindow::mousePressEvent(QMouseEvent *event)
             {
                 selectedTargetType = RADAR;
                 selectedTargetIndex = trackId;
-            }
+            }*/
         }
 
 
@@ -788,23 +788,22 @@ void Mainwindow::DrawRadarTargetByPainter(QPainter* p)//draw radar target from p
     //float x,y;
     short sx,sy;
     short sx1,sy1;
-    float scale_ppi = pRadar->scale_ppi;
+    //float scale_ppi = pRadar->scale_ppi;
     //short targetId = 0;
-    std::list<object_t>* pObjList = &(pRadar->mObjList);
+    std::vector<object_t>* pObjList = &(pRadar->mObjList);
     p->setPen(penTargetBlue);
-    if(true)//raw objects
+    if(false)//raw objects
     {
         foreach (object_t obj, *pObjList) {
             sx = obj.xkm*mScale + radCtX;
             sy = -obj.ykm*mScale + radCtY;
-
             p->drawPoint(sx,sy);
             //p->drawRect(sx-5,sy-5,10,10);
         }
 
     }
     p->setPen(penTarget);
-    if(true)//raw lines
+    if(false)//raw lines
     {
         foreach (object_line line, pRadar->mLineList) {
             sx = line.obj1.xkm*mScale + radCtX;
@@ -817,6 +816,20 @@ void Mainwindow::DrawRadarTargetByPainter(QPainter* p)//draw radar target from p
         }
 
     }
+    if(true)//raw tracks
+    {
+        foreach (track_t track, pRadar->mTrackList) {
+            sx = track.xkm*mScale + radCtX;
+            sy = -track.ykm*mScale + radCtY;
+            sx1 = track.xkmo*mScale + radCtX;
+            sy1 = -track.ykmo*mScale + radCtY;
+            p->drawLine(sx,sy,sx1,sy1);
+
+            //p->drawRect(sx-5,sy-5,10,10);
+        }
+
+    }
+    /*
     trackList* trackListPt = &pRadar->mTrackList;
     if(true)//ui->toolButton_blue_tracks->isChecked())
     {
@@ -881,7 +894,7 @@ void Mainwindow::DrawRadarTargetByPainter(QPainter* p)//draw radar target from p
                 }
                 continue;
             }
-        }
+        }*/
         //                draw track:
 
         //                j--;
@@ -942,9 +955,9 @@ void Mainwindow::DrawRadarTargetByPainter(QPainter* p)//draw radar target from p
                             x+trackListPt->at(i).velocity*500*sinf(trackListPt->at(i).course),
                             y-trackListPt->at(i).velocity*500*cosf(trackListPt->at(i).course));
 
-            }*/
+            }
 
-    }
+    }*/
     /*else for(uint i=0;i<trackListPt->size();i++)
     {
         if(!trackListPt->at(i).state)continue;
@@ -1903,7 +1916,7 @@ void Mainwindow::sync5p()//period 10 second
 void Mainwindow::updateTargetInfo()
 {
     if(selectedTargetType==RADAR)
-    {
+    {/*
         trackList* trackListPt = &pRadar->mTrackList;
         for(uint trackId=0;trackId<trackListPt->size();trackId++)
         {
@@ -1926,7 +1939,7 @@ void Mainwindow::updateTargetInfo()
                 ui->label_data_heading->setText(QString::number(trackListPt->at(trackId).heading*DEG_RAD)+QString::fromLocal8Bit("\260"));
                 // ui->label_data_dopler->setText(QString::number(trackListPt->at(trackId).dopler));
             }
-        }
+        }*/
 
     }
     else if(selectedTargetType == AIS){

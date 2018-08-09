@@ -58,7 +58,7 @@ short histogram[256];
 //static period_t                curPeriod;
 //static std::queue<period_t>    period_cache;
 //static unsigned short cur_mark_index = 0;
-
+/*
 // -------------------Radar tracking class-------------
 void track_t::init(object_t *object)
 {
@@ -360,9 +360,9 @@ void track_t::setManual(bool isMan)
     }
 }
 
-
+*/
 // ---------------Data processing class------------------------
-//QImage *imgAR;
+
 
 C_radar_data::C_radar_data()
 {
@@ -1087,7 +1087,7 @@ void C_radar_data::ProcessEach90Deg()
 {
     if(cur_timeMSecs)
     {
-        qint64 newtime = QDateTime::currentMSecsSinceEpoch();
+        qint64 newtime = now_ms;
         qint64 dtime = newtime - cur_timeMSecs;
         if(dtime<100000&&dtime>0)
         {
@@ -1106,7 +1106,7 @@ void C_radar_data::ProcessEach90Deg()
     }
     else
     {
-        cur_timeMSecs = QDateTime::currentMSecsSinceEpoch();
+        cur_timeMSecs = now_ms;
     }
 
 
@@ -1123,6 +1123,7 @@ void C_radar_data::processSocketData(unsigned char* data,short len)
 
         clk_adc = n_clk_adc;
         isClkAdcChanged = true;
+        UpdateData();
         resetData();
 
     }
@@ -1271,7 +1272,7 @@ int C_radar_data::getNewAzi()
     return newAzi;
 }
 void C_radar_data::ProcessDataFrame()
-{
+{/*
     int newAzi = getNewAzi();
 
     int leftAzi = curAzir-1;if(leftAzi<0)leftAzi+=MAX_AZIR;
@@ -1335,7 +1336,7 @@ void C_radar_data::ProcessDataFrame()
     {
         ProcessEach90Deg();
 
-    }
+    }*/
 }
 void C_radar_data::clearPPI()
 {
@@ -1347,13 +1348,16 @@ void C_radar_data::UpdateData()
 {
     while(aziToProcess.size())
     {
-
+        now_ms = QDateTime::currentMSecsSinceEpoch();
         int azi = aziToProcess.front();
+
         if(azi==lastProcessAzi)
         {
             aziToProcess.pop();
             continue;
         }
+        ProcessData(azi);
+        drawAzi(azi);
         if(!((unsigned char)(azi<<4)))//xu ly moi 16 chu ky
         {
             //procTracks(curAzir);
@@ -1392,8 +1396,7 @@ void C_radar_data::UpdateData()
             histogram[value+2]+=2;
             histogram[value+3]+=1;
         }//
-        ProcessData(azi);
-        drawAzi(azi);
+
         lastProcessAzi = azi;
         aziToProcess.pop();
     }
@@ -1501,9 +1504,8 @@ void C_radar_data::procPLot(plot_t* mPlot)
         ctA = (mPlot->riseA + mPlot->fallA)/2.0;
 
     }
-    float ctR = (float)mPlot->sumR/(float)mPlot->size;
-    if(ctR>500)
-        ctR=ctR;
+    float ctR = (float)mPlot->sumR/(float)mPlot->size+1.0;//min value starts at 1
+
     newobject.size = mPlot->size;
     newobject.drg = mPlot->maxR-mPlot->minR;
     newobject.aziRes = 0.017;
@@ -1519,15 +1521,21 @@ void C_radar_data::procPLot(plot_t* mPlot)
     newobject.rg   = ctR;
     newobject.rgKm =  ctR*sn_scale;
     newobject.p   = -1;
-    newobject.timeMs = QDateTime::currentMSecsSinceEpoch();
+    newobject.timeMs = now_ms;
     newobject.xkm = newobject.rgKm*sin( newobject.az);
     newobject.ykm = newobject.rgKm*cos( newobject.az);
-    if(mObjList.size()<50)
+    if(mObjList.size()<1000)
     {
         mObjList.push_back(newobject);
 //        printf("\nctA:%f",ctA);
 //        printf(" ctR:%f",ctR);
 //        printf(" energy:%d",mPlot->sumEnergy);
+    }
+    else
+    {
+        foreach (object_t obj, mObjList) {
+            if(obj.uniqID<0)obj = newobject;
+        }
     }
     /*
     if(!procObjectManual(&newobject))//check existing confirmed tracks
@@ -1549,7 +1557,7 @@ void C_radar_data::procTracks(unsigned short curA)
     //short pr_curA = curA-1;
     //if(pr_curA<0)pr_curA+=MAX_AZIR;
 
-
+/*
     //proc track
     float azi = (float)curA/MAX_AZIR*PI_NHAN2+aziOffset;
     for(unsigned short i=0;i<mTrackList.size();i++)
@@ -1582,7 +1590,7 @@ void C_radar_data::procTracks(unsigned short curA)
             }
         }
     }
-
+*/
 
 }
 void C_radar_data::kmxyToPolarDeg(double x, double y, double *azi, double *range)
@@ -1604,7 +1612,7 @@ void C_radar_data::kmxyToPolarDeg(double x, double y, double *azi, double *range
 
 }
 void C_radar_data::addTrackManual(double x,double y)
-{
+{/*
     float azi,range;
     if(!y)
     {
@@ -1652,11 +1660,11 @@ void C_radar_data::addTrackManual(double x,double y)
     {
         mTrackList.at(trackId).suspect_list.push_back(newobj);
     }
-
+*/
 
 }
 void C_radar_data::addTrack(object_t* mObject)
-{
+{/*
     //add new track
     //printf("new track \n");
     for(unsigned short i=0;i<mTrackList.size();i++)
@@ -1672,16 +1680,16 @@ void C_radar_data::addTrack(object_t* mObject)
         track_t newTrack;
         newTrack.init(mObject);
         mTrackList.push_back(newTrack);
-    }
+    }*/
 }
 void C_radar_data::deleteTrack(ushort trackNum)
-{
+{/*
     if(mTrackList.size()>trackNum)
     {
         mTrackList[trackNum].state = 0;
         if(mTrackList[trackNum].object_list.size())mTrackList[trackNum].object_list.clear();
         if(mTrackList[trackNum].suspect_list.size())mTrackList[trackNum].suspect_list.clear();
-    }
+    }*/
 }
 
 void C_radar_data::drawRamp()
@@ -1760,7 +1768,7 @@ void C_radar_data::drawRamp(double azi)
 
 }
 bool C_radar_data::procObjectAvto(object_t* pObject)
-{
+{/*
     bool newtrack = true;
     short trackId = -1;
     short max_length = 0;
@@ -1791,11 +1799,12 @@ bool C_radar_data::procObjectAvto(object_t* pObject)
         return false;
     }
 
-
+*/
+    return false;
 }
 bool C_radar_data::procObjectManual(object_t* pObject)// !!!
 {
-
+/*
     short trackId = -1;
     ushort max_length = 0;
     for(unsigned short i=0;i<mTrackList.size();i++)
@@ -1819,7 +1828,8 @@ bool C_radar_data::procObjectManual(object_t* pObject)// !!!
         return true;
     }
     else return false;
-
+*/
+    return false;
 }
 void C_radar_data::procPix(short proc_azi,short range)//_______signal detected, check 4 last neighbour points for nearby mark_______________//
 {
@@ -2319,79 +2329,101 @@ void C_radar_data::resetTrack()
 #define TARGET_OBSERV_TIME 60000//ENVAR max time to save object in the memory
 void C_radar_data::ProcesstRadarObjects()
 {
-    if(mObjList.size()<2)return;
-
-    while(mObjList.size()>1000)
+    for (int i=0;i<mObjList.size();i++)
     {
-        mObjList.pop_front();
-    }
-    qint64 now_ms = QDateTime::currentMSecsSinceEpoch();
-
-    while(now_ms - mObjList.front().timeMs>60000)
-    {
-        mObjList.pop_front();
-        if(mObjList.size()<2)return;
-    }
-
-    foreach (object_t var1, mObjList)
-    {
-        foreach (object_t var2, mObjList)
+        if(now_ms - mObjList.at(i).timeMs>TARGET_OBSERV_TIME)
         {
-            //find new line
+            mObjList.at(i).uniqID = -1;
+        }
+    }
+    for (int i=0;i<mObjList.size();i++)
+    {
+        if(mObjList.at(i).uniqID<0)continue;
+        object_t *obj1 = &(mObjList.at(i));
+        for (int j=0;j<mObjList.size();j++)
+        {
+            if(i==j)continue;
 
-            int dtime = (var2.timeMs - var1.timeMs);no line, just prev object list and next obj list,estimated posistion, dopler histogram peak points
+            object_t *obj2 = &(mObjList.at(j));
+            //find new line
+            if(obj2->uniqID<0)continue;
+            int dtime = (obj2->timeMs - obj1->timeMs);//no line, just prev object list and next obj list,estimated posistion, dopler histogram peak points
             if(dtime<1000)
                 continue;//ENVAR min time between plots in a line(1s)
-            if(dtime>TARGET_OBSERV_TIME/2)continue;//ENVAR mav time between plots in a line(30s)
+            //if(dtime>TARGET_OBSERV_TIME/2)continue;//ENVAR mav time between plots in a line(30s)
 
             bool line_exist = false;
             foreach (object_line line, mLineList) {
-                if(
-                        ((var1.uniqID==line.obj1.uniqID)&&(var2.uniqID==line.obj2.uniqID))
-                        ||(var1.uniqID==line.obj2.uniqID&&var2.uniqID==line.obj1.uniqID))
+                if(((obj1->uniqID==line.obj1.uniqID)&&(obj2->uniqID==line.obj2.uniqID)))
                     line_exist = true;
             }
             if(line_exist)continue;
-            float dx = var2.xkm - var1.xkm;
-            float dy = var2.ykm - var1.ykm;
+            float dx = obj2->xkm - obj1->xkm;
+            float dy = obj2->ykm - obj1->ykm;
             float distancekm = sqrt(dx*dx+dy*dy);
-            float distanceMesA = abs(var2.az-var1.az)/(var1.aziRes+var2.aziRes);
-            float distanceMesR = abs(var2.rgKm-var1.rgKm)/(var1.rangeRes+var2.rangeRes+0.00003*dtime);
-            if(((distanceMesA>3)||(distanceMesR>3))||(distancekm>1.5))continue;//ENVAR max distance between plots (1.5km)
+
             float speedkmh = distancekm/(dtime/3600000.0);
-            if(isMarineMode){if(speedkmh>TARGET_MAX_SPEED_MARINE)continue;}
+            if(isMarineMode){
+                float maxDistance = TARGET_MAX_SPEED_MARINE/3600000.0*dtime   + obj1->rgKm*atan(obj1->aziRes*3);
+                if(/*((distanceMesA>3)||(distanceMesR>3))||*/
+                        (distancekm>(maxDistance))
+                        )
+                    continue;
+            }
             else if(speedkmh>2000)continue;
             object_line newline;
             newline.distancekm = distancekm;
             newline.speedkmh = speedkmh;
             newline.bearingRad = ConvXYToAziRad(dx,dy);
             printf("\nspeed:%f,distance:%f",speedkmh,distancekm);
-            if(dtime>0)
-            {
-                newline.dtime = dtime;
-                newline.obj1 = var1;
-                newline.obj2 = var2;
-            }
+            newline.dtimeSec = dtime/1000.0;
+            newline.obj1 = *obj1;
+            newline.obj2 = *obj2;
+            if(mLineList.size()<500)
+                mLineList.push_back(newline);
             else
             {
-                newline.dtime = -dtime;
-                newline.obj1 = var2;
-                newline.obj2 = var1;
+                qint64 oldestTime = now_ms;
+                object_line* pOldestLine;
+                for (int k=0;k<mLineList.size();k++)
+                {
+                    if(oldestTime>mLineList.at(k).obj1.timeMs)
+                    {
+                        oldestTime = mLineList.at(k).obj1.timeMs;
+                        pOldestLine = &mLineList.at(k);
+                    }
+                }
+                printf("\noldesttime:%ld",(now_ms-oldestTime)/1000);
+                *pOldestLine  = newline;
             }
-            mLineList.push_back(newline);
+
         }
     }
-    while(mLineList.size()>100)
+//    while(mLineList.size()>100)
+//    {
+//        mLineList.pop_front();
+//    }
+    for (int i=0;i<mLineList.size();i++)
     {
-        mLineList.pop_front();
-    }
-    foreach (object_line line1, mLineList)
-    {
-
-        foreach (object_line line2, mLineList)
+        object_line* pLine1 = &mLineList.at(i);
+        for (int j=0;j<mLineList.size();j++)
         {
-            if(line1.obj2.timeMs==line2.obj1.timeMs)// new track
+            if(i==j)continue;
+            object_line* pLine2 = &mLineList.at(j);
+            if(pLine1->obj2.uniqID==pLine2->obj1.uniqID)// new track
             {
+                double distance = pLine2->distancekm+pLine1->distancekm;
+                double accHead = (pLine2->speedkmh-pLine1->speedkmh)/(pLine2->dtimeSec/3600.0);
+                if(abs(accHead)>300)continue;
+                double rot = (pLine2->bearingRad-pLine1->bearingRad)/(pLine2->dtimeSec);
+                if(abs(rot)>PI_CHIA2/9.0)continue;
+                printf("accHead:%f",accHead);
+                track_t newtrack;
+                newtrack.xkm = pLine2->obj2.xkm;
+                newtrack.ykm = pLine2->obj2.ykm;
+                newtrack.xkmo = pLine1->obj1.xkm;
+                newtrack.ykmo = pLine1->obj1.ykm;
+                mTrackList.push_back(newtrack);
 
             }
         }
