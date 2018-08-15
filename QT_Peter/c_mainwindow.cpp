@@ -2437,10 +2437,10 @@ void Mainwindow::on_actionRecording_triggered()
 }
 
 
-void Mainwindow::on_comboBox_temp_type_currentIndexChanged(int index)
-{
+//void Mainwindow::on_comboBox_temp_type_currentIndexChanged(int index)
+//{
 
-}
+//}
 
 //void RadarGui::on_horizontalSlider_brightness_actionTriggered(int action)
 //{

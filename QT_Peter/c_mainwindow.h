@@ -149,7 +149,7 @@ private slots:
 //    void on_actionView_grid_triggered(bool checked);
     void on_actionPlayPause_toggled(bool arg1);
     void on_actionRecording_triggered();
-    void on_comboBox_temp_type_currentIndexChanged(int index);
+//    void on_comboBox_temp_type_currentIndexChanged(int index);
 //    void on_horizontalSlider_brightness_actionTriggered(int action);
     void on_horizontalSlider_brightness_valueChanged(int value);
 
@@ -263,7 +263,7 @@ private slots:
 
     //void on_toolButton_map_2_clicked();
 
-    void on_comboBox_2_currentIndexChanged(int index);
+//    void on_comboBox_2_currentIndexChanged(int index);
 
     void on_toolButton_measuring_clicked(bool checked);
 
