@@ -107,7 +107,7 @@ private:
     void InitTimer();
     void showTime();
     void DrawViewFrame(QPainter *p);
-    void DrawSignal(QPainter *p);
+//    void DrawSignal(QPainter *p);
     void drawAisTarget(QPainter *p);
     void DrawRadarTargetByPainter(QPainter* p);
 

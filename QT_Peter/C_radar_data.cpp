@@ -40,12 +40,12 @@ typedef struct  {
     unsigned char hot_disp[MAX_AZIR][RAD_M_PULSE_RES];
     short         plotIndex[MAX_AZIR][RAD_M_PULSE_RES];
     //display data
-    unsigned char display_ray [DISPLAY_RES][3];//0 - signal, 1- dopler, 2 - sled;
+    unsigned char display_ray [RAD_DISPLAY_RES][3];//0 - signal, 1- dopler, 2 - sled;
     unsigned char display_ray_zoom [DISPLAY_RES_ZOOM][3];
-    unsigned char display_mask [DISPLAY_RES*2+1][DISPLAY_RES*2+1];
+    unsigned char display_mask [RAD_DISPLAY_RES*2+1][RAD_DISPLAY_RES*2+1];
     unsigned char display_mask_zoom [DISPLAY_RES_ZOOM*2+1][DISPLAY_RES_ZOOM*2+1];
-    short xkm[MAX_AZIR_DRAW][DISPLAY_RES+1];
-    short ykm[MAX_AZIR_DRAW][DISPLAY_RES+1];
+    short xkm[MAX_AZIR_DRAW][RAD_DISPLAY_RES+1];
+    short ykm[MAX_AZIR_DRAW][RAD_DISPLAY_RES+1];
     short xzoom[MAX_AZIR_DRAW][DISPLAY_RES_ZOOM];
     short yzoom[MAX_AZIR_DRAW][DISPLAY_RES_ZOOM];
 } signal_map_t;
@@ -379,7 +379,7 @@ C_radar_data::C_radar_data()
     tb_tap=new unsigned short[MAX_AZIR];
     img_histogram=new QImage(257,101,QImage::Format_Mono);
     img_histogram->fill(0);
-    img_ppi = new QImage(DISPLAY_RES*2+1,DISPLAY_RES*2+1,QImage::Format_ARGB32);
+    img_ppi = new QImage(RAD_DISPLAY_RES*2+1,RAD_DISPLAY_RES*2+1,QImage::Format_ARGB32);
     img_RAmp = new QImage(RAD_M_PULSE_RES,256,QImage::Format_ARGB32);
     img_spectre = new QImage(16,256,QImage::Format_Mono);
     img_spectre->fill(0);
@@ -559,7 +559,7 @@ void C_radar_data::drawSgn(short azi_draw, short r_pos)
 
 void C_radar_data::drawBlackAzi(short azi_draw)
 {
-    for (short r_pos = 1;r_pos < DISPLAY_RES;r_pos++)
+    for (short r_pos = 1;r_pos < RAD_DISPLAY_RES;r_pos++)
     {
 
         short px = data_mem.xkm[azi_draw][r_pos];
@@ -614,7 +614,7 @@ void C_radar_data::drawAzi(short azi)
         drawBlackAzi(prev_azi*3+1);
         drawBlackAzi(prev_azi*3);
         //reset the drawing ray
-        memset(&data_mem.display_ray[0][0],0,DISPLAY_RES*3);
+        memset(&data_mem.display_ray[0][0],0,RAD_DISPLAY_RES*3);
         //memset(&signal_map.display_zoom[0][0],0,DISPLAY_RES_ZOOM*3);
         //set data to the drawing ray
 
@@ -628,7 +628,7 @@ void C_radar_data::drawAzi(short azi)
         drawBlackAzi(prev_azi*3+1);
         drawBlackAzi(prev_azi*3+2);
         //reset the drawing ray
-        memset(&data_mem.display_ray[0][0],0,DISPLAY_RES*3);
+        memset(&data_mem.display_ray[0][0],0,RAD_DISPLAY_RES*3);
 
     }
 
@@ -651,7 +651,7 @@ void C_radar_data::drawAzi(short azi)
         short display_pos_next = (r_pos+1)*scale_ppi;
         for(;;)
         {
-            if(display_pos>=DISPLAY_RES)break;
+            if(display_pos>=RAD_DISPLAY_RES)break;
             if(data_mem.display_ray[display_pos][0]<value)
             {
                 data_mem.display_ray[display_pos][0] = value;
@@ -687,9 +687,9 @@ void C_radar_data::drawAzi(short azi)
         }
 
     }
-    if (lastDisplayPos<DISPLAY_RES)
+    if (lastDisplayPos<RAD_DISPLAY_RES)
     {
-        for(;lastDisplayPos<DISPLAY_RES;lastDisplayPos++)
+        for(;lastDisplayPos<RAD_DISPLAY_RES;lastDisplayPos++)
         {
 
             data_mem.display_ray[lastDisplayPos][0] = 0;
@@ -712,7 +712,7 @@ void C_radar_data::drawAzi(short azi)
 
     if(k<=2)
     {
-        for(short display_pos = 1;display_pos<DISPLAY_RES;display_pos++)
+        for(short display_pos = 1;display_pos<RAD_DISPLAY_RES;display_pos++)
         {
             drawSgn(azi*3,display_pos);
             drawSgn(azi*3+1,display_pos);
@@ -722,7 +722,7 @@ void C_radar_data::drawAzi(short azi)
     }
     else
     {
-        for(short display_pos = 1;display_pos<DISPLAY_RES;display_pos++)
+        for(short display_pos = 1;display_pos<RAD_DISPLAY_RES;display_pos++)
         {
             data_mem.display_ray[display_pos][0] = data_mem.display_ray[display_pos-1][0] + ((float)data_mem.display_ray[display_pos][0]-(float)data_mem.display_ray[display_pos-1][0])/k;
             //signal_map.display[display_pos][1] = signal_map.display[display_pos-1][1] + ((float)signal_map.display[display_pos][1]-(float)signal_map.display[display_pos-1][1])/k;
@@ -1973,7 +1973,7 @@ void C_radar_data::setIsSharpEye(bool value)
     isSharpEye = value;
 }
 short zoomXmax,zoomYmax,zoomXmin,zoomYmin;
-short zoomCenterX=DISPLAY_RES,zoomCenterY=DISPLAY_RES;
+short zoomCenterX=RAD_DISPLAY_RES,zoomCenterY=RAD_DISPLAY_RES;
 void C_radar_data::setZoomRectXY(float ctx, float cty)
 {
     zoomXmax = ctx*2.0/scale_ppi+ZOOM_SIZE/2;
@@ -2064,10 +2064,10 @@ void C_radar_data::raw_map_init()
     {
         float cost = cosf(theta);
         float sint = sinf(theta);
-        for(short range = 0;range<DISPLAY_RES;range++)
+        for(short range = 0;range<RAD_DISPLAY_RES;range++)
         {
-            data_mem.xkm[azir][range]     =  short(sint*(range+1))+DISPLAY_RES;
-            data_mem.ykm[azir][range]    =  -short(cost*(range+1))+DISPLAY_RES;
+            data_mem.xkm[azir][range]     =  short(sint*(range+1))+RAD_DISPLAY_RES;
+            data_mem.ykm[azir][range]    =  -short(cost*(range+1))+RAD_DISPLAY_RES;
             if(data_mem.xkm[azir][range]<0||data_mem.xkm[azir][range]>=img_ppi->width()||data_mem.ykm[azir][range]<0||data_mem.ykm[azir][range]>=img_ppi->height())
             {
                 data_mem.xkm[azir][range] = 0;

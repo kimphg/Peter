@@ -120,4 +120,6 @@ win32:LIBS += -L$$PWD//WpdPack/Lib/ -lwpcap
 DISTFILES += \
     appIcon.rc
 win32:RC_FILE += appIcon.rc
-
+ *msvc* { # visual studio spec filter
+      QMAKE_CXXFLAGS += -MP
+  }

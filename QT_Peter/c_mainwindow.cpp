@@ -557,13 +557,11 @@ Mainwindow::Mainwindow(QWidget *parent) :
 
 }
 
-void Mainwindow::DrawSignal(QPainter *p)
-{
-    QRectF signRect(DISPLAY_RES-(radCtX),DISPLAY_RES-(radCtY),SCR_W,SCR_H);
-    QRectF screen(0,0,width(),SCR_H);
-    p->drawImage(screen,*pRadar->img_ppi,signRect,Qt::AutoColor);
+//void Mainwindow::DrawSignal(QPainter *p)
+//{
 
-}
+
+//}
 
 //void MainWindow::createMenus()
 //{
@@ -773,7 +771,7 @@ void Mainwindow::initGraphicView()
 
 void Mainwindow::DrawRadarTargetByPainter(QPainter* p)//draw radar target from pRadar->mTrackList
 {
-
+    return;
     QPen penTarget(Qt::magenta);
     penTarget.setWidth(1);
 
@@ -1144,17 +1142,21 @@ void Mainwindow::UpdateMouseStat(QPainter *p)
 {
 
     if(!isInsideViewZone(mMousex,mMousey))return;
-    QPen penmousePointer(QColor(0x50ffffff));
-    penmousePointer.setWidth(2);
+    if((mouse_mode&MouseVRM)||(mouse_mode&MouseELB))
+    {
+        QPen penmousePointer(QColor(0x50ffffff));
+        penmousePointer.setWidth(2);
 
-    short r = sqrt((mMousex - radCtX)*(mMousex - radCtX)+(mMousey - radCtY)*(mMousey - radCtY));
-    p->setPen(penmousePointer);
-    if(mouse_mode&MouseVRM)p->drawEllipse(QPoint(radCtX,radCtY),r,r);
-    if(mouse_mode&MouseELB)p->drawLine(QPoint(radCtX,radCtY),QPoint(radCtX-(radCtX-mMousex)*100,radCtY-(radCtY-mMousey)*100));
-
+        short r = sqrt((mMousex - radCtX)*(mMousex - radCtX)+(mMousey - radCtY)*(mMousey - radCtY));
+        p->setPen(penmousePointer);
+        if(mouse_mode&MouseVRM)p->drawEllipse(QPoint(radCtX,radCtY),r,r);
+        if(mouse_mode&MouseELB)p->drawLine(QPoint(radCtX,radCtY),QPoint(radCtX-(radCtX-mMousex)*100,radCtY-(radCtY-mMousey)*100));
+    }
     if(isSelectingTarget)
     {
 
+        QPen penmousePointer(QColor(0x50ffffff));
+        penmousePointer.setWidth(2);
         penmousePointer.setStyle(Qt::DashDotLine);
         p->setPen(penmousePointer);
         p->drawLine(selZone_x1,selZone_y1,mMousex,selZone_y1);
@@ -1174,7 +1176,10 @@ void Mainwindow::paintEvent(QPaintEvent *event)
                      dxMap,dyMap,SCR_H,SCR_H);
     }
     //draw signal
-    DrawSignal(&p);
+    QRectF signRect(RAD_DISPLAY_RES-(radCtX),RAD_DISPLAY_RES-(radCtY),SCR_W,SCR_H);
+    QRectF screen(0,0,SCR_W,SCR_H);
+    p.drawImage(screen,*pRadar->img_ppi,signRect,Qt::AutoColor);
+
     DrawRadarTargetByPainter(&p);
     //if(ui->toolButton_ais_show->isChecked())drawAisTarget(&p);
     //draw cursor
@@ -1538,7 +1543,6 @@ void Mainwindow::DrawViewFrame(QPainter* p)
     p->drawEllipse(-100+SCR_LEFT_MARGIN,-100,SCR_H+200,SCR_H+200);
     p->setPen(penOuterGrid2);
     p->drawEllipse(scrCtX-scrCtY+25,25,SCR_H -50,SCR_H -50);
-
     //p->setPen(penOuterGrid2);
     QFont font10 = p->font() ;
     font10.setPointSize(10);
@@ -2045,9 +2049,16 @@ void Mainwindow::UpdateDataStatus()
 }
 void Mainwindow::sync1S()//period 1 second
 {
+
     UpdateDataStatus();
     UpdateGpsData();
-    this->updateTargetInfo();
+    if(isScaleChanged ) {
+
+        pRadar->setScalePPI(mScale);
+        isScaleChanged = false;
+    }
+    return;
+//    this->updateTargetInfo();
     if(processing->isConnected())
         setRadarState(CONNECTED);
     else
@@ -2061,11 +2072,7 @@ void Mainwindow::sync1S()//period 1 second
     }
 
 
-    if(isScaleChanged ) {
 
-        pRadar->setScalePPI(mScale);
-        isScaleChanged = false;
-    }
     showTime();
     /*
     // display radar temperature:
