@@ -27,7 +27,7 @@
 #define FRAME_HEADER_SIZE 34
 #define RADAR_RESOLUTION 1024
 #define OUTPUT_FRAME_SIZE RADAR_RESOLUTION*2+FRAME_HEADER_SIZE
-
+#define CONST_E 2.71828182846
 #define MAX_TRACK_LEN               400
 #define MAX_TRACKS                  199
 #define ENCODER_RES                 5000
@@ -116,7 +116,8 @@ typedef struct  {
 }object_t;
 struct object_line
 {
-    float        dtimeSec;
+    float       score;
+    float       dtimeSec;
     object_t    obj1;
     object_t    obj2;
     float distancekm;

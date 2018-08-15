@@ -2372,6 +2372,7 @@ void C_radar_data::ProcesstRadarObjects()
             }
             else if(speedkmh>2000)continue;
             object_line newline;
+            newline.score = newline.speedkmh/
             newline.distancekm = distancekm;
             newline.speedkmh = speedkmh;
             newline.bearingRad = ConvXYToAziRad(dx,dy);
@@ -2403,7 +2404,7 @@ void C_radar_data::ProcesstRadarObjects()
 //    {
 //        mLineList.pop_front();
 //    }
-    for (int i=0;i<mLineList.size();i++)
+    /*for (int i=0;i<mLineList.size();i++)
     {
         object_line* pLine1 = &mLineList.at(i);
         for (int j=0;j<mLineList.size();j++)
@@ -2417,7 +2418,7 @@ void C_radar_data::ProcesstRadarObjects()
                 if(abs(accHead)>300)continue;
                 double rot = (pLine2->bearingRad-pLine1->bearingRad)/(pLine2->dtimeSec);
                 if(abs(rot)>PI_CHIA2/9.0)continue;
-                printf("accHead:%f",accHead);
+                //printf("accHead:%f",accHead);
                 track_t newtrack;
                 newtrack.xkm = pLine2->obj2.xkm;
                 newtrack.ykm = pLine2->obj2.ykm;
@@ -2427,7 +2428,7 @@ void C_radar_data::ProcesstRadarObjects()
 
             }
         }
-    }
+    }*/
 
     return ;
 }
