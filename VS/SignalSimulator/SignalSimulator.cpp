@@ -40,7 +40,7 @@ void socketInit()
 	memset((char *)&si_capin, 0, sizeof(si_capin));
 	si_capin.sin_family = AF_INET;
 	si_capin.sin_port = htons(12345);//port "127.0.0.1"
-	si_capin.sin_addr.S_un.S_addr = inet_addr("192.168.0.70");
+	si_capin.sin_addr.S_un.S_addr = inet_addr("192.168.16.109");
 	int ret = bind(mSocket, (struct sockaddr *)&si_capin, sizeof(struct sockaddr));
 	if (ret == -1)
 	{

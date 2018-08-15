@@ -581,7 +581,7 @@ void packet_handler(u_char *param, const struct pcap_pkthdr *header, const u_cha
     //    printf("\n");
 
 }
-uchar mReceiveBuff[50];
+uchar mReceiveBuff[500];
 void dataProcessingThread::run()
 {
 
@@ -590,7 +590,7 @@ void dataProcessingThread::run()
         while(radarSocket->hasPendingDatagrams())
         {
             int len = radarSocket->pendingDatagramSize();
-            if(len<50)// control packets
+            if(len<1000)// control packets
             {
                 radarSocket->readDatagram((char*)&mReceiveBuff[0],len);
                 if(mReceiveBuff[0]==0xaa&&mReceiveBuff[1]==0x55)
@@ -610,6 +610,14 @@ void dataProcessingThread::run()
                     {
                         mRadarStat.ReadStatusMessage(&mReceiveBuff[4]);
                     }
+                }
+                else if(mReceiveBuff[0]=='!')
+                {
+                    processARPAData(QByteArray((char*)mReceiveBuff,len));
+                }
+                else
+                {
+                    ProcessNavData(QByteArray((char*)mReceiveBuff,len));
                 }
 
             }
