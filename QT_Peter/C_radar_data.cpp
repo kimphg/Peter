@@ -2372,7 +2372,7 @@ void C_radar_data::ProcesstRadarObjects()
             }
             else if(speedkmh>2000)continue;
             object_line newline;
-            newline.score = newline.speedkmh/
+            newline.score = newline.speedkmh;
             newline.distancekm = distancekm;
             newline.speedkmh = speedkmh;
             newline.bearingRad = ConvXYToAziRad(dx,dy);

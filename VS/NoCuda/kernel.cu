@@ -11,7 +11,7 @@
 #include "pcap.h"
 #define HR2D_PK//
 #define FRAME_LEN 1024
-#define OUTPUT_FRAME_LEN 2048
+#define OUTPUT_FRAME_SIZE FRAME_LEN*2+FRAME_HEADER_SIZE
 #define FFT_SIZE 32
 #define BANG_KHONG 0
 int mFFTSkip = (FFT_SIZE/10);
@@ -145,7 +145,6 @@ struct DataFrame// buffer for data frame
 	bool isToFFT;
 } dataBuff[MAX_IREC];
 unsigned int gyroValue = 0;
-#define OUTPUT_FRAME_SIZE OUTPUT_FRAME_LEN*2+FRAME_HEADER_SIZE
 
 u_char outputFrame[OUTPUT_FRAME_SIZE];
 
@@ -190,7 +189,7 @@ void socketInit()
 	//setup address structure
 	memset((char *)&si_peter, 0, sizeof(si_peter));
 	si_peter.sin_family = AF_INET;
-	si_peter.sin_port = htons(34567);//port "127.0.0.1"
+	si_peter.sin_port = htons(31000);//port "127.0.0.1"
 	si_peter.sin_addr.S_un.S_addr = inet_addr("127.0.0.1");
 
 }
@@ -422,7 +421,7 @@ DWORD WINAPI ProcessDataBuffer(LPVOID lpParam)
 				float res = sqrt(float(maxAmp) / float(FFT_SIZE));
 				if (res > 255)res = 255;
 				outputFrame[i + FRAME_HEADER_SIZE] = res;// u_char(sqrt(float(maxAmp)) / float(FFT_SIZE));
-				outputFrame[i + OUTPUT_FRAME_LEN + FRAME_HEADER_SIZE] = u_char(indexMaxFFT*16.0 / (FFT_SIZE));
+				outputFrame[i + FRAME_LEN + FRAME_HEADER_SIZE] = u_char(indexMaxFFT*16.0 / (FFT_SIZE));
 			}
 			sendto(mSocket, (char*)outputFrame, OUTPUT_FRAME_SIZE, 0, (struct sockaddr *) &si_peter, sizeof(si_peter));
 			
@@ -462,7 +461,7 @@ void packet_handler(u_char *param, const struct pcap_pkthdr *pkt_header, const u
 		u_char* data = (u_char*)pkt_data + UDP_HEADER_LEN;
 		int iNext = iReady + 1;
 		if (iNext >= MAX_IREC)iNext = 0;
-		
+		memcpy(dataBuff[iNext].header, data, FRAME_HEADER_SIZE);
 		if (data[0] == 1)		//I chanel first part
 		{
 			dataBuff[iNext].isToFFT = ((iNext%mFFTSkip) == 0);
@@ -475,19 +474,20 @@ void packet_handler(u_char *param, const struct pcap_pkthdr *pkt_header, const u
 			iReady++;
 			if (iReady >= MAX_IREC)iReady = 0;
 		}
-		else if (data[0] == 1) //I chanel second part
+		else if (data[0] == 3) //I chanel second part
 		{
-			memcpy(dataBuff[iNext].dataI + 1024, data + FRAME_HEADER_SIZE, 1024);
+			memcpy(dataBuff[iNext].dataI, data + FRAME_HEADER_SIZE, 1024);
+			iReady++;
 		}
-		else if (data[0] == 3) //Q chanel second part
+		else if (data[0] == 4) //Q chanel second part
 		{
-			memcpy(dataBuff[iNext].dataQ + 1024, data + FRAME_HEADER_SIZE, 1024);
+			memcpy(dataBuff[iNext].dataQ, data + FRAME_HEADER_SIZE, 1024);
 			iReady++;
 			if (iReady >= MAX_IREC)iReady = 0;
 		}
 		return;
 	}
-	else if (port == 34567)
+	else if (port == 31000)
 	{
 		u_char* data = (u_char*)pkt_data + UDP_HEADER_LEN;
 		if (

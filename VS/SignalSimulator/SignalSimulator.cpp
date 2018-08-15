@@ -3,8 +3,8 @@
 
 #include "stdafx.h"
 #define FRAME_HEADER_SIZE 34
-#define OUTPUT_FRAME_LEN 1024
-#define OUTPUT_FRAME_SIZE OUTPUT_FRAME_LEN*2+FRAME_HEADER_SIZE
+#define FRAME_LEN 1024
+#define OUTPUT_FRAME_SIZE FRAME_LEN*2+FRAME_HEADER_SIZE
 #define PI_NHAN2                    6.2831853072
 #define PI_CHIA2                    1.5707963268
 #define PI                       3.14159265358979323846
@@ -39,8 +39,8 @@ void socketInit()
 
 	memset((char *)&si_capin, 0, sizeof(si_capin));
 	si_capin.sin_family = AF_INET;
-	si_capin.sin_port = htons(34566);//port "127.0.0.1"
-	si_capin.sin_addr.S_un.S_addr = inet_addr("127.0.0.1");
+	si_capin.sin_port = htons(12345);//port "127.0.0.1"
+	si_capin.sin_addr.S_un.S_addr = inet_addr("192.168.0.70");
 	int ret = bind(mSocket, (struct sockaddr *)&si_capin, sizeof(struct sockaddr));
 	if (ret == -1)
 	{
@@ -50,8 +50,8 @@ void socketInit()
 	//setup address structure
 	memset((char *)&si_peter, 0, sizeof(si_peter));
 	si_peter.sin_family = AF_INET;
-	si_peter.sin_port = htons(31000);//port "127.0.0.1"
-	si_peter.sin_addr.S_un.S_addr = inet_addr("127.0.0.1");
+	si_peter.sin_port = htons(5000);//port "127.0.0.1"
+	si_peter.sin_addr.S_un.S_addr = inet_addr("27.72.56.161");
 
 }
 void socketDelete()
@@ -146,8 +146,8 @@ public:
 			if (a < 0)a += 2048;
 			if (a >= 2048) a -= 2048;
 			int value = 150 * (1.0 - abs(k - targetSize) / (targetSize+1.0));
-			outputFrame[a][(int)range + OUTPUT_FRAME_LEN + FRAME_HEADER_SIZE] = dopler;
-			outputFrame[a][(int)range + OUTPUT_FRAME_LEN + 1 + FRAME_HEADER_SIZE] = dopler;
+			outputFrame[a][(int)range + FRAME_LEN + FRAME_HEADER_SIZE] = dopler;
+			outputFrame[a][(int)range + FRAME_LEN + 1 + FRAME_HEADER_SIZE] = dopler;
 			outputFrame[a][(int)range + FRAME_HEADER_SIZE] = value + int(distribution(generator));
 			outputFrame[a][(int)range + 1 + FRAME_HEADER_SIZE] = value + int(distribution(generator));
 			k++;
@@ -166,11 +166,11 @@ public:
 			int num = int(distribution(generator));
 			if (num < 0)num = 0;
 			outputFrame[a][(int)range + FRAME_HEADER_SIZE] = num;
-			outputFrame[a][(int)range + OUTPUT_FRAME_LEN + FRAME_HEADER_SIZE] = rand() % 16;
+			outputFrame[a][(int)range + FRAME_LEN + FRAME_HEADER_SIZE] = rand() % 16;
 			num = int(distribution(generator));
 			if (num < 0)num = 0;
 			outputFrame[a][(int)range + 1 + FRAME_HEADER_SIZE] = num;
-			outputFrame[a][(int)range + OUTPUT_FRAME_LEN + 1 + FRAME_HEADER_SIZE] = rand() % 16;
+			outputFrame[a][(int)range + FRAME_LEN + 1 + FRAME_HEADER_SIZE] = rand() % 16;
 		}
 	}
 	void update()
@@ -250,6 +250,9 @@ int _tmain(int argc, _TCHAR* argv[])
 		}*/
 		//if (rand() % 10 == 0)regenerate(azi);
 		outputFrame[azi][4] = n_clk_adc;
+		outputFrame[azi][0] = 1;
+		sendto(mSocket, (char*)(&outputFrame[azi][0]), OUTPUT_FRAME_SIZE, 0, (struct sockaddr *) &si_peter, sizeof(si_peter));
+		outputFrame[azi][0] = 2;
 		sendto(mSocket, (char*)(&outputFrame[azi][0]), OUTPUT_FRAME_SIZE, 0, (struct sockaddr *) &si_peter, sizeof(si_peter));
 		regenerate(azi);
 	}
