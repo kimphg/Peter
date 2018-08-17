@@ -3259,11 +3259,11 @@ void Mainwindow::on_toolButton_measuring_clicked()
 }
 
 
-void Mainwindow::on_comboBox_2_currentIndexChanged(int index)
+/*void Mainwindow::on_comboBox_2_currentIndexChanged(int index)
 {
     return;
 
-}
+}*/
 
 void Mainwindow::on_toolButton_measuring_clicked(bool checked)
 {
@@ -3956,6 +3956,7 @@ void Mainwindow::on_toolButton_head_up_toggled(bool checked)
 unsigned char commandMay22[]={0xaa,0x55,0x02,0x0c,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00};
 void Mainwindow::on_toolButton_dk_1_toggled(bool checked)
 {
+    return;
     if(checked)
     {
         commandMay22[4]=0x00;
@@ -4030,6 +4031,7 @@ void Mainwindow::on_toolButton_dk_9_toggled(bool checked)
 
 void Mainwindow::on_toolButton_dk_10_toggled(bool checked)
 {
+    return;
     if(checked)
     {
         commandMay22[8]=0x01;
@@ -4040,6 +4042,7 @@ void Mainwindow::on_toolButton_dk_10_toggled(bool checked)
 
 void Mainwindow::on_toolButton_dk_12_toggled(bool checked)
 {
+    return;
     if(checked)
     {
         commandMay22[4]=0x01;
@@ -4049,6 +4052,7 @@ void Mainwindow::on_toolButton_dk_12_toggled(bool checked)
 
 void Mainwindow::on_toolButton_dk_14_toggled(bool checked)
 {
+    return;
     if(checked)
     {
         commandMay22[8]=0x02;
@@ -4066,6 +4070,7 @@ void Mainwindow::on_toolButton_dk_13_toggled(bool checked)
 
 void Mainwindow::on_toolButton_dk_15_toggled(bool checked)
 {
+    return;
     if(checked)
     {
         commandMay22[8]=0x00;
@@ -4075,6 +4080,7 @@ void Mainwindow::on_toolButton_dk_15_toggled(bool checked)
 
 void Mainwindow::on_toolButton_dk_11_toggled(bool checked)
 {
+    return;
     if(checked)
     {
         commandMay22[7]=0x00;
@@ -4084,6 +4090,7 @@ void Mainwindow::on_toolButton_dk_11_toggled(bool checked)
 
 void Mainwindow::on_toolButton_dk_16_toggled(bool checked)
 {
+    return;
     if(checked)
     {
         commandMay22[7]=0x01;
@@ -4093,6 +4100,7 @@ void Mainwindow::on_toolButton_dk_16_toggled(bool checked)
 
 void Mainwindow::on_toolButton_dk_17_toggled(bool checked)
 {
+    return;
     if(checked)
     {
         commandMay22[7]=0x02;
@@ -4107,6 +4115,7 @@ void Mainwindow::on_toolButton_grid_toggled(bool checked)
 
 void Mainwindow::on_toolButton_dk_4_clicked()
 {
+
     commandMay22[6]=0x06;
     processing->sendCommand(commandMay22,12,false);
 }
@@ -4156,5 +4165,29 @@ void Mainwindow::on_toolButton_dk_2_clicked()
 void Mainwindow::on_toolButton_dk_13_clicked()
 {
     commandMay22[5]=0x01;
+    processing->sendCommand(commandMay22,12,false);
+}
+
+void Mainwindow::on_toolButton_dk_12_clicked()
+{
+    commandMay22[4]=0x01;
+    processing->sendCommand(commandMay22,12,false);
+}
+
+void Mainwindow::on_toolButton_dk_10_clicked()
+{
+    commandMay22[8]=0x01;
+    processing->sendCommand(commandMay22,12,false);
+}
+
+void Mainwindow::on_toolButton_dk_14_clicked()
+{
+    commandMay22[8]=0x02;
+    processing->sendCommand(commandMay22,12,false);
+}
+
+void Mainwindow::on_toolButton_dk_15_clicked()
+{
+    commandMay22[8]=0x00;
     processing->sendCommand(commandMay22,12,false);
 }

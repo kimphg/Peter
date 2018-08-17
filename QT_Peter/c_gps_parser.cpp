@@ -35,7 +35,7 @@ CGPSParser::CGPSParser(std::string sentence){
 bool CGPSParser::isValidGGA(const string GGASentence){
 
     vector<std::string> elementVector = splitStringByComma(GGASentence);
-
+    if(!elementVector.size())return false;
     if (elementVector[0] != "$GPGGA")               return false;
     if (elementVector.size() != 15)                 return false;
     if (atoi(elementVector[6].c_str()) == 0)        return false;
@@ -68,7 +68,7 @@ void CGPSParser::setValuesGGA(string GGA){
 // Check if RMC sentence is valid with NMEA standard.
 bool CGPSParser::isValidRMC(const string RMCSentence){
     vector<std::string> elementVector = splitStringByComma(RMCSentence);
-
+    if(!elementVector.size())return false;
     if (elementVector[0] != "$GPRMC")               return false;
     if (elementVector.size() != 12)                 return false;
     if (elementVector[2] != "A")                    return false;

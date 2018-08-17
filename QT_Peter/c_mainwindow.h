@@ -461,6 +461,14 @@ private slots:
 
     void on_toolButton_dk_13_clicked();
 
+    void on_toolButton_dk_12_clicked();
+
+    void on_toolButton_dk_10_clicked();
+
+    void on_toolButton_dk_14_clicked();
+
+    void on_toolButton_dk_15_clicked();
+
 private:
 
 

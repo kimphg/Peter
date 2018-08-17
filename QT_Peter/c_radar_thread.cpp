@@ -611,7 +611,7 @@ void dataProcessingThread::run()
                         mRadarStat.ReadStatusMessage(&mReceiveBuff[4]);
                     }
                 }
-                else if(mReceiveBuff[0]=='!')
+                else if(mReceiveBuff[1]=='A'&&mReceiveBuff[0]=='!')
                 {
                     processARPAData(QByteArray((char*)mReceiveBuff,len));
                 }

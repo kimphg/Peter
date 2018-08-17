@@ -66,6 +66,7 @@ const struct AIS::AisTypeMsgPair AIS::AisMsgTypes[] = {
 { AIS_MSG_18_CS_POS_REPORT_CLASS_B,     18 },
 { AIS_MSG_19_CS_POS_REPORT_EXT_CLASS_B, 19 },
 { AIS_MSG_24_STATIC_DATA_REPORT,        24 },
+{ AIS_MSG_21_AID_TO_NAVIGATION,         21 },
 { AIS_MSG_MAX, 0 } // Must be last
 };
 
@@ -161,6 +162,12 @@ const struct AIS::AisParamPosPair AIS::AisMsgStaticDataRaport[] = {
 { AIS_PARAM_MAX, 0 } // Must be last
 };
 
+const struct AIS::AisParamPosPair AIS::AisAidsToNavReport[] = {
+{ AIS_PARAM_T_SHIPNAME,       42 }, // A
+{ AIS_PARAM_I32_LONG,         164 },
+{ AIS_PARAM_I32_LAT,          192 },
+{ AIS_PARAM_MAX, 0 } // Must be last
+};
 const struct AIS::AisParamPosPair* AIS::AisMsgParams[AIS_MSG_MAX] = {
     &AisMsgPosReportClassA[0],
     &AisMsgBaseStationReport[0],
@@ -168,6 +175,7 @@ const struct AIS::AisParamPosPair* AIS::AisMsgParams[AIS_MSG_MAX] = {
     &AisMsgCsPosReportClassB[0],
     &AisMsgCsPosReportExtClassB[0],
     &AisMsgStaticDataRaport[0]
+    &AisAidsToNavReport[0]
 };
 
 AIS::AIS()
