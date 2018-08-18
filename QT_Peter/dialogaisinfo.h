@@ -2,7 +2,7 @@
 #define DIALOGAISINFO_H
 
 #include <QDialog>
-#include "c_arpa_data.h"
+#include "AIS/AIS.h"
 namespace Ui {
 class DialogAisInfo;
 }

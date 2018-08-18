@@ -446,87 +446,58 @@ void dataProcessingThread::processARPAData(QByteArray inputdata)
     messageStringbuffer.append(QString::fromLatin1(inputdata));
     if(messageStringbuffer.size()>100)messageStringbuffer = "";
     //printf(inputdata.data());
-    QStringList strlist = messageStringbuffer.split("\r\n");
+    QStringList strlist = messageStringbuffer.split("!");
     if(strlist.size() <= 1)return;
 
     for(int i = 0;i<strlist.size()-1;i++)
         if(aisMessageHandler.ProcessNMEA(strlist.at(i)))
         {
-            AIS_object_t newAisObj ;
-            newAisObj.mMMSI = aisMessageHandler.get_mmsi();
-
-            if(aisMessageHandler.get_type()==AIS::AIS_MSG_24_STATIC_DATA_REPORT)
-            {
-                if(aisMessageHandler.get_partno()==0)
-                {
-                    newAisObj.mName = QString::fromLatin1(aisMessageHandler.get_shipname());
-                    newAisObj.mType = 0;
-                }
-                else
-                {
-                    newAisObj.mType = aisMessageHandler.get_shiptype();
-
-                }
-            }
-            else
-            {
-                newAisObj.mName = QString::fromLatin1(aisMessageHandler.get_shipname());
-                newAisObj.mType = aisMessageHandler.get_shiptype();
-            }
-            newAisObj.mDst = QString(aisMessageHandler.get_destination());
-            newAisObj.mImo = aisMessageHandler.get_imo();
-            newAisObj.mNavStat = aisMessageHandler.get_navStatus();
-            newAisObj.mBow = aisMessageHandler.get_to_bow();
-            newAisObj.mStern = aisMessageHandler.get_to_stern();
-            newAisObj.mStarboard = aisMessageHandler.get_to_starboard();
-            newAisObj.mPort = aisMessageHandler.get_to_port();
-            newAisObj.mSog = aisMessageHandler.get_SOG()/10.0;
-            newAisObj.mCog = aisMessageHandler.get_COG()/10.0;
-            newAisObj.mLat = aisMessageHandler.get_latitude()/600000.0;
-            newAisObj.mLong = aisMessageHandler.get_longitude()/600000.0;
-            newAisObj.mLut = QDateTime::currentMSecsSinceEpoch();
-            newAisObj.isNewest = true;
-            newAisObj.isSelected = false;
-            newAisObj.mName.replace('@',"");
+            AIS_object_t obj = aisMessageHandler.GetAisObject(); ;
             QMutableListIterator<AIS_object_t> i(m_aisList);
             int elecount = 0;
             while (i.hasNext())
             {
-                AIS_object_t obj = i.next();
+                AIS_object_t oobj = i.next();
                 elecount++;
                 if(elecount>3000){i.remove();continue;}
-                if(obj.mMMSI==newAisObj.mMMSI)
+                if(obj.mMMSI==oobj.mMMSI)
                 {
-                    obj.isNewest = false;
-                    newAisObj.isSelected = obj.isSelected;
-                    if(newAisObj.mName.isEmpty()&&(!obj.mName.isEmpty()))
-                        newAisObj.mName = obj.mName;
-                    if(newAisObj.mLat==0)newAisObj.mLat = obj.mLat;
-                    if(newAisObj.mLong==0)newAisObj.mLong = obj.mLong;
-                    if(newAisObj.mDst.isEmpty())
-                        newAisObj.mDst       = obj.mDst;
-                    if(!newAisObj.mImo)
-                        newAisObj.mImo       = obj.mImo;
-                    if(!newAisObj.mType)
-                        newAisObj.mType      = obj.mType;
-                    if(!newAisObj.mBow)
-                        newAisObj.mBow       = obj.mBow;
-                    if(!newAisObj.mStern)
-                        newAisObj.mStern     = obj.mStern;
-                    if(!newAisObj.mStarboard)
-                        newAisObj.mStarboard = obj.mStarboard;
-                    if(!newAisObj.mPort)
-                        newAisObj.mPort      = obj.mPort;
-                    if(!newAisObj.mSog)
-                        newAisObj.mSog       = obj.mSog;
-                    if(!newAisObj.mCog)
-                        newAisObj.mCog       = obj.mCog;
-                    i.setValue(obj);
+                    oobj.isNewest = false;
+                    obj.isSelected = oobj.isSelected;
+                    if(obj.mName.isEmpty()&&(!oobj.mName.isEmpty()))
+                        obj.mName = oobj.mName;
+                    if(obj.mLat==0)obj.mLat = oobj.mLat;
+                    if(obj.mLong==0)obj.mLong = oobj.mLong;
+                    if(obj.mDst.isEmpty())
+                        obj.mDst       = oobj.mDst;
+                    if(!obj.mImo)
+                        obj.mImo       = oobj.mImo;
+                    if(!obj.mType)
+                        obj.mType      = oobj.mType;
+                    if(!obj.mBow)
+                        obj.mBow       = oobj.mBow;
+                    if(!obj.mStern)
+                        obj.mStern     = oobj.mStern;
+                    if(!obj.mStarboard)
+                        obj.mStarboard = oobj.mStarboard;
+                    if(!obj.mPort)
+                        obj.mPort      = oobj.mPort;
+                    if(!obj.mSog)
+                        obj.mSog       = oobj.mSog;
+                    if(!obj.mCog)
+                        obj.mCog       = oobj.mCog;
+                    if(!obj.mCog)
+                    {
+                        double heading, speed;
+                        C_radar_data::kmxyToPolarDeg(obj.mLat-oobj.mLat,obj.mLong-oobj.mLong,&heading,&speed);
+                        obj.mCog       =    heading;
+                    }
+                    i.setValue(oobj);
                     break;
                 }
 
             }
-            m_aisList.push_front(newAisObj);
+            m_aisList.push_front(obj);
 
             //            mLONG = mLONG;
 

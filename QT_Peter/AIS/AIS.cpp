@@ -11,6 +11,75 @@
     (((x)>> 8) & 0x0000FF00UL) | \
     (((x)>>24) & 0x000000FFUL) )
 #define htons(x) ( ((x)<<8) | (((x)>>8)&0xFF) )
+AIS_object_t::AIS_object_t()
+{
+
+}
+
+QString AIS_object_t::printData()
+{
+    QString output;
+    if(mMMSI)output.append(QString::fromUtf8("MMSI:")+QString::number(mMMSI)+"\n");
+    if(mImo)output.append(QString::fromUtf8("IMO:")+QString::number(mImo)+"\n");
+    if(mName.size())output.append(QString::fromUtf8("Tên:")+mName+"\n");
+    if(mType)
+    {
+        output.append(QString::fromUtf8("Loại:"));
+        switch(mType/10)
+        {
+        case 2:
+            output.append(QString::fromUtf8("Thủy phi cơ"));
+            break;
+        case 3:
+            if(mType==30)output.append(QString::fromUtf8("Tàu cá"));
+            else if(mType==31||mType==32)output.append(QString::fromUtf8("Tàu kéo"));
+            else output.append(QString::fromUtf8("Thuyền"));
+            break;
+        case 4:
+            output.append(QString::fromUtf8("Tàu cao tốc"));
+            break;
+        case 5:
+            output.append(QString::fromUtf8("Tàu chuyên dụng"));
+            break;
+        case 6:
+            output.append(QString::fromUtf8("Tàu chở khách"));
+            break;
+        case 7:
+            output.append(QString::fromUtf8("Tàu hàng"));
+            break;
+        case 8:
+            output.append(QString::fromUtf8("Tàu chở dầu"));
+            break;
+        default:
+            output.append(QString::fromUtf8("Không xác định"));
+            break;
+        }
+
+        output.append("("+ QString::number(mType)+")");output.append("\n");
+    }
+    output.append(QString::fromUtf8("Kinh độ:")
+                  +QString::number(mLong)
+                  +"\n");
+    output.append(QString::fromUtf8("Vĩ độ:")
+                  +QString::number(mLat)
+                  +"\n");
+    output.append(QString::fromUtf8("Hướng di chuyển:")
+                  + QString::number(mCog)
+                  + "\n");
+    output.append(QString::fromUtf8("Tốc độ:")
+                  + QString::number(mSog)
+                  +"Kn\n");
+    output.append(QString::fromUtf8("Chiều dài:")
+                  + QString::number(mBow+mStern)
+                  + "m\n");
+    output.append(QString::fromUtf8("Chiều rộng:")
+                  + QString::number(mPort+mStarboard)
+                  +"m\n");
+    output.append(QString::fromUtf8("Điểm đến:")
+                  + mDst
+                  +"\n");
+    return output;
+}
 
 const uint16_t AIS::AisParamLength[] = {
     2,   // AIS_PARAM_U8_REPEAT
@@ -174,7 +243,7 @@ const struct AIS::AisParamPosPair* AIS::AisMsgParams[AIS_MSG_MAX] = {
     &AisMsgStaticAndVoyage[0],
     &AisMsgCsPosReportClassB[0],
     &AisMsgCsPosReportExtClassB[0],
-    &AisMsgStaticDataRaport[0]
+    &AisMsgStaticDataRaport[0],
     &AisAidsToNavReport[0]
 };
 
@@ -322,8 +391,51 @@ bool AIS::getdata(unsigned int begin, unsigned int cnt, uint8_t *data, bool isSi
     return true;
 }
 
+AIS_object_t AIS::GetAisObject()
+{
+    AIS_object_t obj;
+    obj.mMMSI = get_mmsi();
+
+    if(get_type()==AIS::AIS_MSG_24_STATIC_DATA_REPORT)
+    {
+        if(get_partno()==0)
+        {
+            obj.mName = QString::fromLatin1(get_shipname());
+            obj.mType = 0;
+        }
+        else
+        {
+            obj.mType = get_shiptype();
+
+        }
+    }
+    else
+    {
+        obj.mName = QString::fromLatin1(get_shipname());
+        obj.mType = get_shiptype();
+    }
+    obj.mDst = QString(get_destination());
+    obj.mImo = get_imo();
+    obj.mNavStat = get_navStatus();
+    obj.mBow = get_to_bow();
+    obj.mStern = get_to_stern();
+    obj.mStarboard = get_to_starboard();
+    obj.mPort = get_to_port();
+    obj.mSog = get_SOG()/10.0;
+    obj.mCog = get_COG()/10.0;
+    obj.mLat = get_latitude()/600000.0;
+    obj.mLong = get_longitude()/600000.0;
+    obj.mLut = QDateTime::currentMSecsSinceEpoch();
+    obj.isNewest = true;
+    obj.isSelected = false;
+    obj.mName.replace('@',"");
+
+    return  obj;
+}
+
 bool AIS::getParamStart(enum AIS::Nmea0183AisParams param, unsigned& start)
 {
+    if(msgType==AIS_MSG_MAX)return false;
     const struct AisParamPosPair* pparam = AisMsgParams[msgType];
 
     while (pparam->param != AIS_PARAM_MAX) {

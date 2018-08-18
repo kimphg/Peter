@@ -3,12 +3,30 @@
 #define _AIS_H_
 #include <QString>
 #include <inttypes.h>
+#include <QDateTime>
 /* Created by QtCreator
  * AIS references:
  * http://catb.org/gpsd/AIVDM.html#_types_1_2_and_3_position_report_class_a
  * http://catb.org/gpsd/AIVDM.html#_type_18_standard_class_b_cs_position_report'
  */
-
+class AIS_object_t {
+public:
+    AIS_object_t();
+    QString printData();
+    QString              mName,mDst;
+    int                  mMMSI;
+    int                  mImo;
+    int                  mNavStat;
+    int                  mType;
+    int                  mBow,mStern,mStarboard,mPort;
+    double               mLat;//in deg
+    double               mLong;//in deg
+    double               mCog;//course
+    double               mSog;//speed
+    qint64               mLut;//last update time
+    bool                isNewest;
+    bool                isSelected;
+};
 class AIS
 {
 public:
@@ -33,7 +51,7 @@ public:
 	// Fixed position parameters
     uint32_t get_mmsi() { return get_u32(8,30); }
     uint8_t get_repeat() { return get_u8(6,2); }
-
+    AIS_object_t GetAisObject();
     enum Nmea0183AisMessages get_type() { return msgType; }
     unsigned int get_numeric_type() { return msgNumeric; }
 
@@ -155,6 +173,7 @@ private:
 	static const struct AisParamPosPair AisMsgCsPosReportClassB[];
     static const struct AisParamPosPair AisMsgCsPosReportExtClassB[];
 	static const struct AisParamPosPair AisMsgStaticDataRaport[];
+    static const struct AisParamPosPair AisAidsToNavReport[];
 
 private:
 	void decode(unsigned int fillBits);

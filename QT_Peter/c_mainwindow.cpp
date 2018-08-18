@@ -325,9 +325,10 @@ void Mainwindow::keyPressEvent(QKeyEvent *event)
         {
             mMousex=this->mapFromGlobal(QCursor::pos()).x();
             mMousey=this->mapFromGlobal(QCursor::pos()).y();
-            double mlat = y2lat(-(mMousex - radCtX));
-            double mlon = x2lon(mMousey - radCtY);
-            SetGPS(mlat,mlon,0);
+
+            SetGPS(y2lat(-(mMousey - radCtY)),
+                   x2lon(mMousex - radCtX),
+                   0);
 
         }
         else if(key==Qt::Key_2)
