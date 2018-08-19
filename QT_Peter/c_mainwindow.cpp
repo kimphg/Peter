@@ -282,7 +282,26 @@ void Mainwindow::wheelEvent(QWheelEvent *event)
     //if(event->delta()<0)ui->horizontalSlider->setValue(ui->horizontalSlider->value()-1);
 }
 void Mainwindow::mouseMoveEvent(QMouseEvent *event) {
+
     if((mouse_mode&MouseDrag)&&(event->buttons() & Qt::LeftButton)) {
+        /*if(ui->tabWidget_iad->isDragging)
+        {
+            ui->tabWidget_iad->move(ui->tabWidget_iad->pos().x()+event->x()-mMouseLastX,
+                    ui->tabWidget_iad->pos().y()+event->y()-mMouseLastY
+                    );
+            mMouseLastX=event->x();
+            mMouseLastY=event->y();
+        }
+        else if(ui->tabWidget_menu->isDragging)
+        {
+            ui->tabWidget_menu->move(ui->tabWidget_iad->pos().x()+event->x()-mMouseLastX,
+                    ui->tabWidget_iad->pos().y()+event->y()-mMouseLastY
+                    );
+            mMouseLastX=event->x();
+            mMouseLastY=event->y();
+
+        }else*/
+        {
         short olddx = dx;
         short olddy = dy;
 
@@ -308,6 +327,7 @@ void Mainwindow::mouseMoveEvent(QMouseEvent *event) {
         isMapOutdated = true;
         radCtX = scrCtX-dx;
         radCtY = scrCtY-dy;
+        }
     }
 }
 bool controlPressed = false;

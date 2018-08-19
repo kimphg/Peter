@@ -455,51 +455,51 @@ void dataProcessingThread::processARPAData(QByteArray inputdata)
             AIS_object_t obj = aisMessageHandler.GetAisObject(); ;
             QMutableListIterator<AIS_object_t> i(m_aisList);
             int elecount = 0;
+            bool objExist = false;
             while (i.hasNext())
             {
-                AIS_object_t oobj = i.next();
+                AIS_object_t oldObj = i.next();
                 elecount++;
                 if(elecount>3000){i.remove();continue;}
-                if(obj.mMMSI==oobj.mMMSI)
+                if(obj.mMMSI==oldObj.mMMSI)
                 {
-                    oobj.isNewest = false;
-                    obj.isSelected = oobj.isSelected;
-                    if(obj.mName.isEmpty()&&(!oobj.mName.isEmpty()))
-                        obj.mName = oobj.mName;
-                    if(obj.mLat==0)obj.mLat = oobj.mLat;
-                    if(obj.mLong==0)obj.mLong = oobj.mLong;
+                    objExist = true;
+                    oldObj.isNewest = false;
+                    obj.isSelected = oldObj.isSelected;
+                    if(obj.mName.isEmpty()&&(!oldObj.mName.isEmpty()))
+                        obj.mName = oldObj.mName;
+                    if(obj.mLat==0)obj.mLat = oldObj.mLat;
+                    if(obj.mLong==0)obj.mLong = oldObj.mLong;
                     if(obj.mDst.isEmpty())
-                        obj.mDst       = oobj.mDst;
+                        obj.mDst       = oldObj.mDst;
                     if(!obj.mImo)
-                        obj.mImo       = oobj.mImo;
+                        obj.mImo       = oldObj.mImo;
                     if(!obj.mType)
-                        obj.mType      = oobj.mType;
+                        obj.mType      = oldObj.mType;
                     if(!obj.mBow)
-                        obj.mBow       = oobj.mBow;
+                        obj.mBow       = oldObj.mBow;
                     if(!obj.mStern)
-                        obj.mStern     = oobj.mStern;
+                        obj.mStern     = oldObj.mStern;
                     if(!obj.mStarboard)
-                        obj.mStarboard = oobj.mStarboard;
+                        obj.mStarboard = oldObj.mStarboard;
                     if(!obj.mPort)
-                        obj.mPort      = oobj.mPort;
+                        obj.mPort      = oldObj.mPort;
                     if(!obj.mSog)
-                        obj.mSog       = oobj.mSog;
+                        obj.mSog       = oldObj.mSog;
                     if(!obj.mCog)
-                        obj.mCog       = oobj.mCog;
+                        obj.mCog       = oldObj.mCog;
                     if(!obj.mCog)
                     {
                         double heading, speed;
-                        C_radar_data::kmxyToPolarDeg(obj.mLat-oobj.mLat,obj.mLong-oobj.mLong,&heading,&speed);
+                        C_radar_data::kmxyToPolarDeg(obj.mLat-oldObj.mLat,obj.mLong-oldObj.mLong,&heading,&speed);
                         obj.mCog       =    heading;
                     }
-                    i.setValue(oobj);
+                    i.setValue(obj);
                     break;
                 }
 
             }
-            m_aisList.push_front(obj);
-
-            //            mLONG = mLONG;
+            if(!objExist)m_aisList.push_front(obj);
 
         }
     messageStringbuffer=strlist.at(strlist.size()-1);

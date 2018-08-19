@@ -13,13 +13,19 @@ public:
     explicit QCustomTabWidget(QWidget *parent = 0);
     dataProcessingThread *processing;
     void SetTransparent(bool transp);
+    bool isDragging;
 protected:
+    void mousePressEvent(QMouseEvent *event);
+    void mouseReleaseEvent(QMouseEvent *event);
+    void mouseMoveEvent(QMouseEvent *event);
     void highLight();
     void hoverEnter(QHoverEvent *event);
     void hoverLeave(QHoverEvent *event);
     void hoverMove(QHoverEvent *event);
     bool event(QEvent *event);
     void paintEvent(QPaintEvent *);
+private:
+    short mMX,mMY;
 
 signals:
 

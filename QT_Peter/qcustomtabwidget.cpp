@@ -4,11 +4,13 @@
 
 QCustomTabWidget::QCustomTabWidget(QWidget *parent) : QTabWidget(parent)
 {
+    isDragging = false;
     setMouseTracking(true);
     //this->setStyleSheet("background-color: rgb(30, 50, 70);color:rgb(255, 255, 255);font: 12pt \"MS Shell Dlg 2\";");
     setAttribute(Qt::WA_Hover);
     this->setCursor(Qt::ArrowCursor);
     SetTransparent(false);
+    //this->setMovable(true);
 }
 
 void QCustomTabWidget::hoverEnter(QHoverEvent *)
@@ -62,12 +64,45 @@ void QCustomTabWidget::SetTransparent(bool transp)
 
 }
 
+void QCustomTabWidget::mousePressEvent(QMouseEvent *event)
+{
+
+     mMX= event->pos().x();
+     mMY= event->pos().y();
+     isDragging = true;
+}
+
+void QCustomTabWidget::mouseReleaseEvent(QMouseEvent *event)
+{
+    isDragging = false;
+}
+
+void QCustomTabWidget::mouseMoveEvent(QMouseEvent *event)
+{
+    //if(!isDragging)return;
+    if(event->buttons() & Qt::LeftButton)
+    {
+//        QRect rect = this->geometry();
+//        rect.setX(rect.x() + event->x()-mMX);
+//        rect.setY(rect.y() + event->y()-mMY);
+        short difx = event->pos().x()-mMX;
+        short dify = event->pos().y()-mMY;
+//        short nx = this->mapFromGlobal(event->pos()).x();
+//        short ny = this->mapFromGlobal(event->pos()).y();
+        this->move(this->pos().x()+difx,this->pos().y()+dify);
+        //mMX = nx;
+        //mMY = ny;
+    }
+}
+
 bool QCustomTabWidget::event(QEvent *event)
 {
-    switch(event->type())
+
+    /*switch(event->type())
     {
+
     default:
         break;
-    }
+    }*/
     return QWidget::event(event);
 }
