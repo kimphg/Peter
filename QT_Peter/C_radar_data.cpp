@@ -2347,10 +2347,9 @@ void C_radar_data::ProcesstRadarObjects()
             object_t *obj2 = &(mObjList.at(j));
             //find new line
             if(obj2->uniqID<0)continue;
-            int dtime = (obj2->timeMs - obj1->timeMs);//no line, just prev object list and next obj list,estimated posistion, dopler histogram peak points
+            int dtime = (obj2->timeMs - obj1->timeMs);
             if(dtime<1000)
                 continue;//ENVAR min time between plots in a line(1s)
-            //if(dtime>TARGET_OBSERV_TIME/2)continue;//ENVAR mav time between plots in a line(30s)
 
             bool line_exist = false;
             foreach (object_line line, mLineList) {
@@ -2372,12 +2371,12 @@ void C_radar_data::ProcesstRadarObjects()
             }
             else if(speedkmh>2000)continue;
             object_line newline;
-            newline.score = newline.speedkmh;
+            newline.score = -1;
             newline.distancekm = distancekm;
             newline.speedkmh = speedkmh;
             newline.bearingRad = ConvXYToAziRad(dx,dy);
-            printf("\nspeed:%f,distance:%f",speedkmh,distancekm);
-            newline.dtimeSec = dtime/1000.0;
+            //printf("\nspeed:%f,distance:%f",speedkmh,distancekm);
+            newline.dtimeMSec = dtime;
             newline.obj1 = *obj1;
             newline.obj2 = *obj2;
             if(mLineList.size()<500)
@@ -2394,17 +2393,14 @@ void C_radar_data::ProcesstRadarObjects()
                         pOldestLine = &mLineList.at(k);
                     }
                 }
-                printf("\noldesttime:%ld",(now_ms-oldestTime)/1000);
+                //printf("\noldesttime:%ld",(now_ms-oldestTime)/1000);
                 *pOldestLine  = newline;
             }
 
         }
     }
-//    while(mLineList.size()>100)
-//    {
-//        mLineList.pop_front();
-//    }
-    /*for (int i=0;i<mLineList.size();i++)
+
+    for (int i=0;i<mLineList.size();i++)
     {
         object_line* pLine1 = &mLineList.at(i);
         for (int j=0;j<mLineList.size();j++)
@@ -2413,22 +2409,49 @@ void C_radar_data::ProcesstRadarObjects()
             object_line* pLine2 = &mLineList.at(j);
             if(pLine1->obj2.uniqID==pLine2->obj1.uniqID)// new track
             {
-                double distance = pLine2->distancekm+pLine1->distancekm;
-                double accHead = (pLine2->speedkmh-pLine1->speedkmh)/(pLine2->dtimeSec/3600.0);
-                if(abs(accHead)>300)continue;
-                double rot = (pLine2->bearingRad-pLine1->bearingRad)/(pLine2->dtimeSec);
-                if(abs(rot)>PI_CHIA2/9.0)continue;
-                //printf("accHead:%f",accHead);
-                track_t newtrack;
-                newtrack.xkm = pLine2->obj2.xkm;
-                newtrack.ykm = pLine2->obj2.ykm;
-                newtrack.xkmo = pLine1->obj1.xkm;
-                newtrack.ykmo = pLine1->obj1.ykm;
-                mTrackList.push_back(newtrack);
+                uint k=0;
+                for(;k<mTrackList.size();k++)
+                {
+                    if(pLine1->obj2.uniqID==mTrackList.at(k).uniqID)break;
+                }
+                if(k<mTrackList.size())continue; //track already exist
+                float distance = pLine2->distancekm+pLine1->distancekm;
+                float accHead = (pLine2->speedkmh-pLine1->speedkmh)/(pLine2->dtimeMSec/3600000.0);
+                if(abs(accHead)>200)
+                    continue;
+                float rot = (pLine2->bearingRad-pLine1->bearingRad)/(pLine2->dtimeMSec);
+                if(abs(rot)>PI_CHIA2/9000.0)
+                    continue;
+                printf("\ndistance:%f",distance);
+                printf(" accHead:%f",accHead);
+                printf(" rot:%f",rot);
+                double score = powf(CONST_E, -distance*distance/0.25)
+                        +powf(CONST_E, -accHead*accHead/100.0)
+                        +powf(CONST_E, -rot*rot/PI_CHIA2/27000.0);
+                if((score>pLine1->score)||(score>pLine2->score))
+                {
+                    track_t newtrack;
+                    newtrack.uniqID = pLine1->obj2.uniqID;
+                    newtrack.xkm = pLine2->obj2.xkm;
+                    newtrack.ykm = pLine2->obj2.ykm;
+                    newtrack.xkmo = pLine1->obj1.xkm;
+                    newtrack.ykmo = pLine1->obj1.ykm;
+                    mTrackList.push_back(newtrack);
+                    printf("\nmTrackList.size:%d",mTrackList.size());
+                }
+                if(score>pLine1->score)use score for points, not line
+                {
+                    pLine1->score = score;
+                }
+                if(score>pLine2->score)
+                {
+                    pLine2->score = score;
+                }
+
 
             }
         }
-    }*/
+    }
 
     return ;
 }

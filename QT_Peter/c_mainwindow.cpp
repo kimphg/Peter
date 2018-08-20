@@ -792,7 +792,6 @@ void Mainwindow::initGraphicView()
 
 void Mainwindow::DrawRadarTargetByPainter(QPainter* p)//draw radar target from pRadar->mTrackList
 {
-    return;
     QPen penTarget(Qt::magenta);
     penTarget.setWidth(1);
 
@@ -821,10 +820,11 @@ void Mainwindow::DrawRadarTargetByPainter(QPainter* p)//draw radar target from p
         }
 
     }
-    p->setPen(penTarget);
-    if(false)//raw lines
+
+    if(true)//raw lines
     {
         foreach (object_line line, pRadar->mLineList) {
+            if(line.score<0)continue;
             sx = line.obj1.xkm*mScale + radCtX;
             sy = -line.obj1.ykm*mScale + radCtY;
             sx1 = line.obj2.xkm*mScale + radCtX;
@@ -835,6 +835,7 @@ void Mainwindow::DrawRadarTargetByPainter(QPainter* p)//draw radar target from p
         }
 
     }
+    p->setPen(penTarget);
     if(true)//raw tracks
     {
         foreach (track_t track, pRadar->mTrackList) {

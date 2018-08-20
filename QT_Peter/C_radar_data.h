@@ -116,8 +116,8 @@ typedef struct  {
 }object_t;
 struct object_line
 {
-    float       score;
-    float       dtimeSec;
+    double       score;
+    float       dtimeMSec;
     object_t    obj1;
     object_t    obj2;
     float distancekm;
@@ -178,6 +178,7 @@ struct track_t
     float accHead,accSide;
     float bearingRad;
     float xkm,ykm;
+    int uniqID;
     float xkmo,ykmo;
 };
 typedef std::vector<track_t> trackList;

@@ -40,7 +40,7 @@ void socketInit()
 	memset((char *)&si_capin, 0, sizeof(si_capin));
 	si_capin.sin_family = AF_INET;
 	si_capin.sin_port = htons(12345);//port "127.0.0.1"
-	si_capin.sin_addr.S_un.S_addr = inet_addr("192.168.16.109");
+	si_capin.sin_addr.S_un.S_addr = inet_addr("127.0.0.1");
 	int ret = bind(mSocket, (struct sockaddr *)&si_capin, sizeof(struct sockaddr));
 	if (ret == -1)
 	{
@@ -50,8 +50,8 @@ void socketInit()
 	//setup address structure
 	memset((char *)&si_peter, 0, sizeof(si_peter));
 	si_peter.sin_family = AF_INET;
-	si_peter.sin_port = htons(5000);//port "127.0.0.1"
-	si_peter.sin_addr.S_un.S_addr = inet_addr("27.72.56.161");
+	si_peter.sin_port = htons(31000);//port "127.0.0.1"
+	si_peter.sin_addr.S_un.S_addr = inet_addr("127.0.0.1");
 
 }
 void socketDelete()
@@ -252,8 +252,8 @@ int _tmain(int argc, _TCHAR* argv[])
 		outputFrame[azi][4] = n_clk_adc;
 		outputFrame[azi][0] = 1;
 		sendto(mSocket, (char*)(&outputFrame[azi][0]), OUTPUT_FRAME_SIZE, 0, (struct sockaddr *) &si_peter, sizeof(si_peter));
-		outputFrame[azi][0] = 2;
-		sendto(mSocket, (char*)(&outputFrame[azi][0]), OUTPUT_FRAME_SIZE, 0, (struct sockaddr *) &si_peter, sizeof(si_peter));
+		//outputFrame[azi][0] = 2;
+		//sendto(mSocket, (char*)(&outputFrame[azi][0]), OUTPUT_FRAME_SIZE, 0, (struct sockaddr *) &si_peter, sizeof(si_peter));
 		regenerate(azi);
 	}
 	socketDelete();

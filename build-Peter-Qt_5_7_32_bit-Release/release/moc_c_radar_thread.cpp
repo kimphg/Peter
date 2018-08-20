@@ -19,8 +19,8 @@
 
 QT_BEGIN_MOC_NAMESPACE
 struct qt_meta_stringdata_dataProcessingThread_t {
-    QByteArrayData data[15];
-    char stringdata0[204];
+    QByteArrayData data[13];
+    char stringdata0[185];
 };
 #define QT_MOC_LITERAL(idx, ofs, len) \
     Q_STATIC_BYTE_ARRAY_DATA_HEADER_INITIALIZER_WITH_OFFSET(len, \
@@ -40,18 +40,15 @@ QT_MOC_LITERAL(7, 99, 15), // "processARPAData"
 QT_MOC_LITERAL(8, 115, 9), // "inputdata"
 QT_MOC_LITERAL(9, 125, 17), // "playbackRadarData"
 QT_MOC_LITERAL(10, 143, 14), // "SerialDataRead"
-QT_MOC_LITERAL(11, 158, 9), // "gpsupdate"
-QT_MOC_LITERAL(12, 168, 16), // "QGeoPositionInfo"
-QT_MOC_LITERAL(13, 185, 3), // "geo"
-QT_MOC_LITERAL(14, 189, 14) // "StopProcessing"
+QT_MOC_LITERAL(11, 158, 11), // "ReadNavData"
+QT_MOC_LITERAL(12, 170, 14) // "StopProcessing"
 
     },
     "dataProcessingThread\0HeadingDataReceived\0"
     "\0heading\0ReadDataBuffer\0PushCommandQueue\0"
     "processRadarData\0processARPAData\0"
     "inputdata\0playbackRadarData\0SerialDataRead\0"
-    "gpsupdate\0QGeoPositionInfo\0geo\0"
-    "StopProcessing"
+    "ReadNavData\0StopProcessing"
 };
 #undef QT_MOC_LITERAL
 
@@ -78,8 +75,8 @@ static const uint qt_meta_data_dataProcessingThread[] = {
        7,    1,   65,    2, 0x08 /* Private */,
        9,    0,   68,    2, 0x08 /* Private */,
       10,    0,   69,    2, 0x08 /* Private */,
-      11,    1,   70,    2, 0x08 /* Private */,
-      14,    0,   73,    2, 0x0a /* Public */,
+      11,    0,   70,    2, 0x08 /* Private */,
+      12,    0,   71,    2, 0x0a /* Public */,
 
  // signals: parameters
     QMetaType::Void, QMetaType::Double,    3,
@@ -91,7 +88,7 @@ static const uint qt_meta_data_dataProcessingThread[] = {
     QMetaType::Void, QMetaType::QByteArray,    8,
     QMetaType::Void,
     QMetaType::Void,
-    QMetaType::Void, 0x80000000 | 12,   13,
+    QMetaType::Void,
     QMetaType::Void,
 
        0        // eod
@@ -110,7 +107,7 @@ void dataProcessingThread::qt_static_metacall(QObject *_o, QMetaObject::Call _c,
         case 4: _t->processARPAData((*reinterpret_cast< QByteArray(*)>(_a[1]))); break;
         case 5: _t->playbackRadarData(); break;
         case 6: _t->SerialDataRead(); break;
-        case 7: _t->gpsupdate((*reinterpret_cast< QGeoPositionInfo(*)>(_a[1]))); break;
+        case 7: _t->ReadNavData(); break;
         case 8: _t->StopProcessing(); break;
         default: ;
         }
