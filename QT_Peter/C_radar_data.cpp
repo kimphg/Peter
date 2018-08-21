@@ -1111,6 +1111,12 @@ void C_radar_data::ProcessEach90Deg()
 
 
 }
+int gray_decode(int n) {
+    printf("\n%x",n);
+    int p = n;
+    while (n >>= 1) p ^= n;
+    return p;
+}
 void C_radar_data::processSocketData(unsigned char* data,short len)
 {
 
@@ -1155,19 +1161,30 @@ void C_radar_data::processSocketData(unsigned char* data,short len)
     }
     else
     {
-        /*unsigned short gray  = ((data[2]<<8)|data[3])/2;
-        unsigned short result = gray & 64;
-        result |= (gray ^ (result >> 1)) & 32;
-        result |= (gray ^ (result >> 1)) & 16;
-        result |= (gray ^ (result >> 1)) & 8;
-        result |= (gray ^ (result >> 1)) & 4;
-        result |= (gray ^ (result >> 1)) & 2;
-        result |= (gray ^ (result >> 1)) & 1;
-        newAzi = result;*/
-        newAzi = ((data[2]<<8)|data[3]);
+        //unsigned short gray1  = ((data[2]<<8)|data[3]);
+        /*
+        unsigned char gray1 = data[3]&0x0f;
+        unsigned char gray2 = data[3]>>4;
+        unsigned char gray3 = data[2]&0x0f;
+        unsigned char gray4 = data[2]>>4;
+        gray1^=(gray1>>1);
+        gray1^=(gray1>>2);
+        gray2^=(gray2>>1);
+        gray2^=(gray2>>2);
+        gray3^=(gray3>>1);
+        gray3^=(gray3>>2);
+        gray4^=(gray4>>1);
+        gray4^=(gray4>>2);
+
+        newAzi = gray1+(gray2<<4)+(gray3<<8)+(gray4<<12);
+        //newAzi = newAzi>>4;
+        //newAzi = ((data[2]<<8)|data[3]);
+        newAzi = newAzi>>1;*/
+        newAzi = gray_decode((data[2]<<8)|data[3]);
+        newAzi = newAzi>>1;
         if(newAzi>=MAX_AZIR)
         {
-            printf("\nWrong Azi");
+            printf("\nWrong Azi:%d",newAzi);
             return;
         }
     }
@@ -2439,7 +2456,7 @@ void C_radar_data::ProcesstRadarObjects()
                     mTrackList.push_back(newtrack);
                     printf("\nmTrackList.size:%d",mTrackList.size());
                 }
-                if(score>pLine1->score)use score for points, not line
+                if(score>pLine1->score)//todo: use score for points, not line
                 {
                     pLine1->score = score;
                 }
