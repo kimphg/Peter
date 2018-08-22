@@ -182,15 +182,15 @@ public:
 	}
 	~target_t();
 };
-#define NUM_OF_TARG 4
+#define NUM_OF_TARG 1
 target_t* target[NUM_OF_TARG];
 
 void initTargets()
 {
-	target[0] = new target_t(250, -300, 4, 100,4);
-	target[1] = new target_t(50, 50, 4, 180,6);
-	target[2] = new target_t(200, -300, 4, 110,8);
-	target[3] = new target_t(200, -350, 4, 80,5);
+	//target[0] = new target_t(250, -300, 4, 100,4);
+	target[0] = new target_t(50, 50, 4, 180,6);
+	//target[2] = new target_t(200, -300, 4, 110,8);
+	//target[3] = new target_t(200, -350, 4, 80,5);
 }
 void updateTargets()
 {

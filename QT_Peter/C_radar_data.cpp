@@ -1111,8 +1111,15 @@ void C_radar_data::ProcessEach90Deg()
 
 
 }
-int gray_decode(int n) {
-    printf("\n%x",n);
+int gray_decode(ushort n) {
+    //printf("\nn:%d ",n);
+
+
+
+    /*printf("%d ",(n>>12)&0x0f);
+    printf("%d ",(n>>8)&0x0f);
+    printf("%d ",(n>>4)&0x0f);
+    printf("\n%d ",n&0x0f);*/
     int p = n;
     while (n >>= 1) p ^= n;
     return p;
@@ -1180,11 +1187,12 @@ void C_radar_data::processSocketData(unsigned char* data,short len)
         //newAzi = newAzi>>4;
         //newAzi = ((data[2]<<8)|data[3]);
         newAzi = newAzi>>1;*/
-        newAzi = gray_decode((data[2]<<8)|data[3]);
-        newAzi = newAzi>>1;
+        /*newAzi = gray_decode((data[2]<<8)|data[3]);
+        newAzi = newAzi>>5;*/
+        newAzi=((data[2]<<8)|data[3]);
         if(newAzi>=MAX_AZIR)
         {
-            printf("\nWrong Azi:%d",newAzi);
+            //printf("\nWrong Azi:%d",newAzi);
             return;
         }
     }
@@ -2357,7 +2365,7 @@ void C_radar_data::ProcesstRadarObjects()
     {
         if(mObjList.at(i).uniqID<0)continue;
         object_t *obj1 = &(mObjList.at(i));
-        for (int j=0;j<mObjList.size();j++)
+        for (ushort j=0;j<mObjList.size();j++)
         {
             if(i==j)continue;
 
@@ -2368,12 +2376,14 @@ void C_radar_data::ProcesstRadarObjects()
             if(dtime<1000)
                 continue;//ENVAR min time between plots in a line(1s)
 
-            bool line_exist = false;
-            foreach (object_line line, mLineList) {
-                if(((obj1->uniqID==line.obj1.uniqID)&&(obj2->uniqID==line.obj2.uniqID)))
-                    line_exist = true;
+            short lineIndex = 0;
+            for(;lineIndex< mLineList.size();lineIndex++) {
+                if(((obj1->uniqID==mLineList.at(lineIndex).obj1.uniqID)
+                    &&(obj2->uniqID==mLineList.at(lineIndex).obj2.uniqID)))
+                    break;
+
             }
-            if(line_exist)continue;
+            if(lineIndex<mLineList.size())continue;
             float dx = obj2->xkm - obj1->xkm;
             float dy = obj2->ykm - obj1->ykm;
             float distancekm = sqrt(dx*dx+dy*dy);
@@ -2385,6 +2395,10 @@ void C_radar_data::ProcesstRadarObjects()
                         (distancekm>(maxDistance))
                         )
                     continue;
+//                else
+//                {
+//                    printf("\ndistance=%f,max distance=%f",distancekm,maxDistance);
+//                }
             }
             else if(speedkmh>2000)continue;
             object_line newline;
@@ -2392,7 +2406,7 @@ void C_radar_data::ProcesstRadarObjects()
             newline.distancekm = distancekm;
             newline.speedkmh = speedkmh;
             newline.bearingRad = ConvXYToAziRad(dx,dy);
-            //printf("\nspeed:%f,distance:%f",speedkmh,distancekm);
+//            printf("\nspeed:%f,distance:%f",speedkmh,distancekm);
             newline.dtimeMSec = dtime;
             newline.obj1 = *obj1;
             newline.obj2 = *obj2;
@@ -2434,14 +2448,20 @@ void C_radar_data::ProcesstRadarObjects()
                 if(k<mTrackList.size())continue; //track already exist
                 float distance = pLine2->distancekm+pLine1->distancekm;
                 float accHead = (pLine2->speedkmh-pLine1->speedkmh)/(pLine2->dtimeMSec/3600000.0);
-                if(abs(accHead)>200)
-                    continue;
-                float rot = (pLine2->bearingRad-pLine1->bearingRad)/(pLine2->dtimeMSec);
-                if(abs(rot)>PI_CHIA2/9000.0)
-                    continue;
-                printf("\ndistance:%f",distance);
+                float bearingDiff = abs(pLine2->bearingRad-pLine1->bearingRad);
+                float rot = (bearingDiff)/(pLine2->dtimeMSec);
+
+                //if(abs(accHead)>2000){
+                    //printf("rejected for accHead = %f",accHead);
+                 //   continue;}
+                //if(abs(rot)>PI_CHIA2/9000.0){
+                    //printf("rejected for rot = %f",rot);
+                   // continue;}
+                printf("\n");
+                printf(" distance:%f",distance);
                 printf(" accHead:%f",accHead);
                 printf(" rot:%f",rot);
+                printf(" bearingDiff:%f",bearingDiff);
                 double score = powf(CONST_E, -distance*distance/0.25)
                         +powf(CONST_E, -accHead*accHead/100.0)
                         +powf(CONST_E, -rot*rot/PI_CHIA2/27000.0);
@@ -2454,7 +2474,7 @@ void C_radar_data::ProcesstRadarObjects()
                     newtrack.xkmo = pLine1->obj1.xkm;
                     newtrack.ykmo = pLine1->obj1.ykm;
                     mTrackList.push_back(newtrack);
-                    printf("\nmTrackList.size:%d",mTrackList.size());
+                    //printf("\nmTrackList.size:%d",mTrackList.size());
                 }
                 if(score>pLine1->score)//todo: use score for points, not line
                 {
