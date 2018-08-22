@@ -2450,6 +2450,7 @@ void C_radar_data::ProcesstRadarObjects()
                 float accHead = (pLine2->speedkmh-pLine1->speedkmh)/(pLine2->dtimeMSec/3600000.0);
                 float bearingDiff = abs(pLine2->bearingRad-pLine1->bearingRad);
                 float rot = (bearingDiff)/(pLine2->dtimeMSec);
+                luyen decision tree bang du lieu mo phong voi gia tri dopler chinh la ID muc tieu
 
                 //if(abs(accHead)>2000){
                     //printf("rejected for accHead = %f",accHead);
