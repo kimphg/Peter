@@ -2443,14 +2443,16 @@ void C_radar_data::ProcesstRadarObjects()
                 uint k=0;
                 for(;k<mTrackList.size();k++)
                 {
-                    if(pLine1->obj2.uniqID==mTrackList.at(k).uniqID)break;
+                    if(pLine1->obj1.uniqID==mTrackList.at(k).objectList.at(0).uniqID
+                            &&pLine1->obj2.uniqID==mTrackList.at(k).objectList.at(1).uniqID
+                            &&pLine2->obj2.uniqID==mTrackList.at(k).objectList.at(2).uniqID)break;
                 }
                 if(k<mTrackList.size())continue; //track already exist
                 float distance = pLine2->distancekm+pLine1->distancekm;
                 float accHead = (pLine2->speedkmh-pLine1->speedkmh)/(pLine2->dtimeMSec/3600000.0);
                 float bearingDiff = abs(pLine2->bearingRad-pLine1->bearingRad);
                 float rot = (bearingDiff)/(pLine2->dtimeMSec);
-                luyen decision tree bang du lieu mo phong voi gia tri dopler chinh la ID muc tieu
+                //luyen decision tree bang du lieu mo phong voi gia tri dopler chinh la ID muc tieu
 
                 //if(abs(accHead)>2000){
                     //printf("rejected for accHead = %f",accHead);
@@ -2466,10 +2468,12 @@ void C_radar_data::ProcesstRadarObjects()
                 double score = powf(CONST_E, -distance*distance/0.25)
                         +powf(CONST_E, -accHead*accHead/100.0)
                         +powf(CONST_E, -rot*rot/PI_CHIA2/27000.0);
-                if((score>pLine1->score)||(score>pLine2->score))
+                if(true)//(score>pLine1->score)||(score>pLine2->score))
                 {
                     track_t newtrack;
-                    newtrack.uniqID = pLine1->obj2.uniqID;
+                    newtrack.objectList.push_back(pLine1->obj1);
+                    newtrack.objectList.push_back(pLine1->obj2);
+                    newtrack.objectList.push_back(pLine2->obj2);
                     newtrack.xkm = pLine2->obj2.xkm;
                     newtrack.ykm = pLine2->obj2.ykm;
                     newtrack.xkmo = pLine1->obj1.xkm;

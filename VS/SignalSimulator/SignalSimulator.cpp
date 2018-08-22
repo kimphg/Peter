@@ -175,7 +175,7 @@ public:
 	}
 	void update()
 	{
-		eraseSIgnal();
+		eraseSIgnal(); bearing += 0.5;
 		x += speed*sin(bearing);
 		y += speed*cos(bearing);
 		generateSignal();

@@ -178,7 +178,6 @@ struct track_t
     float accHead,accSide;
     float bearingRad;
     float xkm,ykm;
-    int uniqID;
     float xkmo,ykmo;
 };
 typedef std::vector<track_t> trackList;
