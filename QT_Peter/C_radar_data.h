@@ -113,6 +113,7 @@ typedef struct  {
     float           rangeRes;
     float           aziRes;
     qint64          timeMs;
+    unsigned long long int period;
 }object_t;
 struct object_line
 {
@@ -202,6 +203,7 @@ public:
     std::vector<plot_t>     plot_list;
     std::vector<object_t>     mObjList;
     std::vector<object_line>  mLineList;
+    unsigned long long int  mPeriodCount;
 //    bool                    isEncoderAzi;
 //    int                     mEncoderAzi;
     unsigned char           spectre[16];

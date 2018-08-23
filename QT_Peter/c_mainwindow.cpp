@@ -794,7 +794,6 @@ void Mainwindow::DrawRadarTargetByPainter(QPainter* p)//draw radar target from p
 {
     QPen penTarget(Qt::magenta);
     penTarget.setWidth(1);
-
     QPen penSelTarget(Qt::magenta);
     penSelTarget.setWidth(2);
     penSelTarget.setStyle(Qt::DashLine);
@@ -813,6 +812,7 @@ void Mainwindow::DrawRadarTargetByPainter(QPainter* p)//draw radar target from p
     if(false)//raw objects
     {
         foreach (object_t obj, *pObjList) {
+            if(obj.uniqID<0)continue;
             sx = obj.xkm*mScale + radCtX;
             sy = -obj.ykm*mScale + radCtY;
             p->drawPoint(sx,sy);
@@ -836,7 +836,7 @@ void Mainwindow::DrawRadarTargetByPainter(QPainter* p)//draw radar target from p
 
     }
     p->setPen(penTarget);
-    if(true)//raw tracks
+    if(false)//raw tracks
     {
         foreach (track_t track, pRadar->mTrackList) {
             sx = track.xkm*mScale + radCtX;
@@ -1363,8 +1363,9 @@ void Mainwindow::InitSetting()
     ui->tabWidget_iad->SetTransparent(true);
     QApplication::setOverrideCursor(Qt::CrossCursor);
     QString systemCommand = CConfig::getString("systemCommand","D:\\HR2D\\cudaCv.exe");
-    systemCommand= "start "+systemCommand;
-    system((char*)systemCommand.toStdString().data());
+    if(systemCommand.size()){
+        systemCommand= "start "+systemCommand;
+    system((char*)systemCommand.toStdString().data());}
     mMaxTapMayThu = CConfig::getInt("mMaxTapMayThu");
     mRangeLevel = CConfig::getInt("mRangeLevel");
     assert(mRangeLevel>=0&&mRangeLevel<8);

@@ -15,6 +15,8 @@
 #define RADAR_DATA_SPECTRE      22
 #define RADAR_DATA_MAX_SIZE     2688
 #define RADAR_
+FILE *logfile;
+
 short waitForData = 0;
 short headerLen = RADAR_DATA_HEADER_MAX;
 unsigned char curFrameId;
@@ -366,6 +368,8 @@ void track_t::setManual(bool isMan)
 
 C_radar_data::C_radar_data()
 {
+    mPeriodCount = 0;
+    logfile = fopen("logfile.txt", "wt");
     isMarineMode = true;
     range_max = RADAR_RESOLUTION;
     imgMode = VALUE_ORANGE_BLUE;
@@ -408,7 +412,7 @@ C_radar_data::C_radar_data()
     noiseAverage = 30;
     noiseVar = 8;
     krain_auto = 0.4;
-    kgain_auto  = 2.1;
+    kgain_auto  = 2.8;
     ksea_auto = 0;
     kgain = 1;
     krain  = ksea = 0;
@@ -434,6 +438,7 @@ C_radar_data::C_radar_data()
 C_radar_data::~C_radar_data()
 {
     delete img_ppi;
+    fclose(logfile);
     //if(pFile)fclose(pFile);
     //    if(pScr_map)
     //    {
@@ -798,7 +803,7 @@ void C_radar_data::SetHeaderLen( short len)
 //    doubleFilter = value;
 //}
 void C_radar_data::decodeData(int azi)
-{
+{/*
     //read spectre
     memcpy((char*)&spectre,(char*)&dataBuff[RADAR_DATA_HEADER_MAX],16);
     img_spectre->fill(0);
@@ -872,7 +877,7 @@ void C_radar_data::decodeData(int azi)
         {
             data_mem.dopler[azi][r_pos] = data_mem.dopler[azi][r_pos]>>4;
         }
-    }
+    }*/
 }
 short threshRay[RADAR_RESOLUTION];
 void C_radar_data::ProcessData(unsigned short azi)
@@ -1382,6 +1387,7 @@ void C_radar_data::UpdateData()
             continue;
         }
         ProcessData(azi);
+        mPeriodCount++;
         drawAzi(azi);
         if(!((unsigned char)(azi<<4)))//xu ly moi 16 chu ky
         {
@@ -1517,6 +1523,7 @@ void C_radar_data::procPLot(plot_t* mPlot)
     newobject.isManual = false;
     newobject.uniqID = rand();
     newobject.dazi = mPlot->lastA-mPlot->riseA;
+    newobject.period = mPeriodCount;
     float ctA;
     if(abs(newobject.dazi)>(MAX_AZIR/2))//quay qua diem 0
     {
@@ -1549,7 +1556,7 @@ void C_radar_data::procPLot(plot_t* mPlot)
     newobject.timeMs = now_ms;
     newobject.xkm = newobject.rgKm*sin( newobject.az);
     newobject.ykm = newobject.rgKm*cos( newobject.az);
-    if(mObjList.size()<1000)
+    if(mObjList.size()<2000)//ENVDEP max number of objects
     {
         mObjList.push_back(newobject);
 //        printf("\nctA:%f",ctA);
@@ -1558,9 +1565,16 @@ void C_radar_data::procPLot(plot_t* mPlot)
     }
     else
     {
-        foreach (object_t obj, mObjList) {
-            if(obj.uniqID<0)obj = newobject;
+        bool full = true;
+        for(int i=0;i<mObjList.size(); i++) {
+            if(mObjList.at(i).uniqID<0)
+            {
+                mObjList.at(i) = newobject;
+                full = false;
+                break;
+            }
         }
+        if(full)printf("\nmObjList is full");
     }
     /*
     if(!procObjectManual(&newobject))//check existing confirmed tracks
@@ -2351,12 +2365,12 @@ void C_radar_data::resetTrack()
     //        }
     //    }
 }
-#define TARGET_OBSERV_TIME 60000//ENVAR max time to save object in the memory
+#define TARGET_OBSERV_PERIOD 8000//ENVAR max periods to save object in the memory
 void C_radar_data::ProcesstRadarObjects()
 {
     for (int i=0;i<mObjList.size();i++)
     {
-        if(now_ms - mObjList.at(i).timeMs>TARGET_OBSERV_TIME)
+        if(mPeriodCount - mObjList.at(i).period>TARGET_OBSERV_PERIOD)
         {
             mObjList.at(i).uniqID = -1;
         }
@@ -2410,7 +2424,7 @@ void C_radar_data::ProcesstRadarObjects()
             newline.dtimeMSec = dtime;
             newline.obj1 = *obj1;
             newline.obj2 = *obj2;
-            if(mLineList.size()<500)
+            if(mLineList.size()<2000)
                 mLineList.push_back(newline);
             else
             {
@@ -2424,7 +2438,7 @@ void C_radar_data::ProcesstRadarObjects()
                         pOldestLine = &mLineList.at(k);
                     }
                 }
-                //printf("\noldesttime:%ld",(now_ms-oldestTime)/1000);
+                printf("\noldesttime:%ld",(now_ms-oldestTime)/1000);
                 *pOldestLine  = newline;
             }
 
@@ -2449,9 +2463,14 @@ void C_radar_data::ProcesstRadarObjects()
                 }
                 if(k<mTrackList.size())continue; //track already exist
                 float distance = pLine2->distancekm+pLine1->distancekm;
-                float accHead = (pLine2->speedkmh-pLine1->speedkmh)/(pLine2->dtimeMSec/3600000.0);
+                float speedDif = abs(pLine2->speedkmh-pLine1->speedkmh);
+                float accHead = speedDif/(pLine2->dtimeMSec/3600000.0);
                 float bearingDiff = abs(pLine2->bearingRad-pLine1->bearingRad);
-                float rot = (bearingDiff)/(pLine2->dtimeMSec);
+                float rotDegSec = (bearingDiff*DEG_RAD*1000.0)/(pLine2->dtimeMSec);
+                float rangeSpeed = (pLine2->obj2.rgKm - pLine1->obj1.rgKm)
+                        /(pLine2->dtimeMSec+pLine1->dtimeMSec);
+                float rangeAccel = abs((pLine2->obj2.rgKm-pLine2->obj1.rgKm)/pLine2->dtimeMSec
+                        - (pLine1->obj2.rgKm-pLine1->obj1.rgKm)/pLine1->dtimeMSec);
                 //luyen decision tree bang du lieu mo phong voi gia tri dopler chinh la ID muc tieu
 
                 //if(abs(accHead)>2000){
@@ -2460,15 +2479,32 @@ void C_radar_data::ProcesstRadarObjects()
                 //if(abs(rot)>PI_CHIA2/9000.0){
                     //printf("rejected for rot = %f",rot);
                    // continue;}
-                printf("\n");
+                /*printf("\n");
                 printf(" distance:%f",distance);
                 printf(" accHead:%f",accHead);
                 printf(" rot:%f",rot);
-                printf(" bearingDiff:%f",bearingDiff);
+                printf(" bearingDiff:%f",bearingDiff);*/
+                if(pLine1->obj1.dopler==pLine1->obj2.dopler&&pLine1->obj2.dopler==pLine2->obj2.dopler)
+                {fprintf(logfile," 1");
+                }
+                else
+                {
+
+                    fprintf(logfile," 0");
+                }
+                fprintf(logfile," range:%f",pLine1->obj2.rgKm);
+                fprintf(logfile," rangeSpeed:%f",rangeSpeed);
+                fprintf(logfile," rangeAccel:%f",rangeAccel);
+                fprintf(logfile," distance:%f",distance);
+                fprintf(logfile," accHead:%f",accHead);
+                fprintf(logfile," rot:%f",rotDegSec);
+                fprintf(logfile," bearingDiff:%f",bearingDiff);
+                fprintf(logfile,"\n");
+
                 double score = powf(CONST_E, -distance*distance/0.25)
                         +powf(CONST_E, -accHead*accHead/100.0)
-                        +powf(CONST_E, -rot*rot/PI_CHIA2/27000.0);
-                if(true)//(score>pLine1->score)||(score>pLine2->score))
+                        +powf(CONST_E, -rotDegSec*rotDegSec/PI_CHIA2/27000.0);
+                if(false)//(score>pLine1->score)||(score>pLine2->score))
                 {
                     track_t newtrack;
                     newtrack.objectList.push_back(pLine1->obj1);
