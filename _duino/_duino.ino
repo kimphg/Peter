@@ -127,6 +127,6 @@ void loop() {
   delay(1000);
   digitalWrite(13, LOW);*/
   readEncoder();
-  delay(1);
+  delayMicroseconds(500);
 
 }
