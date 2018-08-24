@@ -597,6 +597,20 @@ void dataProcessingThread::run()
                 radarSocket->readDatagram((char*)&udpFrameBuffer[iRec][0],len);
                 iRec++;
                 if(iRec>=MAX_IREC)iRec = 0;
+                if(rand()%8==0)
+                {
+
+                    mReceiveBuff[0]=0xaa;
+                    mReceiveBuff[1]=0x55;
+                    mReceiveBuff[2]=0x6e;
+                    mReceiveBuff[3]=0x08;
+                    mReceiveBuff[4]=mRadarData->curAzir>>8;
+                    mReceiveBuff[5]=mRadarData->curAzir;
+                    sendCommand(&mReceiveBuff[0],len,false);
+
+                }
+                mAntennaAziOld = mRadarData->curAzir/MAX_AZIR*360.0;
+
             }
 
         }
@@ -794,6 +808,10 @@ void dataProcessingThread::sendCommand(unsigned char *commandBuff, short len,boo
         radarSocket->writeDatagram((char*)commandBuff,
                 len,
                 QHostAddress("192.168.1.253"),30001
+                );
+        radarSocket->writeDatagram((char*)commandBuff,
+                len,
+                QHostAddress("192.168.1.71"),31000
                 );
         radarSocket->writeDatagram((char*)commandBuff,
                 len,

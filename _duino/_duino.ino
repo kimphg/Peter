@@ -24,11 +24,11 @@ void setup() {
   Serial.begin(115200);
   pinMode(DATA_SSI, INPUT);
   pinMode(CLOCK_SSI, OUTPUT);
-  pinMode(36, OUTPUT);
-  pinMode(37, OUTPUT);
+  pinMode(36, INPUT_PULLUP);
+  pinMode(37, INPUT_PULLUP);
   pinMode(13, OUTPUT);
-  digitalWrite(36, LOW);
-  digitalWrite(37, LOW);
+  //digitalWrite(36, LOW);
+  //digitalWrite(37, LOW);
   digitalWrite(13, HIGH);
   for (int i = PD_0; i <= P_EN; i++)
   {
@@ -54,25 +54,52 @@ void writePD(unsigned char mbyte)
   }
   digitalWrite(PCLK, LOW);
 }
+unsigned int gray_decode(unsigned int  n) {
+    //printf("\nn:%d ",n);
+
+
+
+    /*printf("%d ",(n>>12)&0x0f);
+    printf("%d ",(n>>8)&0x0f);
+    printf("%d ",(n>>4)&0x0f);
+    printf("\n%d ",n&0x0f);*/
+    int p = n;
+    while (n >>= 1) p ^= n;
+    return p;
+}
 unsigned long shiftIn(const int data_pin, const int clock_pin, const int bit_count) {
   unsigned long data = 0;
-
+  
+  digitalWrite(PCLK, LOW);
+  delayMicroseconds(4);
+  digitalWrite(PCLK, HIGH);
+  delayMicroseconds(4);
+  digitalWrite(PCLK, LOW);
+  delayMicroseconds(4);
+  digitalWrite(PCLK, HIGH);
+  delayMicroseconds(4);
+  digitalWrite(PCLK, LOW);
+  delayMicroseconds(4);
+  digitalWrite(PCLK, HIGH);
+  delayMicroseconds(4);
+  bool readBit;
   for (int i=0; i<bit_count; i++) {
     data <<= 1;
     digitalWrite(clock_pin, LOW);
-    digitalWrite(PCLK, LOW);
+    if(i<bit_count-2)digitalWrite(PCLK, LOW);
     delayMicroseconds(4);
     digitalWrite(clock_pin, HIGH);
-    digitalWrite(PCLK, HIGH);
+    if(i<bit_count-2)digitalWrite(PCLK, HIGH);
     delayMicroseconds(4);
-    //data |= digitalRead(data_pin);
-    digitalWrite(P_EN,digitalRead(data_pin));
+    readBit =digitalRead(data_pin);
+    data |= readBit;
+    digitalWrite(P_EN,readBit);
   }
-  digitalWrite(clock_pin, LOW);
-  digitalWrite(PCLK, LOW);
-  delayMicroseconds(4);
-  digitalWrite(clock_pin, HIGH);
-  digitalWrite(PCLK, HIGH);
+  //digitalWrite(clock_pin, LOW);
+  //digitalWrite(PCLK, LOW);
+  //delayMicroseconds(4);
+  //digitalWrite(clock_pin, HIGH);
+  //digitalWrite(PCLK, HIGH);
   return data;
 }
 char encoderFrame[7]={0xAA,0x55,0x6e,0x07,0x00,0x00,0x00};
@@ -82,6 +109,14 @@ void readEncoder()
   // Read the same position data twice to check for errors
   //unsigned long sample1 = shiftIn(DATA_SSI, CLOCK_SSI, BIT_COUNT);
   unsigned long sample2 = shiftIn(DATA_SSI, CLOCK_SSI, BIT_COUNT);
+  sample2 = sample2>>3;
+  int val = sample2&0x3FFF;
+  int rot = gray_decode((sample2&0x03c000)>>14)>>14;
+  if(rot%2)val = 0x3FFF-val;
+  //Serial.println(gray_decode(sample2));
+  Serial.print(val,BIN);
+  Serial.print(' ');
+  Serial.println(rot,BIN);
   //delayMicroseconds(25);  // Clock mus be high for 20 microseconds before a new sample can be taken
 /*
   if (sample1 != sample2) {
@@ -96,7 +131,7 @@ void readEncoder()
     encoderFrame[5]=sample2;
     encoderFrame[6]=encoderFrameSum^encoderFrame[4]^encoderFrame[5];
   //Serial1.write(encoderFrame,7);
-  Serial.println(sample2);
+  //Serial.println(sample2);
   /*digitalWrite(P_EN, HIGH);
   writePD( 0x01);
   writePD( sample2>>8);

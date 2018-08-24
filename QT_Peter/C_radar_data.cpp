@@ -16,7 +16,7 @@
 #define RADAR_DATA_MAX_SIZE     2688
 #define RADAR_
 FILE *logfile;
-
+bool isLeft =false;
 short waitForData = 0;
 short headerLen = RADAR_DATA_HEADER_MAX;
 unsigned char curFrameId;
@@ -1129,6 +1129,8 @@ int gray_decode(ushort n) {
     while (n >>= 1) p ^= n;
     return p;
 }
+bool dir = true;
+int rot;
 void C_radar_data::processSocketData(unsigned char* data,short len)
 {
 
@@ -1192,16 +1194,38 @@ void C_radar_data::processSocketData(unsigned char* data,short len)
         //newAzi = newAzi>>4;
         //newAzi = ((data[2]<<8)|data[3]);
         newAzi = newAzi>>1;*/
-        /*newAzi = gray_decode((data[2]<<8)|data[3]);
-        newAzi = newAzi>>5;*/
-        newAzi=((data[2]<<8)|data[3]);
+        newAzi = (data[2]<<8)|data[3];
+
+        newAzi = gray_decode(newAzi);//&0x1fff
+        int nrot = (newAzi)>>13;
+        if(nrot<rot)isLeft = true;
+        if(nrot>rot)isLeft = false;
+        rot = nrot;
+        printf("\nrot:%d",rot);
+
+        newAzi = (newAzi&0x1fff)>>2;
+        if(!newAzi)
+        {
+            if(rot==7)isLeft = true;
+            if(rot==0)isLeft = false;
+        }
+        if(isLeft)newAzi = MAX_AZIR-newAzi;
+        //if((rot&0x01))newAzi = MAX_AZIR-newAzi;
+        //uchar datapad = newAzi&31;
+        //newAzi = (newAzi&0x1fff)>>1;
+//        if(newAzi<0)newAzi=-newAzi;
+        //newAzi=((data[2]<<8)|data[3]);
+//0 dung 1 dung 2 dung 3 dung
         if(newAzi>=MAX_AZIR)
         {
             //printf("\nWrong Azi:%d",newAzi);
             return;
         }
+        //if(!dir)newAzi=MAX_AZIR-newAzi;
+        //if(rotDir==Left)newAzi = MAX_AZIR-newAzi;
     }
     if(curAzir==newAzi)return;
+    //if(newAzi==0)dir= !dir;
     int dazi = newAzi-curAzir;
     if(abs(dazi)>10&&((MAX_AZIR -abs(dazi))>10))
     {
@@ -1513,6 +1537,7 @@ void C_radar_data::assembleDataFrame(unsigned char* data,unsigned short dataLen)
 void C_radar_data::procPLot(plot_t* mPlot)
 {
     if(init_time)return;
+    if(rotDir==Left)return;
     if(mPlot->sumEnergy<300||mPlot->sumEnergy>20000)// remove too big or too small
     {
         mPlot->size = 0;
@@ -2087,7 +2112,7 @@ void C_radar_data::setAutorgs(bool aut)
     {
         rgs_auto = true;
         krain_auto = 0.3;
-        kgain_auto  = 2.5;
+        kgain_auto  = 2.8;
         ksea_auto = 0;
     }else
     {
@@ -2368,6 +2393,7 @@ void C_radar_data::resetTrack()
 #define TARGET_OBSERV_PERIOD 8000//ENVAR max periods to save object in the memory
 void C_radar_data::ProcesstRadarObjects()
 {
+    return;
     for (int i=0;i<mObjList.size();i++)
     {
         if(mPeriodCount - mObjList.at(i).period>TARGET_OBSERV_PERIOD)
