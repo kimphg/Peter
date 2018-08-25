@@ -368,6 +368,7 @@ void track_t::setManual(bool isMan)
 
 C_radar_data::C_radar_data()
 {
+    rotDir = 0;
     mPeriodCount = 0;
     logfile = fopen("logfile.txt", "wt");
     isMarineMode = true;
@@ -389,6 +390,7 @@ C_radar_data::C_radar_data()
     img_spectre->fill(0);
     img_zoom_ppi = new QImage(ZOOM_SIZE+1,ZOOM_SIZE+1,QImage::Format_ARGB32);
     img_zoom_ar = NULL;
+
     tb_tap_k = 1;
     setZoomRectAR(10,10,1.852,10);
     //    mEncoderAzi = 0;
@@ -412,7 +414,7 @@ C_radar_data::C_radar_data()
     noiseAverage = 30;
     noiseVar = 8;
     krain_auto = 0.3;
-    kgain_auto  = 3;
+    kgain_auto  = 6;
     ksea_auto = 0;
     kgain = 1;
     krain  = ksea = 0;
@@ -426,7 +428,6 @@ C_radar_data::C_radar_data()
     arcMaxAzi = 0;
     arcMinAzi = 0;
     isSharpEye = false;
-    rotDir=Right;
     raw_map_init();
     raw_map_init_zoom();
     setAziOffset(0);
@@ -607,10 +608,25 @@ void C_radar_data::drawAzi(short azi)
 
     int leftAzi = azi-1;if(leftAzi<0)leftAzi+=MAX_AZIR;
     int rightAzi = azi +1; if(rightAzi>=MAX_AZIR)rightAzi-=MAX_AZIR;
-    if(rotDir==Left&&lastProcessAzi==leftAzi){rotDir=Right;init_time=2;}
-    if(rotDir==Right&&lastProcessAzi==rightAzi){rotDir=Left;init_time=2;}
+    if(lastProcessAzi==leftAzi)
+    {
+        if(rotDir>-3)
+        {
+            rotDir--;
+            if(rotDir==-1)init_time+=2;
+        }
+    }
+    else if(lastProcessAzi==rightAzi)
+    {
+        if(rotDir<2)
+        {
+            rotDir++;
+            if(rotDir==0)init_time+=2;
+        }
+    }
 
-    if(rotDir==Left)
+
+    if(rotDir<0)
     {
         //reset the display masks
         short prev_azi = azi - 20;
@@ -880,175 +896,41 @@ void C_radar_data::decodeData(int azi)
     }*/
 }
 short threshRay[RADAR_RESOLUTION];
+
 void C_radar_data::ProcessData(unsigned short azi,unsigned short lastAzi)
 {
-
-    /*
-    if(isSharpEye)
-    {
-        for(short r_pos=5;r_pos<range_max;r_pos++)
-        {
-
-            int a = (int)data_mem.level[azi][r_pos];
-            //if(!a) break;
-            //printf("Innitial:%d\n",a);
-            if(data_mem.dopler[azi][r_pos]==data_mem.dopler[azi][r_pos-1])
-            {
-                a = a*1.5;
-
-            }
-            if(data_mem.dopler[azi][r_pos]==data_mem.dopler[azi][r_pos-2])
-            {
-                a = a*1.2;
-            }
-            if(a>255)a=255;
-            //printf("Result a:%d\n",a);
-            data_mem.level[azi][r_pos] = (unsigned char)a;
-            //                data_mem.level[azi][r_pos] +
-            //                int k = 0;
-            //                for(int i=-4;i<=5;i++)
-            //                {
-            //                    if(data_mem.dopler[azi][r_pos+i]==data_mem.dopler[azi][r_pos+i+1])k++;
-            //                }
-
-        }
-    }*/
-    // apply the  threshholding algorithm manualy
-    //memset(&threshRay[0],0,RADAR_RESOLUTION*2);
-    //do bup song
-    if(is_do_bup_song)
-    {
-        int r_pos = (double)(tb_tap[azi]*tb_tap[azi])/tb_tap_k;
-        for(short pos=0;pos<range_max;pos++)
-        {
-            if(pos==r_pos)
-                data_mem.level[azi][pos] =255;
-            else
-                data_mem.level[azi][pos] = 0;
-        }
-
-    }
-    float maxRain = noiseAverage+9*noiseVar;
-//    if(doubleFilter)// bo loc nguong rain 2 chieu
-//    {
-//        rainLevel = noiseAverage;
-//        for(short r_pos=range_max-1;r_pos>=0;r_pos--)
-//        {
-//            // RGS threshold
-//            rainLevel += krain*(data_mem.level[azi][r_pos]-rainLevel);
-//            if(rainLevel>(maxRain))rainLevel = maxRain;
-//            threshRay[r_pos] = rainLevel + noiseVar*kgain;
-//        }
-//    }
+    float maxRain = noiseAverage+noiseVar*10;
     rainLevel = noiseAverage ;
+//    int leftAzi = curAzir-1;if(leftAzi<0)leftAzi+=MAX_AZIR;
+    //int rightAzi = curAzir +1; if(rightAzi>=MAX_AZIR)rightAzi-=MAX_AZIR;
     //manual threshold
-    for(short r_pos=0;r_pos<range_max;r_pos++)
-    {
-        if(isManualTune&&(!rgs_auto))
-        {
-            bool cutoff = false;
-            rainLevel += krain*(data_mem.level[azi][r_pos]-rainLevel);
-            if(rainLevel>(maxRain))rainLevel = maxRain;
-            short nthresh = rainLevel + noiseVar*kgain;
-            //threshRay[r_pos] = threshRay[r_pos]<nthresh?nthresh:threshRay[r_pos];
-            //            }
-
-            if(!cutoff)cutoff = (data_mem.level[azi][r_pos]<=nthresh);
-            if(bo_bang_0)
-            {
-                if((data_mem.dopler[azi][r_pos]==0)
-                        ||(data_mem.dopler[azi][r_pos]==1)
-                        ||(data_mem.dopler[azi][r_pos]==15))
-                {
-                    cutoff = true;
-                    //signal_map.hot[azi][r_pos]=0;
-                }
-            }
-
-            //update hot value
-            if(!cutoff)
-            {
-                if(data_mem.hot_disp[azi][r_pos]<3)
-                {
-                    data_mem.hot_disp[azi][r_pos]++;
-                }
-            }
-            else
-            {
-                if(data_mem.hot_disp[azi][r_pos])
-                {
-                    data_mem.hot_disp[azi][r_pos]--;
-                }
-
-            }
-            if(filter2of3)cutoff = data_mem.hot_disp[azi][r_pos]<2;
-            //            if(cutoff)
-            //            {
-            //                data_mem.sled[azi][r_pos]-= (data_mem.sled[azi][r_pos])/100.0f;
-
-            //            }else
-            //            {
-            //                data_mem.sled[azi][r_pos] += (255 - data_mem.sled[azi][r_pos])/10.0f;
-            //            }
-            data_mem.level_disp[azi][r_pos] = cutoff?0:data_mem.level[azi][r_pos];
-
-        }
-        else
-        {/*
-            if(cut_thresh)
-            {
-
-                rainLevel += 0.2*(data_mem.level[azi][r_pos]-rainLevel);
-                if(rainLevel>(maxRain))rainLevel = maxRain;
-                threshRay[r_pos] = rainLevel - noiseVar*4;
-                if(data_mem.level[azi][r_pos]>(threshRay[r_pos]))
-                    data_mem.level_disp[azi][r_pos] = (data_mem.level[azi][r_pos] - (threshRay[r_pos]))*(threshRay[r_pos]/255.0f+1.0f);
-                else data_mem.level_disp[azi][r_pos] = 0;
-            }
-            else
-            {
-                data_mem.level_disp[azi][r_pos]=data_mem.level[azi][r_pos];
-            }
-        */
-
-        }
-
-        //
-    }
     //auto threshold
     //memset(&threshRay[0],0,RADAR_RESOLUTION*2);
 
-//    if(doubleFilter)
+//    for(short r_pos=0;r_pos<range_max;r_pos++)
 //    {
-//        rainLevel = noiseAverage;
-//        for(short r_pos=range_max-1;r_pos>0;r_pos--)
+//        //update dopler histogram
+//        unsigned char dopl = data_mem.dopler[azi][r_pos];
+//        doplerHistogram[dopl]++;
+//        if(doplerHistMaxVal<doplerHistogram[dopl])
 //        {
-//            // RGS threshold
-//            rainLevel += krain_auto*(data_mem.level[azi][r_pos]-rainLevel);
-//            if(rainLevel>(maxRain))rainLevel = maxRain;
-//            threshRay[r_pos] = rainLevel + noiseVar*kgain_auto;
+//            doplerHistMaxVal=doplerHistogram[dopl];
+//            doplerHistMaxPoint = dopl;
 //        }
 //    }
-    rainLevel = noiseAverage ;
-
     for(short r_pos=0;r_pos<range_max;r_pos++)
     {
         // RGS threshold
         rainLevel += krain_auto*(data_mem.level[azi][r_pos]-rainLevel);
         if(rainLevel>maxRain)rainLevel = maxRain;
         short nthresh = rainLevel + noiseVar*kgain_auto;
-        threshRay[r_pos] += (nthresh-threshRay[r_pos])*0.7;
+        threshRay[r_pos] += (nthresh-threshRay[r_pos])*0.5;
         bool cutoff = data_mem.level[azi][r_pos]<threshRay[r_pos];
-        if(data_mem.dopler[azi][r_pos]==data_mem.dopler[lastAzi][r_pos])
-        {
-            data_mem.hot[azi][r_pos] = data_mem.hot[lastAzi][r_pos]+1;
-        }
-        else
-        {
-            data_mem.hot[azi][r_pos] = 0;
-        }
+        if(data_mem.dopler[azi][r_pos]!=data_mem.dopler[lastAzi][r_pos])cutoff = true;
+
+
         data_mem.level_disp[azi][r_pos]=data_mem.level[azi][r_pos];
-        data_mem.detect[azi][r_pos] = (!cutoff)&(data_mem.hot[azi][r_pos]>2);
+        data_mem.detect[azi][r_pos] = (!cutoff);
         //data_mem.detect[azi][r_pos] = (!cutoff);
         //detect = vuot nguong & dopler lap lai
 
@@ -1103,7 +985,7 @@ int gray_decode(ushort n) {
 unsigned char inverseBit =0;
 bool isInverseSSI = false;
 //short dirSSI ;
-int ssiDecode(ushort nAzi)
+int C_radar_data::ssiDecode(ushort nAzi)
 {
     inverseBit<<=1;
     inverseBit&=0x03;
@@ -1112,9 +994,11 @@ int ssiDecode(ushort nAzi)
     if(inverseBit==3)isInverseSSI = false;
     if(inverseBit==0)isInverseSSI = true;
     nAzi&=0x1fff;
-    nAzi>>=2;
-    if(isInverseSSI)nAzi = MAX_AZIR-nAzi;
-    return nAzi;
+
+    nAzi>>=1;
+    if(isInverseSSI)nAzi = 4096-nAzi;
+    mEncoderVal = nAzi;
+    return nAzi>>1;
 }
 
 int rot;
@@ -1190,7 +1074,7 @@ void C_radar_data::processSocketData(unsigned char* data,short len)
     int dazi = newAzi-curAzir;
     if(abs(dazi)>10&&((MAX_AZIR -abs(dazi))>10))
     {
-        init_time=20;
+        init_time+=5;
         curAzir=newAzi;
         memcpy(&data_mem.level[curAzir][0],data+34,range_max);
         memcpy(&data_mem.dopler[curAzir][0],data+34+RADAR_RESOLUTION,range_max);
@@ -1361,7 +1245,7 @@ void C_radar_data::clearPPI()
 ushort mulOf16Azi = 0;
 void C_radar_data::UpdateData()
 {
-    while(aziToProcess.size())
+    while(aziToProcess.size()>10)
     {
         now_ms = QDateTime::currentMSecsSinceEpoch();
         int azi = aziToProcess.front();
@@ -1374,7 +1258,7 @@ void C_radar_data::UpdateData()
         ProcessData(azi,lastProcessAzi);
         mPeriodCount++;
         drawAzi(azi);
-        if(!((unsigned char)(azi<<4)))//xu ly moi 16 chu ky
+        if(!((unsigned char)(((unsigned char)mPeriodCount)<<4)))//xu ly moi 16 chu ky
         {
             //procTracks(curAzir);
             mulOf16Azi++;
@@ -1392,7 +1276,7 @@ void C_radar_data::UpdateData()
                     if((plot_list.at(i).lastA!=lastProcessAzi)&&(plot_list.at(i).lastA!=azi))
                     {
                         procPLot(&plot_list.at(i));
-                        plot_list.at(i).size =0;
+                        plot_list.at(i).isUsed = false;
                     }
 
                 }
@@ -1400,9 +1284,9 @@ void C_radar_data::UpdateData()
         }
         // update histogram
         nNoiseCalculator++;
-        sumvar+= abs(data_mem.level[azi][range_max-50]-data_mem.level[azi][range_max-55]);;
-        unsigned char value = data_mem.level[azi][range_max-50];
-        if(value>5&&value<250)
+        sumvar+= abs(data_mem.level[azi][range_max-200]-data_mem.level[azi][range_max-205]);;
+        unsigned char value = data_mem.level[azi][range_max-200];
+        if(value>5&&value<200)
         {
             histogram[value-3]+=1;
             histogram[value-2]+=2;
@@ -1495,16 +1379,84 @@ void C_radar_data::assembleDataFrame(unsigned char* data,unsigned short dataLen)
     return azi;*/
 
 }
+unsigned int doplerHistogram[256];
 void C_radar_data::procPLot(plot_t* mPlot)
 {
-    if(init_time)return;
-    mPlot->isUsed = false;
-    if(/*mPlot->sumEnergy<300||*/mPlot->sumEnergy>20000)// remove too big or too small
+    if(init_time)
+        return;
+    if(mPlot->sumEnergy<100||mPlot->sumEnergy>20000)// remove too big or too small
     {
 
-        printf("\nmPlot->sumEnergy:%d",mPlot->sumEnergy);???
+        //printf("\nmPlot->sumEnergy:%d",mPlot->sumEnergy);
         return;
     }
+    //if(mPlot->minR<500)return;
+    if(xl_dopler)
+    {
+        memset(doplerHistogram,0,256);
+        int leftA = mPlot->riseA-15;
+        if(leftA<0)leftA+=MAX_AZIR;
+        int rightA = mPlot->riseA+15;
+        if(rightA>=MAX_AZIR)rightA-=MAX_AZIR;
+        int maxRg = mPlot->maxR+15;
+        int minRg = mPlot->maxR-15;
+        if(minRg<0)minRg=0;if(maxRg>=range_max)maxRg=range_max-1;
+        for(int lAzi=leftA;lAzi!=rightA;lAzi++)
+        {
+            if(lAzi>=MAX_AZIR)lAzi-=MAX_AZIR;
+
+            for(int lRg = minRg;lRg<maxRg;lRg++)
+            {
+                if(data_mem.level[lAzi][lRg]>(noiseAverage+kgain_auto*noiseVar))
+                    doplerHistogram[data_mem.dopler[lAzi][lRg]]++;
+            }
+        }
+//        int doplerMaxVal=0,doplerMaxPos=0;
+//        int doplerSecondMaxVal=0;
+//        int doplerSecondMaxPos = 0;
+//        for(int i=0;i<16;i++)
+//        {
+//            if(doplerHistogram[i]>doplerMaxVal)
+//            {
+//                if(doplerMaxPos!=i)
+//                {
+//                    doplerSecondMaxPos = doplerMaxPos;
+//                    doplerMaxPos = i;
+//                    doplerSecondMaxVal=doplerMaxVal;
+//                }
+//                doplerMaxVal = doplerHistogram[i];
+//            }
+//        }
+        //printf("\ndoplerMaxPos:%d doplerMaxVal:%d",doplerMaxPos,doplerMaxVal);
+        printf("\n");
+        int sumHis = 0;
+        for(int i=0;i<16;i++)
+        {
+            printf(" %d:%d ",i,doplerHistogram[i]);
+            //sumHis+=doplerHistogram[i];
+            if(doplerHistogram[i]>20)sumHis++;
+            if((doplerHistogram[i]-mPlot->size)>50&&mPlot->dopler==i)
+            {
+                printf("mPlot->size: %d",mPlot->size);
+                return;
+            }
+        }
+        printf(" sumHis: %d",sumHis);
+        if(sumHis>4)return;
+        /*}
+        if(doplerMaxVal>50)
+        {
+            printf("\ndoplerMaxPos:%d doplerMaxVal:%d",doplerMaxPos,doplerMaxVal);
+            if(mPlot->dopler==doplerMaxPos)return;
+        }
+        if(doplerSecondMaxVal>50)
+        {
+            printf("\ndoplerSecondMaxPos:%d doplerSecondMaxVal:%d",doplerSecondMaxPos,doplerSecondMaxVal);
+            if(mPlot->dopler==doplerSecondMaxPos)return;
+        }*/
+
+    }
+
     object_t newobject;
     newobject.isManual = false;
     newobject.uniqID = rand();
@@ -1515,14 +1467,18 @@ void C_radar_data::procPLot(plot_t* mPlot)
     {
         newobject.dazi = MAX_AZIR-newobject.dazi;
         ctA = (mPlot->fallA+mPlot->riseA+MAX_AZIR)/2.0;
-        if(ctA >= MAX_AZIR)ctA -= MAX_AZIR;
+
     }
     else
     {
         ctA = (mPlot->riseA + mPlot->fallA)/2.0;
 
     }
+    if(ctA >= MAX_AZIR)ctA -= MAX_AZIR;
     float ctR = (float)mPlot->sumR/(float)mPlot->size+0.5;//min value starts at 1
+    if(ctR<mPlot->minR||ctR>mPlot->maxR+1)printf("\nWrong ctR");
+    //todo: tinh dopler histogram
+
 
     newobject.size = mPlot->size;
     newobject.drg = mPlot->maxR-mPlot->minR;
@@ -1542,26 +1498,21 @@ void C_radar_data::procPLot(plot_t* mPlot)
     newobject.timeMs = now_ms;
     newobject.xkm = newobject.rgKm*sin( newobject.az);
     newobject.ykm = newobject.rgKm*cos( newobject.az);
-    if(mObjList.size()<2000)//ENVDEP max number of objects
+    // add to mObjList
+    bool full = true;
+    for(int i=0;i<mObjList.size(); i++) {
+        if(mObjList.at(i).uniqID<0)
+        {
+            mObjList.at(i) = newobject;
+            full = false;
+            break;
+        }
+    }
+    if(full)
     {
         mObjList.push_back(newobject);
-//        printf("\nctA:%f",ctA);
-//        printf(" ctR:%f",ctR);
-//        printf(" energy:%d",mPlot->sumEnergy);
     }
-    else
-    {
-        bool full = true;
-        for(int i=0;i<mObjList.size(); i++) {
-            if(mObjList.at(i).uniqID<0)
-            {
-                mObjList.at(i) = newobject;
-                full = false;
-                break;
-            }
-        }
-        if(full)printf("\nmObjList is full");
-    }
+
     /*
     if(!procObjectManual(&newobject))//check existing confirmed tracks
     {
@@ -2003,10 +1954,10 @@ short zoomXmax,zoomYmax,zoomXmin,zoomYmin;
 short zoomCenterX=RAD_DISPLAY_RES,zoomCenterY=RAD_DISPLAY_RES;
 void C_radar_data::setZoomRectXY(float ctx, float cty)
 {
-    zoomXmax = ctx*2.0/scale_ppi+ZOOM_SIZE/2;
-    zoomYmax = cty*2.0/scale_ppi+ZOOM_SIZE/2;
-    zoomXmin = ctx*2.0/scale_ppi-ZOOM_SIZE/2;
-    zoomYmin = cty*2.0/scale_ppi-ZOOM_SIZE/2;
+    zoomXmax = 2*ctx*2.0/scale_ppi+ZOOM_SIZE/2;
+    zoomYmax = 2*cty*2.0/scale_ppi+ZOOM_SIZE/2;
+    zoomXmin = 2*ctx*2.0/scale_ppi-ZOOM_SIZE/2;
+    zoomYmin = 2*cty*2.0/scale_ppi-ZOOM_SIZE/2;
     raw_map_init_zoom();
 }
 
@@ -2167,14 +2118,13 @@ void C_radar_data::resetData()
     memset(data_mem.detect,     0,dataLen);
     memset(data_mem.plotIndex,  0,dataLen);
     memset(data_mem.hot,        0,dataLen);
-    memset(data_mem.hot_disp,   0,dataLen);
     std::queue<int> empty;
     std::swap( aziToProcess, empty );
     //memset(data_mem.terrain,    TERRAIN_INIT,dataLen);
     //memset(data_mem.rainLevel,  0,dataLen);
     //noiseAverage = 30;
     resetSled();
-    init_time = 10;
+    init_time += 10;
 
 }
 void C_radar_data::resetSled()
@@ -2342,7 +2292,7 @@ uint C_radar_data::getColor(unsigned char pvalue,unsigned char dopler,unsigned c
 }
 void C_radar_data::resetTrack()
 {
-    init_time = 3;
+    init_time += 3;
     curIdCount = 1;
     mTrackList.clear();
     //    for(unsigned short i=0;i<mTrackList.size();i++)
@@ -2353,17 +2303,24 @@ void C_radar_data::resetTrack()
     //        }
     //    }
 }
-#define TARGET_OBSERV_PERIOD MAX_AZIR//ENVAR max periods to save object in the memory
-void C_radar_data::ProcesstRadarObjects()
+#define TARGET_OBSERV_PERIOD 2048//ENVAR max periods to save object in the memory
+void C_radar_data::ProcessObjects()
 {
-
+    int nObj = 0;
     for (int i=0;i<mObjList.size();i++)
     {
         if(mPeriodCount - mObjList.at(i).period>TARGET_OBSERV_PERIOD)
         {
             mObjList.at(i).uniqID = -1;
         }
+        else nObj++;
     }
+    if(nObj>2000)
+    {
+        if(kgain_auto<10)kgain_auto*=1.001;
+        printf("\nkgain_auto:%f",kgain_auto);
+    }
+
     return;
     for (int i=0;i<mObjList.size();i++)
     {

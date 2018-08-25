@@ -190,14 +190,14 @@ enum imgDrawMode
     DOPLER_3_COLOR = 2,
 };
 enum DataOverLay { m_only, s_m_200, s_m_150 , max_s_m_200, max_s_m_150};
-enum RotationDir { Right , Left};
+//enum RotationDir { Right , Left};
 class C_radar_data {
 public:
 
     C_radar_data();
     ~C_radar_data();
     float k_vet;// !!!!
-    RotationDir             rotDir;
+    short             rotDir;
     float                   rotation_per_min ;
     trackList               mTrackList;
     std::vector<plot_t>     plot_list;
@@ -322,7 +322,9 @@ private:
     bool DrawZoomAR(int a,int r,short val,short dopler,short sled);
     int getNewAzi();
     void ProcessEach90Deg();
+    int ssiDecode(ushort nAzi);
 public:
+    int mEncoderVal;
     bool isMarineMode;
     //void drawZoomAR();
     float getNoiseAverage() const;
@@ -331,7 +333,7 @@ public:
     double getSelfRotationAzi() const;
     void setSelfRotationAzi(int value);
     void processSocketData(unsigned char *data, short len);
-    void ProcesstRadarObjects();
+    void ProcessObjects();
     static double ConvXYToRange(double x, double y);
     static double ConvXYToAziRad(double x, double y);
 };

@@ -236,7 +236,6 @@ public:
     QSlider *horizontalSlider_sea;
     QSlider *horizontalSlider_rain;
     QCustomButton *toolButton_xl_dopler_2;
-    QCustomButton *toolButton_xl_dopler;
     QWidget *tab;
     QCustomGroupBox *groupBox_16;
     QGridLayout *gridLayout_3;
@@ -296,6 +295,7 @@ public:
     QLabel *label_sn_type;
     QLabel *label_range_resolution;
     QLabel *label_4;
+    QCustomButton *toolButton_xl_dopler;
     QButtonGroup *buttonGroup;
 
     void setupUi(QMainWindow *MainWindow)
@@ -4203,7 +4203,7 @@ public:
         toolButton_sharp_eye->setSizePolicy(sizePolicy1);
         toolButton_sharp_eye->setCheckable(true);
 
-        gridLayout_10->addWidget(toolButton_sharp_eye, 9, 0, 1, 2);
+        gridLayout_10->addWidget(toolButton_sharp_eye, 8, 0, 1, 2);
 
         label_rain = new QLabel(tab2);
         label_rain->setObjectName(QStringLiteral("label_rain"));
@@ -4513,15 +4513,7 @@ public:
         toolButton_xl_dopler_2->setSizePolicy(sizePolicy1);
         toolButton_xl_dopler_2->setCheckable(true);
 
-        gridLayout_10->addWidget(toolButton_xl_dopler_2, 10, 0, 1, 2);
-
-        toolButton_xl_dopler = new QCustomButton(tab2);
-        toolButton_xl_dopler->setObjectName(QStringLiteral("toolButton_xl_dopler"));
-        sizePolicy1.setHeightForWidth(toolButton_xl_dopler->sizePolicy().hasHeightForWidth());
-        toolButton_xl_dopler->setSizePolicy(sizePolicy1);
-        toolButton_xl_dopler->setCheckable(true);
-
-        gridLayout_10->addWidget(toolButton_xl_dopler, 7, 0, 1, 2);
+        gridLayout_10->addWidget(toolButton_xl_dopler_2, 9, 0, 1, 2);
 
         groupBox_3->addTab(tab2, QString());
         tabWidget_menu->addTab(tab_6, QString());
@@ -5837,6 +5829,12 @@ public:
 
         gridLayout_6->addWidget(label_4, 2, 0, 1, 1);
 
+        toolButton_xl_dopler = new QCustomButton(centralWidget);
+        toolButton_xl_dopler->setObjectName(QStringLiteral("toolButton_xl_dopler"));
+        toolButton_xl_dopler->setGeometry(QRect(770, 250, 229, 41));
+        sizePolicy1.setHeightForWidth(toolButton_xl_dopler->sizePolicy().hasHeightForWidth());
+        toolButton_xl_dopler->setSizePolicy(sizePolicy1);
+        toolButton_xl_dopler->setCheckable(true);
         MainWindow->setCentralWidget(centralWidget);
         groupBox_5->raise();
         groupBox_7->raise();
@@ -5857,6 +5855,7 @@ public:
         tabWidget_iad->raise();
         groupBox_4->raise();
         groupBox_6->raise();
+        toolButton_xl_dopler->raise();
 #ifndef QT_NO_SHORTCUT
         label_rain->setBuddy(horizontalSlider_rain);
         label_sea->setBuddy(horizontalSlider_sea);
@@ -5865,8 +5864,8 @@ public:
 
         retranslateUi(MainWindow);
 
-        tabWidget_menu->setCurrentIndex(3);
-        groupBox_3->setCurrentIndex(0);
+        tabWidget_menu->setCurrentIndex(4);
+        groupBox_3->setCurrentIndex(1);
         comboBox->setCurrentIndex(0);
         tabWidget_iad->setCurrentIndex(5);
         comboBox_3->setCurrentIndex(0);
@@ -6045,7 +6044,6 @@ public:
         label_sea->setText(QApplication::translate("MainWindow", "Sea", Q_NULLPTR));
         label_gain->setText(QApplication::translate("MainWindow", "Gain", Q_NULLPTR));
         toolButton_xl_dopler_2->setText(QApplication::translate("MainWindow", "B\341\273\217 b\304\203ng 0 dopler", Q_NULLPTR));
-        toolButton_xl_dopler->setText(QApplication::translate("MainWindow", "L\341\273\215c t\306\260\306\241ng quan dopler", Q_NULLPTR));
         groupBox_3->setTabText(groupBox_3->indexOf(tab2), QApplication::translate("MainWindow", "XL s\306\241 c\341\272\245p", Q_NULLPTR));
         tabWidget_menu->setTabText(tabWidget_menu->indexOf(tab_6), QApplication::translate("MainWindow", "Page", Q_NULLPTR));
         tabWidget_menu->setTabText(tabWidget_menu->indexOf(tab), QApplication::translate("MainWindow", "X", Q_NULLPTR));
@@ -6117,6 +6115,7 @@ public:
         label_sn_type->setText(QApplication::translate("MainWindow", "--", Q_NULLPTR));
         label_range_resolution->setText(QApplication::translate("MainWindow", "--", Q_NULLPTR));
         label_4->setText(QApplication::translate("MainWindow", "T.\304\221\341\273\231 quay anten (v/p):", Q_NULLPTR));
+        toolButton_xl_dopler->setText(QApplication::translate("MainWindow", "L\341\273\215c t\306\260\306\241ng quan dopler", Q_NULLPTR));
     } // retranslateUi
 
 };

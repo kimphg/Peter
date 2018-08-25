@@ -347,7 +347,7 @@ void dataProcessingThread::PushCommandQueue()
 
 
     }
-    mRadarData->ProcesstRadarObjects();
+    mRadarData->ProcessObjects();
     /*while(false)// no sophia yet
     {
         object_t obj= mRadarData->ProcesstRadarObjects();
@@ -604,8 +604,8 @@ void dataProcessingThread::run()
                     mReceiveBuff[1]=0x55;
                     mReceiveBuff[2]=0x6e;
                     mReceiveBuff[3]=0x08;
-                    mReceiveBuff[4]=mRadarData->curAzir>>8;
-                    mReceiveBuff[5]=mRadarData->curAzir;
+                    mReceiveBuff[4]=mRadarData->mEncoderVal>>8;
+                    mReceiveBuff[5]=mRadarData->mEncoderVal;
                     sendCommand(&mReceiveBuff[0],len,false);
 
                 }

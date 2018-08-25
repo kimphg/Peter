@@ -7820,7 +7820,7 @@
      <bool>false</bool>
     </property>
     <property name="currentIndex">
-     <number>3</number>
+     <number>4</number>
     </property>
     <property name="elideMode">
      <enum>Qt::ElideNone</enum>
@@ -23593,7 +23593,7 @@
        <string notr="true">background-color: rgb(30, 50, 70);color:rgb(30, 50, 70);font: 12pt &quot;MS Shell Dlg 2&quot;;</string>
       </property>
       <property name="currentIndex">
-       <number>0</number>
+       <number>1</number>
       </property>
       <widget class="QWidget" name="tab_7">
        <attribute name="title">
@@ -24949,7 +24949,7 @@
           </property>
          </widget>
         </item>
-        <item row="9" column="0" colspan="2">
+        <item row="8" column="0" colspan="2">
          <widget class="QCustomButton" name="toolButton_sharp_eye">
           <property name="sizePolicy">
            <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
@@ -27187,7 +27187,7 @@
           </property>
          </widget>
         </item>
-        <item row="10" column="0" colspan="2">
+        <item row="9" column="0" colspan="2">
          <widget class="QCustomButton" name="toolButton_xl_dopler_2">
           <property name="sizePolicy">
            <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
@@ -27197,22 +27197,6 @@
           </property>
           <property name="text">
            <string>Bỏ băng 0 dopler</string>
-          </property>
-          <property name="checkable">
-           <bool>true</bool>
-          </property>
-         </widget>
-        </item>
-        <item row="7" column="0" colspan="2">
-         <widget class="QCustomButton" name="toolButton_xl_dopler">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-          <property name="text">
-           <string>Lọc tương quan dopler</string>
           </property>
           <property name="checkable">
            <bool>true</bool>
@@ -36314,6 +36298,28 @@ background-color: rgba(255, 255, 255, 0);</string>
      </item>
     </layout>
    </widget>
+   <widget class="QCustomButton" name="toolButton_xl_dopler">
+    <property name="geometry">
+     <rect>
+      <x>770</x>
+      <y>250</y>
+      <width>229</width>
+      <height>41</height>
+     </rect>
+    </property>
+    <property name="sizePolicy">
+     <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+      <horstretch>0</horstretch>
+      <verstretch>0</verstretch>
+     </sizepolicy>
+    </property>
+    <property name="text">
+     <string>Lọc tương quan dopler</string>
+    </property>
+    <property name="checkable">
+     <bool>true</bool>
+    </property>
+   </widget>
    <zorder>groupBox_5</zorder>
    <zorder>groupBox_7</zorder>
    <zorder>groupBox_10</zorder>
@@ -36333,6 +36339,7 @@ background-color: rgba(255, 255, 255, 0);</string>
    <zorder>tabWidget_iad</zorder>
    <zorder>groupBox_4</zorder>
    <zorder>groupBox_6</zorder>
+   <zorder>toolButton_xl_dopler</zorder>
   </widget>
  </widget>
  <layoutdefault spacing="6" margin="11"/>

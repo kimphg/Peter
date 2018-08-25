@@ -373,7 +373,7 @@ void Mainwindow::keyPressEvent(QKeyEvent *event)
         pRadar->setZoomRectAR((mMousex - radCtX)/mScale,
                               -(mMousey - radCtY)/mScale,
                               mZoomSizeRg,mZoomSizeAz);
-        pRadar->setZoomRectXY(mMousex - radCtX,mMousey - radCtY);
+        pRadar->setZoomRectXY((mMousex - radCtX),(mMousey - radCtY));
     }
 
 }
@@ -2080,6 +2080,7 @@ void Mainwindow::sync1S()//period 1 second
         pRadar->setScalePPI(mScale);
         isScaleChanged = false;
     }
+    ui->label_speed_2->setText(QString::number(pRadar->rotation_per_min,'f',1)+"v/p");
     return;
 //    this->updateTargetInfo();
     if(processing->isConnected())
@@ -2241,7 +2242,7 @@ void Mainwindow::sync1S()//period 1 second
 
                 break;
             }*/
-    ui->label_speed_2->setText(QString::number(pRadar->rotation_per_min,'f',1)+"v/p");
+
 
 
 
