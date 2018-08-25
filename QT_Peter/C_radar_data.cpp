@@ -16,7 +16,7 @@
 #define RADAR_DATA_MAX_SIZE     2688
 #define RADAR_
 FILE *logfile;
-bool isLeft =false;
+
 short waitForData = 0;
 short headerLen = RADAR_DATA_HEADER_MAX;
 unsigned char curFrameId;
@@ -1117,19 +1117,27 @@ void C_radar_data::ProcessEach90Deg()
 
 }
 int gray_decode(ushort n) {
-    //printf("\nn:%d ",n);
-
-
-
-    /*printf("%d ",(n>>12)&0x0f);
-    printf("%d ",(n>>8)&0x0f);
-    printf("%d ",(n>>4)&0x0f);
-    printf("\n%d ",n&0x0f);*/
     int p = n;
     while (n >>= 1) p ^= n;
     return p;
 }
-bool dir = true;
+unsigned char inverseBit =0;
+bool isInverseSSI = false;
+//short dirSSI ;
+int ssiDecode(ushort nAzi)
+{
+    inverseBit<<=1;
+    inverseBit&=0x03;
+    nAzi = gray_decode(nAzi);//&0x1fff
+    inverseBit |= (nAzi&0x01);
+    if(inverseBit==3)isInverseSSI = false;
+    if(inverseBit==0)isInverseSSI = true;
+    nAzi&=0x1fff;
+    nAzi>>=2;
+    if(isInverseSSI)nAzi = MAX_AZIR-nAzi;
+    return nAzi;
+}
+
 int rot;
 void C_radar_data::processSocketData(unsigned char* data,short len)
 {
@@ -1175,41 +1183,15 @@ void C_radar_data::processSocketData(unsigned char* data,short len)
     }
     else
     {
-        //unsigned short gray1  = ((data[2]<<8)|data[3]);
-        /*
-        unsigned char gray1 = data[3]&0x0f;
-        unsigned char gray2 = data[3]>>4;
-        unsigned char gray3 = data[2]&0x0f;
-        unsigned char gray4 = data[2]>>4;
-        gray1^=(gray1>>1);
-        gray1^=(gray1>>2);
-        gray2^=(gray2>>1);
-        gray2^=(gray2>>2);
-        gray3^=(gray3>>1);
-        gray3^=(gray3>>2);
-        gray4^=(gray4>>1);
-        gray4^=(gray4>>2);
 
-        newAzi = gray1+(gray2<<4)+(gray3<<8)+(gray4<<12);
-        //newAzi = newAzi>>4;
-        //newAzi = ((data[2]<<8)|data[3]);
-        newAzi = newAzi>>1;*/
         newAzi = (data[2]<<8)|data[3];
-
-        newAzi = gray_decode(newAzi);//&0x1fff
-        int nrot = (newAzi)>>13;
-        if(nrot<rot)isLeft = true;
-        if(nrot>rot)isLeft = false;
-        rot = nrot;
-        printf("\nrot:%d",rot);
-
-        newAzi = (newAzi&0x1fff)>>2;
-        if(!newAzi)
+        newAzi = ssiDecode(newAzi);
+        /*if(!newAzi)
         {
             if(rot==7)isLeft = true;
             if(rot==0)isLeft = false;
-        }
-        if(isLeft)newAzi = MAX_AZIR-newAzi;
+        }*/
+
         //if((rot&0x01))newAzi = MAX_AZIR-newAzi;
         //uchar datapad = newAzi&31;
         //newAzi = (newAzi&0x1fff)>>1;
