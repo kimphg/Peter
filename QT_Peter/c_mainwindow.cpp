@@ -815,8 +815,8 @@ void Mainwindow::DrawRadarTargetByPainter(QPainter* p)//draw radar target from p
             if(obj.uniqID<0)continue;
             sx = obj.xkm*mScale + radCtX;
             sy = -obj.ykm*mScale + radCtY;
-            p->drawPoint(sx,sy);
-            //p->drawRect(sx-5,sy-5,10,10);
+            //p->drawPoint(sx,sy);
+            p->drawRect(sx-5,sy-5,10,10);
         }
 
     }

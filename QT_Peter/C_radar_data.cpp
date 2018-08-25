@@ -411,8 +411,8 @@ C_radar_data::C_radar_data()
     clk_adc = 1;
     noiseAverage = 30;
     noiseVar = 8;
-    krain_auto = 0.4;
-    kgain_auto  = 2.8;
+    krain_auto = 0.3;
+    kgain_auto  = 3;
     ksea_auto = 0;
     kgain = 1;
     krain  = ksea = 0;
@@ -880,7 +880,7 @@ void C_radar_data::decodeData(int azi)
     }*/
 }
 short threshRay[RADAR_RESOLUTION];
-void C_radar_data::ProcessData(unsigned short azi)
+void C_radar_data::ProcessData(unsigned short azi,unsigned short lastAzi)
 {
 
     /*
@@ -1030,6 +1030,7 @@ void C_radar_data::ProcessData(unsigned short azi)
 //        }
 //    }
     rainLevel = noiseAverage ;
+
     for(short r_pos=0;r_pos<range_max;r_pos++)
     {
         // RGS threshold
@@ -1038,54 +1039,32 @@ void C_radar_data::ProcessData(unsigned short azi)
         short nthresh = rainLevel + noiseVar*kgain_auto;
         threshRay[r_pos] += (nthresh-threshRay[r_pos])*0.7;
         bool cutoff = data_mem.level[azi][r_pos]<threshRay[r_pos];
-        if(cutoff)//&&(dvar<2))
+        if(data_mem.dopler[azi][r_pos]==data_mem.dopler[lastAzi][r_pos])
         {
-            if(data_mem.hot[azi][r_pos])
-            {
-                data_mem.hot[azi][r_pos]--;
-            }
-
+            data_mem.hot[azi][r_pos] = data_mem.hot[lastAzi][r_pos]+1;
         }
         else
         {
-            if(data_mem.hot[azi][r_pos]<3)
-            {
-                data_mem.hot[azi][r_pos]++;
-            }
-            if(!data_mem.hot[lastProcessAzi][r_pos])
-            {
-                cutoff = true;
-            }
+            data_mem.hot[azi][r_pos] = 0;
         }
-        data_mem.level_disp[azi][r_pos]=cut_thresh?(data_mem.level[azi][r_pos] - threshRay[r_pos] + noiseAverage):data_mem.level[azi][r_pos];
-        if(cutoff)
+        data_mem.level_disp[azi][r_pos]=data_mem.level[azi][r_pos];
+        data_mem.detect[azi][r_pos] = (!cutoff)&(data_mem.hot[azi][r_pos]>2);
+        //data_mem.detect[azi][r_pos] = (!cutoff);
+        //detect = vuot nguong & dopler lap lai
+
+        if(data_mem.detect[azi][r_pos])
         {
-            if(rgs_auto)
-                data_mem.level_disp[azi][r_pos]= 0;
-            else
+            if(!init_time)data_mem.sled[azi][r_pos] = 255;
+            if(r_pos>RANGE_MIN)procPix(azi,r_pos);
+        }
+        else
+        {
             data_mem.sled[azi][r_pos] -= (data_mem.sled[azi][r_pos])/20.0f;
+            if(rgs_auto)data_mem.level_disp[azi][r_pos]= 0;
         }
-        else if(!init_time)
-        {
 
-            data_mem.sled[azi][r_pos] =255;
-        }
-        if(r_pos>RANGE_MIN)
-        {
-            data_mem.detect[azi][r_pos] = !cutoff;
-            if(!cutoff)
-            {
-                procPix(azi,r_pos);
-                //if(data_mem.terrain[azi][r_pos]<TERRAIN_MAX)data_mem.terrain[azi][r_pos]++;
-            }
-            else
-            {
-                //if(data_mem.terrain[azi][r_pos])data_mem.terrain[azi][r_pos]--;
-            }
 
-        }
     }
-    //memcpy(&data_mem.dopler_old[azi][0],&data_mem.dopler[azi][0],range_max);
     return ;
 }
 void C_radar_data::ProcessEach90Deg()
@@ -1392,7 +1371,7 @@ void C_radar_data::UpdateData()
             aziToProcess.pop();
             continue;
         }
-        ProcessData(azi);
+        ProcessData(azi,lastProcessAzi);
         mPeriodCount++;
         drawAzi(azi);
         if(!((unsigned char)(azi<<4)))//xu ly moi 16 chu ky
@@ -1408,7 +1387,7 @@ void C_radar_data::UpdateData()
             if(init_time)init_time--;
             for(unsigned short i = 0;i<plot_list.size();++i)
             {
-                if(plot_list.at(i).size)
+                if(plot_list.at(i).isUsed)
                 {
                     if((plot_list.at(i).lastA!=lastProcessAzi)&&(plot_list.at(i).lastA!=azi))
                     {
@@ -1519,13 +1498,13 @@ void C_radar_data::assembleDataFrame(unsigned char* data,unsigned short dataLen)
 void C_radar_data::procPLot(plot_t* mPlot)
 {
     if(init_time)return;
-    if(rotDir==Left)return;
-    if(mPlot->sumEnergy<300||mPlot->sumEnergy>20000)// remove too big or too small
+    mPlot->isUsed = false;
+    if(/*mPlot->sumEnergy<300||*/mPlot->sumEnergy>20000)// remove too big or too small
     {
-        mPlot->size = 0;
+
+        printf("\nmPlot->sumEnergy:%d",mPlot->sumEnergy);???
         return;
     }
-
     object_t newobject;
     newobject.isManual = false;
     newobject.uniqID = rand();
@@ -1543,7 +1522,7 @@ void C_radar_data::procPLot(plot_t* mPlot)
         ctA = (mPlot->riseA + mPlot->fallA)/2.0;
 
     }
-    float ctR = (float)mPlot->sumR/(float)mPlot->size+1.0;//min value starts at 1
+    float ctR = (float)mPlot->sumR/(float)mPlot->size+0.5;//min value starts at 1
 
     newobject.size = mPlot->size;
     newobject.drg = mPlot->maxR-mPlot->minR;
@@ -1591,6 +1570,7 @@ void C_radar_data::procPLot(plot_t* mPlot)
             if(avtodetect)addTrack(&newobject);
         }
     }*/
+    mPlot->isUsed = false;
 
 
 
@@ -1923,7 +1903,7 @@ void C_radar_data::procPix(short proc_azi,short range)//_______signal detected, 
     }
     if((plotIndex<plot_list.size())
             &&(plotIndex>=0)
-            &&(plot_list.at(plotIndex).size)
+            &&(plot_list.at(plotIndex).isUsed)
             )// add to existing plot
     {
         /*if(((plot_list.at(plotIndex).maxLevel*0.8)>data_mem.level[proc_azi][range]))//cut fall of target plot
@@ -1953,6 +1933,7 @@ void C_radar_data::procPix(short proc_azi,short range)//_______signal detected, 
     {
 
         plot_t                  new_plot;
+        new_plot.isUsed = true;
         new_plot.lastA =        new_plot.riseA  = new_plot.fallA= proc_azi;
         new_plot.maxLevel =     data_mem.level[proc_azi][range];
         new_plot.sumEnergy =    data_mem.level[proc_azi][range];
@@ -1966,7 +1947,7 @@ void C_radar_data::procPix(short proc_azi,short range)//_______signal detected, 
         for(unsigned short i = 0;i<plot_list.size();++i)
         {
             //  overwrite
-            if(!plot_list.at(i).size)
+            if(!plot_list.at(i).isUsed)
             {
                 data_mem.plotIndex[proc_azi][range] =  i;
 
@@ -2093,9 +2074,9 @@ void C_radar_data::setAutorgs(bool aut)
     if(aut)
     {
         rgs_auto = true;
-        krain_auto = 0.3;
-        kgain_auto  = 2.8;
-        ksea_auto = 0;
+        //krain_auto = 0.3;
+        //kgain_auto  = 4;
+        //ksea_auto = 0;
     }else
     {
         rgs_auto = false;
@@ -2372,10 +2353,10 @@ void C_radar_data::resetTrack()
     //        }
     //    }
 }
-#define TARGET_OBSERV_PERIOD 8000//ENVAR max periods to save object in the memory
+#define TARGET_OBSERV_PERIOD MAX_AZIR//ENVAR max periods to save object in the memory
 void C_radar_data::ProcesstRadarObjects()
 {
-    return;
+
     for (int i=0;i<mObjList.size();i++)
     {
         if(mPeriodCount - mObjList.at(i).period>TARGET_OBSERV_PERIOD)
@@ -2383,6 +2364,7 @@ void C_radar_data::ProcesstRadarObjects()
             mObjList.at(i).uniqID = -1;
         }
     }
+    return;
     for (int i=0;i<mObjList.size();i++)
     {
         if(mObjList.at(i).uniqID<0)continue;

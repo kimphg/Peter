@@ -98,7 +98,7 @@ typedef struct  {
     unsigned short size;
     unsigned int sumEnergy;
     unsigned char dopler,maxLevel;
-    //bool isFinished;
+    bool isUsed;
 } plot_t;
 typedef struct  {
     int uniqID;
@@ -242,7 +242,7 @@ public:
     void        assembleDataFrame(unsigned char *data, unsigned short dataLen);
     void        UpdateData();
     void        ProcessDataFrame();
-    void        ProcessData(unsigned short azi);
+    void        ProcessData(unsigned short azi, unsigned short lastAzi);
     void        raw_map_init();
     void        raw_map_init_zoom();
     void        drawAzi(short azi);
