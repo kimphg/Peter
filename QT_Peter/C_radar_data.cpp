@@ -2339,6 +2339,7 @@ void C_radar_data::resetTrack()
 
 void C_radar_data::ProcessObjects()
 {
+    return;
 
     for (int i=0;i<mObjList.size();i++)
     {
