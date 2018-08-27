@@ -107,7 +107,7 @@ typedef struct  {
     short          dazi,drg;
     short          size;
     char           dopler;
-    bool           isManual;
+    bool           isProcessed;
     float          p;
     float          terrain;
     float           rangeRes;
@@ -125,6 +125,8 @@ struct object_line
     float speedkmh;
     float bearingRad;
     float dx,dy;
+    bool isProcessed;
+    bool isDead;
 };
 typedef std::vector<object_t> objectList;
 using Eigen::MatrixXf;
@@ -227,7 +229,7 @@ public:
     unsigned char           moduleVal;
     float                   aziOffset;
     DataOverLay             dataOver;
-    unsigned char           noise_level[8];
+//    unsigned char           noise_level[8];
     unsigned char           tempType,rotation_speed;
     unsigned short          range_max;
     QImage                  *img_ppi,*img_RAmp,*img_zoom_ppi,*img_histogram,*img_spectre,*img_zoom_ar;
@@ -292,6 +294,7 @@ public:
     double getArcMaxAziRad() const;
     double getArcMinAziRad() const;
 private:
+    int mFalsePositiveCount;
     float hsTap ;
     qint64 now_ms ;
     //QVector<QRgb> colorTable;
@@ -324,6 +327,7 @@ private:
     void ProcessEach90Deg();
     int ssiDecode(ushort nAzi);
 public:
+    unsigned char mSledValue;
     int mEncoderVal;
     bool isMarineMode;
     //void drawZoomAR();
@@ -336,6 +340,7 @@ public:
     void ProcessObjects();
     static double ConvXYToRange(double x, double y);
     static double ConvXYToAziRad(double x, double y);
+    void resetGain();
 };
 
 //extern C_radar_data radarData;

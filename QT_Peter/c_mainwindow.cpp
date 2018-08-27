@@ -554,10 +554,7 @@ Mainwindow::Mainwindow(QWidget *parent) :
     QFont font;
     font.setPointSize(12);
     cmLog = new DialogCommandLog();
-    //ui->listTargetWidget->setFont(font);
-    //ui->frame_2->setStyleSheet("#frame_2 { border: 2px solid darkgreen; }");
-    //ui->frame_3->setStyleSheet("#frame_3 { border: 2px solid darkgreen; }");
-    //if(!this->isFullScreen())this->showFullScreen();
+    mShowobjects = false;
     InitNetwork();
     InitTimer();
     setFocusPolicy(Qt::StrongFocus);
@@ -798,7 +795,7 @@ void Mainwindow::DrawRadarTargetByPainter(QPainter* p)//draw radar target from p
     penSelTarget.setWidth(2);
     penSelTarget.setStyle(Qt::DashLine);
     QPen penTargetBlue(Qt::cyan);
-    penTargetBlue.setWidth(2);
+    penTargetBlue.setWidth(1);
     //penTargetBlue.setStyle(Qt::DashLine);
     //QPen penARPATrack(Qt::darkYellow);
     //draw radar targets
@@ -809,7 +806,7 @@ void Mainwindow::DrawRadarTargetByPainter(QPainter* p)//draw radar target from p
     //short targetId = 0;
     std::vector<object_t>* pObjList = &(pRadar->mObjList);
     p->setPen(penTargetBlue);
-    if(true)//raw objects
+    if(mShowobjects)//raw objects
     {
         foreach (object_t obj, *pObjList) {
             if(obj.uniqID<0)continue;
@@ -2554,6 +2551,7 @@ void Mainwindow::setScaleRange(double srange)
 void Mainwindow::UpdateScale()
 {
     float oldScale = mScale;
+
     //char byte2;
     bool isAdaptSn = ui->toolButton_auto_adapt->isChecked();
     if(mDistanceUnit==0)//NM
@@ -4214,4 +4212,24 @@ void Mainwindow::on_toolButton_dk_15_clicked()
 {
     commandMay22[8]=0x00;
     processing->sendCommand(commandMay22,12,false);
+}
+
+void Mainwindow::on_toolButton_sled_time25_clicked()
+{
+    pRadar->mSledValue = 180;
+}
+
+void Mainwindow::on_toolButton_sled_time8_clicked()
+{
+    pRadar->mSledValue = 50;
+}
+
+void Mainwindow::on_toolButton_sled_time3_clicked()
+{
+    pRadar->mSledValue = 10;
+}
+
+void Mainwindow::on_toolButton_sled_reset_2_clicked(bool checked)
+{
+    mShowobjects = checked;
 }

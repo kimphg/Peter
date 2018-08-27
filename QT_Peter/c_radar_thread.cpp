@@ -347,7 +347,7 @@ void dataProcessingThread::PushCommandQueue()
 
 
     }
-    mRadarData->ProcessObjects();
+//    mRadarData->ProcessObjects();
     /*while(false)// no sophia yet
     {
         object_t obj= mRadarData->ProcesstRadarObjects();

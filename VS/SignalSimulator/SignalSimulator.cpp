@@ -160,7 +160,7 @@ int _tmain(int argc, _TCHAR* argv[])
 			Sleep(500);
 		}*/
 		//if (rand() % 10 == 0)regenerate(azi);
-		outputFrame[azi][0] = 1;
+		outputFrame[azi][0] = 5;
 		outputFrame[azi][2] = azi >> 8;
 		outputFrame[azi][3] = azi;
 		outputFrame[azi][4] = n_clk_adc;

@@ -469,9 +469,17 @@ private slots:
 
     void on_toolButton_dk_15_clicked();
 
+    void on_toolButton_sled_time25_clicked();
+
+    void on_toolButton_sled_time8_clicked();
+
+    void on_toolButton_sled_time3_clicked();
+
+    void on_toolButton_sled_reset_2_clicked(bool checked);
+
 private:
 
-
+    bool mShowobjects;
     void initActionsConnections();
     void initGraphicView();
     void updateTargetInfo();
