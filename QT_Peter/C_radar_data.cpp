@@ -373,7 +373,7 @@ C_radar_data::C_radar_data()
     mSledValue = 180;
     rotDir = 0;
     mPeriodCount = 0;
-    logfile = fopen("logfile.txt", "wt");
+    logfile = fopen("logfile.dat", "wt");
     isMarineMode = true;
     range_max = RADAR_RESOLUTION;
     imgMode = VALUE_ORANGE_BLUE;
@@ -2339,7 +2339,7 @@ void C_radar_data::resetTrack()
 
 void C_radar_data::ProcessObjects()
 {
-    return;
+
 
     for (int i=0;i<mObjList.size();i++)
     {
@@ -2385,22 +2385,45 @@ void C_radar_data::ProcessObjects()
             newline.obj2        = *obj2;
             newline.isProcessed = false;
             newline.isDead      = false;
-            int k=0;
+
+
+
+            fprintf(logfile,"%f",obj1->rgKm*atan(obj1->aziRes*3));//rgAziErr:
+            fprintf(logfile,",%d",dtime);
+            fprintf(logfile,",%f",speedkmh);
+            fprintf(logfile,",%f",distancekm);//
+            if(obj1->dopler==obj2->dopler)
+            {
+                fprintf(logfile,",1");
+            }
+            else
+            {
+                fprintf(logfile,",0");
+            }
+            fprintf(logfile,"\n");
+            continue;
+            ushort k=0;
             for (;k<mLineList.size();k++)
             {
                 if(mLineList[k].isDead)
                 {
                     mLineList[k] = newline;
-                    continue;
+                    break;
                 }
             }
-            if(k>=mLineList.size())
+            if(k>=mLineList.size()&&k<2000)
                 mLineList.push_back(newline);
+            else {
+                printf("\nfull lines memory");
+                continue;
+            }
+            //
             object_line* pLine1=&mLineList[k];
-            for (int l=0;l<mLineList.size();l++)
+            for (ushort l=0;l<mLineList.size();l++)
             {
                 if(k==l)continue;
                 object_line* pLine2 = &mLineList[l];
+                if(pLine2->isDead)continue;
                 if(pLine1->obj2.uniqID==pLine2->obj1.uniqID)// new track
                 {
                     float distance = pLine2->distancekm+pLine1->distancekm;
@@ -2429,9 +2452,9 @@ void C_radar_data::ProcessObjects()
                     fprintf(logfile," bearingDiff:%f",bearingDiff);
                     fprintf(logfile,"\n");
 
-                    double score = powf(CONST_E, -distance*distance/0.25)
-                            +powf(CONST_E, -accHead*accHead/100.0)
-                            +powf(CONST_E, -rotDegSec*rotDegSec/PI_CHIA2/27000.0);
+                    double score = powl(CONST_E, -distance*distance/0.25)
+                            +powl(CONST_E, -accHead*accHead/100.0)
+                            +powl(CONST_E, -rotDegSec*rotDegSec/PI_CHIA2/27000.0);
                     if(false)//(score>pLine1->score)||(score>pLine2->score))
                     {
                         track_t newtrack;
@@ -2458,6 +2481,7 @@ void C_radar_data::ProcessObjects()
 
         }
     }
+    return;
     //create tracks
     for (int i=0;i<mLineList.size();i++)
     {

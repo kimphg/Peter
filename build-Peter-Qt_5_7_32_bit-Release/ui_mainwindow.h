@@ -302,6 +302,8 @@ public:
     QCustomButton *toolButton_sled;
     QCustomButton *toolButton_sled_reset;
     QCustomButton *toolButton_sled_reset_2;
+    QCustomButton *toolButton_sled_reset_3;
+    QCustomButton *toolButton_sled_reset_4;
     QButtonGroup *buttonGroup;
 
     void setupUi(QMainWindow *MainWindow)
@@ -5897,11 +5899,25 @@ public:
         toolButton_sled_reset->setCheckable(false);
         toolButton_sled_reset_2 = new QCustomButton(centralWidget);
         toolButton_sled_reset_2->setObjectName(QStringLiteral("toolButton_sled_reset_2"));
-        toolButton_sled_reset_2->setGeometry(QRect(760, 10, 101, 41));
+        toolButton_sled_reset_2->setGeometry(QRect(720, 10, 141, 41));
         sizePolicy1.setHeightForWidth(toolButton_sled_reset_2->sizePolicy().hasHeightForWidth());
         toolButton_sled_reset_2->setSizePolicy(sizePolicy1);
         toolButton_sled_reset_2->setFont(font1);
         toolButton_sled_reset_2->setCheckable(true);
+        toolButton_sled_reset_3 = new QCustomButton(centralWidget);
+        toolButton_sled_reset_3->setObjectName(QStringLiteral("toolButton_sled_reset_3"));
+        toolButton_sled_reset_3->setGeometry(QRect(720, 60, 141, 41));
+        sizePolicy1.setHeightForWidth(toolButton_sled_reset_3->sizePolicy().hasHeightForWidth());
+        toolButton_sled_reset_3->setSizePolicy(sizePolicy1);
+        toolButton_sled_reset_3->setFont(font1);
+        toolButton_sled_reset_3->setCheckable(true);
+        toolButton_sled_reset_4 = new QCustomButton(centralWidget);
+        toolButton_sled_reset_4->setObjectName(QStringLiteral("toolButton_sled_reset_4"));
+        toolButton_sled_reset_4->setGeometry(QRect(760, 110, 101, 41));
+        sizePolicy1.setHeightForWidth(toolButton_sled_reset_4->sizePolicy().hasHeightForWidth());
+        toolButton_sled_reset_4->setSizePolicy(sizePolicy1);
+        toolButton_sled_reset_4->setFont(font1);
+        toolButton_sled_reset_4->setCheckable(true);
         MainWindow->setCentralWidget(centralWidget);
         groupBox_5->raise();
         groupBox_7->raise();
@@ -5925,6 +5941,8 @@ public:
         toolButton_sled->raise();
         toolButton_sled_reset->raise();
         toolButton_sled_reset_2->raise();
+        toolButton_sled_reset_3->raise();
+        toolButton_sled_reset_4->raise();
 #ifndef QT_NO_SHORTCUT
         label_rain->setBuddy(horizontalSlider_rain);
         label_sea->setBuddy(horizontalSlider_sea);
@@ -6190,6 +6208,8 @@ public:
         toolButton_sled->setText(QApplication::translate("MainWindow", "Hi\341\273\207n v\341\272\277t", Q_NULLPTR));
         toolButton_sled_reset->setText(QApplication::translate("MainWindow", "Kh\341\273\237i t\341\272\241o v\341\272\277t", Q_NULLPTR));
         toolButton_sled_reset_2->setText(QApplication::translate("MainWindow", "\304\220i\341\273\203m d\341\272\245u ", Q_NULLPTR));
+        toolButton_sled_reset_3->setText(QApplication::translate("MainWindow", "Li\303\252n k\341\272\277t \304\221i\341\273\203m d\341\272\245u", Q_NULLPTR));
+        toolButton_sled_reset_4->setText(QApplication::translate("MainWindow", "Qu\341\273\271 \304\221\341\272\241o", Q_NULLPTR));
     } // retranslateUi
 
 };

@@ -36407,9 +36407,9 @@ background-color: rgba(255, 255, 255, 0);</string>
    <widget class="QCustomButton" name="toolButton_sled_reset_2">
     <property name="geometry">
      <rect>
-      <x>760</x>
+      <x>720</x>
       <y>10</y>
-      <width>101</width>
+      <width>141</width>
       <height>41</height>
      </rect>
     </property>
@@ -36426,6 +36426,60 @@ background-color: rgba(255, 255, 255, 0);</string>
     </property>
     <property name="text">
      <string>Điểm dấu </string>
+    </property>
+    <property name="checkable">
+     <bool>true</bool>
+    </property>
+   </widget>
+   <widget class="QCustomButton" name="toolButton_sled_reset_3">
+    <property name="geometry">
+     <rect>
+      <x>720</x>
+      <y>60</y>
+      <width>141</width>
+      <height>41</height>
+     </rect>
+    </property>
+    <property name="sizePolicy">
+     <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+      <horstretch>0</horstretch>
+      <verstretch>0</verstretch>
+     </sizepolicy>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>12</pointsize>
+     </font>
+    </property>
+    <property name="text">
+     <string>Liên kết điểm dấu</string>
+    </property>
+    <property name="checkable">
+     <bool>true</bool>
+    </property>
+   </widget>
+   <widget class="QCustomButton" name="toolButton_sled_reset_4">
+    <property name="geometry">
+     <rect>
+      <x>760</x>
+      <y>110</y>
+      <width>101</width>
+      <height>41</height>
+     </rect>
+    </property>
+    <property name="sizePolicy">
+     <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+      <horstretch>0</horstretch>
+      <verstretch>0</verstretch>
+     </sizepolicy>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>12</pointsize>
+     </font>
+    </property>
+    <property name="text">
+     <string>Quỹ đạo</string>
     </property>
     <property name="checkable">
      <bool>true</bool>
@@ -36453,6 +36507,8 @@ background-color: rgba(255, 255, 255, 0);</string>
    <zorder>toolButton_sled</zorder>
    <zorder>toolButton_sled_reset</zorder>
    <zorder>toolButton_sled_reset_2</zorder>
+   <zorder>toolButton_sled_reset_3</zorder>
+   <zorder>toolButton_sled_reset_4</zorder>
   </widget>
  </widget>
  <layoutdefault spacing="6" margin="11"/>

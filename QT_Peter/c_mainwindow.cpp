@@ -555,6 +555,8 @@ Mainwindow::Mainwindow(QWidget *parent) :
     font.setPointSize(12);
     cmLog = new DialogCommandLog();
     mShowobjects = false;
+    mShowLines = false;
+    mShowTracks = false;
     InitNetwork();
     InitTimer();
     setFocusPolicy(Qt::StrongFocus);
@@ -817,23 +819,25 @@ void Mainwindow::DrawRadarTargetByPainter(QPainter* p)//draw radar target from p
         }
 
     }
-
-    if(false)//raw lines
+    penTargetBlue.setWidth(2);
+    p->setPen(penTargetBlue);
+    if(mShowLines)//raw lines
     {
         foreach (object_line line, pRadar->mLineList) {
-            if(line.score<0)continue;
+            if(line.isDead)continue;
             sx = line.obj1.xkm*mScale + radCtX;
             sy = -line.obj1.ykm*mScale + radCtY;
             sx1 = line.obj2.xkm*mScale + radCtX;
             sy1 = -line.obj2.ykm*mScale + radCtY;
-            p->drawLine(sx,sy,sx1,sy1);
+            if(sx==sx1&&sy==sy1)  p->drawRect(sx,sy,5,5);
+                else p->drawLine(sx,sy,sx1,sy1);
 
             //p->drawRect(sx-5,sy-5,10,10);
         }
 
     }
     p->setPen(penTarget);
-    if(false)//raw tracks
+    if(mShowTracks)//raw tracks
     {
         foreach (track_t track, pRadar->mTrackList) {
             sx = track.xkm*mScale + radCtX;
@@ -4232,4 +4236,14 @@ void Mainwindow::on_toolButton_sled_time3_clicked()
 void Mainwindow::on_toolButton_sled_reset_2_clicked(bool checked)
 {
     mShowobjects = checked;
+}
+
+void Mainwindow::on_toolButton_sled_reset_3_clicked(bool checked)
+{
+    mShowLines = checked;
+}
+
+void Mainwindow::on_toolButton_sled_reset_4_clicked(bool checked)
+{
+    mShowTracks = checked;
 }

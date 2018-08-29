@@ -1,0 +1,4 @@
+age,continuous
+capital-gain,continuous
+capital-loss,continuous
+hours-per-week,continuous

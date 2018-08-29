@@ -477,9 +477,13 @@ private slots:
 
     void on_toolButton_sled_reset_2_clicked(bool checked);
 
+    void on_toolButton_sled_reset_3_clicked(bool checked);
+
+    void on_toolButton_sled_reset_4_clicked(bool checked);
+
 private:
 
-    bool mShowobjects;
+    bool mShowobjects,mShowLines,mShowTracks;
     void initActionsConnections();
     void initGraphicView();
     void updateTargetInfo();

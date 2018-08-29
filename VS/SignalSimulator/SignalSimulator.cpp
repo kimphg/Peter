@@ -80,7 +80,7 @@ void regenerate(int azi)
 
 
 
-#define NUM_OF_TARG 100
+#define NUM_OF_TARG 150
 target_t* target[NUM_OF_TARG];
 
 void initTargets()
@@ -89,10 +89,10 @@ void initTargets()
 	for (int i = 0; i < NUM_OF_TARG; i++)
 	{
 		target[i] = new target_t(
-			(rand() % 50) - 25,//x
-			(rand() % 50) - 25,//y
+			(rand() % 40) - 20,//x
+			(rand() % 40) - 20,//y
 			rand() % 40,//speed
-			rand() % 120,//heading
+			rand() % 360,//heading
 			i);
 	}
 	
