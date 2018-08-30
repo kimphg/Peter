@@ -80,15 +80,17 @@ public:
 		int azimin = azi - targetSize; if (azimin < 0)azimin += 2048;
 		int azimax = azi + targetSize; if (azimax >= 2048)azimax -= 2048;
 		int k = 0;
-		for (int a = azimin; a != azimax; a++)
+		for (int a = azimin; ; a++)
 		{
 			if (a < 0)a += 2048;
 			if (a >= 2048) a -= 2048;
+			if (a == azimax)break;
 			int value = 150 * (1.0 - abs(k - targetSize) / (targetSize + 1.0));
-			outputFrame[a][(int)range + FRAME_LEN + FRAME_HEADER_SIZE] = dopler;
-			outputFrame[a][(int)range + FRAME_LEN + 1 + FRAME_HEADER_SIZE] = dopler;
+			outputFrame[a][(int)range + FRAME_LEN + FRAME_HEADER_SIZE] = 0;
+			outputFrame[a][(int)range + FRAME_LEN + 1 + FRAME_HEADER_SIZE] = 0;
 			outputFrame[a][(int)range + FRAME_HEADER_SIZE] = value + int(distribNoise(generator));
 			outputFrame[a][(int)range + 1 + FRAME_HEADER_SIZE] = value + int(distribNoise(generator));
+			
 			k++;
 		}
 	}
@@ -97,14 +99,15 @@ public:
 		if (range >= FRAME_LEN - 1)return;
 		int azimax = azi + targetSize; if (azimax >= 2048)azimax -= 2048;
 		int azimin = azi - targetSize; if (azimin < 0)azimin += 2048;
-		for (int a = azimin; a != azimax; a++)
+		for (int a = azimin; ; a++)
 		{
 			if (a < 0)a += 2048;
 			if (a>=2048) a -= 2048;
+			if (a == azimax)break;
 			int num = int(distribNoise(generator));
 			if (num < 0)num = 0;
 			outputFrame[a][(int)range + FRAME_HEADER_SIZE] = num;
-			outputFrame[a][(int)range + FRAME_LEN + FRAME_HEADER_SIZE] = rand() % 16;
+			outputFrame[a][(int)range + FRAME_LEN + FRAME_HEADER_SIZE] =  rand() % 16;
 			num = int(distribNoise(generator));
 			if (num < 0)num = 0;
 			outputFrame[a][(int)range + 1 + FRAME_HEADER_SIZE] = num;

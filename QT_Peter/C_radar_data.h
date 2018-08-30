@@ -48,7 +48,7 @@
 #define TERRAIN_GAIN                0.9f
 #define TERRAIN_GAIN_1              0.1f
 #define TERRAIN_THRESH              0.5f
-#define TARGET_MAX_SPEED_MARINE            100
+#define TARGET_MAX_SPEED_MARINE     50.0
 #define ZOOM_SIZE                   550
 #define DISPLAY_RES_ZOOM            5120
 #define DISPLAY_SCALE_ZOOM          4
@@ -113,6 +113,7 @@ typedef struct  {
     float           rangeRes;
     float           aziRes;
     qint64          timeMs;
+    float           score1,score2;
     unsigned long long int period;
 }object_t;
 struct object_line
@@ -121,8 +122,8 @@ struct object_line
     float       dtimeMSec;
     object_t    obj1;
     object_t    obj2;
-    float distancekm;
-    float speedkmh;
+    float distanceCoeff;
+    float speedkmh,rgSpeedkmh;
     float bearingRad;
     float dx,dy;
     bool isProcessed;

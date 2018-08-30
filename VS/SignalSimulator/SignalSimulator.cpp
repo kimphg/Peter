@@ -80,7 +80,7 @@ void regenerate(int azi)
 
 
 
-#define NUM_OF_TARG 150
+#define NUM_OF_TARG 400
 target_t* target[NUM_OF_TARG];
 
 void initTargets()
@@ -134,12 +134,18 @@ int _tmain(int argc, _TCHAR* argv[])
 				nPeriod = 0;
 				//initTargets();
 			}
-			if (nPeriod == 5)
+			if (nPeriod == 20)
 			{
 				n_clk_adc = 2;
 				rResolution = 0.015070644 * pow(2, n_clk_adc);
 				
 				
+			}
+			if (nPeriod == 50)
+			{
+				return 0;
+
+
 			}
 			azi = 0;
 			updateTargets();

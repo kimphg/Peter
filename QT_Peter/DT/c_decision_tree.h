@@ -4,9 +4,11 @@
 #include <QString>
 #include <vector>
 #include <QHash>
-#define MAX_ACCURACY 0.95
+#define MAX_ACCURACY 0.99
 #define MAX_DEPTH 10
-#define MIN_ERROR_GAIN 0.02
+#define MIN_ERROR_GAIN 0.01
+#define LOST_PRECISION 1
+#define LOST_RECALL 1
 struct Feature
 {
     QString mName;

@@ -829,8 +829,7 @@ void Mainwindow::DrawRadarTargetByPainter(QPainter* p)//draw radar target from p
             sy = -line.obj1.ykm*mScale + radCtY;
             sx1 = line.obj2.xkm*mScale + radCtX;
             sy1 = -line.obj2.ykm*mScale + radCtY;
-            if(sx==sx1&&sy==sy1)  p->drawRect(sx,sy,5,5);
-                else p->drawLine(sx,sy,sx1,sy1);
+            p->drawLine(sx,sy,sx1,sy1);
 
             //p->drawRect(sx-5,sy-5,10,10);
         }

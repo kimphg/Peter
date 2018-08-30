@@ -59,7 +59,8 @@ void Node::create_leaf()
     {
         if(mDataSet[j].mTarget)nTrue++;
     }
-    mPrediction = nTrue/double(mDataSet.size());
+    mPrediction = (double)nTrue/double(mDataSet.size());
+    printf("prediction:%f",mPrediction);
 }
 int Node::num_mistakes(DataSet data)//intermediate_node_num_mistakes
 {
@@ -69,8 +70,8 @@ int Node::num_mistakes(DataSet data)//intermediate_node_num_mistakes
         if(data[i].mTarget)nTrue++;
     }
     int nFalse = data.size()-nTrue;
-    if(nFalse<nTrue)return nFalse;
-    else return nTrue;
+    if(nFalse<nTrue)return nFalse*LOST_PRECISION;// mistakes are precision(false detections)
+    else return nTrue*LOST_RECALL;// mistakes are recall(skipped true detections)
 }
 
 bool Node::split()//finds the best feature to split on given the data and a list of features
@@ -144,7 +145,12 @@ bool Node::split()//finds the best feature to split on given the data and a list
         else
             mDataRight.push_back(mDataSet[j]);
     }
+    printf("\nsplit by feature: ");
+    printf(best_feature.toStdString().data());
+    printf(" at value:%f",best_split_point);
+    printf("\nLeft %d:",current_depth+1);
     mLeftNode = new Node(current_depth+1,mDataLeft,mFeatures);
+    printf("\nRight %d:",current_depth+1);
     mRightNode = new Node(current_depth+1,mDataRight,mFeatures);
     return true;
 }

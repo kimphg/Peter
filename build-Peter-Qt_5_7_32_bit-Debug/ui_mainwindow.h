@@ -53,7 +53,7 @@ public:
     QCustomButton *toolButton_centerView;
     QCustomButton *toolButton_measuring;
     QCustomGroupBox *groupBox_7;
-    QWidget *layoutWidget;
+    QVBoxLayout *verticalLayout;
     QFormLayout *formLayout_2;
     QFrame *line;
     QLabel *label_17;
@@ -68,20 +68,11 @@ public:
     QLabel *label_data_long;
     QLabel *label_status_11;
     QLabel *label_data_lat;
-    QWidget *layoutWidget1;
-    QVBoxLayout *verticalLayout;
-    QCustomButton *toolButton_delete_target;
-    QCustomButton *toolButton_reset_6;
-    QCustomButton *toolButton_reset_3;
-    QCustomButton *toolButton_sled;
-    QCustomButton *toolButton_sled_reset;
-    QCustomGroupBox *groupBox_10;
-    QToolButton *label_status_warning;
     QCustomTabWidget *tabWidget_menu;
     QWidget *tab_3;
     QLineEdit *lineEdit_password;
     QGroupBox *groupBox_control;
-    QWidget *layoutWidget2;
+    QWidget *layoutWidget;
     QGridLayout *gridLayout_2;
     QLineEdit *lineEdit_byte_1;
     QLineEdit *lineEdit_byte_2;
@@ -93,12 +84,12 @@ public:
     QLineEdit *lineEdit_byte_8;
     QCustomButton *toolButton_send_command;
     QCustomButton *toolButton_help;
-    QWidget *layoutWidget3;
+    QWidget *layoutWidget1;
     QFormLayout *formLayout_6;
     QCustomButton *toolButton_set_header_size;
     QLineEdit *textEdit_header_len;
     QCustomButton *toolButton_export_data;
-    QWidget *layoutWidget4;
+    QWidget *layoutWidget2;
     QGridLayout *gridLayout;
     QCustomButton *toolButton_command_antenna_rot;
     QCustomButton *toolButton_noise_balance;
@@ -115,7 +106,7 @@ public:
     QLabel *label_command;
     QCustomComboBox *comboBox_temp_type;
     QLabel *label_temp;
-    QWidget *layoutWidget5;
+    QWidget *layoutWidget3;
     QVBoxLayout *verticalLayout_4;
     QLabel *label_debug;
     QLabel *label_debug_data;
@@ -176,7 +167,7 @@ public:
     QLineEdit *textEdit_size_ar_a;
     QLineEdit *textEdit_size_ar_r;
     QCustomButton *toolButton_set_zoom_ar_size;
-    QWidget *layoutWidget6;
+    QWidget *layoutWidget4;
     QVBoxLayout *verticalLayout_5;
     QCustomButton *toolButton_selfRotation;
     QCustomButton *toolButton_selfRotation_2;
@@ -210,12 +201,14 @@ public:
     QLabel *label_gps_lon;
     QLabel *label_record_file_name_8;
     QLabel *label_gps_heading;
-    QLabel *label_sn_param;
-    QLabel *label_sn_pulsew;
-    QLabel *label_18;
+    QWidget *layoutWidget5;
+    QGridLayout *gridLayout_8;
     QLabel *label_3;
-    QLabel *label_24;
+    QLabel *label_sn_param;
+    QLabel *label_18;
     QLabel *label_sn_freq;
+    QLabel *label_24;
+    QLabel *label_sn_pulsew;
     QLabel *label_2;
     QLabel *label_status;
     QWidget *tab_6;
@@ -236,7 +229,16 @@ public:
     QSlider *horizontalSlider_sea;
     QSlider *horizontalSlider_rain;
     QCustomButton *toolButton_xl_dopler_2;
-    QCustomButton *toolButton_xl_dopler;
+    QCustomGroupBox *groupBox_23;
+    QGridLayout *gridLayout_17;
+    QCustomButton *toolButton_sled_time8;
+    QCustomButton *toolButton_sled_time25;
+    QCustomButton *toolButton_sled_time3;
+    QCustomGroupBox *groupBox_10;
+    QToolButton *label_status_warning;
+    QCustomButton *toolButton_delete_target;
+    QCustomButton *toolButton_reset_3;
+    QCustomButton *toolButton_reset_6;
     QWidget *tab;
     QCustomGroupBox *groupBox_16;
     QGridLayout *gridLayout_3;
@@ -277,8 +279,6 @@ public:
     QLabel *label_azi_heading_gps;
     QLabel *label_azi_antenna_head_true;
     QCustomButton *toolButton_head_up;
-    QCustomButton *toolButton_xl_nguong;
-    QCustomButton *toolButton_xl_nguong_3;
     QCustomGroupBox *groupBox_4;
     QGridLayout *gridLayout_4;
     QCustomButton *toolButton_replay;
@@ -296,6 +296,14 @@ public:
     QLabel *label_sn_type;
     QLabel *label_range_resolution;
     QLabel *label_4;
+    QCustomButton *toolButton_xl_nguong_3;
+    QCustomButton *toolButton_xl_dopler;
+    QCustomButton *toolButton_xl_nguong;
+    QCustomButton *toolButton_sled;
+    QCustomButton *toolButton_sled_reset;
+    QCustomButton *toolButton_sled_reset_2;
+    QCustomButton *toolButton_sled_reset_3;
+    QCustomButton *toolButton_sled_reset_4;
     QButtonGroup *buttonGroup;
 
     void setupUi(QMainWindow *MainWindow)
@@ -703,27 +711,27 @@ public:
 
         groupBox_7 = new QCustomGroupBox(centralWidget);
         groupBox_7->setObjectName(QStringLiteral("groupBox_7"));
-        groupBox_7->setGeometry(QRect(950, 0, 321, 211));
+        groupBox_7->setGeometry(QRect(1090, 10, 181, 213));
         groupBox_7->setFont(font1);
         groupBox_7->setAutoFillBackground(false);
         groupBox_7->setTitle(QString::fromUtf8("Th\303\264ng tin m\341\273\245c ti\303\252u"));
-        layoutWidget = new QWidget(groupBox_7);
-        layoutWidget->setObjectName(QStringLiteral("layoutWidget"));
-        layoutWidget->setGeometry(QRect(10, 20, 161, 181));
-        formLayout_2 = new QFormLayout(layoutWidget);
+        verticalLayout = new QVBoxLayout(groupBox_7);
+        verticalLayout->setSpacing(6);
+        verticalLayout->setContentsMargins(11, 11, 11, 11);
+        verticalLayout->setObjectName(QStringLiteral("verticalLayout"));
+        formLayout_2 = new QFormLayout();
         formLayout_2->setSpacing(6);
-        formLayout_2->setContentsMargins(11, 11, 11, 11);
         formLayout_2->setObjectName(QStringLiteral("formLayout_2"));
         formLayout_2->setHorizontalSpacing(8);
         formLayout_2->setVerticalSpacing(8);
-        line = new QFrame(layoutWidget);
+        line = new QFrame(groupBox_7);
         line->setObjectName(QStringLiteral("line"));
         line->setFrameShape(QFrame::HLine);
         line->setFrameShadow(QFrame::Sunken);
 
         formLayout_2->setWidget(0, QFormLayout::SpanningRole, line);
 
-        label_17 = new QLabel(layoutWidget);
+        label_17 = new QLabel(groupBox_7);
         label_17->setObjectName(QStringLiteral("label_17"));
         QPalette palette5;
         palette5.setBrush(QPalette::Active, QPalette::WindowText, brush);
@@ -777,7 +785,7 @@ public:
 
         formLayout_2->setWidget(1, QFormLayout::LabelRole, label_17);
 
-        label_data_range = new QLabel(layoutWidget);
+        label_data_range = new QLabel(groupBox_7);
         label_data_range->setObjectName(QStringLiteral("label_data_range"));
         QPalette palette6;
         palette6.setBrush(QPalette::Active, QPalette::WindowText, brush);
@@ -831,7 +839,7 @@ public:
 
         formLayout_2->setWidget(1, QFormLayout::FieldRole, label_data_range);
 
-        label_14 = new QLabel(layoutWidget);
+        label_14 = new QLabel(groupBox_7);
         label_14->setObjectName(QStringLiteral("label_14"));
         QPalette palette7;
         palette7.setBrush(QPalette::Active, QPalette::WindowText, brush);
@@ -885,7 +893,7 @@ public:
 
         formLayout_2->setWidget(2, QFormLayout::LabelRole, label_14);
 
-        label_data_azi = new QLabel(layoutWidget);
+        label_data_azi = new QLabel(groupBox_7);
         label_data_azi->setObjectName(QStringLiteral("label_data_azi"));
         QPalette palette8;
         palette8.setBrush(QPalette::Active, QPalette::WindowText, brush);
@@ -942,7 +950,7 @@ public:
 
         formLayout_2->setWidget(2, QFormLayout::FieldRole, label_data_azi);
 
-        label_19 = new QLabel(layoutWidget);
+        label_19 = new QLabel(groupBox_7);
         label_19->setObjectName(QStringLiteral("label_19"));
         QPalette palette9;
         palette9.setBrush(QPalette::Active, QPalette::WindowText, brush);
@@ -996,7 +1004,7 @@ public:
 
         formLayout_2->setWidget(3, QFormLayout::LabelRole, label_19);
 
-        label_data_speed = new QLabel(layoutWidget);
+        label_data_speed = new QLabel(groupBox_7);
         label_data_speed->setObjectName(QStringLiteral("label_data_speed"));
         QPalette palette10;
         palette10.setBrush(QPalette::Active, QPalette::WindowText, brush);
@@ -1053,7 +1061,7 @@ public:
 
         formLayout_2->setWidget(3, QFormLayout::FieldRole, label_data_speed);
 
-        label_20 = new QLabel(layoutWidget);
+        label_20 = new QLabel(groupBox_7);
         label_20->setObjectName(QStringLiteral("label_20"));
         QPalette palette11;
         palette11.setBrush(QPalette::Active, QPalette::WindowText, brush);
@@ -1107,7 +1115,7 @@ public:
 
         formLayout_2->setWidget(4, QFormLayout::LabelRole, label_20);
 
-        label_data_heading = new QLabel(layoutWidget);
+        label_data_heading = new QLabel(groupBox_7);
         label_data_heading->setObjectName(QStringLiteral("label_data_heading"));
         QPalette palette12;
         palette12.setBrush(QPalette::Active, QPalette::WindowText, brush);
@@ -1164,7 +1172,7 @@ public:
 
         formLayout_2->setWidget(4, QFormLayout::FieldRole, label_data_heading);
 
-        label_status_10 = new QLabel(layoutWidget);
+        label_status_10 = new QLabel(groupBox_7);
         label_status_10->setObjectName(QStringLiteral("label_status_10"));
         QPalette palette13;
         palette13.setBrush(QPalette::Active, QPalette::WindowText, brush);
@@ -1221,7 +1229,7 @@ public:
 
         formLayout_2->setWidget(5, QFormLayout::LabelRole, label_status_10);
 
-        label_data_long = new QLabel(layoutWidget);
+        label_data_long = new QLabel(groupBox_7);
         label_data_long->setObjectName(QStringLiteral("label_data_long"));
         QPalette palette14;
         palette14.setBrush(QPalette::Active, QPalette::WindowText, brush);
@@ -1278,7 +1286,7 @@ public:
 
         formLayout_2->setWidget(5, QFormLayout::FieldRole, label_data_long);
 
-        label_status_11 = new QLabel(layoutWidget);
+        label_status_11 = new QLabel(groupBox_7);
         label_status_11->setObjectName(QStringLiteral("label_status_11"));
         QPalette palette15;
         palette15.setBrush(QPalette::Active, QPalette::WindowText, brush);
@@ -1335,7 +1343,7 @@ public:
 
         formLayout_2->setWidget(6, QFormLayout::LabelRole, label_status_11);
 
-        label_data_lat = new QLabel(layoutWidget);
+        label_data_lat = new QLabel(groupBox_7);
         label_data_lat->setObjectName(QStringLiteral("label_data_lat"));
         QPalette palette16;
         palette16.setBrush(QPalette::Active, QPalette::WindowText, brush);
@@ -1392,68 +1400,9 @@ public:
 
         formLayout_2->setWidget(6, QFormLayout::FieldRole, label_data_lat);
 
-        layoutWidget1 = new QWidget(groupBox_7);
-        layoutWidget1->setObjectName(QStringLiteral("layoutWidget1"));
-        layoutWidget1->setGeometry(QRect(170, 20, 139, 181));
-        verticalLayout = new QVBoxLayout(layoutWidget1);
-        verticalLayout->setSpacing(6);
-        verticalLayout->setContentsMargins(11, 11, 11, 11);
-        verticalLayout->setObjectName(QStringLiteral("verticalLayout"));
-        toolButton_delete_target = new QCustomButton(layoutWidget1);
-        toolButton_delete_target->setObjectName(QStringLiteral("toolButton_delete_target"));
-        sizePolicy1.setHeightForWidth(toolButton_delete_target->sizePolicy().hasHeightForWidth());
-        toolButton_delete_target->setSizePolicy(sizePolicy1);
-        toolButton_delete_target->setFont(font1);
-        toolButton_delete_target->setCheckable(false);
 
-        verticalLayout->addWidget(toolButton_delete_target);
+        verticalLayout->addLayout(formLayout_2);
 
-        toolButton_reset_6 = new QCustomButton(layoutWidget1);
-        toolButton_reset_6->setObjectName(QStringLiteral("toolButton_reset_6"));
-        sizePolicy1.setHeightForWidth(toolButton_reset_6->sizePolicy().hasHeightForWidth());
-        toolButton_reset_6->setSizePolicy(sizePolicy1);
-        toolButton_reset_6->setFont(font1);
-        toolButton_reset_6->setCheckable(true);
-
-        verticalLayout->addWidget(toolButton_reset_6);
-
-        toolButton_reset_3 = new QCustomButton(layoutWidget1);
-        toolButton_reset_3->setObjectName(QStringLiteral("toolButton_reset_3"));
-        sizePolicy1.setHeightForWidth(toolButton_reset_3->sizePolicy().hasHeightForWidth());
-        toolButton_reset_3->setSizePolicy(sizePolicy1);
-        toolButton_reset_3->setFont(font1);
-        toolButton_reset_3->setCheckable(false);
-
-        verticalLayout->addWidget(toolButton_reset_3);
-
-        toolButton_sled = new QCustomButton(layoutWidget1);
-        toolButton_sled->setObjectName(QStringLiteral("toolButton_sled"));
-        sizePolicy1.setHeightForWidth(toolButton_sled->sizePolicy().hasHeightForWidth());
-        toolButton_sled->setSizePolicy(sizePolicy1);
-        toolButton_sled->setFont(font1);
-        toolButton_sled->setCheckable(true);
-
-        verticalLayout->addWidget(toolButton_sled);
-
-        toolButton_sled_reset = new QCustomButton(layoutWidget1);
-        toolButton_sled_reset->setObjectName(QStringLiteral("toolButton_sled_reset"));
-        sizePolicy1.setHeightForWidth(toolButton_sled_reset->sizePolicy().hasHeightForWidth());
-        toolButton_sled_reset->setSizePolicy(sizePolicy1);
-        toolButton_sled_reset->setFont(font1);
-        toolButton_sled_reset->setCheckable(false);
-
-        verticalLayout->addWidget(toolButton_sled_reset);
-
-        groupBox_10 = new QCustomGroupBox(centralWidget);
-        groupBox_10->setObjectName(QStringLiteral("groupBox_10"));
-        groupBox_10->setGeometry(QRect(770, 0, 171, 81));
-        label_status_warning = new QToolButton(groupBox_10);
-        label_status_warning->setObjectName(QStringLiteral("label_status_warning"));
-        label_status_warning->setGeometry(QRect(10, 30, 151, 41));
-        sizePolicy1.setHeightForWidth(label_status_warning->sizePolicy().hasHeightForWidth());
-        label_status_warning->setSizePolicy(sizePolicy1);
-        label_status_warning->setFont(font1);
-        label_status_warning->setCheckable(false);
         tabWidget_menu = new QCustomTabWidget(centralWidget);
         tabWidget_menu->setObjectName(QStringLiteral("tabWidget_menu"));
         tabWidget_menu->setGeometry(QRect(1380, 20, 531, 541));
@@ -1540,15 +1489,15 @@ public:
         groupBox_control = new QGroupBox(tab_3);
         groupBox_control->setObjectName(QStringLiteral("groupBox_control"));
         groupBox_control->setGeometry(QRect(10, 10, 501, 331));
-        layoutWidget2 = new QWidget(groupBox_control);
-        layoutWidget2->setObjectName(QStringLiteral("layoutWidget2"));
-        layoutWidget2->setGeometry(QRect(0, 20, 151, 171));
-        gridLayout_2 = new QGridLayout(layoutWidget2);
+        layoutWidget = new QWidget(groupBox_control);
+        layoutWidget->setObjectName(QStringLiteral("layoutWidget"));
+        layoutWidget->setGeometry(QRect(0, 20, 151, 171));
+        gridLayout_2 = new QGridLayout(layoutWidget);
         gridLayout_2->setSpacing(6);
         gridLayout_2->setContentsMargins(11, 11, 11, 11);
         gridLayout_2->setObjectName(QStringLiteral("gridLayout_2"));
         gridLayout_2->setContentsMargins(6, 6, 6, 6);
-        lineEdit_byte_1 = new QLineEdit(layoutWidget2);
+        lineEdit_byte_1 = new QLineEdit(layoutWidget);
         lineEdit_byte_1->setObjectName(QStringLiteral("lineEdit_byte_1"));
         sizePolicy1.setHeightForWidth(lineEdit_byte_1->sizePolicy().hasHeightForWidth());
         lineEdit_byte_1->setSizePolicy(sizePolicy1);
@@ -1607,7 +1556,7 @@ public:
 
         gridLayout_2->addWidget(lineEdit_byte_1, 0, 0, 1, 1);
 
-        lineEdit_byte_2 = new QLineEdit(layoutWidget2);
+        lineEdit_byte_2 = new QLineEdit(layoutWidget);
         lineEdit_byte_2->setObjectName(QStringLiteral("lineEdit_byte_2"));
         sizePolicy1.setHeightForWidth(lineEdit_byte_2->sizePolicy().hasHeightForWidth());
         lineEdit_byte_2->setSizePolicy(sizePolicy1);
@@ -1665,7 +1614,7 @@ public:
 
         gridLayout_2->addWidget(lineEdit_byte_2, 0, 1, 1, 1);
 
-        lineEdit_byte_3 = new QLineEdit(layoutWidget2);
+        lineEdit_byte_3 = new QLineEdit(layoutWidget);
         lineEdit_byte_3->setObjectName(QStringLiteral("lineEdit_byte_3"));
         sizePolicy1.setHeightForWidth(lineEdit_byte_3->sizePolicy().hasHeightForWidth());
         lineEdit_byte_3->setSizePolicy(sizePolicy1);
@@ -1724,7 +1673,7 @@ public:
 
         gridLayout_2->addWidget(lineEdit_byte_3, 1, 0, 1, 1);
 
-        lineEdit_byte_4 = new QLineEdit(layoutWidget2);
+        lineEdit_byte_4 = new QLineEdit(layoutWidget);
         lineEdit_byte_4->setObjectName(QStringLiteral("lineEdit_byte_4"));
         sizePolicy1.setHeightForWidth(lineEdit_byte_4->sizePolicy().hasHeightForWidth());
         lineEdit_byte_4->setSizePolicy(sizePolicy1);
@@ -1783,7 +1732,7 @@ public:
 
         gridLayout_2->addWidget(lineEdit_byte_4, 1, 1, 1, 1);
 
-        lineEdit_byte_5 = new QLineEdit(layoutWidget2);
+        lineEdit_byte_5 = new QLineEdit(layoutWidget);
         lineEdit_byte_5->setObjectName(QStringLiteral("lineEdit_byte_5"));
         sizePolicy1.setHeightForWidth(lineEdit_byte_5->sizePolicy().hasHeightForWidth());
         lineEdit_byte_5->setSizePolicy(sizePolicy1);
@@ -1842,7 +1791,7 @@ public:
 
         gridLayout_2->addWidget(lineEdit_byte_5, 2, 0, 1, 1);
 
-        lineEdit_byte_6 = new QLineEdit(layoutWidget2);
+        lineEdit_byte_6 = new QLineEdit(layoutWidget);
         lineEdit_byte_6->setObjectName(QStringLiteral("lineEdit_byte_6"));
         sizePolicy1.setHeightForWidth(lineEdit_byte_6->sizePolicy().hasHeightForWidth());
         lineEdit_byte_6->setSizePolicy(sizePolicy1);
@@ -1901,7 +1850,7 @@ public:
 
         gridLayout_2->addWidget(lineEdit_byte_6, 2, 1, 1, 1);
 
-        lineEdit_byte_7 = new QLineEdit(layoutWidget2);
+        lineEdit_byte_7 = new QLineEdit(layoutWidget);
         lineEdit_byte_7->setObjectName(QStringLiteral("lineEdit_byte_7"));
         sizePolicy1.setHeightForWidth(lineEdit_byte_7->sizePolicy().hasHeightForWidth());
         lineEdit_byte_7->setSizePolicy(sizePolicy1);
@@ -1960,7 +1909,7 @@ public:
 
         gridLayout_2->addWidget(lineEdit_byte_7, 3, 0, 1, 1);
 
-        lineEdit_byte_8 = new QLineEdit(layoutWidget2);
+        lineEdit_byte_8 = new QLineEdit(layoutWidget);
         lineEdit_byte_8->setObjectName(QStringLiteral("lineEdit_byte_8"));
         sizePolicy1.setHeightForWidth(lineEdit_byte_8->sizePolicy().hasHeightForWidth());
         lineEdit_byte_8->setSizePolicy(sizePolicy1);
@@ -2025,22 +1974,22 @@ public:
         toolButton_help = new QCustomButton(groupBox_control);
         toolButton_help->setObjectName(QStringLiteral("toolButton_help"));
         toolButton_help->setGeometry(QRect(10, 240, 141, 31));
-        layoutWidget3 = new QWidget(groupBox_control);
-        layoutWidget3->setObjectName(QStringLiteral("layoutWidget3"));
-        layoutWidget3->setGeometry(QRect(220, 200, 241, 74));
-        formLayout_6 = new QFormLayout(layoutWidget3);
+        layoutWidget1 = new QWidget(groupBox_control);
+        layoutWidget1->setObjectName(QStringLiteral("layoutWidget1"));
+        layoutWidget1->setGeometry(QRect(220, 200, 241, 74));
+        formLayout_6 = new QFormLayout(layoutWidget1);
         formLayout_6->setSpacing(6);
         formLayout_6->setContentsMargins(11, 11, 11, 11);
         formLayout_6->setObjectName(QStringLiteral("formLayout_6"));
         formLayout_6->setContentsMargins(6, 6, 6, 6);
-        toolButton_set_header_size = new QCustomButton(layoutWidget3);
+        toolButton_set_header_size = new QCustomButton(layoutWidget1);
         toolButton_set_header_size->setObjectName(QStringLiteral("toolButton_set_header_size"));
         sizePolicy1.setHeightForWidth(toolButton_set_header_size->sizePolicy().hasHeightForWidth());
         toolButton_set_header_size->setSizePolicy(sizePolicy1);
 
         formLayout_6->setWidget(0, QFormLayout::LabelRole, toolButton_set_header_size);
 
-        textEdit_header_len = new QLineEdit(layoutWidget3);
+        textEdit_header_len = new QLineEdit(layoutWidget1);
         textEdit_header_len->setObjectName(QStringLiteral("textEdit_header_len"));
         sizePolicy1.setHeightForWidth(textEdit_header_len->sizePolicy().hasHeightForWidth());
         textEdit_header_len->setSizePolicy(sizePolicy1);
@@ -2099,7 +2048,7 @@ public:
 
         formLayout_6->setWidget(0, QFormLayout::FieldRole, textEdit_header_len);
 
-        toolButton_export_data = new QCustomButton(layoutWidget3);
+        toolButton_export_data = new QCustomButton(layoutWidget1);
         toolButton_export_data->setObjectName(QStringLiteral("toolButton_export_data"));
         sizePolicy1.setHeightForWidth(toolButton_export_data->sizePolicy().hasHeightForWidth());
         toolButton_export_data->setSizePolicy(sizePolicy1);
@@ -2108,15 +2057,15 @@ public:
 
         formLayout_6->setWidget(1, QFormLayout::LabelRole, toolButton_export_data);
 
-        layoutWidget4 = new QWidget(groupBox_control);
-        layoutWidget4->setObjectName(QStringLiteral("layoutWidget4"));
-        layoutWidget4->setGeometry(QRect(220, 20, 283, 171));
-        gridLayout = new QGridLayout(layoutWidget4);
+        layoutWidget2 = new QWidget(groupBox_control);
+        layoutWidget2->setObjectName(QStringLiteral("layoutWidget2"));
+        layoutWidget2->setGeometry(QRect(220, 20, 283, 171));
+        gridLayout = new QGridLayout(layoutWidget2);
         gridLayout->setSpacing(6);
         gridLayout->setContentsMargins(11, 11, 11, 11);
         gridLayout->setObjectName(QStringLiteral("gridLayout"));
         gridLayout->setContentsMargins(6, 6, 6, 6);
-        toolButton_command_antenna_rot = new QCustomButton(layoutWidget4);
+        toolButton_command_antenna_rot = new QCustomButton(layoutWidget2);
         toolButton_command_antenna_rot->setObjectName(QStringLiteral("toolButton_command_antenna_rot"));
         sizePolicy1.setHeightForWidth(toolButton_command_antenna_rot->sizePolicy().hasHeightForWidth());
         toolButton_command_antenna_rot->setSizePolicy(sizePolicy1);
@@ -2126,7 +2075,7 @@ public:
 
         gridLayout->addWidget(toolButton_command_antenna_rot, 0, 0, 1, 1);
 
-        toolButton_noise_balance = new QCustomButton(layoutWidget4);
+        toolButton_noise_balance = new QCustomButton(layoutWidget2);
         toolButton_noise_balance->setObjectName(QStringLiteral("toolButton_noise_balance"));
         sizePolicy1.setHeightForWidth(toolButton_noise_balance->sizePolicy().hasHeightForWidth());
         toolButton_noise_balance->setSizePolicy(sizePolicy1);
@@ -2136,7 +2085,7 @@ public:
 
         gridLayout->addWidget(toolButton_noise_balance, 0, 1, 1, 1);
 
-        toolButton_command_dopler = new QCustomButton(layoutWidget4);
+        toolButton_command_dopler = new QCustomButton(layoutWidget2);
         toolButton_command_dopler->setObjectName(QStringLiteral("toolButton_command_dopler"));
         sizePolicy1.setHeightForWidth(toolButton_command_dopler->sizePolicy().hasHeightForWidth());
         toolButton_command_dopler->setSizePolicy(sizePolicy1);
@@ -2146,7 +2095,7 @@ public:
 
         gridLayout->addWidget(toolButton_command_dopler, 1, 0, 1, 1);
 
-        toolButton_limit_signal = new QCustomButton(layoutWidget4);
+        toolButton_limit_signal = new QCustomButton(layoutWidget2);
         toolButton_limit_signal->setObjectName(QStringLiteral("toolButton_limit_signal"));
         sizePolicy1.setHeightForWidth(toolButton_limit_signal->sizePolicy().hasHeightForWidth());
         toolButton_limit_signal->setSizePolicy(sizePolicy1);
@@ -2156,7 +2105,7 @@ public:
 
         gridLayout->addWidget(toolButton_limit_signal, 1, 1, 1, 1);
 
-        toolButton_command_period = new QCustomButton(layoutWidget4);
+        toolButton_command_period = new QCustomButton(layoutWidget2);
         toolButton_command_period->setObjectName(QStringLiteral("toolButton_command_period"));
         sizePolicy1.setHeightForWidth(toolButton_command_period->sizePolicy().hasHeightForWidth());
         toolButton_command_period->setSizePolicy(sizePolicy1);
@@ -2166,7 +2115,7 @@ public:
 
         gridLayout->addWidget(toolButton_command_period, 2, 0, 1, 1);
 
-        toolButton_command_dttt = new QCustomButton(layoutWidget4);
+        toolButton_command_dttt = new QCustomButton(layoutWidget2);
         toolButton_command_dttt->setObjectName(QStringLiteral("toolButton_command_dttt"));
         sizePolicy1.setHeightForWidth(toolButton_command_dttt->sizePolicy().hasHeightForWidth());
         toolButton_command_dttt->setSizePolicy(sizePolicy1);
@@ -2176,7 +2125,7 @@ public:
 
         gridLayout->addWidget(toolButton_command_dttt, 3, 0, 1, 1);
 
-        toolButton_command_res = new QCustomButton(layoutWidget4);
+        toolButton_command_res = new QCustomButton(layoutWidget2);
         toolButton_command_res->setObjectName(QStringLiteral("toolButton_command_res"));
         sizePolicy1.setHeightForWidth(toolButton_command_res->sizePolicy().hasHeightForWidth());
         toolButton_command_res->setSizePolicy(sizePolicy1);
@@ -2186,7 +2135,7 @@ public:
 
         gridLayout->addWidget(toolButton_command_res, 3, 1, 1, 1);
 
-        toolButton_command_amplifier = new QCustomButton(layoutWidget4);
+        toolButton_command_amplifier = new QCustomButton(layoutWidget2);
         toolButton_command_amplifier->setObjectName(QStringLiteral("toolButton_command_amplifier"));
         sizePolicy1.setHeightForWidth(toolButton_command_amplifier->sizePolicy().hasHeightForWidth());
         toolButton_command_amplifier->setSizePolicy(sizePolicy1);
@@ -2377,15 +2326,15 @@ public:
         label_temp->setPalette(palette29);
         label_temp->setFont(font1);
         label_temp->setStyleSheet(QStringLiteral("background-color: rgb(16, 32, 64);"));
-        layoutWidget5 = new QWidget(tab_3);
-        layoutWidget5->setObjectName(QStringLiteral("layoutWidget5"));
-        layoutWidget5->setGeometry(QRect(20, 430, 221, 71));
-        verticalLayout_4 = new QVBoxLayout(layoutWidget5);
+        layoutWidget3 = new QWidget(tab_3);
+        layoutWidget3->setObjectName(QStringLiteral("layoutWidget3"));
+        layoutWidget3->setGeometry(QRect(20, 430, 221, 71));
+        verticalLayout_4 = new QVBoxLayout(layoutWidget3);
         verticalLayout_4->setSpacing(6);
         verticalLayout_4->setContentsMargins(11, 11, 11, 11);
         verticalLayout_4->setObjectName(QStringLiteral("verticalLayout_4"));
         verticalLayout_4->setContentsMargins(0, 0, 0, 0);
-        label_debug = new QLabel(layoutWidget5);
+        label_debug = new QLabel(layoutWidget3);
         label_debug->setObjectName(QStringLiteral("label_debug"));
         QPalette palette30;
         palette30.setBrush(QPalette::Active, QPalette::WindowText, brush);
@@ -2437,7 +2386,7 @@ public:
 
         verticalLayout_4->addWidget(label_debug);
 
-        label_debug_data = new QLabel(layoutWidget5);
+        label_debug_data = new QLabel(layoutWidget3);
         label_debug_data->setObjectName(QStringLiteral("label_debug_data"));
         QPalette palette31;
         palette31.setBrush(QPalette::Active, QPalette::WindowText, brush);
@@ -3014,15 +2963,15 @@ public:
 
         formLayout_5->setWidget(0, QFormLayout::SpanningRole, toolButton_set_zoom_ar_size);
 
-        layoutWidget6 = new QWidget(tab_4);
-        layoutWidget6->setObjectName(QStringLiteral("layoutWidget6"));
-        layoutWidget6->setGeometry(QRect(300, 270, 203, 129));
-        verticalLayout_5 = new QVBoxLayout(layoutWidget6);
+        layoutWidget4 = new QWidget(tab_4);
+        layoutWidget4->setObjectName(QStringLiteral("layoutWidget4"));
+        layoutWidget4->setGeometry(QRect(300, 270, 203, 129));
+        verticalLayout_5 = new QVBoxLayout(layoutWidget4);
         verticalLayout_5->setSpacing(6);
         verticalLayout_5->setContentsMargins(11, 11, 11, 11);
         verticalLayout_5->setObjectName(QStringLiteral("verticalLayout_5"));
         verticalLayout_5->setContentsMargins(0, 0, 0, 0);
-        toolButton_selfRotation = new QCustomButton(layoutWidget6);
+        toolButton_selfRotation = new QCustomButton(layoutWidget4);
         toolButton_selfRotation->setObjectName(QStringLiteral("toolButton_selfRotation"));
         sizePolicy1.setHeightForWidth(toolButton_selfRotation->sizePolicy().hasHeightForWidth());
         toolButton_selfRotation->setSizePolicy(sizePolicy1);
@@ -3031,7 +2980,7 @@ public:
 
         verticalLayout_5->addWidget(toolButton_selfRotation);
 
-        toolButton_selfRotation_2 = new QCustomButton(layoutWidget6);
+        toolButton_selfRotation_2 = new QCustomButton(layoutWidget4);
         toolButton_selfRotation_2->setObjectName(QStringLiteral("toolButton_selfRotation_2"));
         sizePolicy1.setHeightForWidth(toolButton_selfRotation_2->sizePolicy().hasHeightForWidth());
         toolButton_selfRotation_2->setSizePolicy(sizePolicy1);
@@ -3040,7 +2989,7 @@ public:
 
         verticalLayout_5->addWidget(toolButton_selfRotation_2);
 
-        lineEdit_selfRotationRate = new QLineEdit(layoutWidget6);
+        lineEdit_selfRotationRate = new QLineEdit(layoutWidget4);
         lineEdit_selfRotationRate->setObjectName(QStringLiteral("lineEdit_selfRotationRate"));
         sizePolicy1.setHeightForWidth(lineEdit_selfRotationRate->sizePolicy().hasHeightForWidth());
         lineEdit_selfRotationRate->setSizePolicy(sizePolicy1);
@@ -3101,7 +3050,7 @@ public:
 
         verticalLayout_5->addWidget(lineEdit_selfRotationRate);
 
-        toolButton_set_default = new QCustomButton(layoutWidget6);
+        toolButton_set_default = new QCustomButton(layoutWidget4);
         toolButton_set_default->setObjectName(QStringLiteral("toolButton_set_default"));
         sizePolicy1.setHeightForWidth(toolButton_set_default->sizePolicy().hasHeightForWidth());
         toolButton_set_default->setSizePolicy(sizePolicy1);
@@ -3137,7 +3086,7 @@ public:
         tab_5->setObjectName(QStringLiteral("tab_5"));
         groupBox_14 = new QCustomGroupBox(tab_5);
         groupBox_14->setObjectName(QStringLiteral("groupBox_14"));
-        groupBox_14->setGeometry(QRect(10, 210, 141, 131));
+        groupBox_14->setGeometry(QRect(10, 230, 141, 131));
         gridLayout_13 = new QGridLayout(groupBox_14);
         gridLayout_13->setSpacing(6);
         gridLayout_13->setContentsMargins(11, 11, 11, 11);
@@ -3172,7 +3121,7 @@ public:
 
         groupBox_18 = new QCustomGroupBox(tab_5);
         groupBox_18->setObjectName(QStringLiteral("groupBox_18"));
-        groupBox_18->setGeometry(QRect(280, 90, 171, 341));
+        groupBox_18->setGeometry(QRect(340, 150, 171, 341));
         gridLayout_16 = new QGridLayout(groupBox_18);
         gridLayout_16->setSpacing(6);
         gridLayout_16->setContentsMargins(11, 11, 11, 11);
@@ -3605,72 +3554,91 @@ public:
 
         gridLayout_14->addWidget(label_gps_heading, 2, 1, 1, 1);
 
-        label_sn_param = new QLabel(tab_5);
-        label_sn_param->setObjectName(QStringLiteral("label_sn_param"));
-        label_sn_param->setGeometry(QRect(190, 80, 48, 23));
+        layoutWidget5 = new QWidget(tab_5);
+        layoutWidget5->setObjectName(QStringLiteral("layoutWidget5"));
+        layoutWidget5->setGeometry(QRect(10, 130, 231, 112));
+        gridLayout_8 = new QGridLayout(layoutWidget5);
+        gridLayout_8->setSpacing(6);
+        gridLayout_8->setContentsMargins(11, 11, 11, 11);
+        gridLayout_8->setObjectName(QStringLiteral("gridLayout_8"));
+        gridLayout_8->setContentsMargins(0, 0, 0, 0);
+        label_3 = new QLabel(layoutWidget5);
+        label_3->setObjectName(QStringLiteral("label_3"));
         QPalette palette42;
         palette42.setBrush(QPalette::Active, QPalette::WindowText, brush);
         palette42.setBrush(QPalette::Active, QPalette::Button, brush8);
-        QBrush brush16(QColor(64, 64, 64, 150));
-        brush16.setStyle(Qt::SolidPattern);
-        palette42.setBrush(QPalette::Active, QPalette::Light, brush16);
-        QBrush brush17(QColor(53, 53, 53, 150));
-        brush17.setStyle(Qt::SolidPattern);
-        palette42.setBrush(QPalette::Active, QPalette::Midlight, brush17);
-        QBrush brush18(QColor(21, 21, 21, 150));
-        brush18.setStyle(Qt::SolidPattern);
-        palette42.setBrush(QPalette::Active, QPalette::Dark, brush18);
-        QBrush brush19(QColor(28, 28, 28, 150));
-        brush19.setStyle(Qt::SolidPattern);
-        palette42.setBrush(QPalette::Active, QPalette::Mid, brush19);
+        palette42.setBrush(QPalette::Active, QPalette::Light, brush6);
+        palette42.setBrush(QPalette::Active, QPalette::Midlight, brush6);
+        palette42.setBrush(QPalette::Active, QPalette::Dark, brush6);
+        palette42.setBrush(QPalette::Active, QPalette::Mid, brush6);
         palette42.setBrush(QPalette::Active, QPalette::Text, brush);
+        palette42.setBrush(QPalette::Active, QPalette::BrightText, brush);
         palette42.setBrush(QPalette::Active, QPalette::ButtonText, brush);
         palette42.setBrush(QPalette::Active, QPalette::Base, brush8);
         palette42.setBrush(QPalette::Active, QPalette::Window, brush8);
-        QBrush brush20(QColor(21, 21, 21, 202));
-        brush20.setStyle(Qt::SolidPattern);
-        palette42.setBrush(QPalette::Active, QPalette::AlternateBase, brush20);
+        palette42.setBrush(QPalette::Active, QPalette::Shadow, brush6);
+        palette42.setBrush(QPalette::Active, QPalette::AlternateBase, brush6);
+        palette42.setBrush(QPalette::Active, QPalette::ToolTipBase, brush7);
+        palette42.setBrush(QPalette::Active, QPalette::ToolTipText, brush6);
         palette42.setBrush(QPalette::Inactive, QPalette::WindowText, brush);
         palette42.setBrush(QPalette::Inactive, QPalette::Button, brush8);
-        palette42.setBrush(QPalette::Inactive, QPalette::Light, brush16);
-        palette42.setBrush(QPalette::Inactive, QPalette::Midlight, brush17);
-        palette42.setBrush(QPalette::Inactive, QPalette::Dark, brush18);
-        palette42.setBrush(QPalette::Inactive, QPalette::Mid, brush19);
+        palette42.setBrush(QPalette::Inactive, QPalette::Light, brush6);
+        palette42.setBrush(QPalette::Inactive, QPalette::Midlight, brush6);
+        palette42.setBrush(QPalette::Inactive, QPalette::Dark, brush6);
+        palette42.setBrush(QPalette::Inactive, QPalette::Mid, brush6);
         palette42.setBrush(QPalette::Inactive, QPalette::Text, brush);
+        palette42.setBrush(QPalette::Inactive, QPalette::BrightText, brush);
         palette42.setBrush(QPalette::Inactive, QPalette::ButtonText, brush);
         palette42.setBrush(QPalette::Inactive, QPalette::Base, brush8);
         palette42.setBrush(QPalette::Inactive, QPalette::Window, brush8);
-        palette42.setBrush(QPalette::Inactive, QPalette::AlternateBase, brush20);
-        palette42.setBrush(QPalette::Disabled, QPalette::WindowText, brush18);
+        palette42.setBrush(QPalette::Inactive, QPalette::Shadow, brush6);
+        palette42.setBrush(QPalette::Inactive, QPalette::AlternateBase, brush6);
+        palette42.setBrush(QPalette::Inactive, QPalette::ToolTipBase, brush7);
+        palette42.setBrush(QPalette::Inactive, QPalette::ToolTipText, brush6);
+        palette42.setBrush(QPalette::Disabled, QPalette::WindowText, brush6);
         palette42.setBrush(QPalette::Disabled, QPalette::Button, brush8);
-        palette42.setBrush(QPalette::Disabled, QPalette::Light, brush16);
-        palette42.setBrush(QPalette::Disabled, QPalette::Midlight, brush17);
-        palette42.setBrush(QPalette::Disabled, QPalette::Dark, brush18);
-        palette42.setBrush(QPalette::Disabled, QPalette::Mid, brush19);
-        palette42.setBrush(QPalette::Disabled, QPalette::Text, brush18);
-        palette42.setBrush(QPalette::Disabled, QPalette::ButtonText, brush18);
+        palette42.setBrush(QPalette::Disabled, QPalette::Light, brush6);
+        palette42.setBrush(QPalette::Disabled, QPalette::Midlight, brush6);
+        palette42.setBrush(QPalette::Disabled, QPalette::Dark, brush6);
+        palette42.setBrush(QPalette::Disabled, QPalette::Mid, brush6);
+        palette42.setBrush(QPalette::Disabled, QPalette::Text, brush6);
+        palette42.setBrush(QPalette::Disabled, QPalette::BrightText, brush);
+        palette42.setBrush(QPalette::Disabled, QPalette::ButtonText, brush6);
         palette42.setBrush(QPalette::Disabled, QPalette::Base, brush8);
         palette42.setBrush(QPalette::Disabled, QPalette::Window, brush8);
-        QBrush brush21(QColor(43, 43, 43, 150));
-        brush21.setStyle(Qt::SolidPattern);
-        palette42.setBrush(QPalette::Disabled, QPalette::AlternateBase, brush21);
-        label_sn_param->setPalette(palette42);
-        label_sn_param->setStyleSheet(QStringLiteral("background-color: rgb(16, 32, 64);"));
-        label_sn_param->setAlignment(Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter);
-        label_sn_pulsew = new QLabel(tab_5);
-        label_sn_pulsew->setObjectName(QStringLiteral("label_sn_pulsew"));
-        label_sn_pulsew->setGeometry(QRect(190, 138, 48, 23));
+        palette42.setBrush(QPalette::Disabled, QPalette::Shadow, brush6);
+        palette42.setBrush(QPalette::Disabled, QPalette::AlternateBase, brush6);
+        palette42.setBrush(QPalette::Disabled, QPalette::ToolTipBase, brush7);
+        palette42.setBrush(QPalette::Disabled, QPalette::ToolTipText, brush6);
+        label_3->setPalette(palette42);
+        label_3->setFont(font1);
+        label_3->setStyleSheet(QStringLiteral("background-color: rgb(16, 32, 64);"));
+
+        gridLayout_8->addWidget(label_3, 0, 0, 1, 1);
+
+        label_sn_param = new QLabel(layoutWidget5);
+        label_sn_param->setObjectName(QStringLiteral("label_sn_param"));
         QPalette palette43;
         palette43.setBrush(QPalette::Active, QPalette::WindowText, brush);
         palette43.setBrush(QPalette::Active, QPalette::Button, brush8);
+        QBrush brush16(QColor(64, 64, 64, 150));
+        brush16.setStyle(Qt::SolidPattern);
         palette43.setBrush(QPalette::Active, QPalette::Light, brush16);
+        QBrush brush17(QColor(53, 53, 53, 150));
+        brush17.setStyle(Qt::SolidPattern);
         palette43.setBrush(QPalette::Active, QPalette::Midlight, brush17);
+        QBrush brush18(QColor(21, 21, 21, 150));
+        brush18.setStyle(Qt::SolidPattern);
         palette43.setBrush(QPalette::Active, QPalette::Dark, brush18);
+        QBrush brush19(QColor(28, 28, 28, 150));
+        brush19.setStyle(Qt::SolidPattern);
         palette43.setBrush(QPalette::Active, QPalette::Mid, brush19);
         palette43.setBrush(QPalette::Active, QPalette::Text, brush);
         palette43.setBrush(QPalette::Active, QPalette::ButtonText, brush);
         palette43.setBrush(QPalette::Active, QPalette::Base, brush8);
         palette43.setBrush(QPalette::Active, QPalette::Window, brush8);
+        QBrush brush20(QColor(21, 21, 21, 202));
+        brush20.setStyle(Qt::SolidPattern);
         palette43.setBrush(QPalette::Active, QPalette::AlternateBase, brush20);
         palette43.setBrush(QPalette::Inactive, QPalette::WindowText, brush);
         palette43.setBrush(QPalette::Inactive, QPalette::Button, brush8);
@@ -3693,13 +3661,17 @@ public:
         palette43.setBrush(QPalette::Disabled, QPalette::ButtonText, brush18);
         palette43.setBrush(QPalette::Disabled, QPalette::Base, brush8);
         palette43.setBrush(QPalette::Disabled, QPalette::Window, brush8);
+        QBrush brush21(QColor(43, 43, 43, 150));
+        brush21.setStyle(Qt::SolidPattern);
         palette43.setBrush(QPalette::Disabled, QPalette::AlternateBase, brush21);
-        label_sn_pulsew->setPalette(palette43);
-        label_sn_pulsew->setStyleSheet(QStringLiteral("background-color: rgb(16, 32, 64);"));
-        label_sn_pulsew->setAlignment(Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter);
-        label_18 = new QLabel(tab_5);
+        label_sn_param->setPalette(palette43);
+        label_sn_param->setStyleSheet(QStringLiteral("background-color: rgb(16, 32, 64);"));
+        label_sn_param->setAlignment(Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter);
+
+        gridLayout_8->addWidget(label_sn_param, 0, 1, 1, 1);
+
+        label_18 = new QLabel(layoutWidget5);
         label_18->setObjectName(QStringLiteral("label_18"));
-        label_18->setGeometry(QRect(11, 109, 173, 23));
         QPalette palette44;
         palette44.setBrush(QPalette::Active, QPalette::WindowText, brush);
         palette44.setBrush(QPalette::Active, QPalette::Button, brush8);
@@ -3749,61 +3721,53 @@ public:
         label_18->setPalette(palette44);
         label_18->setFont(font1);
         label_18->setStyleSheet(QStringLiteral("background-color: rgb(16, 32, 64);"));
-        label_3 = new QLabel(tab_5);
-        label_3->setObjectName(QStringLiteral("label_3"));
-        label_3->setGeometry(QRect(11, 80, 173, 23));
+
+        gridLayout_8->addWidget(label_18, 1, 0, 1, 1);
+
+        label_sn_freq = new QLabel(layoutWidget5);
+        label_sn_freq->setObjectName(QStringLiteral("label_sn_freq"));
         QPalette palette45;
         palette45.setBrush(QPalette::Active, QPalette::WindowText, brush);
         palette45.setBrush(QPalette::Active, QPalette::Button, brush8);
-        palette45.setBrush(QPalette::Active, QPalette::Light, brush6);
-        palette45.setBrush(QPalette::Active, QPalette::Midlight, brush6);
-        palette45.setBrush(QPalette::Active, QPalette::Dark, brush6);
-        palette45.setBrush(QPalette::Active, QPalette::Mid, brush6);
+        palette45.setBrush(QPalette::Active, QPalette::Light, brush16);
+        palette45.setBrush(QPalette::Active, QPalette::Midlight, brush17);
+        palette45.setBrush(QPalette::Active, QPalette::Dark, brush18);
+        palette45.setBrush(QPalette::Active, QPalette::Mid, brush19);
         palette45.setBrush(QPalette::Active, QPalette::Text, brush);
-        palette45.setBrush(QPalette::Active, QPalette::BrightText, brush);
         palette45.setBrush(QPalette::Active, QPalette::ButtonText, brush);
         palette45.setBrush(QPalette::Active, QPalette::Base, brush8);
         palette45.setBrush(QPalette::Active, QPalette::Window, brush8);
-        palette45.setBrush(QPalette::Active, QPalette::Shadow, brush6);
-        palette45.setBrush(QPalette::Active, QPalette::AlternateBase, brush6);
-        palette45.setBrush(QPalette::Active, QPalette::ToolTipBase, brush7);
-        palette45.setBrush(QPalette::Active, QPalette::ToolTipText, brush6);
+        palette45.setBrush(QPalette::Active, QPalette::AlternateBase, brush20);
         palette45.setBrush(QPalette::Inactive, QPalette::WindowText, brush);
         palette45.setBrush(QPalette::Inactive, QPalette::Button, brush8);
-        palette45.setBrush(QPalette::Inactive, QPalette::Light, brush6);
-        palette45.setBrush(QPalette::Inactive, QPalette::Midlight, brush6);
-        palette45.setBrush(QPalette::Inactive, QPalette::Dark, brush6);
-        palette45.setBrush(QPalette::Inactive, QPalette::Mid, brush6);
+        palette45.setBrush(QPalette::Inactive, QPalette::Light, brush16);
+        palette45.setBrush(QPalette::Inactive, QPalette::Midlight, brush17);
+        palette45.setBrush(QPalette::Inactive, QPalette::Dark, brush18);
+        palette45.setBrush(QPalette::Inactive, QPalette::Mid, brush19);
         palette45.setBrush(QPalette::Inactive, QPalette::Text, brush);
-        palette45.setBrush(QPalette::Inactive, QPalette::BrightText, brush);
         palette45.setBrush(QPalette::Inactive, QPalette::ButtonText, brush);
         palette45.setBrush(QPalette::Inactive, QPalette::Base, brush8);
         palette45.setBrush(QPalette::Inactive, QPalette::Window, brush8);
-        palette45.setBrush(QPalette::Inactive, QPalette::Shadow, brush6);
-        palette45.setBrush(QPalette::Inactive, QPalette::AlternateBase, brush6);
-        palette45.setBrush(QPalette::Inactive, QPalette::ToolTipBase, brush7);
-        palette45.setBrush(QPalette::Inactive, QPalette::ToolTipText, brush6);
-        palette45.setBrush(QPalette::Disabled, QPalette::WindowText, brush6);
+        palette45.setBrush(QPalette::Inactive, QPalette::AlternateBase, brush20);
+        palette45.setBrush(QPalette::Disabled, QPalette::WindowText, brush18);
         palette45.setBrush(QPalette::Disabled, QPalette::Button, brush8);
-        palette45.setBrush(QPalette::Disabled, QPalette::Light, brush6);
-        palette45.setBrush(QPalette::Disabled, QPalette::Midlight, brush6);
-        palette45.setBrush(QPalette::Disabled, QPalette::Dark, brush6);
-        palette45.setBrush(QPalette::Disabled, QPalette::Mid, brush6);
-        palette45.setBrush(QPalette::Disabled, QPalette::Text, brush6);
-        palette45.setBrush(QPalette::Disabled, QPalette::BrightText, brush);
-        palette45.setBrush(QPalette::Disabled, QPalette::ButtonText, brush6);
+        palette45.setBrush(QPalette::Disabled, QPalette::Light, brush16);
+        palette45.setBrush(QPalette::Disabled, QPalette::Midlight, brush17);
+        palette45.setBrush(QPalette::Disabled, QPalette::Dark, brush18);
+        palette45.setBrush(QPalette::Disabled, QPalette::Mid, brush19);
+        palette45.setBrush(QPalette::Disabled, QPalette::Text, brush18);
+        palette45.setBrush(QPalette::Disabled, QPalette::ButtonText, brush18);
         palette45.setBrush(QPalette::Disabled, QPalette::Base, brush8);
         palette45.setBrush(QPalette::Disabled, QPalette::Window, brush8);
-        palette45.setBrush(QPalette::Disabled, QPalette::Shadow, brush6);
-        palette45.setBrush(QPalette::Disabled, QPalette::AlternateBase, brush6);
-        palette45.setBrush(QPalette::Disabled, QPalette::ToolTipBase, brush7);
-        palette45.setBrush(QPalette::Disabled, QPalette::ToolTipText, brush6);
-        label_3->setPalette(palette45);
-        label_3->setFont(font1);
-        label_3->setStyleSheet(QStringLiteral("background-color: rgb(16, 32, 64);"));
-        label_24 = new QLabel(tab_5);
+        palette45.setBrush(QPalette::Disabled, QPalette::AlternateBase, brush21);
+        label_sn_freq->setPalette(palette45);
+        label_sn_freq->setStyleSheet(QStringLiteral("background-color: rgb(16, 32, 64);"));
+        label_sn_freq->setAlignment(Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter);
+
+        gridLayout_8->addWidget(label_sn_freq, 1, 1, 1, 1);
+
+        label_24 = new QLabel(layoutWidget5);
         label_24->setObjectName(QStringLiteral("label_24"));
-        label_24->setGeometry(QRect(11, 138, 173, 23));
         QPalette palette46;
         palette46.setBrush(QPalette::Active, QPalette::WindowText, brush);
         palette46.setBrush(QPalette::Active, QPalette::Button, brush8);
@@ -3853,9 +3817,11 @@ public:
         label_24->setPalette(palette46);
         label_24->setFont(font1);
         label_24->setStyleSheet(QStringLiteral("background-color: rgb(16, 32, 64);"));
-        label_sn_freq = new QLabel(tab_5);
-        label_sn_freq->setObjectName(QStringLiteral("label_sn_freq"));
-        label_sn_freq->setGeometry(QRect(190, 109, 48, 23));
+
+        gridLayout_8->addWidget(label_24, 2, 0, 1, 1);
+
+        label_sn_pulsew = new QLabel(layoutWidget5);
+        label_sn_pulsew->setObjectName(QStringLiteral("label_sn_pulsew"));
         QPalette palette47;
         palette47.setBrush(QPalette::Active, QPalette::WindowText, brush);
         palette47.setBrush(QPalette::Active, QPalette::Button, brush8);
@@ -3890,12 +3856,14 @@ public:
         palette47.setBrush(QPalette::Disabled, QPalette::Base, brush8);
         palette47.setBrush(QPalette::Disabled, QPalette::Window, brush8);
         palette47.setBrush(QPalette::Disabled, QPalette::AlternateBase, brush21);
-        label_sn_freq->setPalette(palette47);
-        label_sn_freq->setStyleSheet(QStringLiteral("background-color: rgb(16, 32, 64);"));
-        label_sn_freq->setAlignment(Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter);
-        label_2 = new QLabel(tab_5);
+        label_sn_pulsew->setPalette(palette47);
+        label_sn_pulsew->setStyleSheet(QStringLiteral("background-color: rgb(16, 32, 64);"));
+        label_sn_pulsew->setAlignment(Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter);
+
+        gridLayout_8->addWidget(label_sn_pulsew, 2, 1, 1, 1);
+
+        label_2 = new QLabel(layoutWidget5);
         label_2->setObjectName(QStringLiteral("label_2"));
-        label_2->setGeometry(QRect(11, 167, 173, 22));
         QPalette palette48;
         palette48.setBrush(QPalette::Active, QPalette::WindowText, brush);
         palette48.setBrush(QPalette::Active, QPalette::Button, brush8);
@@ -3945,9 +3913,11 @@ public:
         label_2->setPalette(palette48);
         label_2->setFont(font1);
         label_2->setStyleSheet(QStringLiteral("background-color: rgb(16, 32, 64);"));
-        label_status = new QLabel(tab_5);
+
+        gridLayout_8->addWidget(label_2, 3, 0, 1, 1);
+
+        label_status = new QLabel(layoutWidget5);
         label_status->setObjectName(QStringLiteral("label_status"));
-        label_status->setGeometry(QRect(190, 167, 48, 22));
         QPalette palette49;
         palette49.setBrush(QPalette::Active, QPalette::WindowText, brush);
         palette49.setBrush(QPalette::Active, QPalette::Button, brush8);
@@ -3999,11 +3969,15 @@ public:
         label_status->setAutoFillBackground(false);
         label_status->setStyleSheet(QStringLiteral("background-color: rgb(16, 32, 64);"));
         label_status->setAlignment(Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter);
+
+        gridLayout_8->addWidget(label_status, 3, 1, 1, 1);
+
         tabWidget_menu->addTab(tab_5, QString());
         tab_6 = new QWidget();
         tab_6->setObjectName(QStringLiteral("tab_6"));
         groupBox_3 = new QTabWidget(tab_6);
         groupBox_3->setObjectName(QStringLiteral("groupBox_3"));
+        groupBox_3->setEnabled(false);
         groupBox_3->setGeometry(QRect(10, 30, 251, 331));
         groupBox_3->setFont(font);
         groupBox_3->setStyleSheet(QStringLiteral("background-color: rgb(30, 50, 70);color:rgb(30, 50, 70);font: 12pt \"MS Shell Dlg 2\";"));
@@ -4203,7 +4177,7 @@ public:
         toolButton_sharp_eye->setSizePolicy(sizePolicy1);
         toolButton_sharp_eye->setCheckable(true);
 
-        gridLayout_10->addWidget(toolButton_sharp_eye, 9, 0, 1, 2);
+        gridLayout_10->addWidget(toolButton_sharp_eye, 8, 0, 1, 2);
 
         label_rain = new QLabel(tab2);
         label_rain->setObjectName(QStringLiteral("label_rain"));
@@ -4513,17 +4487,83 @@ public:
         toolButton_xl_dopler_2->setSizePolicy(sizePolicy1);
         toolButton_xl_dopler_2->setCheckable(true);
 
-        gridLayout_10->addWidget(toolButton_xl_dopler_2, 10, 0, 1, 2);
-
-        toolButton_xl_dopler = new QCustomButton(tab2);
-        toolButton_xl_dopler->setObjectName(QStringLiteral("toolButton_xl_dopler"));
-        sizePolicy1.setHeightForWidth(toolButton_xl_dopler->sizePolicy().hasHeightForWidth());
-        toolButton_xl_dopler->setSizePolicy(sizePolicy1);
-        toolButton_xl_dopler->setCheckable(true);
-
-        gridLayout_10->addWidget(toolButton_xl_dopler, 7, 0, 1, 2);
+        gridLayout_10->addWidget(toolButton_xl_dopler_2, 9, 0, 1, 2);
 
         groupBox_3->addTab(tab2, QString());
+        groupBox_23 = new QCustomGroupBox(tab_6);
+        groupBox_23->setObjectName(QStringLiteral("groupBox_23"));
+        groupBox_23->setGeometry(QRect(310, 50, 171, 131));
+        gridLayout_17 = new QGridLayout(groupBox_23);
+        gridLayout_17->setSpacing(6);
+        gridLayout_17->setContentsMargins(11, 11, 11, 11);
+        gridLayout_17->setObjectName(QStringLiteral("gridLayout_17"));
+        toolButton_sled_time8 = new QCustomButton(groupBox_23);
+        toolButton_sled_time8->setObjectName(QStringLiteral("toolButton_sled_time8"));
+        toolButton_sled_time8->setEnabled(true);
+        sizePolicy1.setHeightForWidth(toolButton_sled_time8->sizePolicy().hasHeightForWidth());
+        toolButton_sled_time8->setSizePolicy(sizePolicy1);
+        toolButton_sled_time8->setFont(font1);
+        toolButton_sled_time8->setCheckable(true);
+        toolButton_sled_time8->setChecked(true);
+        toolButton_sled_time8->setAutoExclusive(true);
+
+        gridLayout_17->addWidget(toolButton_sled_time8, 2, 0, 1, 1);
+
+        toolButton_sled_time25 = new QCustomButton(groupBox_23);
+        toolButton_sled_time25->setObjectName(QStringLiteral("toolButton_sled_time25"));
+        toolButton_sled_time25->setEnabled(true);
+        sizePolicy1.setHeightForWidth(toolButton_sled_time25->sizePolicy().hasHeightForWidth());
+        toolButton_sled_time25->setSizePolicy(sizePolicy1);
+        toolButton_sled_time25->setFont(font1);
+        toolButton_sled_time25->setCheckable(true);
+        toolButton_sled_time25->setChecked(false);
+        toolButton_sled_time25->setAutoExclusive(true);
+
+        gridLayout_17->addWidget(toolButton_sled_time25, 1, 0, 1, 1);
+
+        toolButton_sled_time3 = new QCustomButton(groupBox_23);
+        toolButton_sled_time3->setObjectName(QStringLiteral("toolButton_sled_time3"));
+        toolButton_sled_time3->setEnabled(true);
+        sizePolicy1.setHeightForWidth(toolButton_sled_time3->sizePolicy().hasHeightForWidth());
+        toolButton_sled_time3->setSizePolicy(sizePolicy1);
+        toolButton_sled_time3->setFont(font1);
+        toolButton_sled_time3->setCheckable(true);
+        toolButton_sled_time3->setChecked(false);
+        toolButton_sled_time3->setAutoExclusive(true);
+
+        gridLayout_17->addWidget(toolButton_sled_time3, 3, 0, 1, 1);
+
+        groupBox_10 = new QCustomGroupBox(tab_6);
+        groupBox_10->setObjectName(QStringLiteral("groupBox_10"));
+        groupBox_10->setGeometry(QRect(20, 380, 171, 81));
+        label_status_warning = new QToolButton(groupBox_10);
+        label_status_warning->setObjectName(QStringLiteral("label_status_warning"));
+        label_status_warning->setGeometry(QRect(10, 30, 151, 41));
+        sizePolicy1.setHeightForWidth(label_status_warning->sizePolicy().hasHeightForWidth());
+        label_status_warning->setSizePolicy(sizePolicy1);
+        label_status_warning->setFont(font1);
+        label_status_warning->setCheckable(false);
+        toolButton_delete_target = new QCustomButton(tab_6);
+        toolButton_delete_target->setObjectName(QStringLiteral("toolButton_delete_target"));
+        toolButton_delete_target->setGeometry(QRect(310, 280, 137, 31));
+        sizePolicy1.setHeightForWidth(toolButton_delete_target->sizePolicy().hasHeightForWidth());
+        toolButton_delete_target->setSizePolicy(sizePolicy1);
+        toolButton_delete_target->setFont(font1);
+        toolButton_delete_target->setCheckable(false);
+        toolButton_reset_3 = new QCustomButton(tab_6);
+        toolButton_reset_3->setObjectName(QStringLiteral("toolButton_reset_3"));
+        toolButton_reset_3->setGeometry(QRect(300, 380, 137, 41));
+        sizePolicy1.setHeightForWidth(toolButton_reset_3->sizePolicy().hasHeightForWidth());
+        toolButton_reset_3->setSizePolicy(sizePolicy1);
+        toolButton_reset_3->setFont(font1);
+        toolButton_reset_3->setCheckable(false);
+        toolButton_reset_6 = new QCustomButton(tab_6);
+        toolButton_reset_6->setObjectName(QStringLiteral("toolButton_reset_6"));
+        toolButton_reset_6->setGeometry(QRect(310, 330, 121, 31));
+        sizePolicy1.setHeightForWidth(toolButton_reset_6->sizePolicy().hasHeightForWidth());
+        toolButton_reset_6->setSizePolicy(sizePolicy1);
+        toolButton_reset_6->setFont(font1);
+        toolButton_reset_6->setCheckable(true);
         tabWidget_menu->addTab(tab_6, QString());
         tab = new QWidget();
         tab->setObjectName(QStringLiteral("tab"));
@@ -4821,7 +4861,7 @@ public:
         toolButton_menu->setCheckable(false);
         tabWidget_iad = new QCustomTabWidget(centralWidget);
         tabWidget_iad->setObjectName(QStringLiteral("tabWidget_iad"));
-        tabWidget_iad->setGeometry(QRect(1450, 670, 531, 541));
+        tabWidget_iad->setGeometry(QRect(1380, 580, 531, 541));
         tabWidget_iad->setFont(font1);
         tabWidget_iad->setAutoFillBackground(false);
         tabWidget_iad->setElideMode(Qt::ElideNone);
@@ -5277,18 +5317,6 @@ public:
         toolButton_head_up->setSizePolicy(sizePolicy1);
         toolButton_head_up->setFont(font1);
         toolButton_head_up->setCheckable(true);
-        toolButton_xl_nguong = new QCustomButton(centralWidget);
-        toolButton_xl_nguong->setObjectName(QStringLiteral("toolButton_xl_nguong"));
-        toolButton_xl_nguong->setGeometry(QRect(830, 90, 111, 31));
-        sizePolicy1.setHeightForWidth(toolButton_xl_nguong->sizePolicy().hasHeightForWidth());
-        toolButton_xl_nguong->setSizePolicy(sizePolicy1);
-        toolButton_xl_nguong->setCheckable(true);
-        toolButton_xl_nguong_3 = new QCustomButton(centralWidget);
-        toolButton_xl_nguong_3->setObjectName(QStringLiteral("toolButton_xl_nguong_3"));
-        toolButton_xl_nguong_3->setGeometry(QRect(830, 130, 111, 31));
-        sizePolicy1.setHeightForWidth(toolButton_xl_nguong_3->sizePolicy().hasHeightForWidth());
-        toolButton_xl_nguong_3->setSizePolicy(sizePolicy1);
-        toolButton_xl_nguong_3->setCheckable(true);
         groupBox_4 = new QCustomGroupBox(centralWidget);
         groupBox_4->setObjectName(QStringLiteral("groupBox_4"));
         groupBox_4->setGeometry(QRect(1030, 840, 241, 171));
@@ -5837,10 +5865,62 @@ public:
 
         gridLayout_6->addWidget(label_4, 2, 0, 1, 1);
 
+        toolButton_xl_nguong_3 = new QCustomButton(centralWidget);
+        toolButton_xl_nguong_3->setObjectName(QStringLiteral("toolButton_xl_nguong_3"));
+        toolButton_xl_nguong_3->setGeometry(QRect(870, 10, 101, 41));
+        sizePolicy1.setHeightForWidth(toolButton_xl_nguong_3->sizePolicy().hasHeightForWidth());
+        toolButton_xl_nguong_3->setSizePolicy(sizePolicy1);
+        toolButton_xl_nguong_3->setCheckable(true);
+        toolButton_xl_dopler = new QCustomButton(centralWidget);
+        toolButton_xl_dopler->setObjectName(QStringLiteral("toolButton_xl_dopler"));
+        toolButton_xl_dopler->setGeometry(QRect(870, 60, 101, 41));
+        sizePolicy1.setHeightForWidth(toolButton_xl_dopler->sizePolicy().hasHeightForWidth());
+        toolButton_xl_dopler->setSizePolicy(sizePolicy1);
+        toolButton_xl_dopler->setCheckable(true);
+        toolButton_xl_nguong = new QCustomButton(centralWidget);
+        toolButton_xl_nguong->setObjectName(QStringLiteral("toolButton_xl_nguong"));
+        toolButton_xl_nguong->setGeometry(QRect(980, 10, 101, 41));
+        sizePolicy1.setHeightForWidth(toolButton_xl_nguong->sizePolicy().hasHeightForWidth());
+        toolButton_xl_nguong->setSizePolicy(sizePolicy1);
+        toolButton_xl_nguong->setCheckable(true);
+        toolButton_sled = new QCustomButton(centralWidget);
+        toolButton_sled->setObjectName(QStringLiteral("toolButton_sled"));
+        toolButton_sled->setGeometry(QRect(980, 60, 101, 41));
+        sizePolicy1.setHeightForWidth(toolButton_sled->sizePolicy().hasHeightForWidth());
+        toolButton_sled->setSizePolicy(sizePolicy1);
+        toolButton_sled->setFont(font1);
+        toolButton_sled->setCheckable(true);
+        toolButton_sled_reset = new QCustomButton(centralWidget);
+        toolButton_sled_reset->setObjectName(QStringLiteral("toolButton_sled_reset"));
+        toolButton_sled_reset->setGeometry(QRect(980, 110, 101, 41));
+        sizePolicy1.setHeightForWidth(toolButton_sled_reset->sizePolicy().hasHeightForWidth());
+        toolButton_sled_reset->setSizePolicy(sizePolicy1);
+        toolButton_sled_reset->setFont(font1);
+        toolButton_sled_reset->setCheckable(false);
+        toolButton_sled_reset_2 = new QCustomButton(centralWidget);
+        toolButton_sled_reset_2->setObjectName(QStringLiteral("toolButton_sled_reset_2"));
+        toolButton_sled_reset_2->setGeometry(QRect(720, 10, 141, 41));
+        sizePolicy1.setHeightForWidth(toolButton_sled_reset_2->sizePolicy().hasHeightForWidth());
+        toolButton_sled_reset_2->setSizePolicy(sizePolicy1);
+        toolButton_sled_reset_2->setFont(font1);
+        toolButton_sled_reset_2->setCheckable(true);
+        toolButton_sled_reset_3 = new QCustomButton(centralWidget);
+        toolButton_sled_reset_3->setObjectName(QStringLiteral("toolButton_sled_reset_3"));
+        toolButton_sled_reset_3->setGeometry(QRect(720, 60, 141, 41));
+        sizePolicy1.setHeightForWidth(toolButton_sled_reset_3->sizePolicy().hasHeightForWidth());
+        toolButton_sled_reset_3->setSizePolicy(sizePolicy1);
+        toolButton_sled_reset_3->setFont(font1);
+        toolButton_sled_reset_3->setCheckable(true);
+        toolButton_sled_reset_4 = new QCustomButton(centralWidget);
+        toolButton_sled_reset_4->setObjectName(QStringLiteral("toolButton_sled_reset_4"));
+        toolButton_sled_reset_4->setGeometry(QRect(760, 110, 101, 41));
+        sizePolicy1.setHeightForWidth(toolButton_sled_reset_4->sizePolicy().hasHeightForWidth());
+        toolButton_sled_reset_4->setSizePolicy(sizePolicy1);
+        toolButton_sled_reset_4->setFont(font1);
+        toolButton_sled_reset_4->setCheckable(true);
         MainWindow->setCentralWidget(centralWidget);
         groupBox_5->raise();
         groupBox_7->raise();
-        groupBox_10->raise();
         groupBox_16->raise();
         groupBox_11->raise();
         groupBox_13->raise();
@@ -5851,12 +5931,18 @@ public:
         label_azi_heading_gps->raise();
         label_azi_antenna_head_true->raise();
         toolButton_head_up->raise();
-        toolButton_xl_nguong->raise();
-        toolButton_xl_nguong_3->raise();
-        tabWidget_menu->raise();
-        tabWidget_iad->raise();
         groupBox_4->raise();
         groupBox_6->raise();
+        tabWidget_menu->raise();
+        tabWidget_iad->raise();
+        toolButton_xl_nguong_3->raise();
+        toolButton_xl_dopler->raise();
+        toolButton_xl_nguong->raise();
+        toolButton_sled->raise();
+        toolButton_sled_reset->raise();
+        toolButton_sled_reset_2->raise();
+        toolButton_sled_reset_3->raise();
+        toolButton_sled_reset_4->raise();
 #ifndef QT_NO_SHORTCUT
         label_rain->setBuddy(horizontalSlider_rain);
         label_sea->setBuddy(horizontalSlider_sea);
@@ -5865,8 +5951,8 @@ public:
 
         retranslateUi(MainWindow);
 
-        tabWidget_menu->setCurrentIndex(3);
-        groupBox_3->setCurrentIndex(0);
+        tabWidget_menu->setCurrentIndex(4);
+        groupBox_3->setCurrentIndex(1);
         comboBox->setCurrentIndex(0);
         tabWidget_iad->setCurrentIndex(5);
         comboBox_3->setCurrentIndex(0);
@@ -5912,13 +5998,6 @@ public:
         label_data_long->setText(QApplication::translate("MainWindow", "--", Q_NULLPTR));
         label_status_11->setText(QApplication::translate("MainWindow", "V\341\273\271 \304\220.", Q_NULLPTR));
         label_data_lat->setText(QApplication::translate("MainWindow", "--", Q_NULLPTR));
-        toolButton_delete_target->setText(QApplication::translate("MainWindow", "X\303\263a m\341\273\245c ti\303\252u", Q_NULLPTR));
-        toolButton_reset_6->setText(QApplication::translate("MainWindow", "Ch\341\273\211 th\341\273\213 MT", Q_NULLPTR));
-        toolButton_reset_3->setText(QApplication::translate("MainWindow", "X\303\263a t\341\272\245t c\341\272\243 q. \304\221\341\272\241o", Q_NULLPTR));
-        toolButton_sled->setText(QApplication::translate("MainWindow", "V\341\272\277t di chuy\341\273\203n", Q_NULLPTR));
-        toolButton_sled_reset->setText(QApplication::translate("MainWindow", "X\303\263a v\341\272\277t \304\221i", Q_NULLPTR));
-        groupBox_10->setTitle(QApplication::translate("MainWindow", "Th\303\264ng b\303\241o h\341\273\207 th\341\273\221ng", Q_NULLPTR));
-        label_status_warning->setText(QApplication::translate("MainWindow", "Kh\303\264ng c\303\263 c\341\272\243nh b\303\241o", Q_NULLPTR));
         groupBox_control->setTitle(QString());
         lineEdit_byte_2->setText(QApplication::translate("MainWindow", "ab", Q_NULLPTR));
         toolButton_send_command->setText(QApplication::translate("MainWindow", "G\341\273\255i l\341\273\207nh", Q_NULLPTR));
@@ -6020,12 +6099,12 @@ public:
         label_gps_lon->setText(QApplication::translate("MainWindow", "--", Q_NULLPTR));
         label_record_file_name_8->setText(QApplication::translate("MainWindow", "H\306\260\341\273\233ng:", Q_NULLPTR));
         label_gps_heading->setText(QApplication::translate("MainWindow", "--", Q_NULLPTR));
-        label_sn_param->setText(QApplication::translate("MainWindow", "--", Q_NULLPTR));
-        label_sn_pulsew->setText(QApplication::translate("MainWindow", "--", Q_NULLPTR));
-        label_18->setText(QApplication::translate("MainWindow", "T\341\272\247n s\341\273\221 l\341\272\267p KP (Hz):", Q_NULLPTR));
         label_3->setText(QApplication::translate("MainWindow", "H\341\273\207 s\341\273\221 n\303\251n:", Q_NULLPTR));
-        label_24->setText(QApplication::translate("MainWindow", "\304\220\341\273\231 r\341\273\231ng xung ph\303\241t (us):", Q_NULLPTR));
+        label_sn_param->setText(QApplication::translate("MainWindow", "--", Q_NULLPTR));
+        label_18->setText(QApplication::translate("MainWindow", "T\341\272\247n s\341\273\221 l\341\272\267p KP (Hz):", Q_NULLPTR));
         label_sn_freq->setText(QApplication::translate("MainWindow", "--", Q_NULLPTR));
+        label_24->setText(QApplication::translate("MainWindow", "\304\220\341\273\231 r\341\273\231ng xung ph\303\241t (us):", Q_NULLPTR));
+        label_sn_pulsew->setText(QApplication::translate("MainWindow", "--", Q_NULLPTR));
         label_2->setText(QApplication::translate("MainWindow", "Tr\341\272\241ng th\303\241i:", Q_NULLPTR));
         label_status->setText(QApplication::translate("MainWindow", "--", Q_NULLPTR));
         tabWidget_menu->setTabText(tabWidget_menu->indexOf(tab_5), QApplication::translate("MainWindow", "D\341\273\257 li\341\273\207u", Q_NULLPTR));
@@ -6045,15 +6124,23 @@ public:
         label_sea->setText(QApplication::translate("MainWindow", "Sea", Q_NULLPTR));
         label_gain->setText(QApplication::translate("MainWindow", "Gain", Q_NULLPTR));
         toolButton_xl_dopler_2->setText(QApplication::translate("MainWindow", "B\341\273\217 b\304\203ng 0 dopler", Q_NULLPTR));
-        toolButton_xl_dopler->setText(QApplication::translate("MainWindow", "L\341\273\215c t\306\260\306\241ng quan dopler", Q_NULLPTR));
         groupBox_3->setTabText(groupBox_3->indexOf(tab2), QApplication::translate("MainWindow", "XL s\306\241 c\341\272\245p", Q_NULLPTR));
-        tabWidget_menu->setTabText(tabWidget_menu->indexOf(tab_6), QApplication::translate("MainWindow", "Page", Q_NULLPTR));
+        groupBox_23->setTitle(QApplication::translate("MainWindow", "Th\341\273\235i gian l\306\260u v\341\272\277t", Q_NULLPTR));
+        toolButton_sled_time8->setText(QApplication::translate("MainWindow", "15 chu k\341\273\263 quan s\303\241t", Q_NULLPTR));
+        toolButton_sled_time25->setText(QApplication::translate("MainWindow", "45 chu k\341\273\263 quan s\303\241t", Q_NULLPTR));
+        toolButton_sled_time3->setText(QApplication::translate("MainWindow", "5 chu k\341\273\263 quan s\303\241t", Q_NULLPTR));
+        groupBox_10->setTitle(QApplication::translate("MainWindow", "Th\303\264ng b\303\241o h\341\273\207 th\341\273\221ng", Q_NULLPTR));
+        label_status_warning->setText(QApplication::translate("MainWindow", "Kh\303\264ng c\303\263 c\341\272\243nh b\303\241o", Q_NULLPTR));
+        toolButton_delete_target->setText(QApplication::translate("MainWindow", "X\303\263a m\341\273\245c ti\303\252u", Q_NULLPTR));
+        toolButton_reset_3->setText(QApplication::translate("MainWindow", "X\303\263a t\341\272\245t c\341\272\243 q. \304\221\341\272\241o", Q_NULLPTR));
+        toolButton_reset_6->setText(QApplication::translate("MainWindow", "Ch\341\273\211 th\341\273\213 MT", Q_NULLPTR));
+        tabWidget_menu->setTabText(tabWidget_menu->indexOf(tab_6), QApplication::translate("MainWindow", "Hi\341\273\207n s\303\263ng", Q_NULLPTR));
         tabWidget_menu->setTabText(tabWidget_menu->indexOf(tab), QApplication::translate("MainWindow", "X", Q_NULLPTR));
         groupBox_16->setTitle(QApplication::translate("MainWindow", "\304\220i\341\273\201u khi\341\273\203n ra \304\221a", Q_NULLPTR));
         toolButton_tx_off->setText(QApplication::translate("MainWindow", "T\341\272\257t ph\303\241t", Q_NULLPTR));
         toolButton_exit_2->setText(QApplication::translate("MainWindow", "Ki\341\273\203m tra tr\341\272\241ng th\303\241i", Q_NULLPTR));
         toolButton_tx->setText(QApplication::translate("MainWindow", "Ph\303\241t", Q_NULLPTR));
-        groupBox_11->setTitle(QApplication::translate("MainWindow", "H\303\254nh \341\272\243nh t\303\255n hi\341\273\207u", Q_NULLPTR));
+        groupBox_11->setTitle(QApplication::translate("MainWindow", "Hi\341\273\207n s\303\263ng:", Q_NULLPTR));
         label_25->setText(QApplication::translate("MainWindow", "Thang m\303\240u hi\341\273\207n s\303\263ng:", Q_NULLPTR));
         comboBox_img_mode->clear();
         comboBox_img_mode->insertItems(0, QStringList()
@@ -6092,8 +6179,6 @@ public:
         label_azi_heading_gps->setText(QApplication::translate("MainWindow", "--", Q_NULLPTR));
         label_azi_antenna_head_true->setText(QApplication::translate("MainWindow", "--", Q_NULLPTR));
         toolButton_head_up->setText(QApplication::translate("MainWindow", "Head up", Q_NULLPTR));
-        toolButton_xl_nguong->setText(QApplication::translate("MainWindow", "L\341\273\215c t\341\273\261 \304\221\341\273\231ng", Q_NULLPTR));
-        toolButton_xl_nguong_3->setText(QApplication::translate("MainWindow", "CH n\341\273\201n t\341\272\241p", Q_NULLPTR));
         groupBox_4->setTitle(QApplication::translate("MainWindow", "Ghi l\306\260u t\303\255n hi\341\273\207u", Q_NULLPTR));
 #ifndef QT_NO_TOOLTIP
         toolButton_replay->setToolTip(QString());
@@ -6117,6 +6202,14 @@ public:
         label_sn_type->setText(QApplication::translate("MainWindow", "--", Q_NULLPTR));
         label_range_resolution->setText(QApplication::translate("MainWindow", "--", Q_NULLPTR));
         label_4->setText(QApplication::translate("MainWindow", "T.\304\221\341\273\231 quay anten (v/p):", Q_NULLPTR));
+        toolButton_xl_nguong_3->setText(QApplication::translate("MainWindow", "C\303\242n b\341\272\261ng t\341\272\241p", Q_NULLPTR));
+        toolButton_xl_dopler->setText(QApplication::translate("MainWindow", "L\341\273\215c nhi\341\273\205u ", Q_NULLPTR));
+        toolButton_xl_nguong->setText(QApplication::translate("MainWindow", "L\341\273\215c t\341\272\241p", Q_NULLPTR));
+        toolButton_sled->setText(QApplication::translate("MainWindow", "Hi\341\273\207n v\341\272\277t", Q_NULLPTR));
+        toolButton_sled_reset->setText(QApplication::translate("MainWindow", "Kh\341\273\237i t\341\272\241o v\341\272\277t", Q_NULLPTR));
+        toolButton_sled_reset_2->setText(QApplication::translate("MainWindow", "\304\220i\341\273\203m d\341\272\245u ", Q_NULLPTR));
+        toolButton_sled_reset_3->setText(QApplication::translate("MainWindow", "Li\303\252n k\341\272\277t \304\221i\341\273\203m d\341\272\245u", Q_NULLPTR));
+        toolButton_sled_reset_4->setText(QApplication::translate("MainWindow", "Qu\341\273\271 \304\221\341\272\241o", Q_NULLPTR));
     } // retranslateUi
 
 };

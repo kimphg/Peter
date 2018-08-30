@@ -15,7 +15,7 @@
 #define RADAR_DATA_SPECTRE      22
 #define RADAR_DATA_MAX_SIZE     2688
 #define RADAR_
-#define TARGET_OBSERV_PERIOD 4096//ENVAR max periods to save object in the memory
+#define TARGET_OBSERV_PERIOD 7000//ENVAR max periods to save object in the memory
 FILE *logfile;
 
 short waitForData = 0;
@@ -417,7 +417,7 @@ C_radar_data::C_radar_data()
     noiseAverage = 30;
     noiseVar = 8;
     krain_auto = 0.4;
-    kgain_auto  = 4;
+    kgain_auto  = 4.2;
     ksea_auto = 0;
     kgain = 1;
     krain  = ksea = 0;
@@ -967,7 +967,7 @@ void C_radar_data::ProcessEach90Deg()
 {
     //remove old points
     int nObj = 0;
-    for (int i=0;i<mObjList.size();i++)
+    for (uint i=0;i<mObjList.size();i++)
     {
         if(mPeriodCount - mObjList.at(i).period>TARGET_OBSERV_PERIOD)
         {
@@ -975,11 +975,12 @@ void C_radar_data::ProcessEach90Deg()
         }
         else nObj++;
     }
-    if(nObj>1000)
+    if(nObj>1500)
     {
-        if(kgain_auto<10)kgain_auto*=1.01;
+        if(kgain_auto<7.5)kgain_auto*=1.01;
         printf("\ntoo many obj,kgain_auto:%f",kgain_auto);
     }
+    else if(nObj<500)if(kgain_auto>4.2)kgain_auto/=1.01;
     if(mFalsePositiveCount>15)//ENVAR
     {
         if(kgain_auto<10)kgain_auto*=1.01;
@@ -1046,22 +1047,17 @@ int C_radar_data::ssiDecode(ushort nAzi)
 int rot;
 void C_radar_data::processSocketData(unsigned char* data,short len)
 {
-
     unsigned char n_clk_adc = data[4];
     sn_stat = (data[5]<<8)+data[6];
-
     if(clk_adc != n_clk_adc)
     {
         // clock adc
-
         clk_adc = n_clk_adc;
         isClkAdcChanged = true;
         UpdateData();
         resetData();
-
     }
     //isClkAdcChanged = true;
-
     //moduleVal = dataBuff[3];//
     //tempType = dataBuff[2]&0x0f;
     //if(tempType>4)printf("Wrong temperature\n");
@@ -1127,6 +1123,7 @@ void C_radar_data::processSocketData(unsigned char* data,short len)
         while(curAzir != newAzi)
         {
             curAzir--;
+            if(curAzir<0)curAzir+=MAX_AZIR;
             memcpy(&data_mem.level[curAzir][0],data+34,range_max);
             memcpy(&data_mem.dopler[curAzir][0],data+34+RADAR_RESOLUTION,range_max);
             aziToProcess.push(curAzir);
@@ -1139,6 +1136,7 @@ void C_radar_data::processSocketData(unsigned char* data,short len)
         {
 
             curAzir++;
+            if(curAzir>=MAX_AZIR)curAzir-=MAX_AZIR;
             memcpy(&data_mem.level[curAzir][0],data+34,range_max);
             memcpy(&data_mem.dopler[curAzir][0],data+34+RADAR_RESOLUTION,range_max);
             aziToProcess.push(curAzir);
@@ -1447,10 +1445,10 @@ void C_radar_data::procPLot(plot_t* mPlot)
         int maxRg = mPlot->maxR+15;
         int minRg = mPlot->maxR-15;
         if(minRg<0)minRg=0;if(maxRg>=range_max)maxRg=range_max-1;
-        for(int lAzi=leftA;lAzi!=rightA;lAzi++)
+        for(int lAzi=leftA;;lAzi++)
         {
             if(lAzi>=MAX_AZIR)lAzi-=MAX_AZIR;
-
+            if(lAzi==rightA)break;
             for(int lRg = minRg;lRg<maxRg;lRg++)
             {
                 if(data_mem.detect[lAzi][lRg])
@@ -1481,6 +1479,8 @@ void C_radar_data::procPLot(plot_t* mPlot)
     }
 
     object_t newobject;
+    newobject.score1 = 0;
+    newobject.score2 = 0;
     newobject.uniqID = rand();
     newobject.isProcessed = false;
     newobject.dazi = mPlot->lastA-mPlot->riseA;
@@ -1683,7 +1683,8 @@ void C_radar_data::addTrack(object_t* mObject)
     }*/
 }
 void C_radar_data::deleteTrack(ushort trackNum)
-{/*
+{
+    /*
     if(mTrackList.size()>trackNum)
     {
         mTrackList[trackNum].state = 0;
@@ -2339,14 +2340,13 @@ void C_radar_data::resetTrack()
 
 void C_radar_data::ProcessObjects()
 {
-
-
-    for (int i=0;i<mObjList.size();i++)
+    for (ushort i=0;i<mObjList.size();i++)
     {
         object_t *obj1 = &(mObjList[i]);
         if(obj1->uniqID<0)continue;
         if(obj1->isProcessed)continue;
         obj1->isProcessed = true;
+        std::vector<object_line> possibleLines;
         for (ushort j=0;j<mObjList.size();j++)
         {
             if(i==j)continue;
@@ -2355,68 +2355,80 @@ void C_radar_data::ProcessObjects()
             //find new line
             if(obj2->uniqID<0)continue;
             int dtime = (obj1->timeMs - obj2->timeMs);
-            if(dtime<1000)
-                continue;//ENVAR min time between plots in a line(1s)
-
-            /*short lineIndex = 0;
-            for(;lineIndex< mLineList.size();lineIndex++) {
-                if(((obj1->uniqID==mLineList.at(lineIndex).obj1.uniqID)
-                    &&(obj2->uniqID==mLineList.at(lineIndex).obj2.uniqID)))
-                    break;
-
-            }
-            if(lineIndex<mLineList.size())continue;*/
+            if(dtime<1000)continue;//ENVAR min time between plots in a line(1s)
+            if(dtime>40000)continue;//ENVAR max time between plots in a line(30s)
+            float rgSpeedkmh = abs(obj1->rgKm-obj2->rgKm)/(dtime/3600000.0);
+            if(rgSpeedkmh>83)continue;// learned value
             float dx = obj1->xkm - obj2->xkm;
             float dy = obj1->ykm - obj2->ykm;
-            float distancekm = sqrt(dx*dx+dy*dy);
-            float speedkmh = distancekm/(dtime/3600000.0);
-            if(isMarineMode){
-                float maxDistance = TARGET_MAX_SPEED_MARINE/3600000.0*dtime   + obj1->rgKm*atan(obj1->aziRes*3);
-                if((distancekm>(maxDistance)))continue;
+            double maxDistance = TARGET_MAX_SPEED_MARINE/3600000.0*dtime   + obj1->rgKm*atan(obj1->aziRes*3);
+//            if(isMarineMode){
+//                if((distancekm>(maxDistance)))continue;
+//            }
+            //else if(speedkmh>2000)continue;
+            double distancekm = sqrt(dx*dx+dy*dy);
+            double speedkmh = distancekm/(dtime/3600000.0);
+            double distanceCoeff = distancekm/maxDistance;
+            // calculate score using machine learning model
+            double score = 0;
+            if(distanceCoeff>1.0)continue;
+            else if(distanceCoeff<0.430)score=0.98;
+            else
+            {
+                if(speedkmh<56.57)
+                {
+                    if(distanceCoeff<0.519)score = 0.934;
+                    else score = 0.406;
+                }
+                else
+                    continue;
             }
-            else if(speedkmh>2000)continue;
+            //filtering using learned score
+            if(score>obj2->score2&&score>obj1->score1)
+            {
+                obj2->score2 = score;
+                obj1->score1 = score;
+            }
+            else continue;
             object_line newline;
-            newline.score       = -1;
-            newline.distancekm  = distancekm;
-            newline.speedkmh    = speedkmh;
-            newline.bearingRad  = ConvXYToAziRad(dx,dy);
-            newline.dtimeMSec   = dtime;
-            newline.obj1        = *obj1;
-            newline.obj2        = *obj2;
-            newline.isProcessed = false;
-            newline.isDead      = false;
+            newline.score           = obj1->score1;
+            newline.distanceCoeff   = distanceCoeff;
+            newline.speedkmh        = speedkmh;
+            newline.rgSpeedkmh      = rgSpeedkmh;
+            newline.bearingRad      = ConvXYToAziRad(dx,dy);
+            newline.dtimeMSec       = dtime;
+            newline.obj1            = *obj1;
+            newline.obj2            = *obj2;
+            newline.isProcessed     = false;
+            newline.isDead          = false;
+            possibleLines.push_back(newline);
+/*
 
-
-
-            fprintf(logfile,"%f",obj1->rgKm*atan(obj1->aziRes*3));//rgAziErr:
-            fprintf(logfile,",%d",dtime);
-            fprintf(logfile,",%f",speedkmh);
-            fprintf(logfile,",%f",distancekm);//
             if(obj1->dopler==obj2->dopler)
             {
+                //fprintf(logfile,"%f",maxDistance);//
+                fprintf(logfile,"%d",dtime);
+                fprintf(logfile,",%f",speedkmh);
+                fprintf(logfile,",%f",newline.rgSpeedkmh);
+                fprintf(logfile,",%f",distancekm/maxDistance);
                 fprintf(logfile,",1");
+                fprintf(logfile,"\n");
             }
             else
             {
+                //fprintf(logfile,"%f",maxDistance);//
+                fprintf(logfile,"%d",dtime);
+                fprintf(logfile,",%f",speedkmh);
+                fprintf(logfile,",%f",newline.rgSpeedkmh);//
+                fprintf(logfile,",%f",distancekm/maxDistance);
                 fprintf(logfile,",0");
+                fprintf(logfile,"\n");
             }
-            fprintf(logfile,"\n");
-            continue;
-            ushort k=0;
-            for (;k<mLineList.size();k++)
-            {
-                if(mLineList[k].isDead)
-                {
-                    mLineList[k] = newline;
-                    break;
-                }
-            }
-            if(k>=mLineList.size()&&k<2000)
-                mLineList.push_back(newline);
-            else {
-                printf("\nfull lines memory");
-                continue;
-            }
+
+*/
+            /*
+
+            continue;//todo:remove later
             //
             object_line* pLine1=&mLineList[k];
             for (ushort l=0;l<mLineList.size();l++)
@@ -2426,17 +2438,17 @@ void C_radar_data::ProcessObjects()
                 if(pLine2->isDead)continue;
                 if(pLine1->obj2.uniqID==pLine2->obj1.uniqID)// new track
                 {
-                    float distance = pLine2->distancekm+pLine1->distancekm;
+                    float distance = pLine2->distanceCoeff+pLine1->distanceCoeff;
                     float speedDif = abs(pLine2->speedkmh-pLine1->speedkmh);
                     float accHead = speedDif/(pLine2->dtimeMSec/3600000.0);
                     float bearingDiff = abs(pLine2->bearingRad-pLine1->bearingRad);
                     float rotDegSec = (bearingDiff*DEG_RAD*1000.0)/(pLine2->dtimeMSec);
-                    float rangeSpeed = (pLine2->obj2.rgKm - pLine1->obj1.rgKm)
-                            /(pLine2->dtimeMSec+pLine1->dtimeMSec);
+                    float rangeSpeed = (pLine2->obj2.rgKm - pLine1->obj1.rgKm)/(pLine2->dtimeMSec+pLine1->dtimeMSec);
                     float rangeAccel = abs((pLine2->obj2.rgKm-pLine2->obj1.rgKm)/pLine2->dtimeMSec
                             - (pLine1->obj2.rgKm-pLine1->obj1.rgKm)/pLine1->dtimeMSec);
                     if(pLine1->obj1.dopler==pLine1->obj2.dopler&&pLine1->obj2.dopler==pLine2->obj2.dopler)
-                    {fprintf(logfile," 1");
+                    {
+                        fprintf(logfile," 1");
                     }
                     else
                     {
@@ -2476,9 +2488,35 @@ void C_radar_data::ProcessObjects()
                     {
                         pLine2->score = score;
                     }
-                }
+                }*/
+        }
+        if(!possibleLines.size())continue;
+        double maxScore = 0;
+        short maxIndex=0;
+        for(ushort i =0;i<possibleLines.size();i++)
+        {
+            if(possibleLines[i].score>maxScore)
+            {
+                maxScore = possibleLines[i].score;
+                maxIndex=i;
             }
-
+        }
+        ushort k=0;
+        for (;k<mLineList.size();k++)
+        {
+            if(mLineList[k].isDead)
+            {
+                mLineList[k] = possibleLines[maxIndex];
+                break;
+            }
+        }
+        if(k>=mLineList.size())
+        {
+            if(k<3000)mLineList.push_back(possibleLines[maxIndex]);
+            else {
+                printf("\nfull lines memory");
+                continue;
+            }
         }
     }
     return;
@@ -2501,7 +2539,7 @@ void C_radar_data::ProcessObjects()
                             &&pLine2->obj2.uniqID==mTrackList.at(k).objectList.at(2).uniqID)break;
                 }
                 if(k<mTrackList.size())continue; //track already exist
-                float distance = pLine2->distancekm+pLine1->distancekm;
+                float distance = pLine2->distanceCoeff+pLine1->distanceCoeff;
                 float speedDif = abs(pLine2->speedkmh-pLine1->speedkmh);
                 float accHead = speedDif/(pLine2->dtimeMSec/3600000.0);
                 float bearingDiff = abs(pLine2->bearingRad-pLine1->bearingRad);
