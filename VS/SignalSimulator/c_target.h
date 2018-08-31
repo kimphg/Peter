@@ -86,8 +86,8 @@ public:
 			if (a >= 2048) a -= 2048;
 			if (a == azimax)break;
 			int value = 150 * (1.0 - abs(k - targetSize) / (targetSize + 1.0));
-			outputFrame[a][(int)range + FRAME_LEN + FRAME_HEADER_SIZE] = 0;
-			outputFrame[a][(int)range + FRAME_LEN + 1 + FRAME_HEADER_SIZE] = 0;
+			outputFrame[a][(int)range + FRAME_LEN + FRAME_HEADER_SIZE] = dopler;
+			outputFrame[a][(int)range + FRAME_LEN + 1 + FRAME_HEADER_SIZE] = dopler;
 			outputFrame[a][(int)range + FRAME_HEADER_SIZE] = value + int(distribNoise(generator));
 			outputFrame[a][(int)range + 1 + FRAME_HEADER_SIZE] = value + int(distribNoise(generator));
 			

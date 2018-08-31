@@ -32,6 +32,7 @@ void c_decision_tree::LoadDataFile(QString filename, std::vector<QString> featur
         mDataSet.push_back(point);
         line = in.readLine();
     }
+    printf("File loaded, num of features:%d, dataset size:%d\n",mFeatures.size(),mDataSet.size());
 }
 
 void c_decision_tree::run()
@@ -77,11 +78,15 @@ int Node::num_mistakes(DataSet data)//intermediate_node_num_mistakes
 bool Node::split()//finds the best feature to split on given the data and a list of features
 {
     if(current_depth>MAX_DEPTH)return false;//leaf condition
-    if(mDataSet.size()<20)return false;//leaf condition
+    if(mDataSet.size()<20)
+    {
+        printf("stop by mDataSet.size():%d, ",mDataSet.size());
+        return false;//leaf condition
+    }
     double     errorBefore = num_mistakes(mDataSet);
     if(errorBefore/double(mDataSet.size())>MAX_ACCURACY)return false;//leaf condition
     double  best_error  = errorBefore;
-    int     n_split_point  = 100;
+    int     n_split_point  = mDataSet.size()/150;
     for(uint i=0;i<mFeatures.size();i++)
     {
         std::vector<double> split_points;
@@ -109,9 +114,10 @@ bool Node::split()//finds the best feature to split on given the data and a list
                 best_split_point = split_points[j];
             }
         }
+        int iter = 1;
         while (split_pos>0)
         {
-            step/=2;
+            step/=iter;iter++;
             int pos_right = split_pos+step;
             int pos_left = split_pos-step;
             if(pos_right>values.size()-1)break;
@@ -133,8 +139,12 @@ bool Node::split()//finds the best feature to split on given the data and a list
             }
         }
     }
-    double errorGain = (errorBefore-best_error)/mDataSet.size();
-    if(errorGain<MIN_ERROR_GAIN)return false;//leaf condition
+    double errorGain = (errorBefore-best_error)/double(mDataSet.size());
+    if(errorGain<MIN_ERROR_GAIN)
+    {
+        printf("stop by gain, ");
+        return false;//leaf condition
+    }
     DataSet  mDataLeft;
     DataSet  mDataRight;
     for(uint j=0;j<mDataSet.size();j++)

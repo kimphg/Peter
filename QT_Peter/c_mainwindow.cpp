@@ -811,7 +811,7 @@ void Mainwindow::DrawRadarTargetByPainter(QPainter* p)//draw radar target from p
     if(mShowobjects)//raw objects
     {
         foreach (object_t obj, *pObjList) {
-            if(obj.uniqID<0)continue;
+            if(obj.isDead)continue;
             sx = obj.xkm*mScale + radCtX;
             sy = -obj.ykm*mScale + radCtY;
             //p->drawPoint(sx,sy);
@@ -825,8 +825,8 @@ void Mainwindow::DrawRadarTargetByPainter(QPainter* p)//draw radar target from p
     {
         foreach (object_line line, pRadar->mLineList) {
             if(line.isDead)continue;
-            sx = line.obj1.xkm*mScale + radCtX;
-            sy = -line.obj1.ykm*mScale + radCtY;
+            sx  = line.obj1.xkm*mScale + radCtX;
+            sy  = -line.obj1.ykm*mScale + radCtY;
             sx1 = line.obj2.xkm*mScale + radCtX;
             sy1 = -line.obj2.ykm*mScale + radCtY;
             p->drawLine(sx,sy,sx1,sy1);
@@ -839,13 +839,13 @@ void Mainwindow::DrawRadarTargetByPainter(QPainter* p)//draw radar target from p
     if(mShowTracks)//raw tracks
     {
         foreach (track_t track, pRadar->mTrackList) {
-            sx = track.xkm*mScale + radCtX;
-            sy = -track.ykm*mScale + radCtY;
-            sx1 = track.xkmo*mScale + radCtX;
-            sy1 = -track.ykmo*mScale + radCtY;
+            sx = track.objectList.back().xkm*mScale + radCtX;
+            sy = -track.objectList.back().ykm*mScale + radCtY;
+            sx1 = (&(track.objectList.back())-2)->xkm*mScale + radCtX;
+            sy1 = -(&(track.objectList.back())-2)->ykm*mScale + radCtY;
             p->drawLine(sx,sy,sx1,sy1);
 
-            //p->drawRect(sx-5,sy-5,10,10);
+            p->drawRect(sx-5,sy-5,10,10);
         }
 
     }

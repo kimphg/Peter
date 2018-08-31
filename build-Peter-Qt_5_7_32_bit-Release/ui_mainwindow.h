@@ -5877,6 +5877,7 @@ public:
         sizePolicy1.setHeightForWidth(toolButton_xl_dopler->sizePolicy().hasHeightForWidth());
         toolButton_xl_dopler->setSizePolicy(sizePolicy1);
         toolButton_xl_dopler->setCheckable(true);
+        toolButton_xl_dopler->setChecked(true);
         toolButton_xl_nguong = new QCustomButton(centralWidget);
         toolButton_xl_nguong->setObjectName(QStringLiteral("toolButton_xl_nguong"));
         toolButton_xl_nguong->setGeometry(QRect(980, 10, 101, 41));

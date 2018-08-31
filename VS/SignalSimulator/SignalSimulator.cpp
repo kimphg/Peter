@@ -80,7 +80,7 @@ void regenerate(int azi)
 
 
 
-#define NUM_OF_TARG 400
+#define NUM_OF_TARG 200
 target_t* target[NUM_OF_TARG];
 
 void initTargets()
@@ -89,8 +89,8 @@ void initTargets()
 	for (int i = 0; i < NUM_OF_TARG; i++)
 	{
 		target[i] = new target_t(
-			(rand() % 40) - 20,//x
-			(rand() % 40) - 20,//y
+			(rand() % 20) + 3,//x
+			(rand() % 20) + 3,//y
 			rand() % 40,//speed
 			rand() % 360,//heading
 			i);
@@ -119,14 +119,15 @@ int _tmain(int argc, _TCHAR* argv[])
 	initTargets();
 	int dazi = 1;
 	int nPeriod = 0;
-	
+	n_clk_adc = 2;
+	rResolution = 0.015070644 * pow(2, n_clk_adc);
 	while (true)
 	{
 		
 		
-		Sleep(3);
+		Sleep(5);
 		azi += dazi;
-		if (azi >= 2048)
+		/*if (azi >= 2048)
 		{
 			nPeriod++;
 			if (nPeriod > 50)
@@ -149,9 +150,9 @@ int _tmain(int argc, _TCHAR* argv[])
 			}
 			azi = 0;
 			updateTargets();
-		}
-		/*
-		if (azi>= 900)
+		}*/
+		
+		if (azi>= 600)
 		{
 			nPeriod++;
 			dazi = -1;
@@ -159,12 +160,12 @@ int _tmain(int argc, _TCHAR* argv[])
 			Sleep(500);
 		}
 		else
-		if (azi <= 50)
+		if (azi <= 10)
 		{
 			dazi = 1;
 			updateTargets();
 			Sleep(500);
-		}*/
+		}
 		//if (rand() % 10 == 0)regenerate(azi);
 		outputFrame[azi][0] = 5;
 		outputFrame[azi][2] = azi >> 8;

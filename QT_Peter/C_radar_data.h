@@ -108,81 +108,43 @@ typedef struct  {
     short          size;
     char           dopler;
     bool           isProcessed;
+    bool            isDead;
     float          p;
     float          terrain;
     float           rangeRes;
     float           aziRes;
     qint64          timeMs;
-    float           score1,score2;
-    unsigned long long int period;
+    float           scorep1,scorep2;
+    unsigned long int period;
 }object_t;
 struct object_line
 {
-    double       score;
+    double      pointScore,trackScore;
     float       dtimeMSec;
     object_t    obj1;
     object_t    obj2;
-    float distanceCoeff;
-    float speedkmh,rgSpeedkmh;
-    float bearingRad;
+//    float distanceCoeff;
+    float rgSpeedkmh;
+//    float speedkmh;
+//    float bearingRad;
     float dx,dy;
     bool isProcessed;
     bool isDead;
 };
 typedef std::vector<object_t> objectList;
-using Eigen::MatrixXf;
-//class matrix_t
-//{
-//public:
-//    float *data;
-//    short row,col;
-//    matrix_t()
-//    {
-//        data = 0;
-//        row = 0;
-//        col = 0;
-//    }
-//    void init(short irow,short icol) {
-
-//        data = new float[irow*icol];
-//        memset(data,0,irow*icol);
-//        row = irow;
-//        col = icol;
-
-//    }
-//    ~matrix_t() {
-//        if(data)delete[] data;
-//    }
-//    float* at(short r,short c)
-//    {
-//        if(r>row||c>col) return 0;
-//        return &data[col*r+c];
-//    }
-//    matrix_t mul(matrix_t *mat)
-//    {
-//        short r1 = this->row;
-//        short c1 = this->col;
-//        short c2 = mat->col;
-//        matrix_t m;
-//        m.init(r1,c2);
-//        if(c1!=mat->row)return m;
-
-//        for(short i=0; i<r1; ++i)
-//        for(short j=0; j<c2; ++j)
-//        for(short k=0; k<c1; ++k)
-//        *(m.at(i,j)) += (*this->at(i,k))*(*mat->at(k,j));
-//        return m;
-//    }
-//};
-//______________________________________//
+//using Eigen::MatrixXf;
 struct track_t
 {
     uint        dtime;
+    float lineScore;
     std::vector<object_t> objectList;
+    std::vector<object_t> possibleList;
     float accHead,accSide;
     float bearingRad;
-    float xkm,ykm;
-    float xkmo,ykmo;
+//    float xkm,ykm;
+//    float xkmo,ykmo;
+    bool isDead;
+    qint64          updateTimeMs;
 };
 typedef std::vector<track_t> trackList;
 //______________________________________//
@@ -316,8 +278,8 @@ private:
     void        procPix(short proc_azi,short range);
     void        procTracks(unsigned short curA);
     void        procPLot(plot_t* mPlot);
-    bool procObjectAvto(object_t* pObject);
-    bool procObjectManual(object_t* pObject);
+//    bool procObjectAvto(object_t* pObject);
+//    bool procObjectManual(object_t* pObject);
     //void status_start();
     //FILE *pFile;
 
@@ -327,6 +289,8 @@ private:
     int getNewAzi();
     void ProcessEach90Deg();
     int ssiDecode(ushort nAzi);
+    void DetectTracks();
+    double estimateScore(object_t *obj1, object_t *obj2);
 public:
     unsigned char mSledValue;
     int mEncoderVal;

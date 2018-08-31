@@ -36327,6 +36327,9 @@ background-color: rgba(255, 255, 255, 0);</string>
     <property name="checkable">
      <bool>true</bool>
     </property>
+    <property name="checked">
+     <bool>true</bool>
+    </property>
    </widget>
    <widget class="QCustomButton" name="toolButton_xl_nguong">
     <property name="geometry">
