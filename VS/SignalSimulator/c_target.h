@@ -10,7 +10,7 @@
 std::default_random_engine generator;
 std::normal_distribution<double> distribNoise(30, 8);
 std::normal_distribution<double> distribAzi(0, 1);//scale of 2048
-std::normal_distribution<double> distribRot(180, 3);//deg per sec
+std::normal_distribution<double> distribRot(180, 1);//deg per sec
 using namespace std;
 double ConvXYToRange(double x, double y)
 {

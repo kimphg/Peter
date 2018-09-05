@@ -59,7 +59,7 @@
 #include <QImage>
 #include <QDateTime>
 #include <QFile>
-#include <Eigen/Dense>
+//#include <Eigen/Dense>
 #include <queue>
 
 
@@ -72,7 +72,7 @@
 //using namespace arma;
 //#include <list>
 //using namespace std;
-using namespace Eigen;
+//using namespace Eigen;
 /*typedef struct {
     short x,y;
     unsigned char level;
@@ -108,44 +108,46 @@ typedef struct  {
     short          size;
     char           dopler;
     bool           isProcessed;
-    bool            isDead;
+    bool           isRemoved;
     float          p;
     float          terrain;
     float           rangeRes;
     float           aziRes;
     qint64          timeMs;
-    float           scorep1,scorep2;
+    float           scorepObj,scorep2;
+    float scoreTrack;
     unsigned long int period;
+    uint len;
 }object_t;
-struct object_line
-{
-    double      pointScore,trackScore;
-    float       dtimeMSec;
-    object_t    obj1;
-    object_t    obj2;
-//    float distanceCoeff;
-    float rgSpeedkmh;
-//    float speedkmh;
-//    float bearingRad;
-    float dx,dy;
-    bool isProcessed;
-    bool isDead;
-};
+//struct object_line
+//{
+//    double      pointScore,trackScore;
+//    float       dtimeMSec;
+//    object_t    obj1;
+//    object_t    obj2;
+////    float distanceCoeff;
+//    float rgSpeedkmh;
+////    float speedkmh;
+////    float bearingRad;
+//    float dx,dy;
+//    bool isProcessed;
+//    bool isRemoved;
+//};
 typedef std::vector<object_t> objectList;
 //using Eigen::MatrixXf;
-struct track_t
+typedef struct
 {
     uint        dtime;
     float lineScore;
-    std::vector<object_t> objectList;
+    std::deque<object_t> objectList;
     std::vector<object_t> possibleList;
-    float accHead,accSide;
     float bearingRad;
+    float rgSpeedkmh;
 //    float xkm,ykm;
 //    float xkmo,ykmo;
-    bool isDead;
-    qint64          updateTimeMs;
-};
+    bool isRemoved,isLost;
+    qint64          lastTimeMs;
+}track_t;
 typedef std::vector<track_t> trackList;
 //______________________________________//
 enum imgDrawMode
@@ -166,9 +168,9 @@ public:
     float                   rotation_per_min ;
     trackList               mTrackList;
     std::vector<plot_t>     plot_list;
-    std::vector<object_t>     mObjList;
-    std::vector<object_line>  mLineList;
-    unsigned long long int  mPeriodCount;
+    std::vector<object_t>     mFreeObjList;
+    unsigned    long long int  mPeriodCount;
+    qint64 now_ms ;
 //    bool                    isEncoderAzi;
 //    int                     mEncoderAzi;
     unsigned char           spectre[16];
@@ -259,7 +261,7 @@ public:
 private:
     int mFalsePositiveCount;
     float hsTap ;
-    qint64 now_ms ;
+
     //QVector<QRgb> colorTable;
     double      selfRotationDazi,selfRotationRate;
     double      selfRotationAzi;
@@ -289,8 +291,13 @@ private:
     int getNewAzi();
     void ProcessEach90Deg();
     int ssiDecode(ushort nAzi);
-    void DetectTracks();
+//    void DetectTracks();
     double estimateScore(object_t *obj1, object_t *obj2);
+    void ProcessTracks();
+    bool checkBelongToTrack(object_t *obj1);
+    bool checkBelongToObj(object_t *obj1);
+    double estimateScore(object_t *obj1, track_t *track);
+    void CreateTrack(object_t *obj1, object_t *obj2);
 public:
     unsigned char mSledValue;
     int mEncoderVal;
@@ -302,6 +309,7 @@ public:
     double getSelfRotationAzi() const;
     void setSelfRotationAzi(int value);
     void processSocketData(unsigned char *data, short len);
+    bool ProcessObject(object_t *obj1);
     void ProcessObjects();
     static double ConvXYToRange(double x, double y);
     static double ConvXYToAziRad(double x, double y);

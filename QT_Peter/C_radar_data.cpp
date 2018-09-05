@@ -14,7 +14,9 @@
 #define RADAR_DATA_HEADER_MAX   62
 #define RADAR_DATA_SPECTRE      22
 #define RADAR_DATA_MAX_SIZE     2688
-#define RADAR_
+#define RADAR_GAIN_MIN 3.0
+#define RADAR_GAIN_MAX 9.0
+#define AZI_ERROR_STD 0.01746
 #define TARGET_OBSERV_PERIOD 6500//ENVAR max periods to save object in the memory
 FILE *logfile;
 
@@ -659,17 +661,17 @@ void C_radar_data::ProcessData(unsigned short azi,unsigned short lastAzi)
 }
 void C_radar_data::ProcessEach90Deg()
 {
-    DetectTracks();
+    //DetectTracks();
     getNoiseLevel();
     //remove old points
     int nObj = 0;
-    for (uint i=0;i<mObjList.size();i++)
+    for (uint i=0;i<mFreeObjList.size();i++)
     {
 
-        if(!mObjList.at(i).isDead)
+        if(!mFreeObjList.at(i).isRemoved)
         {
-            if((now_ms-mObjList.at(i).timeMs)>20000)
-                mObjList.at(i).isDead = true;
+            if((now_ms-mFreeObjList.at(i).timeMs)>20000)
+                mFreeObjList.at(i).isRemoved = true;
             else nObj++;
         }
 
@@ -678,31 +680,26 @@ void C_radar_data::ProcessEach90Deg()
     //kill old tracks
     for(int i=0;i<mTrackList.size();i++)
     {
-        if(!mTrackList[i].isDead)
+        if(!mTrackList[i].isRemoved)
         {
-            if((now_ms -mTrackList[i].objectList.back().timeMs)>30000)
-                mTrackList[i].isDead = true;
+            if((now_ms -mTrackList[i].lastTimeMs)>30000)
+                mTrackList[i].isRemoved = true;
         }
     }
     //
-    if(nObj>1500)
+    if(nObj>500)
     {
         if(kgain_auto<7.5)kgain_auto*=1.01;
         printf("\ntoo many obj,kgain_auto:%f",kgain_auto);
     }
-    else if(nObj<500)if(kgain_auto>4.2)kgain_auto/=1.01;
-    if(mFalsePositiveCount>15)//ENVAR
+    else if(nObj<20)if(kgain_auto>4.2)kgain_auto/=1.01;
+    else if(mFalsePositiveCount>15)//ENVAR
     {
         if(kgain_auto<10)kgain_auto*=1.01;
         printf("\ntoo many false positive kgain_auto:%f",kgain_auto);
     }
     mFalsePositiveCount = 0;
-    //remove old lines
-    for (int k=0;k<mLineList.size();k++)
-    {
-        if(now_ms - mLineList[k].obj1.timeMs>30000)
-            mLineList[k].isDead = true;
-    }
+
     //calculate rotation speed
     if(cur_timeMSecs)
     {
@@ -989,108 +986,7 @@ void C_radar_data::clearPPI()
     img_ppi->fill(0);
 
 }
-void C_radar_data::DetectTracks()
-{
-    //create tracks
-    for (int i=0;i<mLineList.size();i++)
-    {
-        object_line* pLine1 = &mLineList[i];
-        if(pLine1->isProcessed)continue;
-        pLine1->isProcessed = true;
-        std::vector <track_t> possibleTracks;
-        for (int j=0;j<mLineList.size();j++)
-        {
-            if(i==j)continue;
 
-            object_line* pLine2 = &mLineList.at(j);
-            if(pLine2->isDead)continue;
-
-            if(pLine1->obj2.uniqID!=pLine2->obj1.uniqID)continue;
-
-            if(pLine1->obj2.period!=pLine2->obj1.period)continue;
-            //                float distanceCoeff = (pLine2->distanceCoeff+pLine1->distanceCoeff)/2.0;
-            //                float speedDif      = abs(pLine2->speedkmh-pLine1->speedkmh);
-            //                float speed = (pLine2->speedkmh+pLine1->speedkmh)/2.0;
-            float rgSpeedDif    = abs(pLine2->rgSpeedkmh-pLine1->rgSpeedkmh);
-            //                float accHead = speedDif/(pLine2->dtimeMSec/3600000.0);
-            //                float bearingDiff = abs(pLine2->bearingRad-pLine1->bearingRad);
-            //                float accPerpendir = (bearingDiff*DEG_RAD*1000.0)/(pLine2->dtimeMSec)*speed;
-            //                float rangeSpeed = abs(pLine2->rgSpeedkmh+pLine1->rgSpeedkmh)/2.0;
-
-#ifdef LOG_DATA_TRAINING
-            fprintf(logfile,"%f,",distanceCoeff);
-            fprintf(logfile,"%f,",speedDif);
-            fprintf(logfile,"%f,",rgSpeedDif);
-            //                fprintf(logfile,"%f,",accHead);
-            //                fprintf(logfile,"%f,",bearingDiff);
-            fprintf(logfile,"%f,",accPerpendir);
-            fprintf(logfile,"%f,",rangeSpeed);
-            if(pLine1->obj1.dopler==pLine1->obj2.dopler&&pLine1->obj2.dopler==pLine2->obj2.dopler)
-            {fprintf(logfile," 1");
-            }
-            else
-            {
-
-                fprintf(logfile," 0");
-            }
-            fprintf(logfile,"\n");
-#else
-            /*
-                split by feature: rgSpeedDif at value:54.478218
-                Left 1:stop by gain, prediction:0.924401
-                Right 1:
-                split by feature: rgSpeedDif at value:79.045364
-                Left 2:stop by gain, prediction:0.550000
-                Right 2:stop by gain, prediction:0.030000
-                */
-            float score=1-rgSpeedDif/80.0;
-            if(score<0.2)continue;
-            if(score>pLine1->trackScore&&score>pLine2->trackScore)
-            {
-                track_t newtrack;
-                newtrack.lineScore = score;
-                newtrack.isDead = false;
-                newtrack.objectList.push_back((pLine2->obj2));
-                newtrack.objectList.push_back((pLine1->obj2));
-                newtrack.objectList.push_back((pLine1->obj1));
-                possibleTracks.push_back(newtrack);
-            }
-#endif
-
-
-        }
-        if(possibleTracks.size())
-        {
-            float maxScore = 0;
-            int maxIndex = 0;
-            int i;
-            for(i=0;i<possibleTracks.size();i++)
-            {
-                if(possibleTracks[i].lineScore>maxScore)
-                {
-                    maxScore = possibleTracks[i].lineScore;
-                    maxIndex=i;
-                }
-            }
-            //replace the dead ones
-            for(i=0;i<mTrackList.size();i++)
-            {
-                if(mTrackList[i].isDead)
-                {
-                    mTrackList[i]=possibleTracks[maxIndex];
-                    break;
-                }
-            }
-            if(i<mTrackList.size())continue;
-            if(mTrackList.size()>500)
-            {
-                printf("\nfull tracklist");
-                continue;
-            }
-            if(i>=mTrackList.size())mTrackList.push_back(possibleTracks[maxIndex]);
-        }
-    }
-}
 ushort mulOf16Azi = 0;
 void C_radar_data::UpdateData()
 {
@@ -1110,7 +1006,8 @@ void C_radar_data::UpdateData()
         if(!((unsigned char)(((unsigned char)mPeriodCount)<<3)))//xu ly moi 32 chu ky
         {
             now_ms = QDateTime::currentMSecsSinceEpoch();
-            ProcessObjects();
+            //ProcessObjects();
+            ProcessTracks();
             mulOf16Azi++;
             if(mulOf16Azi>16)// 1/4 vong quet
             {
@@ -1289,10 +1186,10 @@ void C_radar_data::procPLot(plot_t* mPlot)
 
     object_t newobject;
     newobject.timeMs = now_ms;
-    newobject.scorep1 = 0;
-    newobject.scorep2 = 0;
+    newobject.scorepObj = 0;
+    newobject.len = 1;
     newobject.uniqID = rand();
-    newobject.isDead = false;
+    newobject.isRemoved = false;
     newobject.isProcessed = false;
     newobject.dazi = mPlot->lastA-mPlot->riseA;
     newobject.period = mPeriodCount;
@@ -1331,19 +1228,25 @@ void C_radar_data::procPLot(plot_t* mPlot)
     newobject.p   = -1;
     newobject.xkm = newobject.rgKm*sin( newobject.az);
     newobject.ykm = newobject.rgKm*cos( newobject.az);
-    // add to mObjList
-    bool full = true;
-    for(int i=0;i<mObjList.size(); i++) {
-        if(mObjList.at(i).isDead)
-        {
-            mObjList.at(i) = newobject;
-            full = false;
-            break;
-        }
-    }
-    if(full&&mObjList.size()<2000)
+
+    if(!ProcessObject(&newobject))
     {
-        mObjList.push_back(newobject);
+        ProcessObject(&newobject);
+        // add to mObjList
+        bool full = true;
+        for(int i=0;i<mFreeObjList.size(); i++)
+        {
+            if(mFreeObjList.at(i).isRemoved)
+            {
+                mFreeObjList.at(i) = newobject;
+                full = false;
+                break;
+            }
+        }
+        if(full&&mFreeObjList.size()<2000)
+        {
+            mFreeObjList.push_back(newobject);
+        }
     }
 
     /*
@@ -2145,23 +2048,70 @@ void C_radar_data::resetTrack()
     //        }
     //    }
 }
-double C_radar_data::estimateScore(object_t *obj1,object_t *obj2)
+double C_radar_data::estimateScore(object_t *obj1, track_t *track)
 {
-    int dtime = (obj1->timeMs - obj2->timeMs);
-    if(dtime<1000)return 0;//ENVAR min time between plots in a line(1s)
-    if(dtime>40000)return 0;//ENVAR max time between plots in a line(40s)
-    float rgSpeedkmh = (obj1->rgKm-obj2->rgKm)/(dtime/3600000.0);
-    if(rgSpeedkmh>85)return 0;//ENVAR
+    object_t* obj2 = &(track->objectList.back());
+    double dtime = (obj1->timeMs - obj2->timeMs);
+    if(dtime<1000)
+        return -1;//ENVAR min time between plots in a line(1s)
+    if(dtime>40000)
+        return -1;//ENVAR max time between plots in a line(40s)
+
     float dx = obj1->xkm - obj2->xkm;
     float dy = obj1->ykm - obj2->ykm;
-    double maxDistance = TARGET_MAX_SPEED_MARINE/3600000.0*dtime   + obj1->rgKm*atan(obj1->aziRes*3);
+
     double distancekm = sqrt(dx*dx+dy*dy);
+
     double speedkmh = distancekm/(dtime/3600000.0);
-    double distanceCoeff = distancekm/maxDistance;
-    if(distanceCoeff>1.0)return 0;
+    if(speedkmh>430.0)return -1;
+    double distanceCoeff = distancekm/(TARGET_MAX_SPEED_MARINE/3600000.0*dtime   + obj1->rgKm*AZI_ERROR_STD);
+    if(distanceCoeff>1.0)return -1;
+    float rgSpeedkmh = (obj1->rgKm-obj2->rgKm)/(dtime/3600000.0);
+    if(abs(rgSpeedkmh)>120.0)return-1;
+    double dRgSp = rgSpeedkmh - track->rgSpeedkmh;
+    if(abs(dRgSp)>125.0)return-1;
+    double score = 3.0 - speedkmh/430.0 - distanceCoeff - abs(rgSpeedkmh)/120.0 - abs(dRgSp)/125.0;
+    /*fprintf(logfile,"%f,",speedkmh);
+    fprintf(logfile,"%f,",distanceCoeff);
+    fprintf(logfile,"%f,",abs(rgSpeedkmh));
+    fprintf(logfile,"%f,",abs(dRgSp));
 
+    if(obj1->dopler==obj2->dopler)
+    {fprintf(logfile,"1\n");
+        return 1;
+    }
+    else
+        fprintf(logfile,"-1\n");*/
+    return score;
+
+}
+
+double C_radar_data::estimateScore(object_t *obj1,object_t *obj2)
+{
+    //if(obj1->dopler==obj2->dopler)return 1;
+    //else return 0;
+    //
+    //[ 0.4587003  -0.00102045 -0.02371061 -0.0084888 ]
+    //0.936885388565
+    int dtime = (obj1->timeMs - obj2->timeMs);
+    if(dtime<1000)return -1;//ENVAR min time between plots in a line(1s)
+    if(dtime>40000)return -1;//ENVAR max time between plots in a line(40s)
+
+    float dx = obj1->xkm - obj2->xkm;
+    float dy = obj1->ykm - obj2->ykm;
+
+    double distancekm = sqrt(dx*dx+dy*dy);
+
+    double speedkmh = distancekm/(dtime/3600000.0);
+    if(speedkmh>430)return -1;
+    double distanceCoeff = distancekm/(TARGET_MAX_SPEED_MARINE/3600000.0*dtime   + obj1->rgKm*AZI_ERROR_STD);
+    if(distanceCoeff>1.0)return -1;
+    float rgSpeedkmh = abs(obj1->rgKm - obj2->rgKm)/(dtime/3600000.0);
+    if(rgSpeedkmh>120.0)return -1;
+    return 3.0 - speedkmh/430.0 - distanceCoeff - abs(rgSpeedkmh)/120.0;
+    //return 0.4587003 - 0.00102045*speedkmh - 0.02371061*rgSpeedkmh -0.0084888*distanceCoeff;
     // calculate score using machine learning model
-
+/*
     if(distanceCoeff<0.285928)
     {
         if(abs(rgSpeedkmh)<44.409351)return 0.971;
@@ -2179,164 +2129,175 @@ double C_radar_data::estimateScore(object_t *obj1,object_t *obj2)
         }
         else
             return 0.01;
-    }
+    }*/
 
 }
-void C_radar_data::ProcessObjects()
+void C_radar_data::ProcessTracks()
 {
     //processTracks
 
     for (ushort j=0;j<mTrackList.size();j++)
     {
         track_t* track = &(mTrackList[j]);
-        if(now_ms-track->updateTimeMs>500)
+        if(track->isRemoved||track->isLost)continue;
+        // find maximum score from possibleList
+        if(track->possibleList.size())
         {
-            track->updateTimeMs=now_ms;
-            if(track->possibleList.size())
+            if(now_ms-track->possibleList.back().timeMs>300)
             {
                 int maxIndex =0;
                 float maxScore = 0;
-                for(int i=0;i<track->possibleList.size();i++)
+                for(ushort i=0;i<track->possibleList.size();i++)
                 {
-                    if(track->possibleList[i].scorep1>maxScore)
+                    if(track->possibleList[i].scoreTrack>maxScore)
                     {
-                        maxScore = track->possibleList[i].scorep1;
+                        maxScore = track->possibleList[i].scoreTrack;
                         maxIndex = i;
                     }
                 }
                 track->objectList.push_back(track->possibleList[maxIndex]);
+                track->lastTimeMs = track->possibleList[maxIndex].timeMs;
                 track->possibleList.clear();
-//                track->xkm = track->objectList.back().xkm;
-//                track->ykm = track->objectList.back().ykm;
-//                track->xkmo = track->objectList[0].xkm;
-//                track->ykmo = track->objectList[0].ykm;
             }
+
         }
+        //remove old track
+        else if(now_ms-track->lastTimeMs>45000) track->isLost = true;
+        else if(now_ms-track->lastTimeMs>180000) track->isRemoved = true;
+
     }
-    for (ushort i=0;i<mObjList.size();i++)
+}
+bool C_radar_data::ProcessObject(object_t *obj1)
+{
+    //check  if object_t belonging to tracks
+    if(checkBelongToTrack(obj1))return true;
+    // check if object_t belonging to lines
+    //if(checkBelongToLine(obj1))return;
+    // check if object_t belonging to another obj
+    if(checkBelongToObj(obj1))return true;
+    return false;
+
+}
+
+bool C_radar_data::checkBelongToTrack(object_t *obj1)
+{
+    bool isBelongingToTrack = false;
+    obj1->scoreTrack=0;
+    track_t* chosenTrack ;
+    double maxScore=0;
+    for (ushort j=0;j<mTrackList.size();j++)
     {
-        object_t *obj1 = &(mObjList[i]);
-        if(obj1->isDead)continue;
-        if(obj1->isProcessed)continue;
-        obj1->isProcessed = true;
-        obj1->scorep1=0;
-        //check  if object_t belonging to tracks
-        bool isBelongingToTrack = false;
-        track_t* chosenTrack ;
-        for (ushort j=0;j<mTrackList.size();j++)
-        {
-            track_t* track = &(mTrackList[j]);
-            object_t *obj2 = &(track->objectList.back());
+        track_t* track = &(mTrackList[j]);
+        if(track->isRemoved||track->isLost)continue;
+        //object_t *obj2 = &(track->objectList.back());
+        double score = estimateScore(obj1,track);//todo: optimize this score
+        //object_t* obj2 = &(track->objectList.back());
+        //unsigned int dtime = (obj1->timeMs - obj2->timeMs);
+        /*if(dtime<1000)
+            continue;//ENVAR min time between plots in a line(1s)
+        if(dtime>40000)
+            continue;//ENVAR max time between plots in a line(40s)
+        double rgSpeedkmh = (obj1->rgKm-obj2->rgKm)/(dtime/3600000.0);
+        double dRgSp = (rgSpeedkmh - track->rgSpeedkmh)/40.0;*/
+        //double score1 = estimateScore(obj1,obj2);
+        //double score2 = powl(CONST_E,-dRgSp*dRgSp);
+        //score = score1*score2;
+        //printf("\ndtime:%dscore:%f,%f,%f",dtime,score1,score2,score);
+        //-----------------------------------
 
-            double score = estimateScore(obj1,obj2);
-            if(score>0.2&&score>obj1->scorep1)
-            {
-                obj1->scorep1=score;
-                chosenTrack = track;
-
-                isBelongingToTrack = true;
-            }
-
-        }
-        if(isBelongingToTrack)
+        if(score>maxScore)
         {
-            chosenTrack->possibleList.push_back(*obj1);
-            chosenTrack->updateTimeMs = now_ms;
-            obj1->isDead = true;
-            continue;
-        }
-        // check for new lines
-        std::vector<object_line> possibleLines;
-        for (ushort j=0;j<mObjList.size();j++)
-        {
-            if(i==j)continue;
-            object_t *obj2 = &(mObjList.at(j));
-            //find new line
-            if(obj2->isDead)continue;
-            int dtime = (obj1->timeMs - obj2->timeMs);
-            if(dtime>30000)
-            {
-                obj2->isDead = true;
-                continue;
-            }
-            float rgSpeedkmh = (obj1->rgKm-obj2->rgKm)/(dtime/3600000.0);
-            if(rgSpeedkmh>85)continue;//ENVAR
-            double score = estimateScore(obj1,obj2);
-#ifndef LOG_DATA_TRAINING
-            //filtering using learned score
-            if(score<0.5||score<obj2->scorep2||score<obj1->scorep1) continue;
-            object_line newline;
-            newline.pointScore      = score;
-            newline.trackScore      = 0;
-//            newline.distanceCoeff   = distanceCoeff;
-//            newline.speedkmh        = speedkmh;
-            newline.rgSpeedkmh      = rgSpeedkmh;
-//            newline.bearingRad      = ConvXYToAziRad(dx,dy);
-            newline.dtimeMSec       = dtime;
-            newline.obj1            = *obj1;
-            newline.obj2            = *obj2;
-            newline.isProcessed     = false;
-            newline.isDead          = false;
-            possibleLines.push_back(newline);
-#else
-            if(obj1->dopler==obj2->dopler)
-            {
-                fprintf(logfile,"%f",rgSpeedkmh);//
-                //fprintf(logfile,",%d",dtime);
-                fprintf(logfile,",%f",speedkmh);
-                //fprintf(logfile,",%f",newline.rgSpeedkmh);
-                fprintf(logfile,",%f",distancekm/maxDistance);
-                fprintf(logfile,",1");
-                fprintf(logfile,"\n");
-            }
-            else
-            {
-                fprintf(logfile,"%f",rgSpeedkmh);//
-                //fprintf(logfile,"%d",dtime);
-                fprintf(logfile,",%f",speedkmh);
-                //fprintf(logfile,",%f",newline.rgSpeedkmh);//
-                fprintf(logfile,",%f",distancekm/maxDistance);
-                fprintf(logfile,",0");
-                fprintf(logfile,"\n");
-            }
-#endif
-        }
-        if(!possibleLines.size())continue;
-        double maxScore = 0;
-        short maxIndex=0;
-        for(ushort i =0;i<possibleLines.size();i++)
-        {
-            if(possibleLines[i].pointScore>maxScore)
-            {
-                maxScore = possibleLines[i].pointScore;
-                maxIndex=i;
-            }
+            maxScore=score;
+            chosenTrack = track;
+            isBelongingToTrack = true;
         }
 
-        object_line *newline = &(possibleLines[maxIndex]);
-        newline->obj1.scorep1 = maxScore;
-        newline->obj2.scorep2 = maxScore;
+    }
+    if(isBelongingToTrack)
+    {
+        chosenTrack->possibleList.push_back(*obj1);
+        //printf(" maxScore:%f",maxScore);
+        obj1->isRemoved = true;//free the object
+        return true;
+    }
+    else
+    {
+        //printf(" maxScore:%f",maxScore);
+        return false;
+    }
+}
 
-        //replace the dead
-        ushort k=0;
-        for (;k<mLineList.size();k++)
-        {
-            if(mLineList[k].isDead)
-            {
-                mLineList[k] = possibleLines[maxIndex];
-                break;
-            }
-        }
-        if(k>=mLineList.size())
-        {
-            if(k<3000)mLineList.push_back(possibleLines[maxIndex]);
-            else {
-                printf("\nfull lines memory");
-                continue;
-            }
-        }
+void C_radar_data::ProcessObjects()
+{
+
+    for (ushort i=0;i<mFreeObjList.size();i++)
+    {
+        object_t *obj1 = &(mFreeObjList[i]);
+
     }
     return;
+
+}
+void C_radar_data::CreateTrack(object_t* obj1,object_t* obj2)
+{
+    track_t newTrack;
+    newTrack.rgSpeedkmh = (obj1->rgKm-obj2->rgKm)/(obj1->timeMs-obj2->timeMs)*(3600000.0);
+    newTrack.isRemoved = false;
+    newTrack.isLost = false;
+    newTrack.lastTimeMs = obj1->timeMs;
+    newTrack.objectList.push_back(*obj2);
+    newTrack.objectList.push_back(*obj1);
+    ushort j;
+    for (j=0;j<mTrackList.size();j++)
+    {
+        if(mTrackList[j].isRemoved)
+        {
+            mTrackList[j] = newTrack;
+            break;
+        }
+    }
+    if(j>=mTrackList.size()&&j<2000)
+    mTrackList.push_back(newTrack);
+
+}
+bool C_radar_data::checkBelongToObj(object_t* obj1)
+{
+    object_t *objLast;
+    double maxScore=0;
+    for (ushort j=0;j<mFreeObjList.size();j++)
+    {
+        object_t *obj2 = &(mFreeObjList.at(j));
+        //find new line
+        if(obj2->isRemoved)continue;
+        int dtime = (obj1->timeMs - obj2->timeMs);
+        if(dtime<300)
+        {
+            continue;
+        }
+        if(dtime>20000)
+        {
+            obj2->isRemoved = true;
+            continue;
+        }
+        //float rgSpeedkmh = (obj1->rgKm-obj2->rgKm)/(dtime/3600000.0);
+        //if(rgSpeedkmh>85)continue;//ENVAR
+        double score = estimateScore(obj1,obj2);
+        if(score<=0)continue;
+        if(score>maxScore)
+        {
+            maxScore = score;
+            objLast = obj2;
+        }
+    }
+    if(maxScore>0)
+    {
+        //obj1->scorepObj = maxScore;
+        //obj1->isRemoved=true;
+        //objLast->isRemoved = true;
+        CreateTrack(obj1,objLast);objLast->isRemoved = true;
+        return true;
+    }
+    else return false;
 
 }
 double C_radar_data::ConvXYToRange(double x, double y)

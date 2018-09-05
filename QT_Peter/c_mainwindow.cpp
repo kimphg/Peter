@@ -792,12 +792,12 @@ void Mainwindow::initGraphicView()
 void Mainwindow::DrawRadarTargetByPainter(QPainter* p)//draw radar target from pRadar->mTrackList
 {
     QPen penTarget(Qt::magenta);
-    penTarget.setWidth(1);
+    penTarget.setWidth(2);
     QPen penSelTarget(Qt::magenta);
     penSelTarget.setWidth(2);
     penSelTarget.setStyle(Qt::DashLine);
     QPen penTargetBlue(Qt::cyan);
-    penTargetBlue.setWidth(1);
+    penTargetBlue.setWidth(3);
     //penTargetBlue.setStyle(Qt::DashLine);
     //QPen penARPATrack(Qt::darkYellow);
     //draw radar targets
@@ -806,46 +806,56 @@ void Mainwindow::DrawRadarTargetByPainter(QPainter* p)//draw radar target from p
     short sx1,sy1;
     //float scale_ppi = pRadar->scale_ppi;
     //short targetId = 0;
-    std::vector<object_t>* pObjList = &(pRadar->mObjList);
+    std::vector<object_t>* pObjList = &(pRadar->mFreeObjList);
     p->setPen(penTargetBlue);
+    qint64 now_ms  = QDateTime::currentMSecsSinceEpoch();
     if(mShowobjects)//raw objects
     {
-        foreach (object_t obj, *pObjList) {
-            if(obj.isDead)continue;
-            sx = obj.xkm*mScale + radCtX;
-            sy = -obj.ykm*mScale + radCtY;
+        for (uint i = 0;i<pObjList->size();i++) {
+            object_t* obj = &((*pObjList)[i]);
+            if(obj->isRemoved)continue;
+            int size = 10000.0/(now_ms - obj->timeMs+500);
+            if(size<10)size=10;
+            sx = obj->xkm*mScale + radCtX;
+            sy = -obj->ykm*mScale + radCtY;
             //p->drawPoint(sx,sy);
-            p->drawRect(sx-5,sy-5,10,10);
-        }
-
-    }
-    penTargetBlue.setWidth(2);
-    p->setPen(penTargetBlue);
-    if(mShowLines)//raw lines
-    {
-        foreach (object_line line, pRadar->mLineList) {
-            if(line.isDead)continue;
-            sx  = line.obj1.xkm*mScale + radCtX;
-            sy  = -line.obj1.ykm*mScale + radCtY;
-            sx1 = line.obj2.xkm*mScale + radCtX;
-            sy1 = -line.obj2.ykm*mScale + radCtY;
-            p->drawLine(sx,sy,sx1,sy1);
-
-            //p->drawRect(sx-5,sy-5,10,10);
+            p->drawRect(sx-size/2,sy-size/2,size,size);
         }
 
     }
     p->setPen(penTarget);
     if(mShowTracks)//raw tracks
     {
-        foreach (track_t track, pRadar->mTrackList) {
-            sx = track.objectList.back().xkm*mScale + radCtX;
-            sy = -track.objectList.back().ykm*mScale + radCtY;
-            sx1 = (&(track.objectList.back())-2)->xkm*mScale + radCtX;
-            sy1 = -(&(track.objectList.back())-2)->ykm*mScale + radCtY;
-            p->drawLine(sx,sy,sx1,sy1);
-
-            p->drawRect(sx-5,sy-5,10,10);
+        for (uint i = 0;i<pRadar->mTrackList.size();i++)
+        {
+            track_t* track = &(pRadar->mTrackList[i]);
+            if(track->isRemoved)continue;
+            if(track->isLost)
+            {
+                p->setPen(penSelTarget);
+                object_t* obj1 = &(track->objectList.back());
+                sx = obj1->xkm*mScale + radCtX;
+                sy = -obj1->ykm*mScale + radCtY;
+                p->drawRect(sx-5,sy-5,10,10);
+                p->setPen(penTarget);
+            }
+            else
+            {
+                object_t* obj1,*obj2;
+                for (uint j = track->objectList.size()-2;j>1;j--)
+                {
+                    obj1 = &(track->objectList[j]);
+                    obj2 = &(track->objectList[j+1]);
+                    sx = obj1->xkm*mScale + radCtX;
+                    sy = -obj1->ykm*mScale + radCtY;
+                    sx1 = obj2->xkm*mScale + radCtX;
+                    sy1 = -obj2->ykm*mScale + radCtY;
+                    p->drawLine(sx,sy,sx1,sy1);
+                }
+                int size = 15000.0/(now_ms - track->objectList.back().timeMs+400);
+                if(size<10)size=10;
+                p->drawRect(sx-size/2,sy-size/2,size,size);
+            }
         }
 
     }
@@ -1362,15 +1372,15 @@ void Mainwindow::InitSetting()
 {
     ui->tabWidget_iad->SetTransparent(true);
     QApplication::setOverrideCursor(Qt::CrossCursor);
-    QString systemCommand = CConfig::getString("systemCommand","D:\\HR2D\\cudaCv.exe");
+    /*QString systemCommand = CConfig::getString("systemCommand","D:\\HR2D\\cudaCv.exe");
     if(systemCommand.size()){
         systemCommand= "start "+systemCommand;
-    system((char*)systemCommand.toStdString().data());}
+    system((char*)systemCommand.toStdString().data());}*/
     mMaxTapMayThu = CConfig::getInt("mMaxTapMayThu");
     mRangeLevel = CConfig::getInt("mRangeLevel");
-    assert(mRangeLevel>=0&&mRangeLevel<8);
+    //assert(mRangeLevel>=0&&mRangeLevel<8);
     setDistanceUnit(CConfig::getInt("mDistanceUnit"));
-    assert(mDistanceUnit>=0&&mDistanceUnit<2);
+    //assert(mDistanceUnit>=0&&mDistanceUnit<2);
 
     mHeadingT2 = CConfig::getDouble("mHeadingT2",0);
     mHeadingT = CConfig::getDouble("mHeadingT",0);
