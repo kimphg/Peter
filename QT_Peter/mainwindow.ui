@@ -36464,9 +36464,9 @@ background-color: rgba(255, 255, 255, 0);</string>
    <widget class="QCustomButton" name="toolButton_sled_reset_4">
     <property name="geometry">
      <rect>
-      <x>760</x>
+      <x>830</x>
       <y>110</y>
-      <width>101</width>
+      <width>141</width>
       <height>41</height>
      </rect>
     </property>

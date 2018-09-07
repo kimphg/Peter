@@ -81,11 +81,11 @@ def loadData(fileName):
     dataset = np.loadtxt(dataTxt,dtype='double',delimiter=',')
     return dataset
 train_data = loadData('logfile2.dat')
-train_data = train_data[train_data[:,3]<125.]#125
+
 train_data = train_data[train_data[:,0]<430.]
 train_data = train_data[train_data[:,1]<1.]
 train_data = train_data[train_data[:,2]<120.]
-
+train_data = train_data[train_data[:,3]<125.]#125*
 #train_data = np.delete(train_data, [0], axis=1)
 #train_data = np.delete(train_data, [0], axis=1)
 #train_data = np.delete(train_data, [0], axis=1)

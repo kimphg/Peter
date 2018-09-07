@@ -64,6 +64,7 @@ short histogram[256];
 
 C_radar_data::C_radar_data()
 {
+    time_start_ms = QDateTime::currentMSecsSinceEpoch();
     mFalsePositiveCount = 0;
     mSledValue = 180;
     rotDir = 0;
@@ -520,8 +521,8 @@ void C_radar_data::SetHeaderLen( short len)
 //{
 //    doubleFilter = value;
 //}
-void C_radar_data::decodeData(int azi)
-{/*
+/*void C_radar_data::decodeData(int azi)
+{
     //read spectre
     memcpy((char*)&spectre,(char*)&dataBuff[RADAR_DATA_HEADER_MAX],16);
     img_spectre->fill(0);
@@ -595,8 +596,8 @@ void C_radar_data::decodeData(int azi)
         {
             data_mem.dopler[azi][r_pos] = data_mem.dopler[azi][r_pos]>>4;
         }
-    }*/
-}
+    }
+}*/
 short threshRay[RADAR_RESOLUTION];
 
 void C_radar_data::ProcessData(unsigned short azi,unsigned short lastAzi)
@@ -678,12 +679,14 @@ void C_radar_data::ProcessEach90Deg()
     }
 
     //kill old tracks
-    for(int i=0;i<mTrackList.size();i++)
+    for(uint i=0;i<mTrackList.size();i++)
     {
-        if(!mTrackList[i].isRemoved)
+        track_t* track = &(mTrackList[i]);
+        if(!track->isRemoved)
         {
-            if((now_ms -mTrackList[i].lastTimeMs)>30000)
-                mTrackList[i].isRemoved = true;
+            if((now_ms -track->lastTimeMs)>30000)
+                track->isRemoved = true;
+
         }
     }
     //
@@ -986,7 +989,165 @@ void C_radar_data::clearPPI()
     img_ppi->fill(0);
 
 }
+void C_radar_data::LinearFit(track_t* track)
+{
+    /*
+double xsum=0,x2sum=0,ysum=0,xysum=0;                //variables for sums/sigma of xi,yi,xi^2,xiyi etc
+    for (i=0;i<n;i++)
+    {
+        xsum=xsum+x[i];                        //calculate sigma(xi)
+        ysum=ysum+y[i];                        //calculate sigma(yi)
+        x2sum=x2sum+pow(x[i],2);                //calculate sigma(x^2i)
+        xysum=xysum+x[i]*y[i];                    //calculate sigma(xi*yi)
+    }
+    a=(n*xysum-xsum*ysum)/(n*x2sum-xsum*xsum);            //calculate slope
+    b=(x2sum*ysum-xsum*xysum)/(x2sum*n-xsum*xsum);            //calculate intercept
+    double y_fit[n];                        //an array to store the new fitted values of y
+    for (i=0;i<n;i++)
+        y_fit[i]=a*x[i]+b;                    //to calculate y(fitted) at given x points
+*/
+    int nEle=4;
+    if(track->objectList.size()<nEle)return;
+    object_t* obj = &(track->objectList[(track->objectList.size()- nEle)]) ;
+    double *y1 = new double[nEle];
+    double *y2 = new double[nEle];
+    double *t  = new double[nEle];
+    for(int i=0;i<nEle;i++)
+    {
+        y1[i] = obj[i].xkm;
+        y2[i] = obj[i].ykm;
+         t[i] = obj[i].timeMs;
+    }
+    double y1sum = 0;//r1+r2+r3;
+    double y2sum = 0;
+    double tsum = 0;
+    double t2sum = 0;
+    double y1tsum = 0;
+    double y2tsum = 0;
+    for(int i=0;i<nEle;i++)
+    {
+        y1sum+=y1[i];
+        y2sum+=y2[i];
+        tsum+=t[i];
+        t2sum+=t[i]*t[i];
+        y1tsum+=y1[i]*t[i];
+        y2tsum+=y2[i]*t[i];
+    }
+//    a=(n*xysum-xsum*ysum)/(n*x2sum-xsum*xsum);            //calculate slope
+//    b=(x2sum*ysum-xsum*xysum)/(x2sum*n-xsum*xsum);            //calculate intercept
+    double y1a = (nEle*y1tsum-tsum*y1sum)/(nEle*t2sum-tsum*tsum);
+    double y1b = (t2sum*y1sum-tsum*y1tsum)/(t2sum*nEle-tsum*tsum);
+    for(int i=0;i<nEle;i++)
+    {
+        y1[i]=y1a*t[i]+y1b;
+    }
+    double y2a=(nEle*y2tsum-tsum*y2sum)/(nEle*t2sum-tsum*tsum);
+    double y2b=(t2sum*y2sum-tsum*y2tsum)/(t2sum*nEle-tsum*tsum);
+    for(int i=0;i<nEle;i++)
+    {
+        y2[i]=y2a*t[i]+y2b;
+    }
+    for(int i=0;i<nEle;i++)
+    {
+        obj[i].xkmfit=y1[i];
+        obj[i].ykmfit=y2[i];
+        obj[i].xkm=y1[i];
+        obj[i].ykm=y2[i];
+        obj[i].azRad = ConvXYToAziRad(obj[i].xkm,obj[i].ykm);
+        obj[i].rgKm = ConvXYToRange(obj[i].xkm,obj[i].ykm);
+    }
+    track->rgSpeedkmh = (obj[nEle-1].rgKm-obj[nEle-2].rgKm)/
+            ((obj[nEle-1].timeMs-obj[nEle-2].timeMs)/3600000.0);
 
+}
+#define POLY_DEG 2
+void C_radar_data::LeastSquareFit(track_t* track)
+{
+/*
+    uint  nElement = 6;
+    int lastPost = track->objectList.size()-1;
+    double *x = new double[nElement];
+    double *y = new double[nElement];
+    int i,j,k;
+    for(i =0;i<nElement;i++)
+    {
+        x[i] = track->objectList[lastPost-i].timeMs;
+        y[i] = track->objectList[lastPost-i].azRad;
+    }
+    // POLY_DEG is the degree of Polynomial
+    int n = POLY_DEG,N=nElement;
+    double *X = new double[2*n+1];                        //Array that will store the values of sigma(xi),sigma(xi^2),sigma(xi^3)....sigma(xi^2n)
+        for (i=0;i<2*n+1;i++)
+        {
+            X[i]=0;
+            for (j=0;j<N;j++)
+                X[i]=X[i]+pow(x[j],i);        //consecutive positions of the array will store N,sigma(xi),sigma(xi^2),sigma(xi^3)....sigma(xi^2n)
+        }
+        double B[3][4];
+        double a[3];            //B is the Normal matrix(augmented) that will store the equations, 'a' is for value of the final coefficients
+        for (i=0;i<=n;i++)
+            for (j=0;j<=n;j++)
+                B[i][j]=X[i+j];            //Build the Normal matrix by storing the corresponding coefficients at the right positions except the last column of the matrix
+        double Y[3];                    //Array to store the values of sigma(yi),sigma(xi*yi),sigma(xi^2*yi)...sigma(xi^n*yi)
+        for (i=0;i<n+1;i++)
+        {
+            Y[i]=0;
+            for (j=0;j<N;j++)
+            Y[i]=Y[i]+pow(x[j],i)*y[j];        //consecutive positions will store sigma(yi),sigma(xi*yi),sigma(xi^2*yi)...sigma(xi^n*yi)
+        }
+        for (i=0;i<=n;i++)
+            B[i][n+1]=Y[i];                //load the values of Y as the last column of B(Normal Matrix but augmented)
+        n=n+1;                //n is made n+1 because the Gaussian Elimination part below was for n equations, but here n is the degree of polynomial and for n degree we get n+1 equations
+        for (i=0;i<n;i++)                    //From now Gaussian Elimination starts(can be ignored) to solve the set of linear equations (Pivotisation)
+            for (k=i+1;k<n;k++)
+                if (B[i][i]<B[k][i])
+                    for (j=0;j<=n;j++)
+                    {
+                        double temp=B[i][j];
+                        B[i][j]=B[k][j];
+                        B[k][j]=temp;
+                    }
+
+        for (i=0;i<n-1;i++)            //loop to perform the gauss elimination
+            for (k=i+1;k<n;k++)
+                {
+                    double t=B[k][i]/B[i][i];
+                    for (j=0;j<=n;j++)
+                        B[k][j]=B[k][j]-t*B[i][j];    //make the elements below the pivot elements equal to zero or elimnate the variables
+                }
+        for (i=n-1;i>=0;i--)                //back-substitution
+        {                        //x is an array whose values correspond to the values of x,y,z..
+            a[i]=B[i][n];                //make the variable to be calculated equal to the rhs of the last equation
+            for (j=0;j<n;j++)
+                if (j!=i)            //then subtract all the lhs values except the coefficient of the variable whose value                                   is being calculated
+                    a[i]=a[i]-B[i][j]*a[j];
+            a[i]=a[i]/B[i][i];            //now finally divide the rhs by the coefficient of the variable to be calculated
+        }
+
+
+    for ( i=0;i<nElement;i++)            //loop over data points to perform the estimation
+    {
+        y[i]=0;
+        for ( j=0;j<n;j++)            //loop over all degree of polynom
+        {
+            y[i]+=a[j]*pow(x[i],j);
+        }
+    }
+
+    for ( i =0;i<nElement;i++)
+    {
+        //track->objectList[lastPost-i].azRad = x[i];
+        track->objectList[lastPost-i].azRad = y[i] ;
+        track->objectList[lastPost-i].xkmfit = track->objectList[lastPost-i].rgKm*sin( track->objectList[lastPost-i].azRad);
+        track->objectList[lastPost-i].ykmfit = track->objectList[lastPost-i].rgKm*cos( track->objectList[lastPost-i].azRad);
+    }
+    delete[] x;
+    delete[] y;
+    delete[] X;
+//    delete[] B;
+//    delete[] a;
+*/
+}
 ushort mulOf16Azi = 0;
 void C_radar_data::UpdateData()
 {
@@ -1005,7 +1166,7 @@ void C_radar_data::UpdateData()
         drawAzi(azi);
         if(!((unsigned char)(((unsigned char)mPeriodCount)<<3)))//xu ly moi 32 chu ky
         {
-            now_ms = QDateTime::currentMSecsSinceEpoch();
+            now_ms = (QDateTime::currentMSecsSinceEpoch()-time_start_ms);//QDateTime::currentMSecsSinceEpoch();
             //ProcessObjects();
             ProcessTracks();
             mulOf16Azi++;
@@ -1221,13 +1382,13 @@ void C_radar_data::procPLot(plot_t* mPlot)
     }
     newobject.dopler = mPlot->dopler;
     //newobject.terrain = data_mem.terrain[short(ctA)][short(ctR)];
-    newobject.az   = ctA/float(MAX_AZIR/PI_NHAN2)+aziOffset;
-    if(newobject.az>PI_NHAN2)newobject.az-=PI_NHAN2;
+    newobject.azRad   = ctA/float(MAX_AZIR/PI_NHAN2)+aziOffset;
+    if(newobject.azRad>PI_NHAN2)newobject.azRad-=PI_NHAN2;
     newobject.rg   = ctR;
     newobject.rgKm =  ctR*sn_scale;
     newobject.p   = -1;
-    newobject.xkm = newobject.rgKm*sin( newobject.az);
-    newobject.ykm = newobject.rgKm*cos( newobject.az);
+    newobject.xkm = newobject.rgKm*sin( newobject.azRad);
+    newobject.ykm = newobject.rgKm*cos( newobject.azRad);
 
     if(!ProcessObject(&newobject))
     {
@@ -2158,6 +2319,7 @@ void C_radar_data::ProcessTracks()
                 track->objectList.push_back(track->possibleList[maxIndex]);
                 track->lastTimeMs = track->possibleList[maxIndex].timeMs;
                 track->possibleList.clear();
+                this->LinearFit(track);
             }
 
         }

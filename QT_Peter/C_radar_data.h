@@ -102,8 +102,9 @@ typedef struct  {
 } plot_t;
 typedef struct  {
     int uniqID;
-    float          az ,rg,xkm,ykm;
-    float          rgKm;
+    double          azRad ,rg,xkm,ykm;
+    double          xkmfit,ykmfit;
+    double          rgKm;
     short          dazi,drg;
     short          size;
     char           dopler;
@@ -113,7 +114,7 @@ typedef struct  {
     float          terrain;
     float           rangeRes;
     float           aziRes;
-    qint64          timeMs;
+    unsigned int          timeMs;
     float           scorepObj,scorep2;
     float scoreTrack;
     unsigned long int period;
@@ -133,13 +134,13 @@ typedef struct  {
 //    bool isProcessed;
 //    bool isRemoved;
 //};
-typedef std::vector<object_t> objectList;
+
 //using Eigen::MatrixXf;
 typedef struct
 {
     uint        dtime;
     float lineScore;
-    std::deque<object_t> objectList;
+    std::vector<object_t> objectList;
     std::vector<object_t> possibleList;
     float bearingRad;
     float rgSpeedkmh;
@@ -169,8 +170,9 @@ public:
     trackList               mTrackList;
     std::vector<plot_t>     plot_list;
     std::vector<object_t>     mFreeObjList;
-    unsigned    long long int  mPeriodCount;
-    qint64 now_ms ;
+    unsigned     long int   mPeriodCount;
+    qint64 time_start_ms;
+    unsigned     long int   now_ms ;
 //    bool                    isEncoderAzi;
 //    int                     mEncoderAzi;
     unsigned char           spectre[16];
@@ -285,7 +287,7 @@ private:
     //void status_start();
     //FILE *pFile;
 
-    void decodeData(int azi);
+//    void decodeData(int azi);
     //void initZoomAR(int a0, int r0);
     bool DrawZoomAR(int a,int r,short val,short dopler,short sled);
     int getNewAzi();
@@ -298,6 +300,8 @@ private:
     bool checkBelongToObj(object_t *obj1);
     double estimateScore(object_t *obj1, track_t *track);
     void CreateTrack(object_t *obj1, object_t *obj2);
+    void LinearFit(track_t *track);
+    void LeastSquareFit(track_t* track);
 public:
     unsigned char mSledValue;
     int mEncoderVal;

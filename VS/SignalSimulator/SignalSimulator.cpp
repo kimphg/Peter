@@ -80,7 +80,7 @@ void regenerate(int azi)
 
 
 
-#define NUM_OF_TARG 20
+#define NUM_OF_TARG 50
 target_t* target[NUM_OF_TARG];
 
 void initTargets()
@@ -91,7 +91,7 @@ void initTargets()
 		target[i] = new target_t(
 			(rand() % 5) + 3,//x
 			(rand() % 5) -3,//y
-			(rand() % 40),//speed
+			((rand() % 20) +20),//speed
 			rand() % 90,//heading
 			i);
 	}
@@ -152,7 +152,7 @@ int _tmain(int argc, _TCHAR* argv[])
 			updateTargets();
 		}*/
 		
-		if (azi>= 800)
+		if (azi>= 1000)
 		{
 			nPeriod++;
 			dazi = -1;
@@ -160,7 +160,7 @@ int _tmain(int argc, _TCHAR* argv[])
 			Sleep(500);
 		}
 		else
-		if (azi <= 10)
+		if (azi <= 100)
 		{
 			dazi = 1;
 			updateTargets();

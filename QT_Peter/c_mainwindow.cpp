@@ -555,7 +555,7 @@ Mainwindow::Mainwindow(QWidget *parent) :
     font.setPointSize(12);
     cmLog = new DialogCommandLog();
     mShowobjects = false;
-    mShowLines = false;
+//    mShowLines = false;
     mShowTracks = false;
     InitNetwork();
     InitTimer();
@@ -808,7 +808,7 @@ void Mainwindow::DrawRadarTargetByPainter(QPainter* p)//draw radar target from p
     //short targetId = 0;
     std::vector<object_t>* pObjList = &(pRadar->mFreeObjList);
     p->setPen(penTargetBlue);
-    qint64 now_ms  = QDateTime::currentMSecsSinceEpoch();
+    unsigned int now_ms  = QDateTime::currentMSecsSinceEpoch() - pRadar->time_start_ms;
     if(mShowobjects)//raw objects
     {
         for (uint i = 0;i<pObjList->size();i++) {
@@ -842,7 +842,8 @@ void Mainwindow::DrawRadarTargetByPainter(QPainter* p)//draw radar target from p
             else
             {
                 object_t* obj1,*obj2;
-                for (uint j = track->objectList.size()-2;j>1;j--)
+                p->setPen(penTargetBlue);
+                for (uint j = 0;j<track->objectList.size()-1;j++)
                 {
                     obj1 = &(track->objectList[j]);
                     obj2 = &(track->objectList[j+1]);
@@ -852,9 +853,26 @@ void Mainwindow::DrawRadarTargetByPainter(QPainter* p)//draw radar target from p
                     sy1 = -obj2->ykm*mScale + radCtY;
                     p->drawLine(sx,sy,sx1,sy1);
                 }
+                p->setPen(penTarget);
+
+                if(track->objectList.size()>3)
+                {
+
+                    for (uint j = 0;j<track->objectList.size()-1;j++)
+                    {
+                        obj1 = &(track->objectList[j]);
+                        obj2 = &(track->objectList[j+1]);
+                        sx = obj1->xkmfit*mScale + radCtX;
+                        sy = -obj1->ykmfit*mScale + radCtY;
+                        sx1 = obj2->xkmfit*mScale + radCtX;
+                        sy1 = -obj2->ykmfit*mScale + radCtY;
+                        p->drawLine(sx,sy,sx1,sy1);
+                    }
+                }
                 int size = 15000.0/(now_ms - track->objectList.back().timeMs+400);
                 if(size<10)size=10;
-                p->drawRect(sx-size/2,sy-size/2,size,size);
+                p->drawRect(sx1-size/2,sy1-size/2,size,size);
+
             }
         }
 
@@ -2080,11 +2098,23 @@ void Mainwindow::UpdateDataStatus()
 
     }
 }
+void Mainwindow::ViewTrackInfo()
+{
+    int numOfTracks = 0;
+    for (uint i = 0;i<pRadar->mTrackList.size();i++)
+    {
+        if(!(pRadar->mTrackList[i].isRemoved||pRadar->mTrackList[i].isLost))
+        {
+            numOfTracks++;
+        }
+    }
+    ui->toolButton_sled_reset_4->setText(QString::fromUtf8("Quỹ đạo(")+QString::number(numOfTracks)+")");
+}
 void Mainwindow::sync1S()//period 1 second
 {
-
     UpdateDataStatus();
     UpdateGpsData();
+    ViewTrackInfo();
     if(isScaleChanged ) {
 
         pRadar->setScalePPI(mScale);
@@ -4247,12 +4277,17 @@ void Mainwindow::on_toolButton_sled_reset_2_clicked(bool checked)
     mShowobjects = checked;
 }
 
-void Mainwindow::on_toolButton_sled_reset_3_clicked(bool checked)
-{
-    mShowLines = checked;
-}
+//void Mainwindow::on_toolButton_sled_reset_3_clicked(bool checked)
+//{
+//    mShowLines = checked;
+//}
 
 void Mainwindow::on_toolButton_sled_reset_4_clicked(bool checked)
 {
     mShowTracks = checked;
 }
+
+//void Mainwindow::on_toolButton_sled_reset_3_toggled(bool checked)
+//{
+
+//}

@@ -477,13 +477,15 @@ private slots:
 
     void on_toolButton_sled_reset_2_clicked(bool checked);
 
-    void on_toolButton_sled_reset_3_clicked(bool checked);
+//    void on_toolButton_sled_reset_3_clicked(bool checked);
 
     void on_toolButton_sled_reset_4_clicked(bool checked);
 
+//    void on_toolButton_sled_reset_3_toggled(bool checked);
+
 private:
 
-    bool mShowobjects,mShowLines,mShowTracks;
+    bool mShowobjects,mShowTracks;
     void initActionsConnections();
     void initGraphicView();
     void updateTargetInfo();
@@ -503,6 +505,7 @@ private:
     void checkClickAIS(int xclick, int yclick);
     void UpdateGpsData();
     void UpdateDataStatus();
+    void ViewTrackInfo();
 };
 
 #endif // MAINWINDOW_H
