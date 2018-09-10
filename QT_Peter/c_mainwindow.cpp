@@ -843,8 +843,10 @@ void Mainwindow::DrawRadarTargetByPainter(QPainter* p)//draw radar target from p
             {
                 object_t* obj1,*obj2;
                 p->setPen(penTargetBlue);
-                for (uint j = 0;j<track->objectList.size()-1;j++)
+                if(track->objectList.size()<5)continue;
+                for (int j = track->objectList.size()-5;j<track->objectList.size()-1;j++)
                 {
+
                     obj1 = &(track->objectList[j]);
                     obj2 = &(track->objectList[j+1]);
                     sx = obj1->xkm*mScale + radCtX;
