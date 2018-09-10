@@ -150,6 +150,7 @@ private:
     //    bool ProcDataAIS(BYTE *szBuff, int nLeng);
     bool checkFeedback();
     void ProcessNavData(QByteArray data);
+    void sendAziData();
 private slots:
     void ReadDataBuffer();
     void PushCommandQueue();

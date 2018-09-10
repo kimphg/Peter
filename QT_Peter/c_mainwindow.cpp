@@ -1646,7 +1646,7 @@ void Mainwindow::DrawViewFrame(QPainter* p)
         //p->drawText(720,20,200,20,0,"Antenna: "+QString::number(aziDeg,'f',1));
 
     }
-    if(CalcAziContour(pRadar->getCurAziRad()/3.141592653589*180.0,&points[0],&points[1],&points[2],height()-70))
+    if(CalcAziContour(pRadar->getCurAziRad()*DEG_RAD,&points[0],&points[1],&points[2],height()-70))
     {
         p->setPen(QPen(Qt::cyan,4,Qt::SolidLine,Qt::RoundCap));
         p->drawLine(points[2],points[1]);
@@ -1779,7 +1779,7 @@ void Mainwindow::Update100ms()
     DrawMap();
     mMousex=this->mapFromGlobal(QCursor::pos()).x();
     mMousey=this->mapFromGlobal(QCursor::pos()).y();
-    this->ui->label_azi_antenna_head_true->setText(QString::number((processing->mAntennaAzi)));
+    this->ui->label_azi_antenna_head_true->setText(QString::number(pRadar->getCurAziRad()*DEG_RAD));
     if(isInsideViewZone(mMousex,mMousey))
     {
         QApplication::setOverrideCursor(Qt::CrossCursor);
@@ -3167,7 +3167,7 @@ void Mainwindow::SetGPS(double lat,double lon,double heading)
     ui->label_gps_lat->setText(demicalDegToDegMin(lat)+"'N");
     ui->label_gps_lon->setText(demicalDegToDegMin(lon)+"'E");
     ui->label_gps_heading->setText(QString::number(mHeadingGPSNew,'f',2));
-    ui->label_azi_heading_gps->setText(QString::number(mHeadingGPSNew,'f',2));
+    //ui->label_azi_heading_gps->setText(QString::number(mHeadingGPSNew,'f',2));
     osmap->setCenterPos(mLat, mLon);
     isMapOutdated = true;
     repaint();

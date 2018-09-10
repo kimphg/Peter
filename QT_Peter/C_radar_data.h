@@ -35,7 +35,7 @@
 #define MAX_AZIR_DRAW               6144
 #define RAD_M_PULSE_RES             1536
 #define RAD_S_PULSE_RES             256
-#define RAD_DISPLAY_RES                768
+#define RAD_DISPLAY_RES             768
 #define RAD_FULL_RES                1792
 #define SIGNAL_SCALE_7              0.24113 //215.38461538461538461538461538461
 #define SIGNAL_SCALE_6              0.24113//184.61538461538461538461538461538
@@ -104,19 +104,20 @@ typedef struct  {
     int uniqID;
     double          azRad ,rg,xkm,ykm;
     double          xkmfit,ykmfit;
+    double          azRadfit,rgKmfit;
     double          rgKm;
-    short          dazi,drg;
-    short          size;
-    char           dopler;
-    bool           isProcessed;
-    bool           isRemoved;
-    float          p;
-    float          terrain;
-    float           rangeRes;
-    float           aziRes;
+    short           dazi,drg;
+    short           size;
+    char            dopler;
+//    bool            isProcessed;
+    bool            isRemoved;
+//    float           p;
+//    float          terrain;
+    float           rgStdEr;
+    float           aziStdEr;
     unsigned int          timeMs;
-    float           scorepObj,scorep2;
-    float scoreTrack;
+//    float           scorepObj,scorep2;
+//    float scoreTrack;
     unsigned long int period;
     uint len;
 }object_t;
@@ -136,19 +137,34 @@ typedef struct  {
 //};
 
 //using Eigen::MatrixXf;
-typedef struct
+class track_t
 {
+public:
+    track_t()
+    {
+
+    }
+    ~track_t()
+    {
+
+    }
     uint        dtime;
     float lineScore;
     std::vector<object_t> objectList;
-    std::vector<object_t> possibleList;
+    object_t possibleObj;
+    float possibleMaxScore;
     float bearingRad;
     float rgSpeedkmh;
 //    float xkm,ykm;
 //    float xkmo,ykmo;
     bool isRemoved,isLost;
     qint64          lastTimeMs;
-}track_t;
+    void LinearFit();
+    void addPossible(object_t *obj, double score);
+    double LinearFitCost(object_t *myobj);
+    double estimateScore(object_t *obj1);
+    static double estimateScore(object_t *obj1, object_t *obj2);
+};
 typedef std::vector<track_t> trackList;
 //______________________________________//
 enum imgDrawMode
@@ -167,6 +183,7 @@ public:
     float k_vet;// !!!!
     short             rotDir;
     float                   rotation_per_min ;
+    float                   azi_er_rad;
     trackList               mTrackList;
     std::vector<plot_t>     plot_list;
     std::vector<object_t>     mFreeObjList;
@@ -294,14 +311,15 @@ private:
     void ProcessEach90Deg();
     int ssiDecode(ushort nAzi);
 //    void DetectTracks();
-    double estimateScore(object_t *obj1, object_t *obj2);
+//    double estimateScore(object_t *obj1, object_t *obj2);
     void ProcessTracks();
     bool checkBelongToTrack(object_t *obj1);
     bool checkBelongToObj(object_t *obj1);
-    double estimateScore(object_t *obj1, track_t *track);
+//    double estimateScore(object_t *obj1, track_t *track);
     void CreateTrack(object_t *obj1, object_t *obj2);
-    void LinearFit(track_t *track);
+//    void LinearFit(track_t *track);
     void LeastSquareFit(track_t* track);
+//    double LinearFitCost(track_t *track, object_t *myobj);
 public:
     unsigned char mSledValue;
     int mEncoderVal;
@@ -315,8 +333,8 @@ public:
     void processSocketData(unsigned char *data, short len);
     bool ProcessObject(object_t *obj1);
     void ProcessObjects();
-    static double ConvXYToRange(double x, double y);
-    static double ConvXYToAziRad(double x, double y);
+    static inline double ConvXYToRange(double x, double y);
+    static inline double ConvXYToAziRad(double x, double y);
     void resetGain();
 };
 

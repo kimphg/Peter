@@ -1,4 +1,5 @@
 #define PI 3.141592654f
+#include "c_config.h"
 #include "c_radar_data.h"
 #include <QElapsedTimer>
 #include <cmath>
@@ -60,10 +61,255 @@ qint64 cur_timeMSecs = 0;//QDateTime::currentMSecsSinceEpoch();
 signal_map_t data_mem;
 float                   rot_period_sec =0;
 short histogram[256];
+void track_t::addPossible(object_t *obj,double score)
+{
+    possibleObj=(*obj);
+    possibleMaxScore=score;
+}
 
+double track_t::estimateScore(object_t *obj1,object_t *obj2)
+{
+    //if(obj1->dopler==obj2->dopler)return 1;
+    //else return 0;
+    //
+    //[ 0.4587003  -0.00102045 -0.02371061 -0.0084888 ]
+    //0.936885388565
+    int dtime = (obj1->timeMs - obj2->timeMs);
+    if(dtime<1000)return -1;//ENVAR min time between plots in a line(1s)
+    if(dtime>40000)return -1;//ENVAR max time between plots in a line(40s)
+
+    float dx = obj1->xkm - obj2->xkm;
+    float dy = obj1->ykm - obj2->ykm;
+
+    double distancekm = sqrt(dx*dx+dy*dy);
+
+    double speedkmh = distancekm/(dtime/3600000.0);
+    if(speedkmh>430)return -1;
+    double distanceCoeff = distancekm/(TARGET_MAX_SPEED_MARINE/3600000.0*dtime   + obj1->rgKm*AZI_ERROR_STD);
+    if(distanceCoeff>1.0)return -1;
+    float rgSpeedkmh = abs(obj1->rgKm - obj2->rgKm)/(dtime/3600000.0);
+    if(rgSpeedkmh>120.0)return -1;
+    return 3.0 - speedkmh/430.0 - distanceCoeff - abs(rgSpeedkmh)/120.0;
+    //return 0.4587003 - 0.00102045*speedkmh - 0.02371061*rgSpeedkmh -0.0084888*distanceCoeff;
+    // calculate score using machine learning model
+/*
+    if(distanceCoeff<0.285928)
+    {
+        if(abs(rgSpeedkmh)<44.409351)return 0.971;
+        else
+        {
+            if(distanceCoeff<0.127)return 0.57;
+            else return 0.116;
+        }
+    }
+    else
+    {
+        if(speedkmh<54.774822)
+        {
+            return 0.926174;
+        }
+        else
+            return 0.01;
+    }*/
+
+}
+double track_t::LinearFitCost(object_t *myobj)
+{
+    int nEle = 3;
+    if(this->objectList.size()<nEle-1)
+    {
+        printf("\nLinearFitCost error");
+        return 0 ;
+    }
+    object_t obj[3];
+    obj[0] =this->objectList[this->objectList.size()-2];
+    obj[1] =this->objectList[this->objectList.size()-1];
+    obj[2] = *myobj;
+
+    double y1[3];
+    double y2[3];
+    double t[3];
+    for(int i=0;i<nEle;i++)
+    {
+        y1[i] = obj[i].xkm;
+        y2[i] = obj[i].ykm;
+         t[i] = obj[i].timeMs;
+    }
+    double y1sum = 0;//r1+r2+r3;
+    double y2sum = 0;
+    double tsum = 0;
+    double t2sum = 0;
+    double y1tsum = 0;
+    double y2tsum = 0;
+    for(int i=0;i<nEle;i++)
+    {
+        y1sum+=y1[i];
+        y2sum+=y2[i];
+        tsum+=t[i];
+        t2sum+=t[i]*t[i];
+        y1tsum+=y1[i]*t[i];
+        y2tsum+=y2[i]*t[i];
+    }
+//    a=(n*xysum-xsum*ysum)/(n*x2sum-xsum*xsum);            //calculate slope
+//    b=(x2sum*ysum-xsum*xysum)/(x2sum*n-xsum*xsum);            //calculate intercept
+    double y1a = (nEle*y1tsum-tsum*y1sum)/(nEle*t2sum-tsum*tsum);
+    double y1b = (t2sum*y1sum-tsum*y1tsum)/(t2sum*nEle-tsum*tsum);
+    for(int i=0;i<nEle;i++)
+    {
+        y1[i]=y1a*t[i]+y1b;
+    }
+    double y2a=(nEle*y2tsum-tsum*y2sum)/(nEle*t2sum-tsum*tsum);
+    double y2b=(t2sum*y2sum-tsum*y2tsum)/(t2sum*nEle-tsum*tsum);
+    for(int i=0;i<nEle;i++)
+    {
+        y2[i]=y2a*t[i]+y2b;
+    }
+    for(int i=0;i<nEle;i++)
+    {
+        obj[i].xkm+=(y1[i]-obj[i].xkm)*i/float(nEle);
+        obj[i].ykm+=(y2[i]-obj[i].ykm)*i/float(nEle);
+        obj[i].xkmfit=obj[i].xkm;
+        obj[i].ykmfit=obj[i].ykm;
+        obj[i].azRadfit = C_radar_data::ConvXYToAziRad(obj[i].xkmfit,obj[i].ykmfit);
+        obj[i].rgKmfit = C_radar_data::ConvXYToRange(obj[i].xkmfit,obj[i].ykmfit);
+    }
+//    delete[] y1;
+//    delete[] y2;
+//    delete[] t;
+    double costOfFit = 0;
+    for(int i=0;i<nEle;i++)
+    {
+        costOfFit+=abs(obj[i].azRadfit-obj[i].azRad)/obj[i].aziStdEr;
+        costOfFit+=abs(obj[i].rgKmfit-obj[i].rgKm)/obj[i].rgStdEr;
+    }
+    costOfFit/=nEle;
+    return costOfFit;
+}
+double track_t::estimateScore(object_t *obj1)
+{/*
+    object_t* obj2 = &(this->objectList.back());
+    double dtime = (obj1->timeMs - obj2->timeMs);
+    if(dtime<1000)
+        return -1;//ENVAR min time between plots in a line(1s)
+    if(dtime>40000)
+        return -1;//ENVAR max time between plots in a line(40s)
+
+    float dx = obj1->xkm - obj2->xkm;
+    float dy = obj1->ykm - obj2->ykm;
+
+    double distancekm = sqrt(dx*dx+dy*dy);
+
+    double speedkmh = distancekm/(dtime/3600000.0);
+    if(speedkmh>430.0)return -1;
+    double distanceCoeff = distancekm/(TARGET_MAX_SPEED_MARINE/3600000.0*dtime   + obj1->rgKm*AZI_ERROR_STD);
+    if(distanceCoeff>1.0)return -1;
+    float rgSpeedkmh = (obj1->rgKm-obj2->rgKm)/(dtime/3600000.0);
+    if(abs(rgSpeedkmh)>120.0)return-1;
+    double dRgSp = rgSpeedkmh - this->rgSpeedkmh;
+    if(abs(dRgSp)>125.0)return-1;
+    double score = 7.0 - speedkmh/430.0 - distanceCoeff - abs(rgSpeedkmh)/120.0 - abs(dRgSp)/125.0;*/
+    double score = estimateScore(obj1,&(this->objectList.back()));
+    if(score>0)
+    {
+        float linearFit = LinearFitCost(obj1);
+        return score-linearFit*3.0;
+
+//        fprintf(logfile,"%f,",linearFit);
+//        fprintf(logfile,"%f,",score);
+        //fprintf(logfile,"%f,",abs(rgSpeedkmh));
+        //fprintf(logfile,"%f,",abs(dRgSp));
+    }else
+    return 0;
+
+/*
+    if(obj1->dopler==this->objectList.back().dopler)
+    {fprintf(logfile,"1\n");
+        return score;
+    }
+    else
+        fprintf(logfile,"-1\n");
+    return 0;*/
+
+}
+void track_t::LinearFit()
+{
+    /*
+double xsum=0,x2sum=0,ysum=0,xysum=0;                //variables for sums/sigma of xi,yi,xi^2,xiyi etc
+    for (i=0;i<n;i++)
+    {
+        xsum=xsum+x[i];                        //calculate sigma(xi)
+        ysum=ysum+y[i];                        //calculate sigma(yi)
+        x2sum=x2sum+pow(x[i],2);                //calculate sigma(x^2i)
+        xysum=xysum+x[i]*y[i];                    //calculate sigma(xi*yi)
+    }
+    a=(n*xysum-xsum*ysum)/(n*x2sum-xsum*xsum);            //calculate slope
+    b=(x2sum*ysum-xsum*xysum)/(x2sum*n-xsum*xsum);            //calculate intercept
+    double y_fit[n];                        //an array to store the new fitted values of y
+    for (i=0;i<n;i++)
+        y_fit[i]=a*x[i]+b;                    //to calculate y(fitted) at given x points
+*/
+    int nEle=4;
+    if(this->objectList.size()<nEle)return;
+    object_t* obj = &(this->objectList[(this->objectList.size()- nEle)]) ;
+    double *y1 = new double[nEle];
+    double *y2 = new double[nEle];
+    double *t  = new double[nEle];
+    for(int i=0;i<nEle;i++)
+    {
+        y1[i] = obj[i].xkm;
+        y2[i] = obj[i].ykm;
+         t[i] = obj[i].timeMs;
+    }
+    double y1sum = 0;//r1+r2+r3;
+    double y2sum = 0;
+    double tsum = 0;
+    double t2sum = 0;
+    double y1tsum = 0;
+    double y2tsum = 0;
+    for(int i=0;i<nEle;i++)
+    {
+        y1sum+=y1[i];
+        y2sum+=y2[i];
+        tsum+=t[i];
+        t2sum+=t[i]*t[i];
+        y1tsum+=y1[i]*t[i];
+        y2tsum+=y2[i]*t[i];
+    }
+//    a=(n*xysum-xsum*ysum)/(n*x2sum-xsum*xsum);            //calculate slope
+//    b=(x2sum*ysum-xsum*xysum)/(x2sum*n-xsum*xsum);            //calculate intercept
+    double y1a = (nEle*y1tsum-tsum*y1sum)/(nEle*t2sum-tsum*tsum);
+    double y1b = (t2sum*y1sum-tsum*y1tsum)/(t2sum*nEle-tsum*tsum);
+    for(int i=0;i<nEle;i++)
+    {
+        y1[i]=y1a*t[i]+y1b;
+    }
+    double y2a=(nEle*y2tsum-tsum*y2sum)/(nEle*t2sum-tsum*tsum);
+    double y2b=(t2sum*y2sum-tsum*y2tsum)/(t2sum*nEle-tsum*tsum);
+    for(int i=0;i<nEle;i++)
+    {
+        y2[i]=y2a*t[i]+y2b;
+    }
+    for(int i=0;i<nEle;i++)
+    {
+        obj[i].xkm+=(y1[i]-obj[i].xkm)*i/float(nEle);
+        obj[i].ykm+=(y2[i]-obj[i].ykm)*i/float(nEle);
+        obj[i].xkmfit=obj[i].xkm;
+        obj[i].ykmfit=obj[i].ykm;
+        obj[i].azRadfit = C_radar_data::ConvXYToAziRad(obj[i].xkmfit,obj[i].ykmfit);
+        obj[i].rgKmfit = C_radar_data::ConvXYToRange(obj[i].xkmfit,obj[i].ykmfit);
+    }
+    this->rgSpeedkmh = (obj[nEle-1].rgKmfit-obj[nEle-2].rgKmfit)/
+            ((obj[nEle-1].timeMs-obj[nEle-2].timeMs)/3600000.0);
+
+    delete[] y1;
+    delete[] y2;
+    delete[] t;
+
+}
 
 C_radar_data::C_radar_data()
 {
+    azi_er_rad = CConfig::getDouble("azi_er_rad",AZI_ERROR_STD);
     time_start_ms = QDateTime::currentMSecsSinceEpoch();
     mFalsePositiveCount = 0;
     mSledValue = 180;
@@ -989,77 +1235,9 @@ void C_radar_data::clearPPI()
     img_ppi->fill(0);
 
 }
-void C_radar_data::LinearFit(track_t* track)
-{
-    /*
-double xsum=0,x2sum=0,ysum=0,xysum=0;                //variables for sums/sigma of xi,yi,xi^2,xiyi etc
-    for (i=0;i<n;i++)
-    {
-        xsum=xsum+x[i];                        //calculate sigma(xi)
-        ysum=ysum+y[i];                        //calculate sigma(yi)
-        x2sum=x2sum+pow(x[i],2);                //calculate sigma(x^2i)
-        xysum=xysum+x[i]*y[i];                    //calculate sigma(xi*yi)
-    }
-    a=(n*xysum-xsum*ysum)/(n*x2sum-xsum*xsum);            //calculate slope
-    b=(x2sum*ysum-xsum*xysum)/(x2sum*n-xsum*xsum);            //calculate intercept
-    double y_fit[n];                        //an array to store the new fitted values of y
-    for (i=0;i<n;i++)
-        y_fit[i]=a*x[i]+b;                    //to calculate y(fitted) at given x points
-*/
-    int nEle=4;
-    if(track->objectList.size()<nEle)return;
-    object_t* obj = &(track->objectList[(track->objectList.size()- nEle)]) ;
-    double *y1 = new double[nEle];
-    double *y2 = new double[nEle];
-    double *t  = new double[nEle];
-    for(int i=0;i<nEle;i++)
-    {
-        y1[i] = obj[i].xkm;
-        y2[i] = obj[i].ykm;
-         t[i] = obj[i].timeMs;
-    }
-    double y1sum = 0;//r1+r2+r3;
-    double y2sum = 0;
-    double tsum = 0;
-    double t2sum = 0;
-    double y1tsum = 0;
-    double y2tsum = 0;
-    for(int i=0;i<nEle;i++)
-    {
-        y1sum+=y1[i];
-        y2sum+=y2[i];
-        tsum+=t[i];
-        t2sum+=t[i]*t[i];
-        y1tsum+=y1[i]*t[i];
-        y2tsum+=y2[i]*t[i];
-    }
-//    a=(n*xysum-xsum*ysum)/(n*x2sum-xsum*xsum);            //calculate slope
-//    b=(x2sum*ysum-xsum*xysum)/(x2sum*n-xsum*xsum);            //calculate intercept
-    double y1a = (nEle*y1tsum-tsum*y1sum)/(nEle*t2sum-tsum*tsum);
-    double y1b = (t2sum*y1sum-tsum*y1tsum)/(t2sum*nEle-tsum*tsum);
-    for(int i=0;i<nEle;i++)
-    {
-        y1[i]=y1a*t[i]+y1b;
-    }
-    double y2a=(nEle*y2tsum-tsum*y2sum)/(nEle*t2sum-tsum*tsum);
-    double y2b=(t2sum*y2sum-tsum*y2tsum)/(t2sum*nEle-tsum*tsum);
-    for(int i=0;i<nEle;i++)
-    {
-        y2[i]=y2a*t[i]+y2b;
-    }
-    for(int i=0;i<nEle;i++)
-    {
-        obj[i].xkmfit=y1[i];
-        obj[i].ykmfit=y2[i];
-        obj[i].xkm=y1[i];
-        obj[i].ykm=y2[i];
-        obj[i].azRad = ConvXYToAziRad(obj[i].xkm,obj[i].ykm);
-        obj[i].rgKm = ConvXYToRange(obj[i].xkm,obj[i].ykm);
-    }
-    track->rgSpeedkmh = (obj[nEle-1].rgKm-obj[nEle-2].rgKm)/
-            ((obj[nEle-1].timeMs-obj[nEle-2].timeMs)/3600000.0);
 
-}
+
+
 #define POLY_DEG 2
 void C_radar_data::LeastSquareFit(track_t* track)
 {
@@ -1347,11 +1525,11 @@ void C_radar_data::procPLot(plot_t* mPlot)
 
     object_t newobject;
     newobject.timeMs = now_ms;
-    newobject.scorepObj = 0;
+//    newobject.scorepObj = 0;
     newobject.len = 1;
     newobject.uniqID = rand();
     newobject.isRemoved = false;
-    newobject.isProcessed = false;
+//    newobject.isProcessed = false;
     newobject.dazi = mPlot->lastA-mPlot->riseA;
     newobject.period = mPeriodCount;
     float ctA;
@@ -1374,8 +1552,8 @@ void C_radar_data::procPLot(plot_t* mPlot)
 
     newobject.size = mPlot->size;
     newobject.drg = mPlot->maxR-mPlot->minR;
-    newobject.aziRes = 0.017;
-    newobject.rangeRes = sn_scale*pow(2,clk_adc);
+    newobject.aziStdEr = azi_er_rad;
+    newobject.rgStdEr = sn_scale*pow(2,clk_adc);
     if(ctA<0|| ctR>=RADAR_RESOLUTION)
     {
         return;
@@ -1386,38 +1564,11 @@ void C_radar_data::procPLot(plot_t* mPlot)
     if(newobject.azRad>PI_NHAN2)newobject.azRad-=PI_NHAN2;
     newobject.rg   = ctR;
     newobject.rgKm =  ctR*sn_scale;
-    newobject.p   = -1;
+//    newobject.p   = -1;
     newobject.xkm = newobject.rgKm*sin( newobject.azRad);
     newobject.ykm = newobject.rgKm*cos( newobject.azRad);
+    ProcessObject(&newobject);
 
-    if(!ProcessObject(&newobject))
-    {
-        ProcessObject(&newobject);
-        // add to mObjList
-        bool full = true;
-        for(int i=0;i<mFreeObjList.size(); i++)
-        {
-            if(mFreeObjList.at(i).isRemoved)
-            {
-                mFreeObjList.at(i) = newobject;
-                full = false;
-                break;
-            }
-        }
-        if(full&&mFreeObjList.size()<2000)
-        {
-            mFreeObjList.push_back(newobject);
-        }
-    }
-
-    /*
-    if(!procObjectManual(&newobject))//check existing confirmed tracks
-    {
-        if(!procObjectAvto(&newobject))
-        {
-            if(avtodetect)addTrack(&newobject);
-        }
-    }*/
     mPlot->isUsed = false;
 
 
@@ -2209,90 +2360,7 @@ void C_radar_data::resetTrack()
     //        }
     //    }
 }
-double C_radar_data::estimateScore(object_t *obj1, track_t *track)
-{
-    object_t* obj2 = &(track->objectList.back());
-    double dtime = (obj1->timeMs - obj2->timeMs);
-    if(dtime<1000)
-        return -1;//ENVAR min time between plots in a line(1s)
-    if(dtime>40000)
-        return -1;//ENVAR max time between plots in a line(40s)
 
-    float dx = obj1->xkm - obj2->xkm;
-    float dy = obj1->ykm - obj2->ykm;
-
-    double distancekm = sqrt(dx*dx+dy*dy);
-
-    double speedkmh = distancekm/(dtime/3600000.0);
-    if(speedkmh>430.0)return -1;
-    double distanceCoeff = distancekm/(TARGET_MAX_SPEED_MARINE/3600000.0*dtime   + obj1->rgKm*AZI_ERROR_STD);
-    if(distanceCoeff>1.0)return -1;
-    float rgSpeedkmh = (obj1->rgKm-obj2->rgKm)/(dtime/3600000.0);
-    if(abs(rgSpeedkmh)>120.0)return-1;
-    double dRgSp = rgSpeedkmh - track->rgSpeedkmh;
-    if(abs(dRgSp)>125.0)return-1;
-    double score = 3.0 - speedkmh/430.0 - distanceCoeff - abs(rgSpeedkmh)/120.0 - abs(dRgSp)/125.0;
-    /*fprintf(logfile,"%f,",speedkmh);
-    fprintf(logfile,"%f,",distanceCoeff);
-    fprintf(logfile,"%f,",abs(rgSpeedkmh));
-    fprintf(logfile,"%f,",abs(dRgSp));
-
-    if(obj1->dopler==obj2->dopler)
-    {fprintf(logfile,"1\n");
-        return 1;
-    }
-    else
-        fprintf(logfile,"-1\n");*/
-    return score;
-
-}
-
-double C_radar_data::estimateScore(object_t *obj1,object_t *obj2)
-{
-    //if(obj1->dopler==obj2->dopler)return 1;
-    //else return 0;
-    //
-    //[ 0.4587003  -0.00102045 -0.02371061 -0.0084888 ]
-    //0.936885388565
-    int dtime = (obj1->timeMs - obj2->timeMs);
-    if(dtime<1000)return -1;//ENVAR min time between plots in a line(1s)
-    if(dtime>40000)return -1;//ENVAR max time between plots in a line(40s)
-
-    float dx = obj1->xkm - obj2->xkm;
-    float dy = obj1->ykm - obj2->ykm;
-
-    double distancekm = sqrt(dx*dx+dy*dy);
-
-    double speedkmh = distancekm/(dtime/3600000.0);
-    if(speedkmh>430)return -1;
-    double distanceCoeff = distancekm/(TARGET_MAX_SPEED_MARINE/3600000.0*dtime   + obj1->rgKm*AZI_ERROR_STD);
-    if(distanceCoeff>1.0)return -1;
-    float rgSpeedkmh = abs(obj1->rgKm - obj2->rgKm)/(dtime/3600000.0);
-    if(rgSpeedkmh>120.0)return -1;
-    return 3.0 - speedkmh/430.0 - distanceCoeff - abs(rgSpeedkmh)/120.0;
-    //return 0.4587003 - 0.00102045*speedkmh - 0.02371061*rgSpeedkmh -0.0084888*distanceCoeff;
-    // calculate score using machine learning model
-/*
-    if(distanceCoeff<0.285928)
-    {
-        if(abs(rgSpeedkmh)<44.409351)return 0.971;
-        else
-        {
-            if(distanceCoeff<0.127)return 0.57;
-            else return 0.116;
-        }
-    }
-    else
-    {
-        if(speedkmh<54.774822)
-        {
-            return 0.926174;
-        }
-        else
-            return 0.01;
-    }*/
-
-}
 void C_radar_data::ProcessTracks()
 {
     //processTracks
@@ -2302,24 +2370,16 @@ void C_radar_data::ProcessTracks()
         track_t* track = &(mTrackList[j]);
         if(track->isRemoved||track->isLost)continue;
         // find maximum score from possibleList
-        if(track->possibleList.size())
+        if(track->possibleMaxScore>0)
         {
-            if(now_ms-track->possibleList.back().timeMs>300)
+            if(now_ms-track->possibleObj.timeMs>300)
             {
-                int maxIndex =0;
-                float maxScore = 0;
-                for(ushort i=0;i<track->possibleList.size();i++)
-                {
-                    if(track->possibleList[i].scoreTrack>maxScore)
-                    {
-                        maxScore = track->possibleList[i].scoreTrack;
-                        maxIndex = i;
-                    }
-                }
-                track->objectList.push_back(track->possibleList[maxIndex]);
-                track->lastTimeMs = track->possibleList[maxIndex].timeMs;
-                track->possibleList.clear();
-                this->LinearFit(track);
+
+                track->objectList.push_back(track->possibleObj);
+                track->lastTimeMs = track->possibleObj.timeMs;
+                //track->possibleList.clear();
+                track->possibleMaxScore = 0;
+                track->LinearFit();
             }
 
         }
@@ -2332,11 +2392,28 @@ void C_radar_data::ProcessTracks()
 bool C_radar_data::ProcessObject(object_t *obj1)
 {
     //check  if object_t belonging to tracks
-    if(checkBelongToTrack(obj1))return true;
+    if(mTrackList.size())
+    if(checkBelongToTrack(obj1))
+        return true;
     // check if object_t belonging to lines
     //if(checkBelongToLine(obj1))return;
     // check if object_t belonging to another obj
     if(checkBelongToObj(obj1))return true;
+    // add to mObjList
+    bool full = true;
+    for(int i=0;i<mFreeObjList.size(); i++)
+    {
+        if(mFreeObjList.at(i).isRemoved)
+        {
+            mFreeObjList.at(i) = *obj1;
+            full = false;
+            break;
+        }
+    }
+    if(full&&mFreeObjList.size()<2000)
+    {
+        mFreeObjList.push_back(*obj1);
+    }
     return false;
 
 }
@@ -2344,7 +2421,7 @@ bool C_radar_data::ProcessObject(object_t *obj1)
 bool C_radar_data::checkBelongToTrack(object_t *obj1)
 {
     bool isBelongingToTrack = false;
-    obj1->scoreTrack=0;
+//    obj1->scoreTrack=0;
     track_t* chosenTrack ;
     double maxScore=0;
     for (ushort j=0;j<mTrackList.size();j++)
@@ -2352,7 +2429,7 @@ bool C_radar_data::checkBelongToTrack(object_t *obj1)
         track_t* track = &(mTrackList[j]);
         if(track->isRemoved||track->isLost)continue;
         //object_t *obj2 = &(track->objectList.back());
-        double score = estimateScore(obj1,track);//todo: optimize this score
+        double score = track->estimateScore(obj1);//todo: optimize this score
         //object_t* obj2 = &(track->objectList.back());
         //unsigned int dtime = (obj1->timeMs - obj2->timeMs);
         /*if(dtime<1000)
@@ -2367,7 +2444,7 @@ bool C_radar_data::checkBelongToTrack(object_t *obj1)
         //printf("\ndtime:%dscore:%f,%f,%f",dtime,score1,score2,score);
         //-----------------------------------
 
-        if(score>maxScore)
+        if(score>maxScore&&score>track->possibleMaxScore)
         {
             maxScore=score;
             chosenTrack = track;
@@ -2377,8 +2454,17 @@ bool C_radar_data::checkBelongToTrack(object_t *obj1)
     }
     if(isBelongingToTrack)
     {
-        chosenTrack->possibleList.push_back(*obj1);
-        //printf(" maxScore:%f",maxScore);
+        if(chosenTrack->possibleMaxScore>0)
+        {
+           //reprocess
+           object_t tempObj = chosenTrack->possibleObj;
+           chosenTrack->addPossible(obj1,maxScore);
+           ProcessObject(&tempObj);
+        }
+        else
+        {
+            chosenTrack->addPossible(obj1,maxScore);
+        }
         obj1->isRemoved = true;//free the object
         return true;
     }
@@ -2406,9 +2492,11 @@ void C_radar_data::CreateTrack(object_t* obj1,object_t* obj2)
     newTrack.rgSpeedkmh = (obj1->rgKm-obj2->rgKm)/(obj1->timeMs-obj2->timeMs)*(3600000.0);
     newTrack.isRemoved = false;
     newTrack.isLost = false;
+    newTrack.possibleMaxScore = 0;
     newTrack.lastTimeMs = obj1->timeMs;
     newTrack.objectList.push_back(*obj2);
     newTrack.objectList.push_back(*obj1);
+//    newTrack.possibleObj
     ushort j;
     for (j=0;j<mTrackList.size();j++)
     {
@@ -2443,7 +2531,7 @@ bool C_radar_data::checkBelongToObj(object_t* obj1)
         }
         //float rgSpeedkmh = (obj1->rgKm-obj2->rgKm)/(dtime/3600000.0);
         //if(rgSpeedkmh>85)continue;//ENVAR
-        double score = estimateScore(obj1,obj2);
+        double score = track_t::estimateScore(obj1,obj2);
         if(score<=0)continue;
         if(score>maxScore)
         {
@@ -2469,17 +2557,17 @@ double C_radar_data::ConvXYToRange(double x, double y)
 }
 double C_radar_data::ConvXYToAziRad(double x, double y)
 {
-    double azi;
     if (!y)
     {
-        azi = x>0 ? PI_CHIA2 : (PI_NHAN2 - PI_CHIA2);
+        return (x>0 ? PI_CHIA2 : (PI_NHAN2 - PI_CHIA2));
 
     }
     else
     {
-        azi = atanf(x / y);
+        double azi = atanf(x / y);
         if (y<0)azi += PI;
         if (azi<0)azi += PI_NHAN2;
+        return azi;
     }
-    return azi;
+
 }

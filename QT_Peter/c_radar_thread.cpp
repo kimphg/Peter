@@ -312,8 +312,25 @@ bool dataProcessingThread::checkFeedback()
     }
     else return false;
 }
+void dataProcessingThread::sendAziData()
+{
+    unsigned char sendBuf[9];
+    sendBuf[0]=0xaa;
+    sendBuf[1]=0x55;
+    sendBuf[2]=0x6e;
+    sendBuf[3]=0x09;
+    int azi = (mRadarData->getCurAziRad()/3.1415926535*2048);
+    sendBuf[4]=azi>>8;
+    sendBuf[5]=azi;
+    sendBuf[6]=0;
+    sendBuf[7]=0;
+    sendBuf[8]=0;
+
+    sendCommand(&sendBuf[10],9,false);
+}
 void dataProcessingThread::PushCommandQueue()
 {
+    sendAziData();
     if(radarComQ.size())
     {
         if(radarComQ.front().bytes[1]==0xab)
@@ -347,6 +364,7 @@ void dataProcessingThread::PushCommandQueue()
 
 
     }
+
 //    mRadarData->ProcessObjects();
     /*while(false)// no sophia yet
     {
@@ -568,13 +586,13 @@ void dataProcessingThread::run()
                 {
                     if(mReceiveBuff[2]==0x6e)
                     {
-                        mAntennaAzi = ((mReceiveBuff[4]<<8)|mReceiveBuff[5])/11.377778;
+                        //mAntennaAzi = ((mReceiveBuff[4]<<8)|mReceiveBuff[5])/11.377778;
                         //printf("\nmAntennaAzi:%f",mAntennaAzi);
-                        if(rand()%4==0)
+                        /*if(rand()%4==0)
                         {
                             sendCommand(&mReceiveBuff[0],len,false);
                             mAntennaAziOld = mAntennaAzi;
-                        }
+                        }*/
 
                     }
                     else if(mReceiveBuff[2]==0x65)

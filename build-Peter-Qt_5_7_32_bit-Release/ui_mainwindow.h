@@ -5914,7 +5914,7 @@ public:
         toolButton_sled_reset_3->setCheckable(true);
         toolButton_sled_reset_4 = new QCustomButton(centralWidget);
         toolButton_sled_reset_4->setObjectName(QStringLiteral("toolButton_sled_reset_4"));
-        toolButton_sled_reset_4->setGeometry(QRect(720, 110, 141, 41));
+        toolButton_sled_reset_4->setGeometry(QRect(830, 110, 141, 41));
         sizePolicy1.setHeightForWidth(toolButton_sled_reset_4->sizePolicy().hasHeightForWidth());
         toolButton_sled_reset_4->setSizePolicy(sizePolicy1);
         toolButton_sled_reset_4->setFont(font1);
