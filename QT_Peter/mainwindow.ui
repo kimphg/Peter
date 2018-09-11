@@ -7657,7 +7657,7 @@
      <bool>false</bool>
     </property>
     <property name="currentIndex">
-     <number>4</number>
+     <number>1</number>
     </property>
     <property name="elideMode">
      <enum>Qt::ElideNone</enum>
@@ -15106,7 +15106,7 @@
        <rect>
         <x>180</x>
         <y>30</y>
-        <width>99</width>
+        <width>261</width>
         <height>19</height>
        </rect>
       </property>

@@ -1392,10 +1392,10 @@ void Mainwindow::InitSetting()
 {
     ui->tabWidget_iad->SetTransparent(true);
     QApplication::setOverrideCursor(Qt::CrossCursor);
-    /*QString systemCommand = CConfig::getString("systemCommand","D:\\HR2D\\cudaCv.exe");
+    QString systemCommand = CConfig::getString("systemCommand","D:\\HR2D\\cudaCv.exe");
     if(systemCommand.size()){
         systemCommand= "start "+systemCommand;
-    system((char*)systemCommand.toStdString().data());}*/
+    system((char*)systemCommand.toStdString().data());}
     mMaxTapMayThu = CConfig::getInt("mMaxTapMayThu");
     mRangeLevel = CConfig::getInt("mRangeLevel");
     //assert(mRangeLevel>=0&&mRangeLevel<8);
