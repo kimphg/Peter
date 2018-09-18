@@ -55,7 +55,7 @@ typedef struct  {
     short xzoom[MAX_AZIR_DRAW][DISPLAY_RES_ZOOM];
     short yzoom[MAX_AZIR_DRAW][DISPLAY_RES_ZOOM];
 } signal_map_t;
-double sn_scale = SIGNAL_SCALE_0;
+
 short curIdCount = 1;
 qint64 cur_timeMSecs = 0;//QDateTime::currentMSecsSinceEpoch();
 signal_map_t data_mem;
@@ -407,6 +407,7 @@ C_radar_data::C_radar_data()
     arcMaxAzi = 0;
     arcMinAzi = 0;
     isSharpEye = false;
+    sn_scale = SIGNAL_SCALE_0;
     raw_map_init();
     raw_map_init_zoom();
     setAziOffset(0);
@@ -2069,12 +2070,14 @@ void C_radar_data::resetSled()
 void C_radar_data::setScalePPI(float scale)
 {
     scale_ppi = sn_scale*scale;
+    //setScaleZoom(scale/4.0);
+    //scale_zoom_ppi = scale_ppi*4;
     //updateZoomRect();
 }
 void C_radar_data::setScaleZoom(float scale)
 {
 
-    scale_zoom_ppi = SIGNAL_SCALE_0*scale/scale_ppi;
+    scale_zoom_ppi = scale;//SIGNAL_SCALE_0*scale/scale_ppi;
     //updateZoomRect();
 }
 

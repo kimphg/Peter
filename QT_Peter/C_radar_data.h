@@ -251,6 +251,7 @@ public:
     unsigned     long int   mPeriodCount;
     float rgStdErr;
     qint64 time_start_ms;
+    double sn_scale;
     unsigned     long int   now_ms ;
 //    bool                    isEncoderAzi;
 //    int                     mEncoderAzi;
