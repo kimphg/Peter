@@ -50,10 +50,10 @@
 #define TERRAIN_THRESH              0.5f
 #define TARGET_MAX_SPEED_MARINE     50.0
 #define ZOOM_SIZE                   550
-#define DISPLAY_RES_ZOOM            5120
+#define DISPLAY_RES_ZOOM            8192
 #define DISPLAY_SCALE_ZOOM          4
 
-#include "jtarget.h"
+//#include "jtarget.h"
 
 #include <vector>
 #include <QImage>
@@ -88,8 +88,38 @@ typedef struct {
 
 }frame_t;
 */
+inline double sinFast(double a)
+{
+    while (a>PI) {
+        a-=PI_NHAN2;
+    }
+    double a2 = a*a;
+    return a-a2*a/6.0+a2*a2*a/120.0-a2*a2*a2*a/5040.0;
+}
+inline double cosFast(double a)
+{
+    while (a>PI) {
+        a-=PI_NHAN2;
+    }
+    double a2 = a*a;
+    return 1.0-a2/2.0+a2*a2/24.0-a2*a2*a2/720.0;
+}
+inline double ConvXYToRange(double x, double y)
+{
+    return sqrt(x*x + y*y);
 
-
+}
+inline double ConvXYToAziRad(double x, double y)
+{
+    if (!y)        return (x>0 ? PI_CHIA2 : (PI_NHAN2 - PI_CHIA2));
+    else
+    {
+        double azi = atan(x / y);
+        if (y<0)azi += PI;
+        if (azi<0)azi += PI_NHAN2;
+        return azi;
+    }
+}
 typedef struct  {
     short lastA,riseA,fallA;
     short maxA1,maxA2;
@@ -103,8 +133,8 @@ typedef struct  {
 typedef struct  {
 //    int uniqID;
     double          azRad ,rg,xkm,ykm;
-    double          xkmfit,ykmfit;
-    double          azRadfit,rgKmfit;
+//    double          xkmfit,ykmfit;
+//    double          azRadfit,rgKmfit;
     double          rgKm;
     short           dazi,drg;
     short           size;
@@ -140,21 +170,48 @@ typedef struct  {
 class track_t
 {
 public:
-    track_t()
+    track_t(object_t* obj1,object_t* obj2)
     {
-
+        double dtime = (obj1->timeMs-obj2->timeMs)/3600000.0;
+        double dx = obj1->xkm - obj2->xkm;
+        double dy = obj1->ykm - obj2->ykm;
+        rgSpeedkmh = (obj1->rgKm-obj2->rgKm)/dtime;
+        isRemoved  = false;
+        mSpeedkmh  = sqrt(dx*dx+dy*dy)/dtime;
+        isLost     = false;
+        bearingRad = ConvXYToAziRad(dx,dy);
+        possibleMaxScore = 0;
+        lastTimeMs = obj1->timeMs;
+        objectList.push_back(*obj2);
+        objectList.push_back(*obj1);
     }
     ~track_t()
     {
 
     }
-    uint        dtime;
+    void update()
+    {
+        objectList.push_back(possibleObj);
+        lastTimeMs = possibleObj.timeMs;
+        possibleMaxScore = 0;
+        if(objectList.size()<4)return;
+        LinearFit();
+        object_t* obj1 = &(objectList.back());
+        object_t* obj2 = &(objectList.back())-3;
+        double dx = obj1->xkm - obj2->xkm;
+        double dy = obj1->ykm - obj2->ykm;
+        double dtime = (obj1->timeMs-obj2->timeMs)/3600000.0;
+        mSpeedkmhFit  = sqrt(dx*dx+dy*dy)/dtime;
+        bearingRadFit = ConvXYToAziRad(dx,dy);
+
+    }
+    //uint  dtime;
     float lineScore;
-    float mSpeedkmh;
+    float mSpeedkmhFit;
     std::vector<object_t> objectList;
     object_t possibleObj;
     float possibleMaxScore;
-    float bearingRad;
+    float bearingRadFit;
     float rgSpeedkmh;
 //    float xkm,ykm;
 //    float xkmo,ykmo;
@@ -165,6 +222,9 @@ public:
     double LinearFitCost(object_t *myobj);
     double estimateScore(object_t *obj1);
     static double estimateScore(object_t *obj1, object_t *obj2);
+private:
+    float bearingRad;
+    float mSpeedkmh;
 };
 typedef std::vector<track_t> trackList;
 //______________________________________//
@@ -335,8 +395,8 @@ public:
     void processSocketData(unsigned char *data, short len);
     bool ProcessObject(object_t *obj1);
 //    void ProcessObjects();
-    static double ConvXYToRange(double x, double y);
-    static double ConvXYToAziRad(double x, double y);
+//    inline static double ConvXYToRange(double x, double y);
+//    inline static double ConvXYToAziRad(double x, double y);
     void resetGain();
 };
 

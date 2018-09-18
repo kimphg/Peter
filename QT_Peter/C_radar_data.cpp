@@ -186,8 +186,8 @@ double track_t::LinearFitCost(object_t *myobj)
         //obj[i].ykm+=(y2[i]-obj[i].ykm)*i/float(nEle);
         //obj[i].xkmfit=y1[i];
         //obj[i].ykmfit=y2[i];
-        azRadfit[i] = C_radar_data::ConvXYToAziRad  (y1[i],y2[i]);
-        rgKmfit[i]  = C_radar_data::ConvXYToRange   (y1[i],y2[i]);
+        azRadfit[i] = ConvXYToAziRad  (y1[i],y2[i]);
+        rgKmfit[i]  = ConvXYToRange   (y1[i],y2[i]);
     }
 //    delete[] y1;
 //    delete[] y2;
@@ -217,7 +217,7 @@ double track_t::estimateScore(object_t *obj1)
         return -1;
     object_t* obj2 = &(this->objectList.back());
     double dtime = (obj1->timeMs - obj2->timeMs);
-    if(dtime<1000)
+    if(dtime<500)
         return -1;//ENVAR min time between plots in a line(1s)
     dtime/=3600000.0;
     float dx = obj1->xkm - obj2->xkm;
@@ -226,7 +226,7 @@ double track_t::estimateScore(object_t *obj1)
     double distancekm = sqrt(dx*dx+dy*dy);
     double distanceCoeff = distancekm/(TARGET_MAX_SPEED_MARINE*dtime   + obj1->rgKm*AZI_ERROR_STD);
     if(distanceCoeff>1.0)return 0;
-    double dBearing = C_radar_data::ConvXYToAziRad(dx,dy)-this->bearingRad;
+    double dBearing = ConvXYToAziRad(dx,dy)-this->bearingRad;
     double speedkmh = distancekm/(dtime);
     if(speedkmh>500.0)return 0;
     double dSpeed = speedkmh-(this->mSpeedkmh*cos(-dBearing));
@@ -271,19 +271,19 @@ double track_t::estimateScore(object_t *obj1)
 void track_t::LinearFit()
 {
     /*
-double xsum=0,x2sum=0,ysum=0,xysum=0;                //variables for sums/sigma of xi,yi,xi^2,xiyi etc
+double xsum=0,x2sum=0,ysum=0,xysum=0;
     for (i=0;i<n;i++)
     {
-        xsum=xsum+x[i];                        //calculate sigma(xi)
-        ysum=ysum+y[i];                        //calculate sigma(yi)
-        x2sum=x2sum+pow(x[i],2);                //calculate sigma(x^2i)
-        xysum=xysum+x[i]*y[i];                    //calculate sigma(xi*yi)
+        xsum=xsum+x[i];
+        ysum=ysum+y[i];
+        x2sum=x2sum+pow(x[i],2);
+        xysum=xysum+x[i]*y[i];
     }
-    a=(n*xysum-xsum*ysum)/(n*x2sum-xsum*xsum);            //calculate slope
-    b=(x2sum*ysum-xsum*xysum)/(x2sum*n-xsum*xsum);            //calculate intercept
-    double y_fit[n];                        //an array to store the new fitted values of y
+    a=(n*xysum-xsum*ysum)/(n*x2sum-xsum*xsum);
+    b=(x2sum*ysum-xsum*xysum)/(x2sum*n-xsum*xsum);
+    double y_fit[n];
     for (i=0;i<n;i++)
-        y_fit[i]=a*x[i]+b;                    //to calculate y(fitted) at given x points
+        y_fit[i]=a*x[i]+b;
 */
     int nEle=4;
     if(this->objectList.size()<nEle)return;
@@ -312,8 +312,8 @@ double xsum=0,x2sum=0,ysum=0,xysum=0;                //variables for sums/sigma 
         y1tsum+=y1[i]*t[i];
         y2tsum+=y2[i]*t[i];
     }
-//    a=(n*xysum-xsum*ysum)/(n*x2sum-xsum*xsum);            //calculate slope
-//    b=(x2sum*ysum-xsum*xysum)/(x2sum*n-xsum*xsum);            //calculate intercept
+//    a=(n*xysum-xsum*ysum)/(n*x2sum-xsum*xsum);
+//    b=(x2sum*ysum-xsum*xysum)/(x2sum*n-xsum*xsum);
     double y1a = (nEle*y1tsum-tsum*y1sum)/(nEle*t2sum-tsum*tsum);
     double y1b = (t2sum*y1sum-tsum*y1tsum)/(t2sum*nEle-tsum*tsum);
     for(int i=0;i<nEle;i++)
@@ -322,21 +322,17 @@ double xsum=0,x2sum=0,ysum=0,xysum=0;                //variables for sums/sigma 
     }
     double y2a=(nEle*y2tsum-tsum*y2sum)/(nEle*t2sum-tsum*tsum);
     double y2b=(t2sum*y2sum-tsum*y2tsum)/(t2sum*nEle-tsum*tsum);
-    for(int i=0;i<nEle;i++)
+    for(int i=0;i<nEle;i++)// !!index start from 1
     {
         y2[i]=y2a*t[i]+y2b;
     }
-    for(int i=0;i<nEle;i++)
+    for(int i=1;i<nEle;i++)// !!index start from 1
     {
         obj[i].xkm+=(y1[i]-obj[i].xkm)*i/float(nEle);
         obj[i].ykm+=(y2[i]-obj[i].ykm)*i/float(nEle);
-        obj[i].xkmfit=obj[i].xkm;
-        obj[i].ykmfit=obj[i].ykm;
-        obj[i].azRadfit = C_radar_data::ConvXYToAziRad(obj[i].xkmfit,obj[i].ykmfit);
-        obj[i].rgKmfit = C_radar_data::ConvXYToRange(obj[i].xkmfit,obj[i].ykmfit);
     }
-    this->rgSpeedkmh = (obj[nEle-1].rgKmfit-obj[nEle-2].rgKmfit)/
-            ((obj[nEle-1].timeMs-obj[nEle-2].timeMs)/3600000.0);
+//    rgSpeedkmh = (obj[nEle-1].rgKmfit-obj[nEle-2].rgKmfit)/
+//            ((obj[nEle-1].timeMs-obj[nEle-2].timeMs)/3600000.0);
 
     delete[] y1;
     delete[] y2;
@@ -405,7 +401,7 @@ C_radar_data::C_radar_data()
     avtodetect = true;
     isClkAdcChanged = true;
     isSled = false;
-    init_time = 10;
+    init_time = 5;
     dataOver = max_s_m_200;
     curAzir = 0;
     arcMaxAzi = 0;
@@ -503,35 +499,14 @@ void C_radar_data::drawSgn(short azi_draw, short r_pos)
     short px = data_mem.xkm[azi_draw][r_pos];
     short py = data_mem.ykm[azi_draw][r_pos];
     if(px<=0||py<=0)return;
-    short pSize = 1;
-    if(r_pos<100)pSize=0;
-    else if(r_pos>800)pSize=2;
+    short pSize = r_pos/150;if(pSize>3)pSize=3;
+    //else if(r_pos>800)pSize=2;
     if((px<pSize)||(py<pSize)||(px>=img_ppi->width()-pSize)||(py>=img_ppi->height()-pSize))return;
     for(short x = -pSize;x <= pSize;x++)
     {
         for(short y = -pSize;y <= pSize;y++)
         {
-            double k ;
-            switch((x*x+y*y))
-            {
-
-            case 0:
-                k=1;
-                break;
-            case 1:
-                if(data_mem.display_mask[px+x][py+y])k=0.6;
-                else k=1;
-                break;
-            case 2:
-                if(data_mem.display_mask[px+x][py+y])k=0.4;
-                else k=1;
-                break;
-            default:
-                if(data_mem.display_mask[px+x][py+y])continue;
-
-                k=0.2;
-                break;
-            }
+            double k =1.0/((x*x+y*y)/3.0+1.0);
             unsigned char pvalue = value*k;
             if( data_mem.display_mask[px+x][py+y] <= pvalue)
             {
@@ -553,11 +528,9 @@ void C_radar_data::drawBlackAzi(short azi_draw)
 
         short px = data_mem.xkm[azi_draw][r_pos];
         short py = data_mem.ykm[azi_draw][r_pos];
-        if(px<0||py<0)continue;
-        short pSize = 1;
-        if(r_pos<100)pSize=0;
-        else if(r_pos>800)pSize=2;
-        else if((px<pSize)||(py<pSize)||(px>=img_ppi->width()-pSize)||(py>=img_ppi->height()-pSize))continue;
+        if(px<=0||py<=0)continue;
+        short pSize = r_pos/150;if(pSize>3)pSize=3;
+        if((px<pSize)||(py<pSize)||(px>=img_ppi->width()-pSize)||(py>=img_ppi->height()-pSize))continue;
 
         for(short x = -pSize;x <= pSize;x++)
         {
@@ -574,8 +547,8 @@ void C_radar_data::drawBlackAzi(short azi_draw)
 
         short px = data_mem.xzoom[azi_draw][r_pos];
         short py = data_mem.yzoom[azi_draw][r_pos];
-        if(px<0||py<0)continue;
-        short pSize = 1;
+        if(px<=0||py<=0)continue;
+        short pSize = r_pos/150;if(pSize>8)pSize=8;
         if((px<pSize)||(py<pSize)||(px>=img_zoom_ppi->width()-pSize)||(py>=img_zoom_ppi->height()-pSize))continue;
 
         for(short x = -pSize;x <= pSize;x++)
@@ -961,18 +934,6 @@ void C_radar_data::ProcessEach90Deg()
         }
 
     }
-
-    //kill old tracks
-    for(uint i=0;i<mTrackList.size();i++)
-    {
-        track_t* track = &(mTrackList[i]);
-        if(!track->isRemoved)
-        {
-            if((now_ms -track->lastTimeMs)>30000)
-                track->isRemoved = true;
-
-        }
-    }
     //
     if(nObj>500)
     {
@@ -992,7 +953,7 @@ void C_radar_data::ProcessEach90Deg()
     {
         qint64 newtime = now_ms;
         qint64 dtime = newtime - cur_timeMSecs;
-        if(dtime<100000&&dtime>0)
+        if(dtime<50000&&dtime>0)
         {
             rot_period_sec = (dtime/1000.0);
             rotation_per_min += (15.0/rot_period_sec-rotation_per_min)/2.0;
@@ -2129,16 +2090,15 @@ void C_radar_data::setScaleZoom(float scale)
 //}
 void C_radar_data::drawSgnZoom(short azi_draw, short r_pos)
 {
-    unsigned char value    = data_mem.display_ray_zoom[r_pos][0];
-    unsigned char dopler    = data_mem.display_ray_zoom[r_pos][1];
-    unsigned char sled     = data_mem.display_ray_zoom[r_pos][2];
+
 
     short px = data_mem.xzoom[azi_draw][r_pos];
     short py = data_mem.yzoom[azi_draw][r_pos];
-    if(px<=0||py<=0)return;
-    short pSize = 1;
-    if(r_pos<100)pSize=0;
-    else if(r_pos>800)pSize=2;
+    if(!(px*py))return;
+    unsigned char value    = data_mem.display_ray_zoom[r_pos][0];
+    unsigned char dopler    = data_mem.display_ray_zoom[r_pos][1];
+    unsigned char sled     = data_mem.display_ray_zoom[r_pos][2];
+    short pSize = r_pos/150;if(pSize>8)pSize=8;
 
     //if(pSize>2)pSize = 2;
     if((px<pSize)||(py<pSize)||(px>=img_zoom_ppi->width()-pSize)||(py>=img_zoom_ppi->height()-pSize))return;
@@ -2146,25 +2106,8 @@ void C_radar_data::drawSgnZoom(short azi_draw, short r_pos)
     {
         for(short y = -pSize;y <= pSize;y++)
         {
-            float k ;
-            switch(short(x*x+y*y))
-            {
-            case 0:
-                k=1;
-                break;
-            case 1:
-                if(data_mem.display_mask_zoom[px+x][py+y])k=0.95f;
-                else k=1;
-                break;
-            case 2:
-                if(data_mem.display_mask_zoom[px+x][py+y])k=0.7f;
-                else k=1;
+           double k =1.0/((x*x+y*y)/60.0+1.0);
 
-            default:
-                if(data_mem.display_mask_zoom[px+x][py+y])continue;
-                k=0.7f;
-                break;
-            }
             unsigned char pvalue = value*k;
             if( data_mem.display_mask_zoom[px+x][py+y] <= pvalue)
             {
@@ -2287,25 +2230,21 @@ void C_radar_data::ProcessTracks()
     for (ushort j=0;j<mTrackList.size();j++)
     {
         track_t* track = &(mTrackList[j]);
-        if(track->isRemoved||track->isLost)continue;
+        if(track->isRemoved)continue;
         // find maximum score from possibleList
         if(track->possibleMaxScore>0)
         {
             if(now_ms-track->possibleObj.timeMs>300)
             {
-
-                track->objectList.push_back(track->possibleObj);
-                track->lastTimeMs = track->possibleObj.timeMs;
-                //track->possibleList.clear();
-                track->possibleMaxScore = 0;
-                track->LinearFit();
+                track->update();
             }
 
         }
         //remove old track
-        else if(now_ms-track->lastTimeMs>45000) track->isLost = true;
-        else if(now_ms-track->lastTimeMs>180000) track->isRemoved = true;
-
+        else {
+            if(now_ms-track->lastTimeMs>60000)  track->isLost = true;
+            if(now_ms-track->lastTimeMs>180000) track->isRemoved = true;
+        }
     }
 }
 bool C_radar_data::ProcessObject(object_t *obj1)
@@ -2355,7 +2294,7 @@ bool C_radar_data::checkBelongToTrack(object_t *obj1)
         double score = track->estimateScore(obj1);//todo: optimize this score
         //object_t* obj2 = &(track->objectList.back());
         //unsigned int dtime = (obj1->timeMs - obj2->timeMs);
-        /*if(dtime<1000)
+        /*if(dtime<500)
             continue;//ENVAR min time between plots in a line(1s)
         if(dtime>40000)
             continue;//ENVAR max time between plots in a line(40s)
@@ -2400,32 +2339,21 @@ bool C_radar_data::checkBelongToTrack(object_t *obj1)
 
 void C_radar_data::CreateTrack(object_t* obj1,object_t* obj2)
 {
-    track_t newTrack;
-    double dtime = (obj1->timeMs-obj2->timeMs)/3600000.0;
-    float dx = obj1->xkm - obj2->xkm;
-    float dy = obj1->ykm - obj2->ykm;
-
-    newTrack.rgSpeedkmh = (obj1->rgKm-obj2->rgKm)/dtime;
-    newTrack.isRemoved  = false;
-    newTrack.mSpeedkmh  = sqrt(dx*dx+dy*dy)/dtime;
-    newTrack.isLost     = false;
-    newTrack.bearingRad = ConvXYToAziRad(dx,dy);
-    newTrack.possibleMaxScore = 0;
-    newTrack.lastTimeMs = obj1->timeMs;
-    newTrack.objectList.push_back(*obj2);
-    newTrack.objectList.push_back(*obj1);
-//    newTrack.possibleObj
-    ushort j;
-    for (j=0;j<mTrackList.size();j++)
+    for (ushort j=0;j<mTrackList.size();j++)
     {
         if(mTrackList[j].isRemoved)
         {
+            track_t newTrack(obj1,obj2);
             mTrackList[j] = newTrack;
-            break;
+            return;
         }
     }
-    if(j>=mTrackList.size()&&j<500)
-    mTrackList.push_back(newTrack);
+    if(mTrackList.size()<800)
+    {
+        track_t newTrack(obj1,obj2);
+        mTrackList.push_back(newTrack);
+    }
+
 
 }
 bool C_radar_data::checkBelongToObj(object_t* obj1)
@@ -2468,24 +2396,4 @@ bool C_radar_data::checkBelongToObj(object_t* obj1)
     else return false;
 
 }
-double C_radar_data::ConvXYToRange(double x, double y)
-{
-    return sqrt(x*x + y*y);
 
-}
-double C_radar_data::ConvXYToAziRad(double x, double y)
-{
-    if (!y)
-    {
-        return (x>0 ? PI_CHIA2 : (PI_NHAN2 - PI_CHIA2));
-
-    }
-    else
-    {
-        double azi = atan(x / y);
-        if (y<0)azi += PI;
-        if (azi<0)azi += PI_NHAN2;
-        return azi;
-    }
-
-}

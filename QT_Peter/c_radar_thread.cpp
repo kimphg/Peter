@@ -183,7 +183,7 @@ void dataProcessingThread::ProcessNavData(unsigned char *mReceiveBuff,int len)
                {
                    double dLat = mGpsData.back().lat - mGpsData.front().lat;
                    double dLon = mGpsData.back().lon - mGpsData.front().lon;
-                   newGPSPoint.heading = degrees(C_radar_data::ConvXYToAziRad(dLon,dLat));
+                   newGPSPoint.heading = degrees(ConvXYToAziRad(dLon,dLat));
                }
             }
 
