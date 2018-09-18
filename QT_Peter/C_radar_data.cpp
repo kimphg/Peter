@@ -212,7 +212,9 @@ inline double fastPow(double a, double b) {
 }
 double track_t::estimateScore(object_t *obj1)
 {
-    return estimateScore(obj1,&(this->objectList.back()));
+    //return estimateScore(obj1,&(this->objectList.back()));
+    if(objectList.size()<2)
+        return -1;
     object_t* obj2 = &(this->objectList.back());
     double dtime = (obj1->timeMs - obj2->timeMs);
     if(dtime<1000)
@@ -1523,12 +1525,10 @@ void C_radar_data::procPLot(plot_t* mPlot)
     {
         dAz = MAX_AZIR-dAz;
         ctA = (mPlot->fallA+mPlot->riseA+MAX_AZIR)/2.0;
-
     }
     else
     {
         ctA = (mPlot->riseA + mPlot->fallA)/2.0;
-
     }
     if(dAz>15)return;//ENVDEP
     if(ctA >= MAX_AZIR)ctA -= MAX_AZIR;
