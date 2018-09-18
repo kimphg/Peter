@@ -160,7 +160,7 @@ void Mainwindow::sendToRadarString(QString command)
 void Mainwindow::sendToRadarHS(const char* hexdata)//todo:move to radar class
 {
     short len = strlen(hexdata)/2;
-    unsigned char* sendBuff = new unsigned char[len];
+    unsigned char* sendBuff = new unsigned char[len+1];
     hex2bin(hexdata,sendBuff);
     processing->sendCommand(sendBuff,len);
     delete[] sendBuff;

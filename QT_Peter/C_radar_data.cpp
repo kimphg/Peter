@@ -499,7 +499,7 @@ void C_radar_data::drawSgn(short azi_draw, short r_pos)
     unsigned char sled     = data_mem.display_ray[r_pos][2];
     short px = data_mem.xkm[azi_draw][r_pos];
     short py = data_mem.ykm[azi_draw][r_pos];
-    if(px<=0||py<=0)return;
+    if(!(px+py))return;
     short pSize = r_pos/150;if(pSize>3)pSize=3;
     //else if(r_pos>800)pSize=2;
     if((px<pSize)||(py<pSize)||(px>=img_ppi->width()-pSize)||(py>=img_ppi->height()-pSize))return;
@@ -507,7 +507,7 @@ void C_radar_data::drawSgn(short azi_draw, short r_pos)
     {
         for(short y = -pSize;y <= pSize;y++)
         {
-            double k =1.0/((x*x+y*y)/3.0+1.0);
+            double k =1.0/((x*x+y*y)/2.0+1.0);
             unsigned char pvalue = value*k;
             if( data_mem.display_mask[px+x][py+y] <= pvalue)
             {
@@ -618,10 +618,12 @@ void C_radar_data::drawAzi(short azi)
     {
         unsigned short value = data_mem.level_disp[azi][r_pos];
         unsigned short dopler = data_mem.dopler[azi][r_pos];
+        unsigned short sled =  data_mem.sled[azi][r_pos];
+        //if(!(value+sled))continue;
         if(DrawZoomAR(azi,r_pos,
                       value,
                       dopler,
-                      data_mem.sled[azi][r_pos]))
+                      sled))
         {
             value+=30;
             if(value>255)value=255;
@@ -910,7 +912,7 @@ void C_radar_data::ProcessData(unsigned short azi,unsigned short lastAzi)
         }
         else
         {
-            data_mem.sled[azi][r_pos] -= (data_mem.sled[azi][r_pos])/20.0f;
+            data_mem.sled[azi][r_pos] *=0.95;
             if(rgs_auto)data_mem.level_disp[azi][r_pos]= 0;
         }
 
@@ -2097,7 +2099,7 @@ void C_radar_data::drawSgnZoom(short azi_draw, short r_pos)
 
     short px = data_mem.xzoom[azi_draw][r_pos];
     short py = data_mem.yzoom[azi_draw][r_pos];
-    if(!(px*py))return;
+    if(!(px+py))return;
     unsigned char value    = data_mem.display_ray_zoom[r_pos][0];
     unsigned char dopler    = data_mem.display_ray_zoom[r_pos][1];
     unsigned char sled     = data_mem.display_ray_zoom[r_pos][2];
