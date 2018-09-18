@@ -116,7 +116,6 @@ dataProcessingThread::dataProcessingThread()
     {
         if(navSocket->bind(port))
         {
-
             connect(navSocket,SIGNAL(readyRead()),this, SLOT(ReadNavData()));
             break;
         }
@@ -130,22 +129,68 @@ dataProcessingThread::dataProcessingThread()
 }
 void dataProcessingThread::ReadNavData()
 {
-
     while(navSocket->hasPendingDatagrams())
     {
         int len = navSocket->pendingDatagramSize();
         QByteArray data;
         data.resize(len);
         navSocket->readDatagram(data.data(),len);
-        ProcessNavData(data);
+        //ProcessNavData(data);
     }
 
     return;
 }
-QString str="";
-void dataProcessingThread::ProcessNavData(QByteArray data)
+void dataProcessingThread::ProcessNavData(unsigned char *mReceiveBuff,int len)
 {
-    CGPSParser gpsParser(data.toStdString());
+    if(len<3)return;
+    if(mReceiveBuff[0]==0xaa&&mReceiveBuff[1]==0x55)//system messages
+    {
+        if(mReceiveBuff[2]==0x6e)
+        {
+            //mAntennaAzi = ((mReceiveBuff[4]<<8)|mReceiveBuff[5])/11.377778;
+            //printf("\nmAntennaAzi:%f",mAntennaAzi);
+            /*if(rand()%4==0)
+            {
+                sendCommand(&mReceiveBuff[0],len,false);
+                mAntennaAziOld = mAntennaAzi;
+            }*/
+
+        }
+        else if(mReceiveBuff[2]==0x65)// trang thai may 2-2
+        {
+            mRadarStat.ReadStatusMessage(&mReceiveBuff[4]);
+        }
+    }
+    else if(mReceiveBuff[0]=='!'&&mReceiveBuff[1]=='A')//AIS
+    {
+        processARPAData(QByteArray((char*)mReceiveBuff,len));
+    }
+    else if((mReceiveBuff[0]=='$')&&(mReceiveBuff[1]=='G')&&(mReceiveBuff[2]=='P'))//GPS
+    {
+        for(int i = 0;i<len;i++)
+        {
+            if(mGPS.decode(mReceiveBuff[i]))
+            {
+               GPSData newGPSPoint;
+               mGPS.get_position(&(newGPSPoint.lat),&(newGPSPoint.lon));
+               newGPSPoint.heading =  mGPS.course()/100.0;
+               while(mGpsData.size()>10)
+               {
+                   mGpsData.pop();
+               }
+               mGpsData.push(newGPSPoint);
+               if(mGpsData.size()>5)
+               {
+                   double dLat = mGpsData.back().lat - mGpsData.front().lat;
+                   double dLon = mGpsData.back().lon - mGpsData.front().lon;
+                   newGPSPoint.heading = degrees(C_radar_data::ConvXYToAziRad(dLon,dLat));
+               }
+            }
+
+        }
+    }
+
+    /*CGPSParser gpsParser(data.toStdString());
     if(gpsParser.isDataValid)
     {
         if(gpsParser.latitude)
@@ -185,7 +230,7 @@ void dataProcessingThread::ProcessNavData(QByteArray data)
                 mGpsData.push(newGPSPoint);
             }
         }
-    }
+    }*/
 }
 void dataProcessingThread::initSerialComm()
 {
@@ -322,8 +367,9 @@ void dataProcessingThread::sendAziData()
     int azi = (mRadarData->getCurAziRad()/3.1415926535*2048.0);
     sendBuf[4]=azi>>8;
     sendBuf[5]=azi;
-    sendBuf[6]=0;
-    sendBuf[7]=0;
+    int bearing =0;
+    sendBuf[6]=bearing>>8;
+    sendBuf[7]=bearing;
     sendBuf[8]=0;
     sendCommand(&sendBuf[0],9,false);
 }
@@ -407,12 +453,12 @@ void dataProcessingThread::playbackRadarData()
             buff.resize(len);
 
             signRepFile.read(buff.data(),len);
-            if(len>500){
+            if(len>1000){
                 //mRadarData->assembleDataFrame((unsigned char*)buff.data(),buff.size());
                 mRadarData->processSocketData((unsigned char*)buff.data(),len);
             }
             else if(len)
-                ProcessNavData(buff);
+                ProcessNavData((unsigned char*)buff.data(),len);
             if(isRecording)
             {
                 signRecFile.write((char*)&len,2);
@@ -578,61 +624,19 @@ void dataProcessingThread::run()
         while(radarSocket->hasPendingDatagrams())
         {
             int len = radarSocket->pendingDatagramSize();
-            if(len<1000)// control packets
+            if(len<500)// system packets
             {
                 radarSocket->readDatagram((char*)&mReceiveBuff[0],len);
-                if(mReceiveBuff[0]==0xaa&&mReceiveBuff[1]==0x55)
-                {
-                    if(mReceiveBuff[2]==0x6e)
-                    {
-                        //mAntennaAzi = ((mReceiveBuff[4]<<8)|mReceiveBuff[5])/11.377778;
-                        //printf("\nmAntennaAzi:%f",mAntennaAzi);
-                        /*if(rand()%4==0)
-                        {
-                            sendCommand(&mReceiveBuff[0],len,false);
-                            mAntennaAziOld = mAntennaAzi;
-                        }*/
-
-                    }
-                    else if(mReceiveBuff[2]==0x65)
-                    {
-                        mRadarStat.ReadStatusMessage(&mReceiveBuff[4]);
-                    }
-                }
-                else if(mReceiveBuff[1]=='A'&&mReceiveBuff[0]=='!')
-                {
-                    processARPAData(QByteArray((char*)mReceiveBuff,len));
-                }
-                else
-                {
-                    ProcessNavData(QByteArray((char*)mReceiveBuff,len));
-                }
-
+                ProcessNavData((unsigned char*)mReceiveBuff,len);
             }
             else
             {
                 radarSocket->readDatagram((char*)&udpFrameBuffer[iRec][0],len);
                 iRec++;
                 if(iRec>=MAX_IREC)iRec = 0;
-//                if(rand()%8==0)
-//                {
-
-//                    mReceiveBuff[0]=0xaa;
-//                    mReceiveBuff[1]=0x55;
-//                    mReceiveBuff[2]=0x6e;
-//                    mReceiveBuff[3]=0x08;
-//                    mReceiveBuff[4]=mRadarData->mEncoderVal>>8;
-//                    mReceiveBuff[5]=mRadarData->mEncoderVal;
-//                    sendCommand(&mReceiveBuff[0],len,false);
-
-//                }
-//                mAntennaAziOld = mRadarData->curAzir/MAX_AZIR*360.0;
-
             }
 
         }
-        //sleep(1);
-
     }
 
 }
@@ -807,20 +811,24 @@ void dataProcessingThread::radTxOff()
 
 void dataProcessingThread::sendCommand(unsigned char *commandBuff, short len,bool queued )
 {
+    // checksum byte calculation
+    commandBuff[len-1] = 0;
+    for(int i=0;i<len-1;i++)
+    {
+        commandBuff[len-1]^=commandBuff[i];
+    }
+    //queued command
     if(queued)
     {
         RadarCommand command;
 
-        command.bytes[7] = 0;
+
         memset(&command.bytes[0],0,8);
         memcpy(&command.bytes[0],commandBuff,len);
-        for(int i=0;i<len-1;i++)
-        {
-            command.bytes[7]+=command.bytes[i];
-        }
+
         if(radarComQ.size()<MAX_COMMAND_QUEUE_SIZE)radarComQ.push(command);
     }
-    else
+    else// realtime command
     {
         radarSocket->writeDatagram((char*)commandBuff,
                 len,

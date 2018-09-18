@@ -80,7 +80,7 @@ def loadData(fileName):
     dataTxt = np.genfromtxt(fileName,dtype='str')
     dataset = np.loadtxt(dataTxt,dtype='double',delimiter=',')
     return dataset
-train_data = loadData('logfileLinearFit.dat')
+train_data = loadData('logfile.dat')
 
 #train_data = train_data[train_data[:,0]<430.]
 #train_data = train_data[train_data[:,1]<1.]
@@ -96,19 +96,22 @@ train_data = loadData('logfileLinearFit.dat')
 feature_matrix = np.c_[np.ones(train_data.shape[0]),train_data[:,:(train_data.shape[1]-1)]]
 label_array = train_data[:,-1]
 #label_array = (label_array*2)-1
-print(train_data.shape)
+
 dataset0 = train_data[label_array==-1]
 dataset1 = train_data[label_array== 1]
+dataset1 = dataset1[:2221,:]
 print(dataset0.shape)
 print(dataset1.shape)
+train_data = np.concatenate((dataset0, dataset1), axis=0);
+print(train_data.shape)
 #initial_coefficients=np.array([ 0.45844316,-0.00055291,-0.02725333,-0.03192186, 0.02382861])
 initial_coefficients = np.zeros(feature_matrix.shape[1])
 coefficients_0_penalty = logistic_regression_with_L2(feature_matrix, label_array,
                                                      initial_coefficients,
-                                                     step_size=1e-3, l2_penalty=0, max_iter=40001)
+                                                     step_size=1e-7, l2_penalty=0, max_iter=1001)
                                                      
 print (coefficients_0_penalty)
-test_data = loadData('logfileLinearFit.dat')
+test_data = loadData('logfile.dat')
 #test_data = test_data[test_data[:,3]<300.]
 #test_data = test_data[test_data[:,0]<500.]
 #test_data = test_data[test_data[:,1]<1.]
@@ -122,6 +125,6 @@ feature_matrix_test = np.c_[np.ones(test_data.shape[0]),test_data[:,:(test_data.
 accTest = get_classification_accuracy(feature_matrix_test,label_test_data,coefficients_0_penalty)
 #print accTrain,accTest
 print accTest
-#plt.hist(dataset1[:2500,0],50)
+#plt.hist(dataset1[:,5],50)
 #plt.hist(dataset0[:,0],50)
 

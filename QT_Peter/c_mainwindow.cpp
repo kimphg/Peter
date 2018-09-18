@@ -138,7 +138,7 @@ void Mainwindow::mouseDoubleClickEvent( QMouseEvent * e )
         {
         float xRadar = (mMouseLastX - radCtX)/pRadar->scale_ppi ;//coordinates in  radar xy system
         float yRadar = -(mMouseLastY - radCtY)/pRadar->scale_ppi;
-        pRadar->addTrackManual(xRadar,yRadar);
+//        pRadar->addTrackManual(xRadar,yRadar);
         }
         //ui->toolButton_manual_track->setChecked(false);
 
@@ -745,8 +745,8 @@ void Mainwindow::DrawGrid(QPainter* p,short centerX,short centerY)
     short gridR = ringStep*1.852f*mScale*7;
     for(theta=0;theta<360;theta+=90){
         QPoint point1,point2;
-        short dx = gridR*cosf(theta/DEG_RAD);
-        short dy = gridR*sinf(theta/DEG_RAD);
+        short dx = gridR*cos(radians(theta));
+        short dy = gridR*sin(radians(theta));
         point1.setX(centerX);
         point1.setY(centerY);
         point2.setX(centerX+dx);
@@ -756,8 +756,8 @@ void Mainwindow::DrawGrid(QPainter* p,short centerX,short centerY)
     }
     for(theta=0;theta<360;theta+=30){
         QPoint point1,point2;
-        short dx = gridR*cosf(theta/DEG_RAD);
-        short dy = gridR*sinf(theta/DEG_RAD);
+        short dx = gridR*cos(radians(theta));
+        short dy = gridR*sin(radians(theta));
         point1.setX(centerX);
         point1.setY(centerY);
         point2.setX( centerX+dx);
@@ -843,23 +843,19 @@ void Mainwindow::DrawRadarTargetByPainter(QPainter* p)//draw radar target from p
             {
                 object_t* obj1,*obj2;
                 p->setPen(penTargetBlue);
-                if(track->objectList.size()<5)continue;
-                for (int j = track->objectList.size()-5;j<track->objectList.size()-1;j++)
+                if(track->objectList.size()>5)
                 {
-
-                    obj1 = &(track->objectList[j]);
-                    obj2 = &(track->objectList[j+1]);
-                    sx = obj1->xkm*mScale + radCtX;
-                    sy = -obj1->ykm*mScale + radCtY;
-                    sx1 = obj2->xkm*mScale + radCtX;
-                    sy1 = -obj2->ykm*mScale + radCtY;
-                    p->drawLine(sx,sy,sx1,sy1);
-                }
-                p->setPen(penTarget);
-
-                if(track->objectList.size()>3)
-                {
-
+                    for (int j = track->objectList.size()-5;j<track->objectList.size()-1;j++)
+                    {
+                        obj1 = &(track->objectList[j]);
+                        obj2 = &(track->objectList[j+1]);
+                        sx = obj1->xkm*mScale + radCtX;
+                        sy = -obj1->ykm*mScale + radCtY;
+                        sx1 = obj2->xkm*mScale + radCtX;
+                        sy1 = -obj2->ykm*mScale + radCtY;
+                        p->drawLine(sx,sy,sx1,sy1);
+                    }
+                    p->setPen(penTarget);
                     for (uint j = 0;j<track->objectList.size()-1;j++)
                     {
                         obj1 = &(track->objectList[j]);
@@ -870,6 +866,12 @@ void Mainwindow::DrawRadarTargetByPainter(QPainter* p)//draw radar target from p
                         sy1 = -obj2->ykmfit*mScale + radCtY;
                         p->drawLine(sx,sy,sx1,sy1);
                     }
+                }
+                else
+                {
+                    obj1 = &(track->objectList.back());
+                    sx1 = obj1->xkm*mScale + radCtX;
+                    sy1 = -obj1->ykm*mScale + radCtY;
                 }
                 int size = 15000.0/(now_ms - track->objectList.back().timeMs+400);
                 if(size<10)size=10;
@@ -1390,6 +1392,7 @@ void Mainwindow::setDistanceUnit(int unit)//0:NM, 1:KM
 }
 void Mainwindow::InitSetting()
 {
+    qApp->setStyleSheet("QToolTip { color: #ffffff; background-color: #2a82da; border: 1px solid white; }");
     ui->tabWidget_iad->SetTransparent(true);
     QApplication::setOverrideCursor(Qt::CrossCursor);
     QString systemCommand = CConfig::getString("systemCommand","D:\\HR2D\\cudaCv.exe");
@@ -1648,7 +1651,7 @@ void Mainwindow::DrawViewFrame(QPainter* p)
         //p->drawText(720,20,200,20,0,"Antenna: "+QString::number(aziDeg,'f',1));
 
     }
-    if(CalcAziContour(pRadar->getCurAziRad()*DEG_RAD,&points[0],&points[1],&points[2],height()-70))
+    if(CalcAziContour(degrees(pRadar->getCurAziRad()),&points[0],&points[1],&points[2],height()-70))
     {
         p->setPen(QPen(Qt::cyan,4,Qt::SolidLine,Qt::RoundCap));
         p->drawLine(points[2],points[1]);
@@ -1781,7 +1784,7 @@ void Mainwindow::Update100ms()
     DrawMap();
     mMousex=this->mapFromGlobal(QCursor::pos()).x();
     mMousey=this->mapFromGlobal(QCursor::pos()).y();
-    this->ui->label_azi_antenna_head_true->setText(QString::number(pRadar->getCurAziRad()*DEG_RAD));
+    this->ui->label_azi_antenna_head_true->setText(QString::number(degrees(pRadar->getCurAziRad())));
     if(isInsideViewZone(mMousex,mMousey))
     {
         QApplication::setOverrideCursor(Qt::CrossCursor);
@@ -4293,3 +4296,25 @@ void Mainwindow::on_toolButton_sled_reset_4_clicked(bool checked)
 //{
 
 //}
+
+
+
+void Mainwindow::on_on_toolButton_xl_nguong_3_clicked(bool checked)
+{
+    pRadar->cut_thresh = checked;
+}
+
+void Mainwindow::on_toolButton_xl_nguong_4_clicked(bool checked)
+{
+    pRadar->setAutorgs(checked);
+}
+
+void Mainwindow::on_toolButton_sled_clicked(bool checked)
+{
+    pRadar->isSled=checked;
+}
+
+void Mainwindow::on_toolButton_xl_dopler_clicked(bool checked)
+{
+    pRadar->xl_dopler = checked;
+}

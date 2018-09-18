@@ -2,6 +2,7 @@
 
 QCustomButton::QCustomButton(QWidget *parent) : QToolButton(parent)
 {
+
     setMouseTracking(true);
     setAttribute(Qt::WA_Hover);
     this->setCursor(Qt::ArrowCursor);

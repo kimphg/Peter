@@ -1,16 +1,17 @@
 #include <random>
 #include <time.h>
 #define FRAME_HEADER_SIZE 34
-#define FRAME_LEN 1024
+#define FRAME_LEN 2048
 #define OUTPUT_FRAME_SIZE FRAME_LEN*2+FRAME_HEADER_SIZE
 #define PI_NHAN2                    6.2831853072
 #define PI_CHIA2                    1.5707963268
 #define PI                       3.14159265358979323846
 #define DEG_RAD 57.295779513
+#define MAX_AZI 2048
 std::default_random_engine generator;
 std::normal_distribution<double> distribNoise(30, 8);
 std::normal_distribution<double> distribAzi(0, 1);//scale of 2048
-std::normal_distribution<double> distribRot(180, 1);//deg per sec
+std::normal_distribution<double> distribRot(180, 0.5 );//deg per sec
 using namespace std;
 double ConvXYToRange(double x, double y)
 {
@@ -46,7 +47,7 @@ double ConvXYToAziRad(double x, double y)
 	}
 	return azi;
 }
-extern unsigned char outputFrame[4096][OUTPUT_FRAME_SIZE];
+extern unsigned char outputFrame[MAX_AZI][OUTPUT_FRAME_SIZE];
 extern double rResolution;
 class target_t
 {
@@ -73,8 +74,6 @@ public:
 	}
 	void generateSignal()
 	{
-
-		
 		if (range >= FRAME_LEN - 1)return;
 		//if (rand() % 5)return;
 		int azimin = azi - targetSize; if (azimin < 0)azimin += 2048;
@@ -122,19 +121,20 @@ public:
 		double elapsed_secs = difftime(timenow, timeLast);
 		timeLast = timenow;
 		nUpdates++;
-		if (nUpdates>20)
+		if (nUpdates>5)
 		{
 			nUpdates = 0;
 			rot = distribRot(generator) / DEG_RAD - PI;
 
 		}
 		bearing += rot*elapsed_secs;
+		printf("\nbearing:%f", bearing);
 		double distance = elapsed_secs / 3600.0*speed;
 		x += distance*sin(bearing);
 		y += distance*cos(bearing);
 		//
-		azi = ConvXYToAziRad(x, y) / 3.141592653589*1024.0 + (distribAzi(generator));
-		range = ConvXYToRange(x, y) / rResolution;
+		azi		= ConvXYToAziRad(x, y) / 3.141592653589*1024.0 + (distribAzi(generator));
+		range	= ConvXYToRange(x, y) / rResolution;
 		
 		
 		generateSignal();

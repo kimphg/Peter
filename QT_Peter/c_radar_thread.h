@@ -7,8 +7,9 @@
 #include "c_radar_data.h"
 #include "c_arpa_data.h"
 #include "c_config.h"
+#include "c_gps.h"
 #include "AIS/AIS.h"
-#include "c_gps_parser.h"
+//#include "c_gps_parser.h"
 #include <vector>
 #include <QFile>
 #include <QUdpSocket>
@@ -18,15 +19,16 @@
 #define MAX_COMMAND_QUEUE_SIZE 100
 #define HAVE_REMOTE// for pcap
 #include "pcap.h"
+
 #ifndef CONST_NM
-#define CONST_NM 1.852f
+#define CONST_NM 1.852
 #endif
 #define HR2D_UDP_PORT 5000
 using namespace std;
 struct GPSData
 {
-    double lat,lon;
-    double heading,speed;
+    float lat,lon;
+    float heading,speed;
     long long timeStamp;
     bool isFixed;
 };
@@ -72,6 +74,7 @@ struct  RadarCommand// radar control commmand
 {
     unsigned char bytes[32];
 };
+//extern class CGPS{};
 typedef std::queue<RadarCommand> RadarCommandQueue;
 class dataProcessingThread:public QThread
 {
@@ -82,6 +85,7 @@ public:
     //QMutex  mutex_data_change;
     unsigned short    playRate;
     DataBuff*   dataBuff;
+    c_gps mGPS;
     float   k_vet;
     void SetRadarPort( unsigned short portNumber);
     void SetARPAPort( unsigned short portNumber);
@@ -149,7 +153,7 @@ private:
     void processSerialData(QByteArray inputData);
     //    bool ProcDataAIS(BYTE *szBuff, int nLeng);
     bool checkFeedback();
-    void ProcessNavData(QByteArray data);
+    void ProcessNavData(unsigned char *mReceiveBuff, int len);
     void sendAziData();
 private slots:
     void ReadDataBuffer();

@@ -13,7 +13,7 @@ unsigned char n_clk_adc = 0;
 double rResolution = 0.015070644;
 struct sockaddr_in si_peter;
 struct sockaddr_in si_capin;
-u_char outputFrame[4096][OUTPUT_FRAME_SIZE];
+u_char outputFrame[MAX_AZI][OUTPUT_FRAME_SIZE];
 void socketInit()
 {
 	WSADATA wsa;
@@ -56,30 +56,20 @@ void socketDelete()
 	closesocket(mSocket);
 	WSACleanup();
 }
-
-
-
-
 void regenerate(int azi)
 {
 	u_char* dataPointer = &outputFrame[azi][0] + FRAME_HEADER_SIZE;
-	for (int i = 0; i < 1024; i++)
+	for (int i = 0; i < MAX_AZI; i++)
 	{
 		int num = int(distribNoise(generator));
 		if (num < 0)num = 0;
 		dataPointer[i] = num;
-		
 	}
-	for (int i = 1024; i < 2018; i++)
+	for (int i = MAX_AZI; i < MAX_AZI*2; i++)
 	{
-		
 		dataPointer[i] = rand()%16;
-
 	}
 }
-
-
-
 #define NUM_OF_TARG 100
 target_t* target[NUM_OF_TARG];
 
@@ -89,9 +79,9 @@ void initTargets()
 	for (int i = 0; i < NUM_OF_TARG; i++)
 	{
 		target[i] = new target_t(
-			(rand() % 50)/10.0 + 3,//x
-			(rand() % 50) / 10.0 - 3,//y
-			((rand() % 20) +20),//speed
+			(rand() % 400)/10.0 + 10,//x
+			(rand() % 400)/10.0 - 20,//y
+			((rand() % 20) +15),//speed
 			rand() % 90,//heading
 			i);
 	}
@@ -110,7 +100,7 @@ int _tmain(int argc, _TCHAR* argv[])
 { 
 	socketInit();
 	int azi = 200;
-	for (int i = 0; i < 2048; i++)
+	for (int i = 0; i < MAX_AZI; i++)
 	{
 		regenerate(i);
 		outputFrame[i][2] = i >> 8;
@@ -119,7 +109,7 @@ int _tmain(int argc, _TCHAR* argv[])
 	initTargets();
 	int dazi = 1;
 	int nPeriod = 0;
-	n_clk_adc = 2;
+	n_clk_adc = 1;
 	rResolution = 0.015070644 * pow(2, n_clk_adc);
 	while (true)
 	{
@@ -160,7 +150,7 @@ int _tmain(int argc, _TCHAR* argv[])
 			Sleep(500);
 		}
 		else
-		if (azi <= 100)
+		if (azi <= 2)
 		{
 			dazi = 1;
 			updateTargets();

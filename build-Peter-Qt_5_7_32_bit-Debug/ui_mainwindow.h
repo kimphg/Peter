@@ -295,12 +295,12 @@ public:
     QLabel *label_sn_type;
     QLabel *label_range_resolution;
     QLabel *label_4;
-    QCustomButton *toolButton_xl_nguong_3;
-    QCustomButton *toolButton_xl_dopler;
-    QCustomButton *toolButton_xl_nguong;
     QCustomButton *toolButton_sled;
     QCustomButton *toolButton_sled_reset;
     QCustomButton *toolButton_sled_reset_4;
+    QCustomButton *on_toolButton_xl_nguong_3;
+    QCustomButton *toolButton_xl_dopler;
+    QCustomButton *toolButton_xl_nguong_4;
     QButtonGroup *buttonGroup;
 
     void setupUi(QMainWindow *MainWindow)
@@ -411,6 +411,7 @@ public:
         sizePolicy1.setVerticalStretch(0);
         sizePolicy1.setHeightForWidth(toolButton_VRM->sizePolicy().hasHeightForWidth());
         toolButton_VRM->setSizePolicy(sizePolicy1);
+        toolButton_VRM->setFocusPolicy(Qt::NoFocus);
         toolButton_VRM->setCheckable(true);
 
         gridLayout_7->addWidget(toolButton_VRM, 4, 0, 1, 1);
@@ -419,6 +420,7 @@ public:
         toolButton_ELB->setObjectName(QStringLiteral("toolButton_ELB"));
         sizePolicy1.setHeightForWidth(toolButton_ELB->sizePolicy().hasHeightForWidth());
         toolButton_ELB->setSizePolicy(sizePolicy1);
+        toolButton_ELB->setFocusPolicy(Qt::NoFocus);
         toolButton_ELB->setCheckable(true);
 
         gridLayout_7->addWidget(toolButton_ELB, 4, 1, 1, 1);
@@ -683,6 +685,7 @@ public:
         toolButton_grid->setObjectName(QStringLiteral("toolButton_grid"));
         sizePolicy1.setHeightForWidth(toolButton_grid->sizePolicy().hasHeightForWidth());
         toolButton_grid->setSizePolicy(sizePolicy1);
+        toolButton_grid->setFocusPolicy(Qt::NoFocus);
         toolButton_grid->setCheckable(true);
         toolButton_grid->setChecked(true);
 
@@ -693,6 +696,7 @@ public:
         sizePolicy1.setHeightForWidth(toolButton_centerView->sizePolicy().hasHeightForWidth());
         toolButton_centerView->setSizePolicy(sizePolicy1);
         toolButton_centerView->setFont(font1);
+        toolButton_centerView->setFocusPolicy(Qt::NoFocus);
         toolButton_centerView->setCheckable(false);
 
         gridLayout_7->addWidget(toolButton_centerView, 1, 0, 1, 2);
@@ -702,6 +706,7 @@ public:
         sizePolicy1.setHeightForWidth(toolButton_measuring->sizePolicy().hasHeightForWidth());
         toolButton_measuring->setSizePolicy(sizePolicy1);
         toolButton_measuring->setFont(font1);
+        toolButton_measuring->setFocusPolicy(Qt::NoFocus);
         toolButton_measuring->setCheckable(true);
 
         gridLayout_7->addWidget(toolButton_measuring, 3, 0, 1, 2);
@@ -2629,7 +2634,7 @@ public:
 
         label_data_range_2 = new QLabel(tab_8);
         label_data_range_2->setObjectName(QStringLiteral("label_data_range_2"));
-        label_data_range_2->setGeometry(QRect(180, 30, 99, 19));
+        label_data_range_2->setGeometry(QRect(180, 30, 261, 19));
         QPalette palette32;
         palette32.setBrush(QPalette::Active, QPalette::WindowText, brush);
         palette32.setBrush(QPalette::Active, QPalette::Button, brush8);
@@ -5807,31 +5812,13 @@ public:
 
         gridLayout_6->addWidget(label_4, 2, 0, 1, 1);
 
-        toolButton_xl_nguong_3 = new QCustomButton(centralWidget);
-        toolButton_xl_nguong_3->setObjectName(QStringLiteral("toolButton_xl_nguong_3"));
-        toolButton_xl_nguong_3->setGeometry(QRect(870, 10, 101, 41));
-        sizePolicy1.setHeightForWidth(toolButton_xl_nguong_3->sizePolicy().hasHeightForWidth());
-        toolButton_xl_nguong_3->setSizePolicy(sizePolicy1);
-        toolButton_xl_nguong_3->setCheckable(true);
-        toolButton_xl_dopler = new QCustomButton(centralWidget);
-        toolButton_xl_dopler->setObjectName(QStringLiteral("toolButton_xl_dopler"));
-        toolButton_xl_dopler->setGeometry(QRect(870, 60, 101, 41));
-        sizePolicy1.setHeightForWidth(toolButton_xl_dopler->sizePolicy().hasHeightForWidth());
-        toolButton_xl_dopler->setSizePolicy(sizePolicy1);
-        toolButton_xl_dopler->setCheckable(true);
-        toolButton_xl_dopler->setChecked(true);
-        toolButton_xl_nguong = new QCustomButton(centralWidget);
-        toolButton_xl_nguong->setObjectName(QStringLiteral("toolButton_xl_nguong"));
-        toolButton_xl_nguong->setGeometry(QRect(980, 10, 101, 41));
-        sizePolicy1.setHeightForWidth(toolButton_xl_nguong->sizePolicy().hasHeightForWidth());
-        toolButton_xl_nguong->setSizePolicy(sizePolicy1);
-        toolButton_xl_nguong->setCheckable(true);
         toolButton_sled = new QCustomButton(centralWidget);
         toolButton_sled->setObjectName(QStringLiteral("toolButton_sled"));
         toolButton_sled->setGeometry(QRect(980, 60, 101, 41));
         sizePolicy1.setHeightForWidth(toolButton_sled->sizePolicy().hasHeightForWidth());
         toolButton_sled->setSizePolicy(sizePolicy1);
         toolButton_sled->setFont(font1);
+        toolButton_sled->setFocusPolicy(Qt::NoFocus);
         toolButton_sled->setCheckable(true);
         toolButton_sled_reset = new QCustomButton(centralWidget);
         toolButton_sled_reset->setObjectName(QStringLiteral("toolButton_sled_reset"));
@@ -5839,6 +5826,7 @@ public:
         sizePolicy1.setHeightForWidth(toolButton_sled_reset->sizePolicy().hasHeightForWidth());
         toolButton_sled_reset->setSizePolicy(sizePolicy1);
         toolButton_sled_reset->setFont(font1);
+        toolButton_sled_reset->setFocusPolicy(Qt::NoFocus);
         toolButton_sled_reset->setCheckable(false);
         toolButton_sled_reset_4 = new QCustomButton(centralWidget);
         toolButton_sled_reset_4->setObjectName(QStringLiteral("toolButton_sled_reset_4"));
@@ -5846,7 +5834,33 @@ public:
         sizePolicy1.setHeightForWidth(toolButton_sled_reset_4->sizePolicy().hasHeightForWidth());
         toolButton_sled_reset_4->setSizePolicy(sizePolicy1);
         toolButton_sled_reset_4->setFont(font1);
+        toolButton_sled_reset_4->setFocusPolicy(Qt::NoFocus);
         toolButton_sled_reset_4->setCheckable(true);
+        on_toolButton_xl_nguong_3 = new QCustomButton(centralWidget);
+        on_toolButton_xl_nguong_3->setObjectName(QStringLiteral("on_toolButton_xl_nguong_3"));
+        on_toolButton_xl_nguong_3->setGeometry(QRect(870, 10, 101, 41));
+        sizePolicy1.setHeightForWidth(on_toolButton_xl_nguong_3->sizePolicy().hasHeightForWidth());
+        on_toolButton_xl_nguong_3->setSizePolicy(sizePolicy1);
+        on_toolButton_xl_nguong_3->setFont(font1);
+        on_toolButton_xl_nguong_3->setFocusPolicy(Qt::NoFocus);
+        on_toolButton_xl_nguong_3->setCheckable(true);
+        toolButton_xl_dopler = new QCustomButton(centralWidget);
+        toolButton_xl_dopler->setObjectName(QStringLiteral("toolButton_xl_dopler"));
+        toolButton_xl_dopler->setGeometry(QRect(870, 60, 101, 41));
+        sizePolicy1.setHeightForWidth(toolButton_xl_dopler->sizePolicy().hasHeightForWidth());
+        toolButton_xl_dopler->setSizePolicy(sizePolicy1);
+        toolButton_xl_dopler->setFont(font1);
+        toolButton_xl_dopler->setFocusPolicy(Qt::NoFocus);
+        toolButton_xl_dopler->setCheckable(true);
+        toolButton_xl_dopler->setChecked(true);
+        toolButton_xl_nguong_4 = new QCustomButton(centralWidget);
+        toolButton_xl_nguong_4->setObjectName(QStringLiteral("toolButton_xl_nguong_4"));
+        toolButton_xl_nguong_4->setGeometry(QRect(980, 10, 101, 41));
+        sizePolicy1.setHeightForWidth(toolButton_xl_nguong_4->sizePolicy().hasHeightForWidth());
+        toolButton_xl_nguong_4->setSizePolicy(sizePolicy1);
+        toolButton_xl_nguong_4->setFont(font1);
+        toolButton_xl_nguong_4->setFocusPolicy(Qt::NoFocus);
+        toolButton_xl_nguong_4->setCheckable(true);
         MainWindow->setCentralWidget(centralWidget);
         groupBox_5->raise();
         groupBox_7->raise();
@@ -5863,12 +5877,12 @@ public:
         groupBox_6->raise();
         tabWidget_menu->raise();
         tabWidget_iad->raise();
-        toolButton_xl_nguong_3->raise();
-        toolButton_xl_dopler->raise();
-        toolButton_xl_nguong->raise();
         toolButton_sled->raise();
         toolButton_sled_reset->raise();
         toolButton_sled_reset_4->raise();
+        on_toolButton_xl_nguong_3->raise();
+        toolButton_xl_dopler->raise();
+        toolButton_xl_nguong_4->raise();
 #ifndef QT_NO_SHORTCUT
         label_rain->setBuddy(horizontalSlider_rain);
         label_sea->setBuddy(horizontalSlider_sea);
@@ -5877,7 +5891,7 @@ public:
 
         retranslateUi(MainWindow);
 
-        tabWidget_menu->setCurrentIndex(4);
+        tabWidget_menu->setCurrentIndex(1);
         groupBox_3->setCurrentIndex(1);
         comboBox->setCurrentIndex(0);
         tabWidget_iad->setCurrentIndex(5);
@@ -5890,7 +5904,13 @@ public:
     void retranslateUi(QMainWindow *MainWindow)
     {
         MainWindow->setWindowTitle(QApplication::translate("MainWindow", "HR-2D", Q_NULLPTR));
+#ifndef QT_NO_TOOLTIP
+        toolButton_VRM->setToolTip(QApplication::translate("MainWindow", "Hi\341\273\207n v\303\262ng \304\221\341\272\263ng c\341\273\245 ly", Q_NULLPTR));
+#endif // QT_NO_TOOLTIP
         toolButton_VRM->setText(QApplication::translate("MainWindow", "VRM", Q_NULLPTR));
+#ifndef QT_NO_TOOLTIP
+        toolButton_ELB->setToolTip(QApplication::translate("MainWindow", "Hi\341\273\207n \304\221\306\260\341\273\235ng \304\221\341\272\263ng ph\306\260\306\241ng v\341\273\213", Q_NULLPTR));
+#endif // QT_NO_TOOLTIP
         toolButton_ELB->setText(QApplication::translate("MainWindow", "ELB", Q_NULLPTR));
         label_10->setText(QApplication::translate("MainWindow", "C\341\273\261 ly:", Q_NULLPTR));
         label_cursor_range->setText(QApplication::translate("MainWindow", "--", Q_NULLPTR));
@@ -6082,6 +6102,9 @@ public:
         label_range->setText(QApplication::translate("MainWindow", "--", Q_NULLPTR));
         toolButton_zoom_out->setText(QApplication::translate("MainWindow", "+", Q_NULLPTR));
         toolButton_auto_adapt->setText(QApplication::translate("MainWindow", "PGTN", Q_NULLPTR));
+#ifndef QT_NO_TOOLTIP
+        toolButton_menu->setToolTip(QApplication::translate("MainWindow", "Menu \304\221i\341\273\201u khi\341\273\203n v\303\240 c\303\240i \304\221\341\272\267t n\303\242ng cao", Q_NULLPTR));
+#endif // QT_NO_TOOLTIP
         toolButton_menu->setText(QApplication::translate("MainWindow", "MENU", Q_NULLPTR));
         tabWidget_iad->setTabText(tabWidget_iad->indexOf(tab_11), QApplication::translate("MainWindow", "IAD", Q_NULLPTR));
         tabWidget_iad->setTabText(tabWidget_iad->indexOf(tab_12), QApplication::translate("MainWindow", "Hist", Q_NULLPTR));
@@ -6090,6 +6113,9 @@ public:
         tabWidget_iad->setTabText(tabWidget_iad->indexOf(tab_14), QApplication::translate("MainWindow", "H. s\303\263ng bi\303\252n", Q_NULLPTR));
         tabWidget_iad->setTabText(tabWidget_iad->indexOf(tab_15), QApplication::translate("MainWindow", "Zoom", Q_NULLPTR));
         tabWidget_iad->setTabText(tabWidget_iad->indexOf(tab_2), QApplication::translate("MainWindow", "X", Q_NULLPTR));
+#ifndef QT_NO_TOOLTIP
+        toolButton_iad->setToolTip(QApplication::translate("MainWindow", "M\303\240n hi\341\273\207n s\303\263ng ph\303\263ng to", Q_NULLPTR));
+#endif // QT_NO_TOOLTIP
         toolButton_iad->setText(QApplication::translate("MainWindow", "IAD", Q_NULLPTR));
         groupBox_17->setTitle(QApplication::translate("MainWindow", "B\341\272\243n \304\221\341\273\223 s\341\273\221", Q_NULLPTR));
         label_command_3->setText(QApplication::translate("MainWindow", "D\341\273\257 li\341\273\207u:", Q_NULLPTR));
@@ -6103,6 +6129,9 @@ public:
         label_command_4->setText(QApplication::translate("MainWindow", "\304\220\341\273\231 s\303\241ng:", Q_NULLPTR));
         label_azi_antenna_head_ship->setText(QApplication::translate("MainWindow", "--", Q_NULLPTR));
         label_azi_antenna_head_true->setText(QApplication::translate("MainWindow", "--", Q_NULLPTR));
+#ifndef QT_NO_TOOLTIP
+        toolButton_head_up->setToolTip(QApplication::translate("MainWindow", "\304\220\341\272\267t m\303\240n hi\341\273\207n s\303\263ng c\341\273\221 \304\221\341\273\213nh theo h\306\260\341\273\233ng m\305\251i t\303\240u", Q_NULLPTR));
+#endif // QT_NO_TOOLTIP
         toolButton_head_up->setText(QApplication::translate("MainWindow", "Head up", Q_NULLPTR));
         groupBox_4->setTitle(QApplication::translate("MainWindow", "Ghi l\306\260u t\303\255n hi\341\273\207u", Q_NULLPTR));
 #ifndef QT_NO_TOOLTIP
@@ -6127,12 +6156,30 @@ public:
         label_sn_type->setText(QApplication::translate("MainWindow", "--", Q_NULLPTR));
         label_range_resolution->setText(QApplication::translate("MainWindow", "--", Q_NULLPTR));
         label_4->setText(QApplication::translate("MainWindow", "T.\304\221\341\273\231 quay anten (v/p):", Q_NULLPTR));
-        toolButton_xl_nguong_3->setText(QApplication::translate("MainWindow", "C\303\242n b\341\272\261ng t\341\272\241p", Q_NULLPTR));
-        toolButton_xl_dopler->setText(QApplication::translate("MainWindow", "L\341\273\215c nhi\341\273\205u ", Q_NULLPTR));
-        toolButton_xl_nguong->setText(QApplication::translate("MainWindow", "L\341\273\215c t\341\272\241p", Q_NULLPTR));
+#ifndef QT_NO_TOOLTIP
+        toolButton_sled->setToolTip(QApplication::translate("MainWindow", "Hi\341\273\207n v\341\272\277t di chuy\341\273\203n c\341\273\247a m\341\273\245c ti\303\252u", Q_NULLPTR));
+#endif // QT_NO_TOOLTIP
         toolButton_sled->setText(QApplication::translate("MainWindow", "Hi\341\273\207n v\341\272\277t", Q_NULLPTR));
-        toolButton_sled_reset->setText(QApplication::translate("MainWindow", "Kh\341\273\237i t\341\272\241o v\341\272\277t", Q_NULLPTR));
+#ifndef QT_NO_TOOLTIP
+        toolButton_sled_reset->setToolTip(QApplication::translate("MainWindow", "X\303\263a c\303\241c v\341\272\277t di chuy\341\273\203n c\305\251", Q_NULLPTR));
+#endif // QT_NO_TOOLTIP
+        toolButton_sled_reset->setText(QApplication::translate("MainWindow", "X\303\263a v\341\272\277t", Q_NULLPTR));
+#ifndef QT_NO_TOOLTIP
+        toolButton_sled_reset_4->setToolTip(QApplication::translate("MainWindow", "Hi\341\273\203n th\341\273\213 c\303\241c qu\341\273\271 \304\221\341\272\241o m\341\273\245c ti\303\252u", Q_NULLPTR));
+#endif // QT_NO_TOOLTIP
         toolButton_sled_reset_4->setText(QApplication::translate("MainWindow", "Qu\341\273\271 \304\221\341\272\241o", Q_NULLPTR));
+#ifndef QT_NO_TOOLTIP
+        on_toolButton_xl_nguong_3->setToolTip(QApplication::translate("MainWindow", "C\303\242n b\341\272\261ng n\341\273\201n t\341\272\241p t\303\255n hi\341\273\207u", Q_NULLPTR));
+#endif // QT_NO_TOOLTIP
+        on_toolButton_xl_nguong_3->setText(QApplication::translate("MainWindow", "C\303\242n b\341\272\261ng t\341\272\241p", Q_NULLPTR));
+#ifndef QT_NO_TOOLTIP
+        toolButton_xl_dopler->setToolTip(QString());
+#endif // QT_NO_TOOLTIP
+        toolButton_xl_dopler->setText(QApplication::translate("MainWindow", "L\341\273\215c nhi\341\273\205u", Q_NULLPTR));
+#ifndef QT_NO_TOOLTIP
+        toolButton_xl_nguong_4->setToolTip(QApplication::translate("MainWindow", "G\341\272\241t n\341\273\201n t\341\272\241p tr\303\252n hi\341\273\207n s\303\263ng", Q_NULLPTR));
+#endif // QT_NO_TOOLTIP
+        toolButton_xl_nguong_4->setText(QApplication::translate("MainWindow", "L\341\273\215c t\341\272\241p", Q_NULLPTR));
     } // retranslateUi
 
 };

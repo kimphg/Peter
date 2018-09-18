@@ -483,6 +483,16 @@ private slots:
 
 //    void on_toolButton_sled_reset_3_toggled(bool checked);
 
+
+
+    void on_on_toolButton_xl_nguong_3_clicked(bool checked);
+
+    void on_toolButton_xl_nguong_4_clicked(bool checked);
+
+    void on_toolButton_sled_clicked(bool checked);
+
+    void on_toolButton_xl_dopler_clicked(bool checked);
+
 private:
 
     bool mShowobjects,mShowTracks;

@@ -1,12 +1,11 @@
 #ifndef C_RAW_DATA_H
 #define C_RAW_DATA_H
-//----------------------------------------------------------//
-//HR2D signal processing class and Kalman tracking algorithm   //
-//First release: November 2015                              //
-//Project:https://github.com/kimphg/Jupiter                 //
-//Last update: March 2017                                   //
-//Author: Phung Kim Phuong                                  //
-//----------------------------------------------------------//
+//  |----------------------------------------------------------|
+//  |HR2D signal processing class and tracking algorithm       |
+//  |First release: November 2015                              |
+//  |Last update: Sept 2018                                    |
+//  |Author: Phung Kim Phuong                                  |
+//  |----------------------------------------------------------|
 #define ARMA_USE_LAPACK
 #define ARMA_USE_BLAS
 #define ARMA_BLAS_UNDERSCORE
@@ -16,6 +15,7 @@
 #define TRACK_CONFIRMED_SIZE        3
 #define TRACK_INIT_STATE            3
 #define DEG_RAD 57.295779513
+#define sq(x) (x*x)
 #ifndef CONST_NM
     #define CONST_NM 1.852f// he so chuyen doi tu km sang hai ly
 #endif
@@ -25,7 +25,7 @@
    #define PI                       3.14159265358979323846
 #endif
 #define FRAME_HEADER_SIZE 34
-#define RADAR_RESOLUTION 1024
+#define RADAR_RESOLUTION 2048
 #define OUTPUT_FRAME_SIZE RADAR_RESOLUTION*2+FRAME_HEADER_SIZE
 #define CONST_E 2.71828182846
 #define MAX_TRACK_LEN               400
@@ -33,7 +33,7 @@
 #define ENCODER_RES                 5000
 #define MAX_AZIR                    2048
 #define MAX_AZIR_DRAW               6144
-#define RAD_M_PULSE_RES             1536
+//#define RAD_M_PULSE_RES             1536
 #define RAD_S_PULSE_RES             256
 #define RAD_DISPLAY_RES             768
 #define RAD_FULL_RES                1792
@@ -101,7 +101,7 @@ typedef struct  {
     bool isUsed;
 } plot_t;
 typedef struct  {
-    int uniqID;
+//    int uniqID;
     double          azRad ,rg,xkm,ykm;
     double          xkmfit,ykmfit;
     double          azRadfit,rgKmfit;
@@ -119,7 +119,7 @@ typedef struct  {
 //    float           scorepObj,scorep2;
 //    float scoreTrack;
     unsigned long int period;
-    uint len;
+//    uint len;
 }object_t;
 //struct object_line
 //{
@@ -150,6 +150,7 @@ public:
     }
     uint        dtime;
     float lineScore;
+    float mSpeedkmh;
     std::vector<object_t> objectList;
     object_t possibleObj;
     float possibleMaxScore;
@@ -188,6 +189,7 @@ public:
     std::vector<plot_t>     plot_list;
     std::vector<object_t>     mFreeObjList;
     unsigned     long int   mPeriodCount;
+    float rgStdErr;
     qint64 time_start_ms;
     unsigned     long int   now_ms ;
 //    bool                    isEncoderAzi;
@@ -221,7 +223,7 @@ public:
     int                     zoom_ar_size_a,zoom_ar_size_r;
     imgDrawMode             imgMode;
     //double                  sn_scale;
-    void deleteTrack(ushort trackNum);
+//    void deleteTrack(ushort trackNum);
     void drawRamp();
 
     //______________________________________//
@@ -235,8 +237,8 @@ public:
     void        drawBlackAzi(short azi_draw);
     void        DrawZoom(short azi_draw, short r_pos);
 //    void        blackLine(short x0, short y0, short x1, short y1);
-    void        addTrackManual(double x, double y);
-    void        addTrack(object_t *mObject);
+//    void        addTrackManual(double x, double y);
+//    void        addTrack(object_t *mObject);
     static    void        kmxyToPolarDeg(double x, double y, double *azi, double *range);
     void        setAziOffset(double trueN_deg){
 
@@ -280,7 +282,7 @@ public:
 private:
     int mFalsePositiveCount;
     float hsTap ;
-
+    std::queue<int>  aziToProcess;//hàng chờ các frame cần xử lý
     //QVector<QRgb> colorTable;
     double      selfRotationDazi,selfRotationRate;
     double      selfRotationAzi;
@@ -297,7 +299,7 @@ private:
     float       noiseAverage,rainLevel,noiseVar;
     void        getNoiseLevel();
     void        procPix(short proc_azi,short range);
-    void        procTracks(unsigned short curA);
+//    void        procTracks(unsigned short curA);
     void        procPLot(plot_t* mPlot);
 //    bool procObjectAvto(object_t* pObject);
 //    bool procObjectManual(object_t* pObject);
@@ -332,9 +334,9 @@ public:
     void setSelfRotationAzi(int value);
     void processSocketData(unsigned char *data, short len);
     bool ProcessObject(object_t *obj1);
-    void ProcessObjects();
-    static inline double ConvXYToRange(double x, double y);
-    static inline double ConvXYToAziRad(double x, double y);
+//    void ProcessObjects();
+    static double ConvXYToRange(double x, double y);
+    static double ConvXYToAziRad(double x, double y);
     void resetGain();
 };
 

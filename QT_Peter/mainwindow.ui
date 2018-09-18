@@ -496,6 +496,12 @@
          <verstretch>0</verstretch>
         </sizepolicy>
        </property>
+       <property name="focusPolicy">
+        <enum>Qt::NoFocus</enum>
+       </property>
+       <property name="toolTip">
+        <string>Hiện vòng đẳng cụ ly</string>
+       </property>
        <property name="text">
         <string>VRM</string>
        </property>
@@ -511,6 +517,12 @@
          <horstretch>0</horstretch>
          <verstretch>0</verstretch>
         </sizepolicy>
+       </property>
+       <property name="focusPolicy">
+        <enum>Qt::NoFocus</enum>
+       </property>
+       <property name="toolTip">
+        <string>Hiện đường đẳng phương vị</string>
        </property>
        <property name="text">
         <string>ELB</string>
@@ -2312,6 +2324,9 @@
          <verstretch>0</verstretch>
         </sizepolicy>
        </property>
+       <property name="focusPolicy">
+        <enum>Qt::NoFocus</enum>
+       </property>
        <property name="toolTip">
         <string>Lưới chia ô cự ly và phương vị</string>
        </property>
@@ -2339,6 +2354,9 @@
          <pointsize>12</pointsize>
         </font>
        </property>
+       <property name="focusPolicy">
+        <enum>Qt::NoFocus</enum>
+       </property>
        <property name="toolTip">
         <string>Đưa tâm màn hình về tâm đài</string>
        </property>
@@ -2362,6 +2380,9 @@
         <font>
          <pointsize>12</pointsize>
         </font>
+       </property>
+       <property name="focusPolicy">
+        <enum>Qt::NoFocus</enum>
        </property>
        <property name="toolTip">
         <string>Đo tọa độ mục tiêu so với điểm tham chiếu</string>
@@ -28957,6 +28978,9 @@
       <pointsize>12</pointsize>
      </font>
     </property>
+    <property name="toolTip">
+     <string>Menu điều khiển và cài đặt nâng cao</string>
+    </property>
     <property name="text">
      <string>MENU</string>
     </property>
@@ -29086,6 +29110,9 @@
      <font>
       <pointsize>12</pointsize>
      </font>
+    </property>
+    <property name="toolTip">
+     <string>Màn hiện sóng phóng to</string>
     </property>
     <property name="text">
      <string>IAD</string>
@@ -31783,6 +31810,9 @@ background-color: rgba(255, 255, 255, 0);</string>
      <font>
       <pointsize>12</pointsize>
      </font>
+    </property>
+    <property name="toolTip">
+     <string>Đặt màn hiện sóng cố định theo hướng mũi tàu</string>
     </property>
     <property name="text">
      <string>Head up</string>
@@ -35847,75 +35877,6 @@ background-color: rgba(255, 255, 255, 0);</string>
      </item>
     </layout>
    </widget>
-   <widget class="QCustomButton" name="toolButton_xl_nguong_3">
-    <property name="geometry">
-     <rect>
-      <x>870</x>
-      <y>10</y>
-      <width>101</width>
-      <height>41</height>
-     </rect>
-    </property>
-    <property name="sizePolicy">
-     <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-      <horstretch>0</horstretch>
-      <verstretch>0</verstretch>
-     </sizepolicy>
-    </property>
-    <property name="text">
-     <string>Cân bằng tạp</string>
-    </property>
-    <property name="checkable">
-     <bool>true</bool>
-    </property>
-   </widget>
-   <widget class="QCustomButton" name="toolButton_xl_dopler">
-    <property name="geometry">
-     <rect>
-      <x>870</x>
-      <y>60</y>
-      <width>101</width>
-      <height>41</height>
-     </rect>
-    </property>
-    <property name="sizePolicy">
-     <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-      <horstretch>0</horstretch>
-      <verstretch>0</verstretch>
-     </sizepolicy>
-    </property>
-    <property name="text">
-     <string>Lọc nhiễu </string>
-    </property>
-    <property name="checkable">
-     <bool>true</bool>
-    </property>
-    <property name="checked">
-     <bool>true</bool>
-    </property>
-   </widget>
-   <widget class="QCustomButton" name="toolButton_xl_nguong">
-    <property name="geometry">
-     <rect>
-      <x>980</x>
-      <y>10</y>
-      <width>101</width>
-      <height>41</height>
-     </rect>
-    </property>
-    <property name="sizePolicy">
-     <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-      <horstretch>0</horstretch>
-      <verstretch>0</verstretch>
-     </sizepolicy>
-    </property>
-    <property name="text">
-     <string>Lọc tạp</string>
-    </property>
-    <property name="checkable">
-     <bool>true</bool>
-    </property>
-   </widget>
    <widget class="QCustomButton" name="toolButton_sled">
     <property name="geometry">
      <rect>
@@ -35935,6 +35896,12 @@ background-color: rgba(255, 255, 255, 0);</string>
      <font>
       <pointsize>12</pointsize>
      </font>
+    </property>
+    <property name="focusPolicy">
+     <enum>Qt::NoFocus</enum>
+    </property>
+    <property name="toolTip">
+     <string>Hiện vết di chuyển của mục tiêu</string>
     </property>
     <property name="text">
      <string>Hiện vết</string>
@@ -35963,8 +35930,14 @@ background-color: rgba(255, 255, 255, 0);</string>
       <pointsize>12</pointsize>
      </font>
     </property>
+    <property name="focusPolicy">
+     <enum>Qt::NoFocus</enum>
+    </property>
+    <property name="toolTip">
+     <string>Xóa các vết di chuyển cũ</string>
+    </property>
     <property name="text">
-     <string>Khởi tạo vết</string>
+     <string>Xóa vết</string>
     </property>
     <property name="checkable">
      <bool>false</bool>
@@ -35990,8 +35963,116 @@ background-color: rgba(255, 255, 255, 0);</string>
       <pointsize>12</pointsize>
      </font>
     </property>
+    <property name="focusPolicy">
+     <enum>Qt::NoFocus</enum>
+    </property>
+    <property name="toolTip">
+     <string>Hiển thị các quỹ đạo mục tiêu</string>
+    </property>
     <property name="text">
      <string>Quỹ đạo</string>
+    </property>
+    <property name="checkable">
+     <bool>true</bool>
+    </property>
+   </widget>
+   <widget class="QCustomButton" name="on_toolButton_xl_nguong_3">
+    <property name="geometry">
+     <rect>
+      <x>870</x>
+      <y>10</y>
+      <width>101</width>
+      <height>41</height>
+     </rect>
+    </property>
+    <property name="sizePolicy">
+     <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+      <horstretch>0</horstretch>
+      <verstretch>0</verstretch>
+     </sizepolicy>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>12</pointsize>
+     </font>
+    </property>
+    <property name="focusPolicy">
+     <enum>Qt::NoFocus</enum>
+    </property>
+    <property name="toolTip">
+     <string>Cân bằng nền tạp tín hiệu</string>
+    </property>
+    <property name="text">
+     <string>Cân bằng tạp</string>
+    </property>
+    <property name="checkable">
+     <bool>true</bool>
+    </property>
+   </widget>
+   <widget class="QCustomButton" name="toolButton_xl_dopler">
+    <property name="geometry">
+     <rect>
+      <x>870</x>
+      <y>60</y>
+      <width>101</width>
+      <height>41</height>
+     </rect>
+    </property>
+    <property name="sizePolicy">
+     <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+      <horstretch>0</horstretch>
+      <verstretch>0</verstretch>
+     </sizepolicy>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>12</pointsize>
+     </font>
+    </property>
+    <property name="focusPolicy">
+     <enum>Qt::NoFocus</enum>
+    </property>
+    <property name="toolTip">
+     <string/>
+    </property>
+    <property name="text">
+     <string>Lọc nhiễu</string>
+    </property>
+    <property name="checkable">
+     <bool>true</bool>
+    </property>
+    <property name="checked">
+     <bool>true</bool>
+    </property>
+   </widget>
+   <widget class="QCustomButton" name="toolButton_xl_nguong_4">
+    <property name="geometry">
+     <rect>
+      <x>980</x>
+      <y>10</y>
+      <width>101</width>
+      <height>41</height>
+     </rect>
+    </property>
+    <property name="sizePolicy">
+     <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+      <horstretch>0</horstretch>
+      <verstretch>0</verstretch>
+     </sizepolicy>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>12</pointsize>
+     </font>
+    </property>
+    <property name="focusPolicy">
+     <enum>Qt::NoFocus</enum>
+    </property>
+    <property name="toolTip">
+     <string>Gạt nền tạp trên hiện sóng</string>
+    </property>
+    <property name="text">
+     <string>Lọc tạp</string>
     </property>
     <property name="checkable">
      <bool>true</bool>
@@ -36012,12 +36093,12 @@ background-color: rgba(255, 255, 255, 0);</string>
    <zorder>groupBox_6</zorder>
    <zorder>tabWidget_menu</zorder>
    <zorder>tabWidget_iad</zorder>
-   <zorder>toolButton_xl_nguong_3</zorder>
-   <zorder>toolButton_xl_dopler</zorder>
-   <zorder>toolButton_xl_nguong</zorder>
    <zorder>toolButton_sled</zorder>
    <zorder>toolButton_sled_reset</zorder>
    <zorder>toolButton_sled_reset_4</zorder>
+   <zorder>on_toolButton_xl_nguong_3</zorder>
+   <zorder>toolButton_xl_dopler</zorder>
+   <zorder>toolButton_xl_nguong_4</zorder>
   </widget>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
