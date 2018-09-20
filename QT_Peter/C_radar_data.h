@@ -16,6 +16,8 @@
 #define TRACK_INIT_STATE            3
 #define DEG_RAD 57.295779513
 #define sq(x) (x*x)
+#define degrees(x) (x*57.295779513)
+#define radians(x) (x/57.295779513)
 #ifndef CONST_NM
     #define CONST_NM 1.852f// he so chuyen doi tu km sang hai ly
 #endif
@@ -52,7 +54,7 @@
 #define ZOOM_SIZE                   550
 #define DISPLAY_RES_ZOOM            8192
 #define DISPLAY_SCALE_ZOOM          4
-
+#define nm(x) (x*1.852)
 //#include "jtarget.h"
 
 #include <vector>
@@ -172,6 +174,7 @@ class track_t
 public:
     track_t(object_t* obj1,object_t* obj2)
     {
+
         double dtime = (obj1->timeMs-obj2->timeMs)/3600000.0;
         double dx = obj1->xkm - obj2->xkm;
         double dy = obj1->ykm - obj2->ykm;
@@ -180,40 +183,83 @@ public:
         mSpeedkmh  = sqrt(dx*dx+dy*dy)/dtime;
         isLost     = false;
         bearingRad = ConvXYToAziRad(dx,dy);
+        mSpeedkmhFit    = sqrt(dx*dx+dy*dy)/dtime;
+        bearingRadFit   = ConvXYToAziRad(dx,dy);
         possibleMaxScore = 0;
+        xkm             = obj1->xkm;
+        ykm             = obj1->ykm;
+        rgKm            = ConvXYToRange(xkm,ykm);
+        aziDeg          = degrees(ConvXYToAziRad(xkm,ykm));
         lastTimeMs = obj1->timeMs;
         objectList.push_back(*obj2);
         objectList.push_back(*obj1);
+        objectHistory.push_back(*obj1);
+        time=obj2->timeMs;
+        id=rand();
+        isUpdating = false;
     }
     ~track_t()
     {
 
     }
+    uint time,id;
+    bool isUpdating;
     void update()
     {
+        isUpdating = true;
         objectList.push_back(possibleObj);
-        lastTimeMs = possibleObj.timeMs;
-        possibleMaxScore = 0;
-        if(objectList.size()<4)return;
-        LinearFit();
-        object_t* obj1 = &(objectList.back());
-        object_t* obj2 = &(objectList.back())-3;
-        double dx = obj1->xkm - obj2->xkm;
-        double dy = obj1->ykm - obj2->ykm;
-        double dtime = (obj1->timeMs-obj2->timeMs)/3600000.0;
-        mSpeedkmhFit  = sqrt(dx*dx+dy*dy)/dtime;
-        bearingRadFit = ConvXYToAziRad(dx,dy);
+        while(objectList.size()>4)
+        {
+            objectList.erase(objectList.begin());
+        }
 
+        lastTimeMs = possibleObj.timeMs;
+        if((lastTimeMs-objectHistory.back().timeMs)>60000)
+            objectHistory.push_back(possibleObj);
+        possibleMaxScore = 0;
+        if(objectList.size()<4)
+        {
+            object_t* obj1  = &(objectList.back());
+            object_t* obj2  = &(objectList.back())-1;
+            double dx       = obj1->xkm - obj2->xkm;
+            double dy       = obj1->ykm - obj2->ykm;
+            double dtime    = (obj1->timeMs-obj2->timeMs)/3600000.0;
+            rgSpeedkmh      = (obj1->rgKm-obj2->rgKm)/dtime;
+            mSpeedkmhFit    = sqrt(dx*dx+dy*dy)/dtime;
+            bearingRadFit   = ConvXYToAziRad(dx,dy);
+            xkm             = obj1->xkm;
+            ykm             = obj1->ykm;
+            rgKm            = ConvXYToRange(xkm,ykm);
+            aziDeg          = degrees(ConvXYToAziRad(xkm,ykm));
+        }
+        else
+        {
+            LinearFit();
+            object_t* obj1  = &(objectList.back());
+            object_t* obj2  = &(objectList.back())-3;
+            double dx       = obj1->xkm - obj2->xkm;
+            double dy       = obj1->ykm - obj2->ykm;
+            double dtime    = (obj1->timeMs-obj2->timeMs)/3600000.0;
+            rgSpeedkmh      = (obj1->rgKm-obj2->rgKm)/dtime;
+            mSpeedkmhFit    = sqrt(dx*dx+dy*dy)/dtime;
+            bearingRadFit   = ConvXYToAziRad(dx,dy);
+            xkm             = obj1->xkm;
+            ykm             = obj1->ykm;
+            rgKm            = ConvXYToRange(xkm,ykm);
+            aziDeg          = degrees(ConvXYToAziRad(xkm,ykm));
+        }
+        isUpdating = false;
     }
     //uint  dtime;
     float lineScore;
     float mSpeedkmhFit;
     std::vector<object_t> objectList;
+    std::vector<object_t> objectHistory;
     object_t possibleObj;
     float possibleMaxScore;
     float bearingRadFit;
     float rgSpeedkmh;
-//    float xkm,ykm;
+    double xkm,ykm;
 //    float xkmo,ykmo;
     bool isRemoved,isLost;
     qint64          lastTimeMs;
@@ -222,9 +268,9 @@ public:
     double LinearFitCost(object_t *myobj);
     double estimateScore(object_t *obj1);
     static double estimateScore(object_t *obj1, object_t *obj2);
-private:
-    float bearingRad;
-    float mSpeedkmh;
+    double bearingRad;
+    double mSpeedkmh;
+    double aziDeg,rgKm;
 };
 typedef std::vector<track_t> trackList;
 //______________________________________//
@@ -252,6 +298,7 @@ public:
     float rgStdErr;
     qint64 time_start_ms;
     double sn_scale;
+    bool isGrayAzi;
     unsigned     long int   now_ms ;
 //    bool                    isEncoderAzi;
 //    int                     mEncoderAzi;

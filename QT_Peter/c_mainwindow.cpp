@@ -10,6 +10,7 @@
 //#define CONST_NM 1.852f// he so chuyen doi tu km sang hai ly
 #define MAX_VIEW_RANGE_KM 50
 QStringList                 commandLogList;
+
 QPixmap                     *pMap=NULL;// painter cho ban do
 //QPixmap                     *pViewFrame=NULL;// painter cho ban do
 CMap *osmap ;
@@ -160,7 +161,7 @@ void Mainwindow::sendToRadarString(QString command)
 void Mainwindow::sendToRadarHS(const char* hexdata)//todo:move to radar class
 {
     short len = strlen(hexdata)/2;
-    unsigned char* sendBuff = new unsigned char[len+1];
+    unsigned char* sendBuff = new unsigned char[len];
     hex2bin(hexdata,sendBuff);
     processing->sendCommand(sendBuff,len);
     delete[] sendBuff;
@@ -483,24 +484,33 @@ void Mainwindow::mousePressEvent(QMouseEvent *event)
             //mouse_mode=MouseDrag;//isDraging = true;
         }
     }
-    if(event->buttons() & Qt::RightButton)
+    if(event->buttons() & Qt::LeftButton)
     {
         //select radar target
-        trackList* trackListPt = &pRadar->mTrackList;
-        for(uint trackId=0;trackId<trackListPt->size();trackId++)
-        {/*
-            if(!trackListPt->at(trackId).isConfirmed)continue;
-            if(!trackListPt->at(trackId).isManual)continue;
-            //if(trackListPt->at(trackId).state<5)continue;
-            short sx = trackListPt->at(trackId).estX*pRadar->scale_ppi + radCtX;
-            short sy = -trackListPt->at(trackId).estY*pRadar->scale_ppi + radCtY;
-            if( qAbs(sx-event->x()) <5 && qAbs(sy-event->y())<5)
-            {
-                selectedTargetType = RADAR;
-                selectedTargetIndex = trackId;
-            }*/
-        }
+        int minDistanceToCursor = 10;
+        uint trackMin = 0;
+        uint tracktime;
+        for (uint i = 0;i<pRadar->mTrackList.size();i++)
+        {
+            track_t* track = &(pRadar->mTrackList[i]);
+            if(track->isRemoved)continue;
 
+            object_t* obj1 = &(track->objectList.back()) ;
+            int sx = abs((obj1->xkm*mScale + radCtX)  - mMousex);
+            int sy = abs((-obj1->ykm*mScale + radCtY) - mMousey);
+            if(sx+sy<minDistanceToCursor)
+            {
+                minDistanceToCursor = sx+sy;
+                trackMin = track->id;
+                tracktime = track->time;
+            }
+
+        }
+        if(minDistanceToCursor<10)
+        {
+            mSelectedTrack = trackMin;
+            mSelectedTrackTime = tracktime;
+        }
 
         //select ais target
         if(ui->toolButton_ais_show->isChecked())
@@ -550,6 +560,7 @@ Mainwindow::Mainwindow(QWidget *parent) :
     ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
+    degreeSymbol= QString::fromLocal8Bit("\260");
     //ui->frame_RadarViewOptions->hide();
     QFont font;
     font.setPointSize(12);
@@ -791,12 +802,12 @@ void Mainwindow::initGraphicView()
 #define TARG_SIZE 12
 void Mainwindow::DrawRadarTargetByPainter(QPainter* p)//draw radar target from pRadar->mTrackList
 {
-    QPen penTarget(Qt::magenta);
+    QPen penTarget(Qt::darkMagenta);
     penTarget.setWidth(2);
-    QPen penSelTarget(Qt::magenta);
+    QPen penSelTarget(Qt::darkMagenta);
     penSelTarget.setWidth(2);
     penSelTarget.setStyle(Qt::DashLine);
-    QPen penTargetBlue(Qt::cyan);
+    QPen penTargetBlue(Qt::magenta);
     penTargetBlue.setWidth(3);
     //penTargetBlue.setStyle(Qt::DashLine);
     //QPen penARPATrack(Qt::darkYellow);
@@ -809,57 +820,51 @@ void Mainwindow::DrawRadarTargetByPainter(QPainter* p)//draw radar target from p
 //    std::vector<object_t>* pObjList = &(pRadar->mFreeObjList);
 //    p->setPen(penTargetBlue);
     unsigned int now_ms  = QDateTime::currentMSecsSinceEpoch() - pRadar->time_start_ms;
-//    if(mShowobjects)//raw objects
-//    {
-//        for (uint i = 0;i<pObjList->size();i++) {
-//            object_t* obj = &((*pObjList)[i]);
-//            if(obj->isRemoved)continue;
-//            int size = 10000.0/(now_ms - obj->timeMs+500);
-//            if(size<TARG_SIZE)size=TARG_SIZE;
-//            sx = obj->xkm*mScale + radCtX;
-//            sy = -obj->ykm*mScale + radCtY;
-//            //p->drawPoint(sx,sy);
-//            p->drawRect(sx-size/2,sy-size/2,size,size);
-//        }
+    bool blink = (now_ms/500)%2;
 
-//    }
-    p->setPen(penTarget);
     if(mShowTracks)//raw tracks
     {
         for (uint i = 0;i<pRadar->mTrackList.size();i++)
         {
             track_t* track = &(pRadar->mTrackList[i]);
             if(track->isRemoved)continue;
-            p->setPen(penTarget);
+            if(mSelectedTrack== track->id&&mSelectedTrackTime == track->time)
+            {
+                p->setPen(penSelTarget);
+                for (int j = 0;j<track->objectHistory.size()-1;j++)
+                {
+                    object_t* obj1 = &(track->objectHistory[j]);
+                    object_t* obj2 = &(track->objectHistory[j+1]);
+                    sx = obj1->xkm*mScale + radCtX;
+                    sy = -obj1->ykm*mScale + radCtY;
+                    sx1 = obj2->xkm*mScale + radCtX;
+                    sy1 = -obj2->ykm*mScale + radCtY;
+                    p->drawLine(sx,sy,sx1,sy1);
+                }
+                p->setPen(penTargetBlue);
+            }
+            else p->setPen(penTarget);
             if(track->isLost)
             {
-                object_t* obj1 = &(track->objectList.back());
-                sx = obj1->xkm*mScale + radCtX;
-                sy = -obj1->ykm*mScale + radCtY;
-                p->drawRect(sx-5,sy-5,10,10);
-                p->drawLine(sx-7,sy-3,sx+7,sy+3);
-                continue;
+                if(blink)
+                {
+                    //object_t* obj1 = &(track->objectList.back());
+                    sx = track->xkm*mScale + radCtX;
+                    sy = -track->ykm*mScale + radCtY;
+                    p->drawRect(sx-5,sy-5,10,10);
+                    p->drawLine(sx-7,sy-3,sx+7,sy+3);
+                    continue;
+                }
             }
             else
             {
-                object_t* obj1 = &(track->objectList.back());
-                sx1 = obj1->xkm*mScale + radCtX;
-                sy1 = -obj1->ykm*mScale + radCtY;
-                int size = 18000.0/(now_ms - obj1->timeMs+400);
+                //object_t* obj1 = &(track->objectList.back());
+                sx1 = track->xkm*mScale + radCtX;
+                sy1 = -track->ykm*mScale + radCtY;
+                int size = 18000.0/(now_ms - track->lastTimeMs+400);
                 if(size<TARG_SIZE)size=TARG_SIZE;//rect size depend to time
                 if(track->objectList.size()>3)
                 {
-
-                    /*for (int j = track->objectList.size()-5;j<track->objectList.size()-1;j++)
-                    {
-                        obj1 = &(track->objectList[j]);
-                        obj2 = &(track->objectList[j+1]);
-                        sx = obj1->xkm*mScale + radCtX;
-                        sy = -obj1->ykm*mScale + radCtY;
-                        sx1 = obj2->xkm*mScale + radCtX;
-                        sy1 = -obj2->ykm*mScale + radCtY;
-                        p->drawLine(sx,sy,sx1,sy1);
-                    }*/
 
                     p->drawEllipse(sx1-size/2,sy1-size/2,size,size);
                     if(track->mSpeedkmhFit>10){
@@ -870,7 +875,7 @@ void Mainwindow::DrawRadarTargetByPainter(QPainter* p)//draw radar target from p
 
                 }
                 else {
-                    p->setPen(penSelTarget);
+                    //p->setPen(penSelTarget);
                     p->drawRect(sx1-size/2,sy1-size/2,size,size);
                 }
 //                else
@@ -1804,7 +1809,7 @@ void Mainwindow::Update100ms()
         }
         rg/=rangeRatio;
         ui->label_cursor_range->setText(QString::number(rg,'f',2)+strDistanceUnit);
-        ui->label_cursor_azi->setText(QString::number(azi)+QString::fromLocal8Bit("\260"));
+        ui->label_cursor_azi->setText(QString::number(azi)+degreeSymbol);
         ui->label_cursor_lat->setText(demicalDegToDegMin( y2lat(-(mMousey - radCtY)))+"'N");
         ui->label_cursor_long->setText(demicalDegToDegMin(x2lon(mMousex - radCtX))+"'E");
     }
@@ -1996,11 +2001,11 @@ void Mainwindow::updateTargetInfo()
                 if(tmpazi<0)tmpazi+=360;
                 //ui->label_data_type->setText("Radar");
                 ui->label_data_range->setText(QString::number(trackListPt->at(trackId).estR*pRadar->scale_ppi/mScale/1.852f,'f',2)+"Nm");
-                ui->label_data_azi->setText( QString::number(tmpazi,'f',2)+QString::fromLocal8Bit("\260"));
-                ui->label_data_lat->setText( QString::number((short)mLat)+QString::fromLocal8Bit("\260")+QString::number((mLat-(short)mLat)*60,'f',2)+"'N");
-                ui->label_data_long->setText(QString::number((short)mLon)+QString::fromLocal8Bit("\260")+QString::number((mLon-(short)mLon)*60,'f',2)+"'E");
+                ui->label_data_azi->setText( QString::number(tmpazi,'f',2)+degreeSymbol);
+                ui->label_data_lat->setText( QString::number((short)mLat)+degreeSymbol+QString::number((mLat-(short)mLat)*60,'f',2)+"'N");
+                ui->label_data_long->setText(QString::number((short)mLon)+degreeSymbol+QString::number((mLon-(short)mLon)*60,'f',2)+"'E");
                 ui->label_data_speed->setText(QString::number(trackListPt->at(trackId).speed,'f',2)+"Kn");
-                ui->label_data_heading->setText(QString::number(trackListPt->at(trackId).heading*DEG_RAD)+QString::fromLocal8Bit("\260"));
+                ui->label_data_heading->setText(QString::number(trackListPt->at(trackId).heading*DEG_RAD)+degreeSymbol);
                 // ui->label_data_dopler->setText(QString::number(trackListPt->at(trackId).dopler));
             }
         }*/
@@ -2017,10 +2022,10 @@ void Mainwindow::updateTargetInfo()
     ui->label_data_range->setText(QString::number(rg,'f',2));
     ui->label_data_azi->setText(QString::number(azi,'f',2));
     ui->label_data_type->setText("AIS");
-    ui->label_data_lat->setText( QString::number((short)selectedTrack->getLat())+QString::fromLocal8Bit("\260")+QString::number((selectedTrack->getLat()-(short)selectedTrack->getLat())*60,'f',2)+"N");
-    ui->label_data_long->setText(QString::number((short)selectedTrack->getLon())+QString::fromLocal8Bit("\260")+QString::number((selectedTrack->getLon()-(short)selectedTrack->getLon())*60,'f',2)+"E");
+    ui->label_data_lat->setText( QString::number((short)selectedTrack->getLat())+degreeSymbol+QString::number((selectedTrack->getLat()-(short)selectedTrack->getLat())*60,'f',2)+"N");
+    ui->label_data_long->setText(QString::number((short)selectedTrack->getLon())+degreeSymbol+QString::number((selectedTrack->getLon()-(short)selectedTrack->getLon())*60,'f',2)+"E");
     ui->label_data_speed->setText(QString::number(selectedTrack->m_Speed,'f',2)+"Kn");
-    ui->label_data_heading->setText(QString::number(selectedTrack->getHead()*DEG_RAD)+QString::fromLocal8Bit("\260"));
+    ui->label_data_heading->setText(QString::number(selectedTrack->getHead()*DEG_RAD)+degreeSymbol);
     */}
     else if(selectedTargetType==NOTARGET)
     {
@@ -2110,12 +2115,43 @@ void Mainwindow::UpdateDataStatus()
 void Mainwindow::ViewTrackInfo()
 {
     int numOfTracks = 0;
+    bool selectionExist = false;
     for (uint i = 0;i<pRadar->mTrackList.size();i++)
     {
-        if(!(pRadar->mTrackList[i].isRemoved||pRadar->mTrackList[i].isLost))
+        track_t* track = &(pRadar->mTrackList[i]);
+        if(!(track->isRemoved))
         {
+            if(!track->isLost)
+            {
+                if((mSelectedTrack==track->id)&&(mSelectedTrackTime == track->time))
+                {
+                    selectionExist = true;
+                    if(mDistanceUnit==0)//NM
+                    {
+                        ui->label_data_range->setText(QString::number(nm(track->rgKm),'f',2)+"Nm");
+                        ui->label_data_azi->setText(QString::number(track->aziDeg,'f',2)+degreeSymbol);
+                        ui->label_data_speed->setText(QString::number(nm(track->mSpeedkmhFit),'f',1)+"Kn");
+                        ui->label_data_heading->setText(QString::number(degrees(track->bearingRadFit),'f',1)+degreeSymbol);
+                        ui->label_data_rg_speed->setText(QString::number(nm(-track->rgSpeedkmh),'f',1)+"Kn");
+                    }
+                    else
+                    {
+                        ui->label_data_range->setText(QString::number(track->rgKm,'f',2)+"Km");
+                        ui->label_data_azi->setText(QString::number(track->aziDeg,'f',2)+degreeSymbol);
+                        ui->label_data_speed->setText(QString::number(track->mSpeedkmhFit,'f',1)+"Km/h");
+                        ui->label_data_heading->setText(QString::number(degrees(track->bearingRadFit),'f',1)+degreeSymbol);
+                        ui->label_data_rg_speed->setText(QString::number((-track->rgSpeedkmh),'f',1)+"Km/h");
+                    }
+                }
+            }
             numOfTracks++;
         }
+    }
+    if(!selectionExist)
+    {
+        ui->label_data_range->setText("--");
+        ui->label_data_azi->setText("--");
+        ui->label_data_speed->setText("--");
     }
     ui->toolButton_sled_reset_4->setText(QString::fromUtf8("Quỹ đạo(")+QString::number(numOfTracks)+")");
 }
@@ -3047,11 +3083,11 @@ void Mainwindow::on_toolButton_open_record_clicked()
                     ui->label_data_id->setText(QString::number(i+1));
                     ui->label_data_type->setText("Radar");
                     ui->label_data_range->setText(QString::number(trackListPt->at(targetDisplayList.at(i)->trackId).estR*pRadar->scale_ppi/mScale/1.852f,'f',2)+"Nm");
-                    ui->label_data_azi->setText( QString::number(tmpazi,'f',2)+QString::fromLocal8Bit("\260"));
-                    ui->label_data_lat->setText( QString::number((short)targetDisplayList.at(i)->m_lat)+QString::fromLocal8Bit("\260")+QString::number((targetDisplayList.at(i)->m_lat-(short)targetDisplayList.at(i)->m_lat)*60,'f',2)+"'N");
-                    ui->label_data_long->setText(QString::number((short)targetDisplayList.at(i)->m_lon)+QString::fromLocal8Bit("\260")+QString::number((targetDisplayList.at(i)->m_lon-(short)targetDisplayList.at(i)->m_lon)*60,'f',2)+"'E");
+                    ui->label_data_azi->setText( QString::number(tmpazi,'f',2)+degreeSymbol);
+                    ui->label_data_lat->setText( QString::number((short)targetDisplayList.at(i)->m_lat)+degreeSymbol+QString::number((targetDisplayList.at(i)->m_lat-(short)targetDisplayList.at(i)->m_lat)*60,'f',2)+"'N");
+                    ui->label_data_long->setText(QString::number((short)targetDisplayList.at(i)->m_lon)+degreeSymbol+QString::number((targetDisplayList.at(i)->m_lon-(short)targetDisplayList.at(i)->m_lon)*60,'f',2)+"'E");
                     ui->label_data_speed->setText(QString::number(trackListPt->at(targetDisplayList.at(i)->trackId).speed,'f',2)+"Kn");
-                    ui->label_data_heading->setText(QString::number(trackListPt->at(targetDisplayList.at(i)->trackId).head_r*DEG_RAD)+QString::fromLocal8Bit("\260"));
+                    ui->label_data_heading->setText(QString::number(trackListPt->at(targetDisplayList.at(i)->trackId).head_r*DEG_RAD)+degreeSymbol);
                     ui->label_data_dopler->setText(QString::number(trackListPt->at(targetDisplayList.at(i)->trackId).dopler));
                 }
                 else
@@ -4321,4 +4357,14 @@ void Mainwindow::on_toolButton_sled_clicked(bool checked)
 void Mainwindow::on_toolButton_xl_dopler_clicked(bool checked)
 {
     pRadar->xl_dopler = checked;
+}
+
+void Mainwindow::on_toolButton_setRangeUnit_toggled(bool checked)
+{
+
+}
+
+void Mainwindow::on_toolButton_xl_dopler_3_clicked(bool checked)
+{
+    pRadar->isGrayAzi = checked;
 }

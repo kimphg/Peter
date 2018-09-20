@@ -1,7 +1,7 @@
-#define PI 3.141592654f
+#define PI 3.1415926536
 #include "c_config.h"
 #include "c_radar_data.h"
-#include <QElapsedTimer>
+//#include <QElapsedTimer>
 #include <cmath>
 //#include <QtDebug>
 
@@ -229,7 +229,7 @@ double track_t::estimateScore(object_t *obj1)
     double dBearing = ConvXYToAziRad(dx,dy)-this->bearingRad;
     double speedkmh = distancekm/(dtime);
     if(speedkmh>500.0)return 0;
-    double dSpeed = speedkmh-(this->mSpeedkmh*cos(-dBearing));
+    double dSpeed = speedkmh-(this->mSpeedkmh*cosFast(-dBearing));
     if(dSpeed>600.0)return 0;
     float rgSpeedkmh = (obj1->rgKm-obj2->rgKm)/(dtime);
     if(abs(rgSpeedkmh)>120.0)return 0;
@@ -246,6 +246,7 @@ double track_t::estimateScore(object_t *obj1)
     speedkmh/=150.0;
     dRgSp/=40.0;
     linearFit/=0.16;
+    dtime/=0.004167;
     /*fprintf(logfile,"%f,",distanceCoeff);//1.0
     fprintf(logfile,"%f,",speedkmh);//500
     fprintf(logfile,"%f,",abs(dSpeed));//600
@@ -257,7 +258,8 @@ double track_t::estimateScore(object_t *obj1)
             *fastPow(CONST_E,-sq(dSpeed))
             *fastPow(CONST_E,-sq(speedkmh))
             *fastPow(CONST_E,-sq(dRgSp))
-            *fastPow(CONST_E,-sq(linearFit));
+            *fastPow(CONST_E,-sq(linearFit))
+            *fastPow(CONST_E,-sq(dtime));
     /*if(obj1->dopler==this->objectList.back().dopler)
     {fprintf(logfile,"1\n");
         return 1;
@@ -342,6 +344,7 @@ double xsum=0,x2sum=0,ysum=0,xysum=0;
 
 C_radar_data::C_radar_data()
 {
+    isGrayAzi = true;
     rgStdErr = sn_scale*pow(2,clk_adc);
     azi_er_rad = CConfig::getDouble("azi_er_rad",AZI_ERROR_STD);
     time_start_ms = QDateTime::currentMSecsSinceEpoch();
@@ -499,15 +502,15 @@ void C_radar_data::drawSgn(short azi_draw, short r_pos)
     unsigned char sled     = data_mem.display_ray[r_pos][2];
     short px = data_mem.xkm[azi_draw][r_pos];
     short py = data_mem.ykm[azi_draw][r_pos];
-    if(!(px+py))return;
-    short pSize = r_pos/150;if(pSize>3)pSize=3;
+    if(px<=0||py<=0)return;
+    short pSize = r_pos/150;if(pSize>2)pSize=2;
     //else if(r_pos>800)pSize=2;
     if((px<pSize)||(py<pSize)||(px>=img_ppi->width()-pSize)||(py>=img_ppi->height()-pSize))return;
     for(short x = -pSize;x <= pSize;x++)
     {
         for(short y = -pSize;y <= pSize;y++)
         {
-            double k =1.0/((x*x+y*y)/2.0+1.0);
+            double k =1.0/((x*x+y*y)/3.0+1.0);
             unsigned char pvalue = value*k;
             if( data_mem.display_mask[px+x][py+y] <= pvalue)
             {
@@ -517,8 +520,6 @@ void C_radar_data::drawSgn(short azi_draw, short r_pos)
             }
         }
     }
-
-
 
 }
 
@@ -530,7 +531,7 @@ void C_radar_data::drawBlackAzi(short azi_draw)
         short px = data_mem.xkm[azi_draw][r_pos];
         short py = data_mem.ykm[azi_draw][r_pos];
         if(px<=0||py<=0)continue;
-        short pSize = r_pos/150;if(pSize>3)pSize=3;
+        short pSize = r_pos/150;if(pSize>2)pSize=2;
         if((px<pSize)||(py<pSize)||(px>=img_ppi->width()-pSize)||(py>=img_ppi->height()-pSize))continue;
 
         for(short x = -pSize;x <= pSize;x++)
@@ -618,12 +619,10 @@ void C_radar_data::drawAzi(short azi)
     {
         unsigned short value = data_mem.level_disp[azi][r_pos];
         unsigned short dopler = data_mem.dopler[azi][r_pos];
-        unsigned short sled =  data_mem.sled[azi][r_pos];
-        //if(!(value+sled))continue;
         if(DrawZoomAR(azi,r_pos,
                       value,
                       dopler,
-                      sled))
+                      data_mem.sled[azi][r_pos]))
         {
             value+=30;
             if(value>255)value=255;
@@ -912,7 +911,7 @@ void C_radar_data::ProcessData(unsigned short azi,unsigned short lastAzi)
         }
         else
         {
-            data_mem.sled[azi][r_pos] *=0.95;
+            data_mem.sled[azi][r_pos] -= (data_mem.sled[azi][r_pos])/20.0f;
             if(rgs_auto)data_mem.level_disp[azi][r_pos]= 0;
         }
 
@@ -1040,9 +1039,13 @@ void C_radar_data::processSocketData(unsigned char* data,short len)
     }
     else
     {
-
         newAzi = (data[2]<<8)|data[3];
-        if(data[0]!=5)newAzi = ssiDecode(newAzi);
+        if(data[0]!=5)
+        {
+            if(isGrayAzi)
+            newAzi = ssiDecode(newAzi);
+            else newAzi = newAzi = (data[2]<<8)|data[3];
+        }
         /*if(!newAzi)
         {
             if(rot==7)isLeft = true;
@@ -1543,16 +1546,10 @@ void C_radar_data::procPLot(plot_t* mPlot)
 
     object_t newobject;
     newobject.timeMs = now_ms;
-//    newobject.scorepObj = 0;
-//    newobject.len = 1;
-//    newobject.uniqID = rand();
     newobject.isRemoved = false;
-//    newobject.isProcessed = false;
     newobject.dazi = dAz;
     newobject.period = mPeriodCount;
-
-
-    float ctR = (float)mPlot->sumR/(float)mPlot->size+1;//min value starts at 1
+    float ctR = (float)mPlot->sumR/(float)mPlot->size+0.5;//min value starts at 1
     if(ctR<mPlot->minR||ctR>mPlot->maxR+1)printf("\nWrong ctR");
     //todo: tinh dopler histogram
 
@@ -2099,7 +2096,7 @@ void C_radar_data::drawSgnZoom(short azi_draw, short r_pos)
 
     short px = data_mem.xzoom[azi_draw][r_pos];
     short py = data_mem.yzoom[azi_draw][r_pos];
-    if(!(px+py))return;
+    if(!(px*py))return;
     unsigned char value    = data_mem.display_ray_zoom[r_pos][0];
     unsigned char dopler    = data_mem.display_ray_zoom[r_pos][1];
     unsigned char sled     = data_mem.display_ray_zoom[r_pos][2];
@@ -2290,11 +2287,12 @@ bool C_radar_data::checkBelongToTrack(object_t *obj1)
     for (ushort j=0;j<mTrackList.size();j++)
     {
         track_t* track = &(mTrackList[j]);
-        if(!track)
-        {
-            track = track;
-        }
+
         if(track->isRemoved||track->isLost)continue;
+        if(track->isUpdating)
+        {
+            continue;
+        }
         //object_t *obj2 = &(track->objectList.back());
         double score = track->estimateScore(obj1);//todo: optimize this score
         //object_t* obj2 = &(track->objectList.back());

@@ -85,7 +85,7 @@ double dataProcessingThread::getSelsynAzi() const
 }
 dataProcessingThread::dataProcessingThread()
 {
-    mAntennaAzi=0;
+    mAntennaAzi = 0;
     failureCount = 0;
     isHeadingAvaible=false;
     selsynEncoderAzi = 0;
@@ -822,6 +822,8 @@ void dataProcessingThread::sendCommand(unsigned char *commandBuff, short len,boo
     if(queued)
     {
         RadarCommand command;
+
+
         memset(&command.bytes[0],0,8);
         memcpy(&command.bytes[0],commandBuff,len);
 

@@ -67,6 +67,7 @@ protected:
     void mouseDoubleClickEvent( QMouseEvent * e );
     enum radarSate   { DISCONNECTED,CONNECTED,CONNECTED_ROTATE9_TXOFF,CONNECTED_ROTATE12_TXOFF, CONNECTED_ROTATE9_TXON,CONNECTED_ROTATE12_TXON } radar_state;
 private:
+    QString degreeSymbol ;
     //void updateTargets();
     void DrawGrid(QPainter* p,short centerX,short centerY);
     void CameraControl(int x,int y, int zoom);
@@ -493,10 +494,16 @@ private slots:
 
     void on_toolButton_xl_dopler_clicked(bool checked);
 
+    void on_toolButton_setRangeUnit_toggled(bool checked);
+
+    void on_toolButton_xl_dopler_3_clicked(bool checked);
+
 private:
 
 //    bool mShowobjects,
     bool mShowTracks;
+    uint mSelectedTrack;
+    uint mSelectedTrackTime;
     void initActionsConnections();
     void initGraphicView();
     void updateTargetInfo();
