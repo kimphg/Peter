@@ -498,6 +498,10 @@ private slots:
 
     void on_toolButton_xl_dopler_3_clicked(bool checked);
 
+    void on_toolButton_head_up_clicked(bool checked);
+
+    void on_toolButton_dk_1_clicked();
+
 private:
 
 //    bool mShowobjects,

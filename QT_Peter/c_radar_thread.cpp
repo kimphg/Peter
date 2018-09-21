@@ -822,19 +822,12 @@ void dataProcessingThread::sendCommand(unsigned char *commandBuff, short len,boo
     if(queued)
     {
         RadarCommand command;
-
-
         memset(&command.bytes[0],0,8);
         memcpy(&command.bytes[0],commandBuff,len);
-
         if(radarComQ.size()<MAX_COMMAND_QUEUE_SIZE)radarComQ.push(command);
     }
     else// realtime command
     {
-        radarSocket->writeDatagram((char*)commandBuff,
-                len,
-                QHostAddress("192.168.1.253"),30001
-                );
         radarSocket->writeDatagram((char*)commandBuff,
                 len,
                 QHostAddress("192.168.1.71"),31000

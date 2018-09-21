@@ -105,7 +105,7 @@ guard_zone_t gz1,gz2,gz3;
 short lon2x(float lon)
 {
     float refLat = mLat*0.00872664625997f;
-    return  (- dx + scrCtX + ((lon - mLon) * 111.31949079327357f*cosFast(refLat))*mScale);
+    return  (- dx + scrCtX + ((lon - mLon) * 111.31949079327357f*cos(refLat))*mScale);
 }
 short lat2y(float lat)
 {
@@ -119,7 +119,7 @@ double y2lat(short y)
 double x2lon(short x)
 {
     float refLat = mLat*0.00872664625997;
-    return (x  )/mScale/111.31949079327357f/cosFast(refLat) + mLon;
+    return (x  )/mScale/111.31949079327357f/cos(refLat) + mLon;
 }
 inline QString demicalDegToDegMin(double demicalDeg)
 {
@@ -137,8 +137,8 @@ void Mainwindow::mouseDoubleClickEvent( QMouseEvent * e )
     {
         if(isInsideViewZone(mMouseLastX,mMouseLastY))
         {
-        float xRadar = (mMouseLastX - radCtX)/pRadar->scale_ppi ;//coordinates in  radar xy system
-        float yRadar = -(mMouseLastY - radCtY)/pRadar->scale_ppi;
+        //float xRadar = (mMouseLastX - radCtX)/pRadar->scale_ppi ;//coordinates in  radar xy system
+        //float yRadar = -(mMouseLastY - radCtY)/pRadar->scale_ppi;
 //        pRadar->addTrackManual(xRadar,yRadar);
         }
         //ui->toolButton_manual_track->setChecked(false);
@@ -161,10 +161,11 @@ void Mainwindow::sendToRadarString(QString command)
 void Mainwindow::sendToRadarHS(const char* hexdata)//todo:move to radar class
 {
     short len = strlen(hexdata)/2;
-    unsigned char* sendBuff = new unsigned char[len];
+    if(len>8)return;
+    unsigned char sendBuff[8];
     hex2bin(hexdata,sendBuff);
-    processing->sendCommand(sendBuff,len);
-    delete[] sendBuff;
+    processing->sendCommand(sendBuff,8);
+
 }
 void Mainwindow::sendToRadar(unsigned char* hexdata)
 {
@@ -366,7 +367,7 @@ void Mainwindow::keyPressEvent(QKeyEvent *event)
         double azid,rg;
         C_radar_data::kmxyToPolarDeg((mMousex - radCtX)/mScale,-(mMousey - radCtY)/mScale,&azid,&rg);
         int aziBinary = azid/360.0*4096;
-        unsigned char command[]={0xaa,0x55,0x6a,0x08,aziBinary>>8,aziBinary,0x00,0x00,0x00,0x00,0x00,0x00};
+        unsigned char command[]={0xaa,0x55,0x6a,0x09,aziBinary>>8,aziBinary,0x00,0x00,0x00,0x00,0x00,0x00};
         processing->sendCommand(command,9,false);
         mZoomCenterx = mMousex;
         mZoomCentery = mMousey;
@@ -1139,7 +1140,7 @@ void Mainwindow::ConvWGSToKm(double* x, double *y, double m_Long,double m_Lat)
 {
 
     double refLat = (mLat + (m_Lat))*0.00872664625997;//pi/360
-    *x	= (((m_Long) - mLon) * 111.31949079327357)*cosFast(refLat);// 3.14159265358979324/180.0*6378.137);//deg*pi/180*rEarth
+    *x	= (((m_Long) - mLon) * 111.31949079327357)*cos(refLat);// 3.14159265358979324/180.0*6378.137);//deg*pi/180*rEarth
     *y	= ((mLat - (m_Lat)) * 111.132954);
     //tinh toa do xy KM so voi diem center khi biet lat-lon
 }
@@ -1148,7 +1149,7 @@ void Mainwindow::ConvKmToWGS(double x, double y, double *m_Long, double *m_Lat)
 
     *m_Lat  = mLat +  (y)/(111.132954);
     double refLat = (mLat +(*m_Lat))*0.00872664625997;//3.14159265358979324/180.0/2;
-    *m_Long = (x)/(111.31949079327357*cosFast(refLat))+ mLon;
+    *m_Long = (x)/(111.31949079327357*cos(refLat))+ mLon;
     //tinh toa do lat-lon khi biet xy km (truong hop coi trai dat hinh cau)
 }
 void Mainwindow::drawAisTarget2(QPainter *p)
@@ -1639,13 +1640,13 @@ void Mainwindow::DrawViewFrame(QPainter* p)
         if(isHeadUp)
         {
             radHeading=0;
-        }else radHeading = mHeadingGPSOld/180.0*PI;
+        }else radHeading = radians(mHeadingGPSOld);
         p->setPen(QPen(Qt::cyan,6,Qt::SolidLine,Qt::RoundCap));
 
-        points[0].setX(20*sinFast(radHeading)+radCtX);
-        points[0].setY(20*cosFast(radHeading)+radCtX);
-        double dX = 20*sinFast(radHeading);
-        double dY = 20*cosFast(radHeading);
+        points[0].setX(20*sin(radHeading)+radCtX);
+        points[0].setY(20*cos(radHeading)+radCtX);
+        double dX = 20*sin(radHeading);
+        double dY = 20*cos(radHeading);
         p->drawLine(radCtX,radCtY,radCtX+dX,radCtY-dY);
         //p->drawText(720,60,200,20,0,"Heading: "+QString::number(mHeadingGPS,'f',1));
 
@@ -4367,4 +4368,15 @@ void Mainwindow::on_toolButton_setRangeUnit_toggled(bool checked)
 void Mainwindow::on_toolButton_xl_dopler_3_clicked(bool checked)
 {
     pRadar->isGrayAzi = checked;
+}
+
+void Mainwindow::on_toolButton_head_up_clicked(bool checked)
+{
+
+}
+
+void Mainwindow::on_toolButton_dk_1_clicked()
+{
+    commandMay22[4]=0x00;
+    processing->sendCommand(commandMay22,12,false);
 }

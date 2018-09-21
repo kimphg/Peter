@@ -503,8 +503,9 @@ void C_radar_data::drawSgn(short azi_draw, short r_pos)
     short px = data_mem.xkm[azi_draw][r_pos];
     short py = data_mem.ykm[azi_draw][r_pos];
     if(px<=0||py<=0)return;
-    short pSize = r_pos/150;if(pSize>2)pSize=2;
-    //else if(r_pos>800)pSize=2;
+    short pSize = 1;
+    if(r_pos<200)pSize=0;
+    else if(r_pos>800)pSize=2;
     if((px<pSize)||(py<pSize)||(px>=img_ppi->width()-pSize)||(py>=img_ppi->height()-pSize))return;
     for(short x = -pSize;x <= pSize;x++)
     {
@@ -531,7 +532,10 @@ void C_radar_data::drawBlackAzi(short azi_draw)
         short px = data_mem.xkm[azi_draw][r_pos];
         short py = data_mem.ykm[azi_draw][r_pos];
         if(px<=0||py<=0)continue;
-        short pSize = r_pos/150;if(pSize>2)pSize=2;
+        short pSize = 1;
+        if(r_pos<200)pSize=0;
+        else if(r_pos>800)pSize=2;
+
         if((px<pSize)||(py<pSize)||(px>=img_ppi->width()-pSize)||(py>=img_ppi->height()-pSize))continue;
 
         for(short x = -pSize;x <= pSize;x++)
@@ -550,7 +554,9 @@ void C_radar_data::drawBlackAzi(short azi_draw)
         short px = data_mem.xzoom[azi_draw][r_pos];
         short py = data_mem.yzoom[azi_draw][r_pos];
         if(px<=0||py<=0)continue;
-        short pSize = r_pos/150;if(pSize>8)pSize=8;
+        short pSize = 1;
+        if(r_pos<200)pSize=0;
+        else if(r_pos>800)pSize=2;
         if((px<pSize)||(py<pSize)||(px>=img_zoom_ppi->width()-pSize)||(py>=img_zoom_ppi->height()-pSize))continue;
 
         for(short x = -pSize;x <= pSize;x++)
@@ -1001,7 +1007,7 @@ int C_radar_data::ssiDecode(ushort nAzi)
 int rot;
 void C_radar_data::processSocketData(unsigned char* data,short len)
 {
-    range_max = (len-FRAME_HEADER_SIZE)/2;
+    range_max = 1024;//(len-FRAME_HEADER_SIZE)/2;todo
     unsigned char n_clk_adc = data[4];
     sn_stat = (data[5]<<8)+data[6];
     if(clk_adc != n_clk_adc)
@@ -1600,7 +1606,7 @@ void C_radar_data::kmxyToPolarDeg(double x, double y, double *azi, double *range
 void C_radar_data::drawRamp()
 {
     img_RAmp->fill(Qt::black);
-    for (short r_pos = 0;r_pos<RADAR_RESOLUTION;r_pos++)
+    for (short r_pos = 0;r_pos<range_max;r_pos++)
     {
         unsigned char value = data_mem.level[curAzir][r_pos];
         char dopler = data_mem.dopler[curAzir][r_pos];
@@ -1640,7 +1646,7 @@ void C_radar_data::drawRamp(double azi)
     azi-=aziOffset;
     if(azi<0)azi+=PI_NHAN2;
     int az = azi/PI_NHAN2*MAX_AZIR;
-    for (short r_pos = 0;r_pos<RADAR_RESOLUTION;r_pos++)
+    for (short r_pos = 0;r_pos<range_max;r_pos++)
     {
         unsigned char value = data_mem.level[az][r_pos];
         char dopler = data_mem.dopler[az][r_pos];
@@ -2100,7 +2106,7 @@ void C_radar_data::drawSgnZoom(short azi_draw, short r_pos)
     unsigned char value    = data_mem.display_ray_zoom[r_pos][0];
     unsigned char dopler    = data_mem.display_ray_zoom[r_pos][1];
     unsigned char sled     = data_mem.display_ray_zoom[r_pos][2];
-    short pSize = r_pos/150;if(pSize>8)pSize=8;
+    short pSize = r_pos/150;if(pSize>4)pSize=4;
 
     //if(pSize>2)pSize = 2;
     if((px<pSize)||(py<pSize)||(px>=img_zoom_ppi->width()-pSize)||(py>=img_zoom_ppi->height()-pSize))return;

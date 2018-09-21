@@ -9,7 +9,7 @@
 #-------------------------------------------------
 # Version 4.0.1
 #-------------------------------------------------
-#data file type defined as .r2d, data starts from 22nd byte of each frame
+#data file type defined as .r2d,
 
 @CONFIG  += debug_and_release@
 QT       += core gui

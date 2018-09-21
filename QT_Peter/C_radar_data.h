@@ -27,7 +27,7 @@
    #define PI                       3.14159265358979323846
 #endif
 #define FRAME_HEADER_SIZE 34
-#define RADAR_RESOLUTION 2048
+#define RADAR_RESOLUTION 1024
 #define OUTPUT_FRAME_SIZE RADAR_RESOLUTION*2+FRAME_HEADER_SIZE
 #define CONST_E 2.71828182846
 #define MAX_TRACK_LEN               400
@@ -87,7 +87,6 @@
 
 typedef struct {
     raw_point_t raw_map[RAD_FULL_RES];
-
 }frame_t;
 */
 inline double sinFast(double a)
