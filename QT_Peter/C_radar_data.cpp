@@ -1050,7 +1050,7 @@ void C_radar_data::processSocketData(unsigned char* data,short len)
         {
             if(isGrayAzi)
             newAzi = ssiDecode(newAzi);
-            else newAzi = newAzi = (data[2]<<8)|data[3];
+            else  newAzi /=2;
         }
         /*if(!newAzi)
         {
