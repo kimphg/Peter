@@ -816,7 +816,7 @@ void dataProcessingThread::sendCommand(unsigned char *commandBuff, short len,boo
     commandBuff[len-1] = 0;
     for(int i=0;i<len-1;i++)
     {
-        commandBuff[len-1]^=commandBuff[i];
+        commandBuff[len-1]+=commandBuff[i];
     }
     //queued command
     if(queued)

@@ -1045,12 +1045,15 @@ void C_radar_data::processSocketData(unsigned char* data,short len)
     }
     else
     {
-        newAzi = (data[2]<<8)|data[3];
+        //newAzi = (data[2]<<8)|data[3];
         if(data[0]!=5)
         {
+            newAzi = (data[9]<<24)+(data[10]<<16)+(data[11]<<8)+data[12];
+            newAzi>>=3;
+            newAzi&=0xff;
             if(isGrayAzi)
             newAzi = ssiDecode(newAzi);
-            else  newAzi /=2;
+
         }
         /*if(!newAzi)
         {
@@ -1064,11 +1067,7 @@ void C_radar_data::processSocketData(unsigned char* data,short len)
         //        if(newAzi<0)newAzi=-newAzi;
         //newAzi=((data[2]<<8)|data[3]);
         //0 dung 1 dung 2 dung 3 dung
-        if(newAzi>=MAX_AZIR)
-        {
-            //printf("\nWrong Azi:%d",newAzi);
-            return;
-        }
+        newAzi&=0x01ff;
         //if(!dir)newAzi=MAX_AZIR-newAzi;
         //if(rotDir==Left)newAzi = MAX_AZIR-newAzi;
     }

@@ -4380,3 +4380,8 @@ void Mainwindow::on_toolButton_dk_1_clicked()
     commandMay22[4]=0x00;
     processing->sendCommand(commandMay22,12,false);
 }
+
+void Mainwindow::on_toolButton_tx_3_clicked(bool checked)
+{
+
+}

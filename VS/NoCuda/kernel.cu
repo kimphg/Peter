@@ -1,4 +1,4 @@
-//setx -m OPENCV_DIR D:\OpenCV\OpenCV331\opencv\build
+﻿//setx -m OPENCV_DIR D:\OpenCV\OpenCV331\opencv\build
 //setx path "%path%;D:\OpenCV\OpenCV331\opencv\build\bin\Release\"
 #include "device_launch_parameters.h"
 //#include <opencv2/opencv.hpp>
@@ -10,7 +10,7 @@
 #define HAVE_REMOTE// for pcap
 #include "pcap.h"
 #define HR2D_PK//
-#define FRAME_LEN 1024
+#define FRAME_LEN 2048
 #define OUTPUT_FRAME_SIZE FRAME_LEN*2+FRAME_HEADER_SIZE
 #define FFT_SIZE 32
 #define BANG_KHONG 0
@@ -139,9 +139,9 @@ public:
 struct DataFrame// buffer for data frame
 {
 	char header[FRAME_HEADER_SIZE];
-	char dataI[FRAME_LEN];
-	char dataQ[FRAME_LEN];
-	char image256[256];
+	char dataPM_I[FRAME_LEN];
+	char dataPM_Q[FRAME_LEN];
+	short dataLen;
 	bool isToFFT;
 } dataBuff[MAX_IREC];
 unsigned int gyroValue = 0;
@@ -318,9 +318,9 @@ DWORD WINAPI ProcessDataBuffer(LPVOID lpParam)
 			for (int ir = 0; ir < FRAME_LEN; ir++)
 			{
 				
-				//ramSignalNen[iProcessing][ir].x = sqrt(double(dataBuff[iProcessing].dataI[ir] * dataBuff[iProcessing].dataI[ir] + dataBuff[iProcessing].dataQ[ir] * dataBuff[iProcessing].dataQ[ir]));//int(dataBuff[iProcessing].dataI[ir]);
-				ramSignalNen[iProcessing][ir].x = float(dataBuff[iProcessing].dataI[ir]);
-				ramSignalNen[iProcessing][ir].y = float(dataBuff[iProcessing].dataQ[ir]);//0;// 
+				//ramSignalNen[iProcessing][ir].x = sqrt(double(dataBuff[iProcessing].dataPM_I[ir] * dataBuff[iProcessing].dataPM_I[ir] + dataBuff[iProcessing].dataPM_Q[ir] * dataBuff[iProcessing].dataPM_Q[ir]));//int(dataBuff[iProcessing].dataPM_I[ir]);
+				ramSignalNen[iProcessing][ir].x = float(dataBuff[iProcessing].dataPM_I[ir]);
+				ramSignalNen[iProcessing][ir].y = float(dataBuff[iProcessing].dataPM_Q[ir]);//0;// 
 				//ramSignalNen[iProcessing][ir].y = 0;
 			}
 			/*
@@ -454,53 +454,77 @@ void packet_handler(u_char *param, const struct pcap_pkthdr *pkt_header, const u
 	//    localtime_s(&ltime, &local_tv_sec);
 	//    strftime( timestr, sizeof timestr, "%H:%M:%S", &ltime);
 
-	if (pkt_header->len<70)return;
+	if (pkt_header->len<200)return;
 	int port = ((*(pkt_data + 36) << 8) | (*(pkt_data + 37)));
 	if (port == 5000)
 	{
+		/*
+		+ 0: 1024 byte đầu kênh I
+		+ 1: 1024 byte sau kênh I
+		+ 2: 1024 byte đầu kênh Q
+		+ 3: 1024 byte sau kênh Q
+		+ 4: 256 byte máy hỏi  
+		+ 5: 1024 byte tín hiệu giả L/tục (512 byte đầu là I, 512 byte sau là Q)   
+		+ 6: 1024 byte sau kênh I tín hiệu xung đơn  
+		+ 7: 1024 byte sau kênh Q tín hiệu xung đơn 
+
+		*/
 		u_char* data = (u_char*)pkt_data + UDP_HEADER_LEN;
 		int iNext = iReady + 1;
 		if (iNext >= MAX_IREC)iNext = 0;
 		memcpy(dataBuff[iNext].header, data, FRAME_HEADER_SIZE);
-		if (data[0] == 1)		//I chanel first part
+		bool isLastFrame = false;
+		if (data[0] == 0)		//0: 1024 byte đầu kênh I
 		{
+			//memcpy(dataBuff[iNext].header, data, FRAME_HEADER_SIZE);
+			memcpy(dataBuff[iNext].dataPM_I, data + FRAME_HEADER_SIZE, 1024);
+		}
+		else if (data[0] == 1) //1: 1024 byte sau kênh I
+		{
+			memcpy(dataBuff[iNext].dataPM_I + 1024, data + FRAME_HEADER_SIZE, 1024);
+			
+		}
+		else if (data[0] == 2) //2: 1024 byte đầu kênh Q
+		{
+			memcpy(dataBuff[iNext].dataPM_Q, data + FRAME_HEADER_SIZE, 1024);
+			
+		}
+		else if (data[0] == 3) //3: 1024 byte sau kênh Q
+		{
+			memcpy(dataBuff[iNext].dataPM_Q + 1024, data + FRAME_HEADER_SIZE, 1024);
+			dataBuff[iNext].dataLen = FRAME_LEN;
+			isLastFrame = true;
+			
+		}
+		else if (data[0] == 5) //5: 1024 byte tín hiệu giả L/tục (512 byte đầu là I, 512 byte sau là Q) 
+		{
+			memcpy(dataBuff[iNext].dataPM_I, data + FRAME_HEADER_SIZE, 512);
+			memcpy(dataBuff[iNext].dataPM_Q, data + FRAME_HEADER_SIZE + 512, 512);
+			dataBuff[iNext].dataLen = 512;
+			isLastFrame = true;
+		}
+		else if (data[0] == 6) //6: 1024 byte sau kênh I tín hiệu xung đơn 
+		{
+			memcpy(dataBuff[iNext].dataPM_I, data + FRAME_HEADER_SIZE, 1024);
+			dataBuff[iNext].dataLen = 1024;
+			
+		}
+		else if (data[0] == 7) //7: 1024 byte sau kênh Q tín hiệu xung đơn 
+		{
+			memcpy(dataBuff[iNext].dataPM_Q, data + FRAME_HEADER_SIZE,1024);
+			dataBuff[iNext].dataLen = 1024;
+			isLastFrame = true;
+			
+		}
+		if (isLastFrame)
+		{
+			iReady++;
 			dataBuff[iNext].isToFFT = ((iNext%mFFTSkip) == 0);
-			memcpy(dataBuff[iNext].header, data, FRAME_HEADER_SIZE);
-			memcpy(dataBuff[iNext].dataI, data + FRAME_HEADER_SIZE, 1024);
-		}
-		else if (data[0] == 2) //Q chanel first part
-		{
-			memcpy(dataBuff[iNext].dataQ, data + FRAME_HEADER_SIZE, 1024);
-			iReady++;
-			if (iReady >= MAX_IREC)iReady = 0;
-		}
-		else if (data[0] == 3) //I chanel second part
-		{
-			memcpy(dataBuff[iNext].dataI, data + FRAME_HEADER_SIZE, 1024);
-			iReady++;
-		}
-		else if (data[0] == 4) //Q chanel second part
-		{
-			memcpy(dataBuff[iNext].dataQ, data + FRAME_HEADER_SIZE, 1024);
-			iReady++;
 			if (iReady >= MAX_IREC)iReady = 0;
 		}
 		return;
 	}
-	else if (port == 31000)
-	{
-		u_char* data = (u_char*)pkt_data + UDP_HEADER_LEN;
-		if (
-			(data[0] == 0x5a)
-			&& (data[1] == 0xa5)
-			&& (data[2] == 0x1a)
-			&& (data[31] == 0xaa)
-			)
-		{
-			gyroValue = ((data[6]) << 8) + data[7];
-		}
-		
-	}
+	
 	
 }
 /*void packet_handler_compress(u_char *param, const struct pcap_pkthdr *pkt_header, const u_char *pkt_data)
@@ -516,19 +540,19 @@ void packet_handler(u_char *param, const struct pcap_pkthdr *pkt_header, const u
 		iReady++;
 		if (iReady >= MAX_IREC)iReady = 0;
 		memcpy(dataBuff[iReady].header, data, FRAME_HEADER_SIZE);
-		memcpy(dataBuff[iReady].dataI, data + FRAME_HEADER_SIZE, 1024);
+		memcpy(dataBuff[iReady].dataPM_I, data + FRAME_HEADER_SIZE, 1024);
 	}
 	else if (data[0] == 2) //Q chanel first part
 	{
-		memcpy(dataBuff[iReady].dataQ, data + FRAME_HEADER_SIZE, 1024);
+		memcpy(dataBuff[iReady].dataPM_Q, data + FRAME_HEADER_SIZE, 1024);
 	}
 	else if (data[0] == 1) //I chanel second part
 	{
-		memcpy(dataBuff[iReady].dataI + 1024, data + FRAME_HEADER_SIZE, 1024);
+		memcpy(dataBuff[iReady].dataPM_I + 1024, data + FRAME_HEADER_SIZE, 1024);
 	}
 	else if (data[0] == 3) //Q chanel second part
 	{
-		memcpy(dataBuff[iReady].dataQ + 1024, data + FRAME_HEADER_SIZE, 1024);
+		memcpy(dataBuff[iReady].dataPM_Q + 1024, data + FRAME_HEADER_SIZE, 1024);
 	}
 	return;
 }*/

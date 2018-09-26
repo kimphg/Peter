@@ -502,6 +502,8 @@ private slots:
 
     void on_toolButton_dk_1_clicked();
 
+    void on_toolButton_tx_3_clicked(bool checked);
+
 private:
 
 //    bool mShowobjects,
