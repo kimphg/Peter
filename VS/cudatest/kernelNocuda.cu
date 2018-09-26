@@ -10,7 +10,7 @@
 #define HAVE_REMOTE// for pcap
 #include "pcap.h"
 #define HR2D_PK//
-#define FRAME_LEN 2048
+#define FRAME_LEN 1024
 #define FFT_SIZE 1
 #define BANG_KHONG 0
 //int mFFTSkip = FFT_SIZE/8;
@@ -83,7 +83,7 @@ void socketInit()
 	//setup address structure
 	memset((char *)&si_peter, 0, sizeof(si_peter));
 	si_peter.sin_family = AF_INET;
-	si_peter.sin_port = htons(34567);//port "127.0.0.1"
+	si_peter.sin_port = htons(31000);//port "127.0.0.1"
 	si_peter.sin_addr.S_un.S_addr = inet_addr("127.0.0.1");
 
 }
