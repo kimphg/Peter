@@ -502,14 +502,12 @@ private slots:
 
     void on_toolButton_dk_1_clicked();
 
-    void on_toolButton_tx_3_clicked(bool checked);
-
 private:
 
 //    bool mShowobjects,
     bool mShowTracks;
-    uint mSelectedTrack;
-    uint mSelectedTrackTime;
+    unsigned long long mSelectedTrackId;
+//    uint mSelectedTrackTime;
     void initActionsConnections();
     void initGraphicView();
     void updateTargetInfo();

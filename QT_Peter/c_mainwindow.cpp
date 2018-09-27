@@ -8,7 +8,7 @@
 //#define mapWidth mapWidth
 //#define mapHeight mapWidth
 //#define CONST_NM 1.852f// he so chuyen doi tu km sang hai ly
-#define MAX_VIEW_RANGE_KM 50
+#define MAX_VIEW_RANGE_KM   50
 QStringList                 commandLogList;
 
 QPixmap                     *pMap=NULL;// painter cho ban do
@@ -162,7 +162,8 @@ void Mainwindow::sendToRadarHS(const char* hexdata)//todo:move to radar class
 {
     short len = strlen(hexdata)/2;
     if(len>8)return;
-    unsigned char sendBuff[8];
+    if(len%2)return;
+    unsigned char sendBuff[]={0,0,0,0,0,0,0,0};
     hex2bin(hexdata,sendBuff);
     processing->sendCommand(sendBuff,8);
 
@@ -489,12 +490,12 @@ void Mainwindow::mousePressEvent(QMouseEvent *event)
     {
         //select radar target
         int minDistanceToCursor = 10;
-        uint trackMin = 0;
-        uint tracktime;
+        unsigned long long trackMin = 0;
+
         for (uint i = 0;i<pRadar->mTrackList.size();i++)
         {
             track_t* track = &(pRadar->mTrackList[i]);
-            if(track->isRemoved)continue;
+            if(track->isRemoved())continue;
 
             object_t* obj1 = &(track->objectList.back()) ;
             int sx = abs((obj1->xkm*mScale + radCtX)  - mMousex);
@@ -502,15 +503,15 @@ void Mainwindow::mousePressEvent(QMouseEvent *event)
             if(sx+sy<minDistanceToCursor)
             {
                 minDistanceToCursor = sx+sy;
-                trackMin = track->id;
-                tracktime = track->time;
+                trackMin = track->uniqId;
+//                tracktime = track->time;
             }
 
         }
         if(minDistanceToCursor<10)
         {
-            mSelectedTrack = trackMin;
-            mSelectedTrackTime = tracktime;
+            mSelectedTrackId = trackMin;
+//            mSelectedTrackTime = tracktime;
         }
 
         //select ais target
@@ -828,8 +829,8 @@ void Mainwindow::DrawRadarTargetByPainter(QPainter* p)//draw radar target from p
         for (uint i = 0;i<pRadar->mTrackList.size();i++)
         {
             track_t* track = &(pRadar->mTrackList[i]);
-            if(track->isRemoved)continue;
-            if(mSelectedTrack== track->id&&mSelectedTrackTime == track->time)
+            if(track->isRemoved())continue;
+            if(mSelectedTrackId== track->uniqId)
             {
                 p->setPen(penSelTarget);
                 for (int j = 0;j<track->objectHistory.size()-1;j++)
@@ -845,7 +846,7 @@ void Mainwindow::DrawRadarTargetByPainter(QPainter* p)//draw radar target from p
                 p->setPen(penTargetBlue);
             }
             else p->setPen(penTarget);
-            if(track->isLost)
+            if(track->isLost())
             {
                 if(blink)
                 {
@@ -2090,7 +2091,7 @@ void Mainwindow::UpdateDataStatus()
         }
 
         if(processing->mRadarStat.mTaiAngTen==1)ui->toolButton_dk_2->setChecked(true);//tai ang ten
-        else if(processing->mRadarStat.mTaiAngTen==0)ui->toolButton_dk_13->setChecked(true);//tai ang ten
+        else if(processing->mRadarStat.mTaiAngTen==0)ui->toolButton_dk_13->setChecked(true);//tai tuong duong
         if(processing->mRadarStat.mMaHieu==0)ui->toolButton_dk_11->setChecked(true);//ma hieu
         else if(processing->mRadarStat.mMaHieu==1)ui->toolButton_dk_16->setChecked(true);//ma hieu
         else if(processing->mRadarStat.mMaHieu==2)ui->toolButton_dk_17->setChecked(true);//ma hieu
@@ -2120,11 +2121,11 @@ void Mainwindow::ViewTrackInfo()
     for (uint i = 0;i<pRadar->mTrackList.size();i++)
     {
         track_t* track = &(pRadar->mTrackList[i]);
-        if(!(track->isRemoved))
+        if(!(track->isRemoved()))
         {
-            if(!track->isLost)
+            if(!track->isLost())
             {
-                if((mSelectedTrack==track->id)&&(mSelectedTrackTime == track->time))
+                if((mSelectedTrackId==track->uniqId))
                 {
                     selectionExist = true;
                     if(mDistanceUnit==0)//NM
@@ -4379,9 +4380,4 @@ void Mainwindow::on_toolButton_dk_1_clicked()
 {
     commandMay22[4]=0x00;
     processing->sendCommand(commandMay22,12,false);
-}
-
-void Mainwindow::on_toolButton_tx_3_clicked(bool checked)
-{
-
 }

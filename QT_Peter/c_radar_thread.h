@@ -72,7 +72,7 @@ public:
 };
 struct  RadarCommand// radar control commmand
 {
-    unsigned char bytes[32];
+    unsigned char bytes[8];
 };
 //extern class CGPS{};
 typedef std::queue<RadarCommand> RadarCommandQueue;

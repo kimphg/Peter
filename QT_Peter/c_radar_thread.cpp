@@ -385,13 +385,12 @@ void dataProcessingThread::PushCommandQueue()
                     8,
                     QHostAddress("192.168.0.44"),2572
                     );
-        }
-        else {
             radarSocket->writeDatagram((char*)&radarComQ.front().bytes[0],
-                    32,
-                    QHostAddress("127.0.0.1"),30000
+                    8,
+                    QHostAddress("127.0.0.1"),30002
                     );
         }
+
         radarComQ.pop();
         /*if(checkFeedback())
         {
@@ -852,10 +851,10 @@ void dataProcessingThread::sendCommand(unsigned char *commandBuff, short len,boo
                 len,
                 QHostAddress("192.168.1.253"),30004
                 );
-        radarSocket->writeDatagram((char*)commandBuff,
-                len,
-                QHostAddress("127.0.0.1"),30002
-                );
+//        radarSocket->writeDatagram((char*)commandBuff,
+//                len,
+//                QHostAddress("127.0.0.1"),30002
+//                );
     }
 }
 void dataProcessingThread::startRecord(QString fileName)

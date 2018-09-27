@@ -217,7 +217,7 @@ double track_t::estimateScore(object_t *obj1)
         return -1;
     object_t* obj2 = &(this->objectList.back());
     double dtime = (obj1->timeMs - obj2->timeMs);
-    if(dtime<500)
+    if(dtime<300)
         return -1;//ENVAR min time between plots in a line(1s)
     dtime/=3600000.0;
     float dx = obj1->xkm - obj2->xkm;
@@ -1027,7 +1027,7 @@ void C_radar_data::processSocketData(unsigned char* data,short len)
     //tb_tap[newAzi] = dataBuff[18]<<8|dataBuff[19];
     //memcpy(command_feedback,&dataBuff[RADAR_COMMAND_FEEDBACK],8);
     //memcpy(noise_level,&dataBuff[RADAR_COMMAND_FEEDBACK+8],8);
-    int newAzi =0;
+    uint newAzi =0;
     if(isSelfRotation)
     {
         selfRotationAzi+=selfRotationDazi;
@@ -1045,31 +1045,26 @@ void C_radar_data::processSocketData(unsigned char* data,short len)
     }
     else
     {
-        //newAzi = (data[2]<<8)|data[3];
         if(data[0]!=5)
         {
-            newAzi = (data[9]<<24)+(data[10]<<16)+(data[11]<<8)+data[12];
-            newAzi>>=3;
-            newAzi&=0xff;
             if(isGrayAzi)
-            newAzi = ssiDecode(newAzi);
+            {
+                newAzi = (data[9]<<24)|(data[10]<<16)|(data[11]<<8)|(data[12]);
+                newAzi>>=3;
+                newAzi&=0xffff;
+                newAzi = ssiDecode(newAzi)&0x07ff;
+            }
+            else
+            {
+                newAzi = ((data[2]<<8)|data[3])>>5;
+            }
 
         }
-        /*if(!newAzi)
+        else
         {
-            if(rot==7)isLeft = true;
-            if(rot==0)isLeft = false;
-        }*/
+            newAzi = (data[2]<<8)|data[3];
+        }
 
-        //if((rot&0x01))newAzi = MAX_AZIR-newAzi;
-        //uchar datapad = newAzi&31;
-        //newAzi = (newAzi&0x1fff)>>1;
-        //        if(newAzi<0)newAzi=-newAzi;
-        //newAzi=((data[2]<<8)|data[3]);
-        //0 dung 1 dung 2 dung 3 dung
-        newAzi&=0x01ff;
-        //if(!dir)newAzi=MAX_AZIR-newAzi;
-        //if(rotDir==Left)newAzi = MAX_AZIR-newAzi;
     }
     if(curAzir==newAzi)return;
     //if(newAzi==0)dir= !dir;
@@ -1486,7 +1481,7 @@ void C_radar_data::procPLot(plot_t* mPlot)
         mFalsePositiveCount++;
         return;
     }
-    else if(mPlot->sumEnergy>15000)
+    else if(mPlot->sumEnergy>20000)
     {
         return;
     }
@@ -1502,7 +1497,7 @@ void C_radar_data::procPLot(plot_t* mPlot)
     {
         ctA = (mPlot->riseA + mPlot->fallA)/2.0;
     }
-    if(dAz>15)return;//ENVDEP
+    if(dAz>30)return;//ENVDEP
     if(ctA >= MAX_AZIR)ctA -= MAX_AZIR;
     
     //if(mPlot->minR<500)return;
@@ -2237,21 +2232,16 @@ void C_radar_data::ProcessTracks()
     for (ushort j=0;j<mTrackList.size();j++)
     {
         track_t* track = &(mTrackList[j]);
-        if(track->isRemoved)continue;
+        if(track->mState==TrackState::removed)continue;
         // find maximum score from possibleList
         if(track->possibleMaxScore>0)
         {
             if(now_ms-track->possibleObj.timeMs>300)
             {
-                track->update();
+                track->update(now_ms);
             }
+        }
 
-        }
-        //remove old track
-        else {
-            if(now_ms-track->lastTimeMs>60000)  track->isLost = true;
-            if(now_ms-track->lastTimeMs>180000) track->isRemoved = true;
-        }
     }
 }
 bool C_radar_data::ProcessObject(object_t *obj1)
@@ -2286,14 +2276,14 @@ bool C_radar_data::ProcessObject(object_t *obj1)
 bool C_radar_data::checkBelongToTrack(object_t *obj1)
 {
     bool isBelongingToTrack = false;
-//    obj1->scoreTrack=0;
     track_t* chosenTrack ;
     double maxScore=0;
     for (ushort j=0;j<mTrackList.size();j++)
     {
         track_t* track = &(mTrackList[j]);
 
-        if(track->isRemoved||track->isLost)continue;
+        if(track->mState==TrackState::removed||
+                track->mState==TrackState::lost)continue;
         if(track->isUpdating)
         {
             continue;
@@ -2349,7 +2339,7 @@ void C_radar_data::CreateTrack(object_t* obj1,object_t* obj2)
 {
     for (ushort j=0;j<mTrackList.size();j++)
     {
-        if(mTrackList[j].isRemoved)
+        if(mTrackList[j].mState==TrackState::removed)
         {
             track_t newTrack(obj1,obj2);
             mTrackList[j] = newTrack;
@@ -2373,12 +2363,13 @@ bool C_radar_data::checkBelongToObj(object_t* obj1)
         object_t *obj2 = &(mFreeObjList.at(j));
         //find new line
         if(obj2->isRemoved)continue;
-        int dtime = (obj1->timeMs - obj2->timeMs);
-        if(dtime<300)
+//        uint dtime = (obj1->timeMs - obj2->timeMs);
+        uint dperiod = (obj1->period-obj2->period);
+        if(dperiod<300)
         {
             continue;
         }
-        if(dtime>20000)
+        if(dperiod>MAX_AZIR*1.5)
         {
             obj2->isRemoved = true;
             continue;
@@ -2393,7 +2384,7 @@ bool C_radar_data::checkBelongToObj(object_t* obj1)
             objLast = obj2;
         }
     }
-    if(maxScore>0)
+    if(maxScore>0.5)
     {
         //obj1->scorepObj = maxScore;
         //obj1->isRemoved=true;

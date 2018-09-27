@@ -8547,7 +8547,7 @@
      <bool>false</bool>
     </property>
     <property name="currentIndex">
-     <number>3</number>
+     <number>0</number>
     </property>
     <property name="elideMode">
      <enum>Qt::ElideNone</enum>
@@ -18289,7 +18289,7 @@
      <widget class="QCustomGroupBox" name="groupBox_18">
       <property name="geometry">
        <rect>
-        <x>260</x>
+        <x>340</x>
         <y>150</y>
         <width>171</width>
         <height>341</height>

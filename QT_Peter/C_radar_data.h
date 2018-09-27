@@ -168,6 +168,12 @@ typedef struct  {
 //};
 
 //using Eigen::MatrixXf;
+enum class TrackState {newDetection=0,
+                       confirmed=1,
+                       operatorConfirmed = 2,
+                       operatorSelected = 3,
+                       lost = 4,
+                       removed=5};
 class track_t
 {
 public:
@@ -178,9 +184,9 @@ public:
         double dx = obj1->xkm - obj2->xkm;
         double dy = obj1->ykm - obj2->ykm;
         rgSpeedkmh = (obj1->rgKm-obj2->rgKm)/dtime;
-        isRemoved  = false;
+//        isRemoved  = false;
         mSpeedkmh  = sqrt(dx*dx+dy*dy)/dtime;
-        isLost     = false;
+//        isLost     = false;
         bearingRad = ConvXYToAziRad(dx,dy);
         mSpeedkmhFit    = sqrt(dx*dx+dy*dy)/dtime;
         bearingRadFit   = ConvXYToAziRad(dx,dy);
@@ -194,24 +200,52 @@ public:
         objectList.push_back(*obj1);
         objectHistory.push_back(*obj1);
         time=obj2->timeMs;
-        id=rand();
+        uniqId = time;
+        uniqId<<=32;
+        uniqId+=rand();
         isUpdating = false;
+        mState = TrackState::newDetection;
     }
     ~track_t()
     {
 
     }
-    uint time,id;
+    bool isRemoved()
+    {
+        return mState==TrackState::removed;
+    }
+    bool isLost()
+    {
+        return mState==TrackState::lost;
+    }
+    TrackState mState;
+    uint time;
+    unsigned long long uniqId;
     bool isUpdating;
-    void update()
+    void update(uint now_ms)
     {
         isUpdating = true;
         objectList.push_back(possibleObj);
         while(objectList.size()>4)
         {
             objectList.erase(objectList.begin());
-        }
 
+        }
+        switch (mState) {
+        case TrackState::newDetection:
+            if(objectList.size()>3)         mState = TrackState::confirmed;
+            if(now_ms-lastTimeMs>80000)     mState = TrackState::removed;
+            break;
+        case TrackState::confirmed:
+            if(now_ms-lastTimeMs>80000)     mState = TrackState::lost;
+            break;
+        case TrackState::lost:
+            if(now_ms-lastTimeMs>160000)    mState = TrackState::removed;
+            break;
+
+        default:
+            break;
+        }
         lastTimeMs = possibleObj.timeMs;
         if((lastTimeMs-objectHistory.back().timeMs)>60000)
             objectHistory.push_back(possibleObj);
@@ -260,7 +294,7 @@ public:
     float rgSpeedkmh;
     double xkm,ykm;
 //    float xkmo,ykmo;
-    bool isRemoved,isLost;
+//    bool isRemoved,isLost;
     qint64          lastTimeMs;
     void LinearFit();
     void addPossible(object_t *obj, double score);

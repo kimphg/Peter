@@ -3237,7 +3237,7 @@ public:
 
         groupBox_18 = new QCustomGroupBox(tab_5);
         groupBox_18->setObjectName(QStringLiteral("groupBox_18"));
-        groupBox_18->setGeometry(QRect(260, 150, 171, 341));
+        groupBox_18->setGeometry(QRect(340, 150, 171, 341));
         gridLayout_16 = new QGridLayout(groupBox_18);
         gridLayout_16->setSpacing(6);
         gridLayout_16->setContentsMargins(11, 11, 11, 11);
@@ -6015,7 +6015,7 @@ public:
 
         retranslateUi(MainWindow);
 
-        tabWidget_menu->setCurrentIndex(3);
+        tabWidget_menu->setCurrentIndex(0);
         groupBox_3->setCurrentIndex(1);
         comboBox->setCurrentIndex(0);
         tabWidget_iad->setCurrentIndex(5);
