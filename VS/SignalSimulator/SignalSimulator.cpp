@@ -59,18 +59,18 @@ void socketDelete()
 void regenerate(int azi)
 {
 	u_char* dataPointer = &outputFrame[azi][0] + FRAME_HEADER_SIZE;
-	for (int i = 0; i < MAX_AZI; i++)
+	for (int i = 0; i < FRAME_LEN; i++)
 	{
 		int num = int(distribNoise(generator));
 		if (num < 0)num = 0;
 		dataPointer[i] = num;
 	}
-	for (int i = MAX_AZI; i < MAX_AZI*2; i++)
+	for (int i = FRAME_LEN; i < FRAME_LEN * 2; i++)
 	{
 		dataPointer[i] = rand()%16;
 	}
 }
-#define NUM_OF_TARG 100
+#define NUM_OF_TARG 10
 target_t* target[NUM_OF_TARG];
 
 void initTargets()
@@ -157,7 +157,7 @@ int _tmain(int argc, _TCHAR* argv[])
 			Sleep(500);
 		}
 		//if (rand() % 10 == 0)regenerate(azi);
-		outputFrame[azi][0] = 5;
+		outputFrame[azi][0] = 0x55;
 		outputFrame[azi][2] = azi >> 8;
 		outputFrame[azi][3] = azi;
 		outputFrame[azi][4] = n_clk_adc;

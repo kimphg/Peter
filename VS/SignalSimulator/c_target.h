@@ -133,7 +133,7 @@ public:
 		x += distance*sin(bearing);
 		y += distance*cos(bearing);
 		//
-		azi		= ConvXYToAziRad(x, y) / 3.141592653589*1024.0 + (distribAzi(generator));
+		azi = ConvXYToAziRad(x, y) / 3.141592653589*1024.0;// +(distribAzi(generator));
 		range	= ConvXYToRange(x, y) / rResolution;
 		
 		

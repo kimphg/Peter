@@ -1007,7 +1007,10 @@ int C_radar_data::ssiDecode(ushort nAzi)
 int rot;
 void C_radar_data::processSocketData(unsigned char* data,short len)
 {
-    range_max = 1024;//(len-FRAME_HEADER_SIZE)/2;todo
+    if(len==MAX_FRAME_SIZE)
+        range_max = RADAR_RESOLUTION;
+    else if(len==MAX_FRAME_SIZE_HALF)
+        range_max = RADAR_RESOLUTION_HALF;
     unsigned char n_clk_adc = data[4];
     sn_stat = (data[5]<<8)+data[6];
     if(clk_adc != n_clk_adc)
@@ -1045,14 +1048,14 @@ void C_radar_data::processSocketData(unsigned char* data,short len)
     }
     else
     {
-        if(data[0]!=5)
+        if(data[0]!=0x55)
         {
             if(isGrayAzi)
             {
                 newAzi = (data[9]<<24)|(data[10]<<16)|(data[11]<<8)|(data[12]);
                 newAzi>>=3;
                 newAzi&=0xffff;
-                newAzi = ssiDecode(newAzi)&0x07ff;
+                newAzi = ssiDecode(newAzi);
             }
             else
             {
@@ -1063,9 +1066,11 @@ void C_radar_data::processSocketData(unsigned char* data,short len)
         else
         {
             newAzi = (data[2]<<8)|data[3];
+
         }
 
     }
+    newAzi&=0x07ff;
     if(curAzir==newAzi)return;
     //if(newAzi==0)dir= !dir;
     int dazi = newAzi-curAzir;
@@ -1335,11 +1340,11 @@ void C_radar_data::LeastSquareFit(track_t* track)
 ushort mulOf16Azi = 0;
 void C_radar_data::UpdateData()
 {
-    while(aziToProcess.size()>10)
+    while(aziToProcess.size()>2)
     {
 
         int azi = aziToProcess.front();
-
+        //printf("\nAzi:%d",azi);
         if(azi==lastProcessAzi)
         {
             aziToProcess.pop();
@@ -2384,7 +2389,7 @@ bool C_radar_data::checkBelongToObj(object_t* obj1)
             objLast = obj2;
         }
     }
-    if(maxScore>0.5)
+    if(maxScore>0.5)//todo: find best value
     {
         //obj1->scorepObj = maxScore;
         //obj1->isRemoved=true;

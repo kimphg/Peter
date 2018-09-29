@@ -59,7 +59,7 @@ double      rangeRatio = 1;
 //extern CConfig         mGlobbalConfig;
 QStringList     warningList;
 QString         strDistanceUnit;
-short selectedTargetIndex;
+//short selectedTargetIndex;
 mouseMode mouse_mode = MouseNormal;
 DialogCommandLog *cmLog;
 enum drawModes{
@@ -377,6 +377,30 @@ void Mainwindow::keyPressEvent(QKeyEvent *event)
                               -(mMousey - radCtY)/mScale,
                               mZoomSizeRg,mZoomSizeAz);
         pRadar->setZoomRectXY((mMousex - radCtX),(mMousey - radCtY));
+    }
+    else if((!controlPressed)&&key >= Qt::Key_0&&key<=Qt::Key_9)
+    {
+        int keyNum = key-Qt::Key_0;
+        if(keyNum>0){
+            for(int i=0;i<pRadar->mTrackList.size();i++)
+            {
+                track_t* track=&( pRadar->mTrackList[i]);
+                if(track->operatorID==keyNum)
+                {
+
+                    mSelectedTrackId=track->uniqId;
+                    return;
+                }
+            }
+        }
+        for(int i=0;i<pRadar->mTrackList.size();i++)
+        {
+            track_t* track=&( pRadar->mTrackList[i]);
+            if(mSelectedTrackId==track->uniqId)
+            {
+                track->operatorID = keyNum;
+            }
+        }
     }
 
 }
@@ -731,9 +755,8 @@ void Mainwindow::DrawGrid(QPainter* p,short centerX,short centerY)
     QPen pen(QColor(150,150,150,0xff));
 
     pen.setStyle(Qt::DashLine);
-    QFont font;
-    font.setPointSize(10);
-    p->setFont(font);
+
+    p->setFont(QFont("Times", 10));
     p->setBrush(QBrush(Qt::NoBrush));
     p->setPen(pen);
     p->drawLine(centerX-5,centerY,centerX+5,centerY);
@@ -758,8 +781,8 @@ void Mainwindow::DrawGrid(QPainter* p,short centerX,short centerY)
     short gridR = ringStep*1.852f*mScale*7;
     for(theta=0;theta<360;theta+=90){
         QPoint point1,point2;
-        short dx = gridR*cosFast(radians(theta));
-        short dy = gridR*sinFast(radians(theta));
+        short dx = gridR*cos(radians(theta));
+        short dy = gridR*sin(radians(theta));
         point1.setX(centerX);
         point1.setY(centerY);
         point2.setX(centerX+dx);
@@ -769,8 +792,8 @@ void Mainwindow::DrawGrid(QPainter* p,short centerX,short centerY)
     }
     for(theta=0;theta<360;theta+=30){
         QPoint point1,point2;
-        short dx = gridR*cosFast(radians(theta));
-        short dy = gridR*sinFast(radians(theta));
+        short dx = gridR*cos(radians(theta));
+        short dy = gridR*sin(radians(theta));
         point1.setX(centerX);
         point1.setY(centerY);
         point2.setX( centerX+dx);
@@ -801,16 +824,21 @@ void Mainwindow::initGraphicView()
     //view->setBackgroundBrush(Qt::transparent);
 
 }
+//void Mainwindow::DrawTrack(track_t* track ,QPainter* p)
+//{
+
+//}
 #define TARG_SIZE 12
 void Mainwindow::DrawRadarTargetByPainter(QPainter* p)//draw radar target from pRadar->mTrackList
 {
+    p->setFont(QFont("Times", 8));
     QPen penTarget(Qt::darkMagenta);
     penTarget.setWidth(2);
     QPen penSelTarget(Qt::darkMagenta);
     penSelTarget.setWidth(2);
     penSelTarget.setStyle(Qt::DashLine);
-    QPen penTargetBlue(Qt::magenta);
-    penTargetBlue.setWidth(3);
+    QPen penTargetSelected(Qt::magenta);
+    penTargetSelected.setWidth(3);
     //penTargetBlue.setStyle(Qt::DashLine);
     //QPen penARPATrack(Qt::darkYellow);
     //draw radar targets
@@ -823,13 +851,80 @@ void Mainwindow::DrawRadarTargetByPainter(QPainter* p)//draw radar target from p
 //    p->setPen(penTargetBlue);
     unsigned int now_ms  = QDateTime::currentMSecsSinceEpoch() - pRadar->time_start_ms;
     bool blink = (now_ms/500)%2;
-
-    if(mShowTracks)//raw tracks
+    //draw operator indexed tracks
+    for (uint i = 0;i<pRadar->mTrackList.size();i++)
     {
-        for (uint i = 0;i<pRadar->mTrackList.size();i++)
+        track_t* track = &(pRadar->mTrackList[i]);
+        if(track->isRemoved())continue;
+        if(track->operatorID)//draw operator selected targets
         {
-            track_t* track = &(pRadar->mTrackList[i]);
-            if(track->isRemoved())continue;
+            if(mSelectedTrackId== track->uniqId)//selected
+            {
+                // draw history
+                p->setPen(penSelTarget);
+                for (int j = 0;j<track->objectHistory.size()-1;j++)
+                {
+                    object_t* obj1 = &(track->objectHistory[j]);
+                    object_t* obj2 = &(track->objectHistory[j+1]);
+                    sx = obj1->xkm*mScale + radCtX;
+                    sy = -obj1->ykm*mScale + radCtY;
+                    sx1 = obj2->xkm*mScale + radCtX;
+                    sy1 = -obj2->ykm*mScale + radCtY;
+                    p->drawLine(sx,sy,sx1,sy1);
+                }
+                p->setPen(penTargetSelected);
+            }
+            else p->setPen(penTarget);
+            if(track->isLost())
+            {
+                if(blink)
+                {
+                    //object_t* obj1 = &(track->objectList.back());
+                    sx = track->xkm*mScale + radCtX;
+                    sy = -track->ykm*mScale + radCtY;
+                    p->drawRect(sx-5,sy-5,10,10);
+                    p->drawLine(sx-7,sy-3,sx+7,sy+3);
+                    continue;
+                }
+            }
+            //nornal targets
+            else
+            {
+                //object_t* obj1 = &(track->objectList.back());
+                sx1 = track->xkm*mScale + radCtX;
+                sy1 = -track->ykm*mScale + radCtY;
+                int size = 18000.0/(now_ms - track->lastTimeMs+400);
+                if(size<TARG_SIZE)size=TARG_SIZE;//rect size depend to time
+                if(track->objectList.size()>3)
+                {
+
+                    p->drawEllipse(sx1-size/2,sy1-size/2,size,size);
+                    if(track->mSpeedkmhFit>10){
+                    sx = sx1+10*sinFast(track->bearingRadFit);
+                    sy = sy1-10*cosFast(track->bearingRadFit);
+                    p->drawLine(sx,sy,sx1,sy1);
+                    }
+
+                }
+                else {
+                    //p->setPen(penSelTarget);
+                    p->drawRect(sx1-size/2,sy1-size/2,size,size);
+                }
+//                else
+//                {
+//                    obj1 = &(track->objectList.back());
+//                    sx1 = obj1->xkm*mScale + radCtX;
+//                    sy1 = -obj1->ykm*mScale + radCtY;
+//                }
+
+
+            }
+            //draw target number
+
+            p->drawText(sx1+6,sy1+6,100,50,0,QString::number(track->operatorID));
+        }
+        else if(mShowTracks||mSelectedTrackId== track->uniqId)
+        {
             if(mSelectedTrackId== track->uniqId)
             {
                 p->setPen(penSelTarget);
@@ -843,7 +938,7 @@ void Mainwindow::DrawRadarTargetByPainter(QPainter* p)//draw radar target from p
                     sy1 = -obj2->ykm*mScale + radCtY;
                     p->drawLine(sx,sy,sx1,sy1);
                 }
-                p->setPen(penTargetBlue);
+                p->setPen(penTargetSelected);
             }
             else p->setPen(penTarget);
             if(track->isLost())
@@ -890,251 +985,9 @@ void Mainwindow::DrawRadarTargetByPainter(QPainter* p)//draw radar target from p
 
             }
         }
-
-    }
-    /*
-    trackList* trackListPt = &pRadar->mTrackList;
-    if(true)//ui->toolButton_blue_tracks->isChecked())
-    {
-        for(uint trackId=0;trackId<trackListPt->size();trackId++)
-        {
-            if(!trackListPt->at(trackId).isConfirmed)continue;
-            if(trackListPt->at(trackId).isManual)continue;
-            //if(trackListPt->at(trackId).state<5)continue;
-            sx = trackListPt->at(trackId).estX*scale_ppi + radCtX;
-            sy = -trackListPt->at(trackId).estY*scale_ppi + radCtY;
-            p->setPen(penTargetBlue);
-            p->drawRect(sx-5,sy-5,10,10);
-        }
-
     }
 
-    //draw red targets
-    for(uint trackId=0;trackId<trackListPt->size();trackId++)
-    {
-        if(!trackListPt->at(trackId).isManual)continue;
-        if(!trackListPt->at(trackId).isLost)
-        {
-            //x= trackListPt->at(trackId).estX*scale_ppi/mScale;
-            //y= trackListPt->at(trackId).estY*scale_ppi/mScale;
-            sx = trackListPt->at(trackId).estX*scale_ppi + radCtX;
-            sy = -trackListPt->at(trackId).estY*scale_ppi + radCtY;
-            if(trackListPt->at(trackId).dopler==17)//diem dau dat bang tay
-            {
-                p->setPen(penTargetBlue);
-                p->drawRect(sx-6,sy-6,12,12);
-                continue;
-            }
-            else if(trackListPt->at(trackId).isManual)
-            {
-                p->setPen(penTarget);
-                //ve huong di chuyen
-                if(trackListPt->at(trackId).object_list.size()>12)
-                {
-                    sx = trackListPt->at(trackId).estX*scale_ppi + radCtX;
-                    sy =-trackListPt->at(trackId).estY*scale_ppi + radCtY;
-                    p->drawLine(sx,sy,sx+15*sinFast(trackListPt->at(trackId).heading),sy-15*cosFast(trackListPt->at(trackId).heading));
-                }
-                //ve so hieu MT
-                p->drawText(sx+7,sy+7,300,40,0,QString::number(trackListPt->at(trackId).idCount));
-                //ve lich su qui dao
-                if(selectedTargetIndex==trackId)
-                {
-                    for(uint j=0 ;j<trackListPt->at(trackId).object_list.size();j+=3)
-                    {
-                        sx = trackListPt->at(trackId).object_list.at(j).xkm*mScale + radCtX;
-                        sy = -trackListPt->at(trackId).object_list.at(j).ykm*mScale + radCtY;
-                        p->drawPoint(sx,sy);
-                    }
-                    p->drawRect(sx-6,sy-6,12,12);
-                    p->setPen(penSelTarget);
-                    p->drawRect(sx-9,sy-9,18,18);
-                }
-                else
-                {
-                    p->drawRect(sx-6,sy-6,12,12);
 
-                }
-                continue;
-            }
-        }*/
-        //                draw track:
-
-        //                j--;
-        //                if(j<0)continue;
-        //printf("red");
-        /*if(trackListPt->at(trackId).confirmed)
-                {
-                    p->setPen(penTargetRed);
-
-                }
-                else
-                {
-                    p->setPen(penTargetBlue);
-                }
-                p->drawRect(x-6,y-6,12,12);
-                p->drawText(x+5,y+5,300,40,0,QString::number(trackListPt->at(trackId).state)
-                            + "-" + QString::number(trackListPt->at(trackId).terrain)
-                            + "-" + QString::number(trackListPt->at(trackId).dopler),0);*/
-        /*if(false)//trackListPt->at(i).isMoving) // moving obj
-                {
-
-                    QPolygon poly;
-                    QPoint   point,point2;
-                    point2.setX(x+trackListPt->at(i).velocity*500*sinFast(trackListPt->at(i).course));
-                    point2.setY(y-trackListPt->at(i).velocity*500*cosFast(trackListPt->at(i).course));
-
-                    point.setX(x+10*sinFast(trackListPt->at(i).course));
-                    point.setY(y-10*cosFast(trackListPt->at(i).course));
-                    p->setPen(penTargetBlue);
-                    p->drawLine(point,point2);
-                    poly<<point;
-                    point.setX(x+10*sinFast(trackListPt->at(i).course+2.3562));
-                    point.setY(y-10*cosFast(trackListPt->at(i).course+2.3562));
-                    poly<<point;
-                    point.setX(x);
-                    point.setY(y);
-                    poly<<point;
-                    point.setX(x+10*sinFast(trackListPt->at(i).course-2.3562));
-                    point.setY(y-10*cosFast(trackListPt->at(i).course-2.3562));
-                    poly<<point;
-                    point.setX(x+10*sinFast(trackListPt->at(i).course));
-                    point.setY(y-10*cosFast(trackListPt->at(i).course));
-                    poly<<point;
-                    p->setPen(penTargetRed);
-                    p->drawPolygon(poly);
-                    p->drawText(x-30,y-20,100,40,0,QString::number(i+1),0);
-                }else*/
-
-        /*}
-            else if(trackListPt->at(i).tclass==BLUE_OBJ)
-            {
-                p->setPen(penTargetBlue);
-                //printf("b");
-                p->drawRect(x-6,y-6,12,12);
-                p->drawText(x-30,y-20,100,40,0,QString::number(i+1),0);
-                p->drawLine(x,
-                            y,
-                            x+trackListPt->at(i).velocity*500*sinFast(trackListPt->at(i).course),
-                            y-trackListPt->at(i).velocity*500*cosFast(trackListPt->at(i).course));
-
-            }
-
-    }*/
-    /*else for(uint i=0;i<trackListPt->size();i++)
-    {
-        if(!trackListPt->at(i).state)continue;
-        short x,y;
-        p->setPen(penTrack);
-        short j;
-        //draw track:
-        for(j=0;j<((short)trackListPt->at(i).object_list.size());j++)
-        {
-            x = (trackListPt->at(i).object_list[j].x + RADAR_MAX_RESOLUTION)*signsize - (RADAR_MAX_RESOLUTION*signsize-scrCtX)-dx;
-            y = (RADAR_MAX_RESOLUTION - trackListPt->at(i).object_list[j].y)*signsize - (RADAR_MAX_RESOLUTION*signsize-scrCtY)-dy;
-            p->drawPoint(x,y);
-        }
-        j--;
-        if(j<0)continue;
-
-
-            if(trackListPt->at(i).isMoving) // moving obj
-            {
-
-                QPolygon poly;
-                QPoint   point,point2;
-                point2.setX(x+trackListPt->at(i).velocity*500*sinFast(trackListPt->at(i).course));
-                point2.setY(y-trackListPt->at(i).velocity*500*cosFast(trackListPt->at(i).course));
-
-                point.setX(x+10*sinFast(trackListPt->at(i).course));
-                point.setY(y-10*cosFast(trackListPt->at(i).course));
-                p->setPen(penTargetSub);
-                p->drawLine(point,point2);
-                poly<<point;
-                point.setX(x+10*sinFast(trackListPt->at(i).course+2.3562));
-                point.setY(y-10*cosFast(trackListPt->at(i).course+2.3562));
-                poly<<point;
-                point.setX(x);
-                point.setY(y);
-                poly<<point;
-                point.setX(x+10*sinFast(trackListPt->at(i).course-2.3562));
-                point.setY(y-10*cosFast(trackListPt->at(i).course-2.3562));
-                poly<<point;
-                point.setX(x+10*sinFast(trackListPt->at(i).course));
-                point.setY(y-10*cosFast(trackListPt->at(i).course));
-                poly<<point;
-                p->setPen(penTarget);
-                p->drawPolygon(poly);
-                p->drawText(x-30,y-20,100,40,0,QString::number(i+1),0);
-            }else
-            {
-                p->setPen(penTarget);
-                p->drawRect(x-6,y-6,12,12);
-                p->drawText(x-30,y-20,100,40,0,QString::number(i+1),0);
-            }
-
-
-    }*/
-    //draw arpa targets
-    /*
-    for(uint i=0;i<processing->arpaData->track_list.size();i++)
-    {
-        short x,y;
-        if(!processing->arpaData->track_list[i].lives)continue;
-        for(uint j=0;j<(processing->arpaData->track_list[i].object_list.size());j++)
-        {
-            x = processing->arpaData->track_list[i].object_list[j].centerX*scale+(radCtX);
-            y = processing->arpaData->track_list[i].object_list[j].centerY*scale+(radCtY);
-            //printf("\n x:%d y:%d",x,y);
-            p->setPen(penARPATrack);
-            p->drawPoint(x,y);
-        }
-        QPolygon poly;
-        QPoint point;
-
-        point.setX(x+10*sinFast(processing->arpaData->track_list[i].course));
-        point.setY(y-10*cosFast(processing->arpaData->track_list[i].course));
-        poly<<point;
-        point.setX(x+10*sinFast(processing->arpaData->track_list[i].course+2.3562f));
-        point.setY(y-10*cosFast(processing->arpaData->track_list[i].course+2.3562f));
-        poly<<point;
-        point.setX(x);
-        point.setY(y);
-        poly<<point;
-        point.setX(x+10*sinFast(processing->arpaData->track_list[i].course-2.3562f));
-        point.setY(y-10*cosFast(processing->arpaData->track_list[i].course-2.3562f));
-        poly<<point;
-        /*if(processing->arpaData->track_list[i].selected)
-        {
-            char buf[50];
-            p.setPen(penyellow);
-            sprintf(buf, "%3d:%3.3fNM:%3.3f\260",processing->arpaData->track_list[i].id,processing->arpaData->track_list[i].centerR/DEFAULT_NM, processing->arpaData->track_list[i].centerA*57.2957795);
-            QString info = QString::fromAscii(buf);
-            p.drawText(10,infoPosy,150,20,0,info);
-            infoPosy+=20;
-            if(processing->arpaData->track_list[i].id==curTargetId)
-            {
-                p.setPen(penyellow);
-                p.setBrush(Qt::red);
-            }
-                else
-            {
-                p.setPen(penTarget);
-                p.setBrush(Qt::red);
-            }
-
-        }else
-        {
-
-            p.setPen(pensubtaget);
-            p.setBrush(QColor(100,100,50,100));
-        }
-        p->setPen(penARPATarget);
-        //p->setBrush(Qt::red);
-        p->drawPolygon(poly);
-        p->drawText(x-20,y-20,20,40,0,QString::number(processing->arpaData->track_list[i].id),0);
-
-    }*/
 
 }
 void Mainwindow::ConvWGSToKm(double* x, double *y, double m_Long,double m_Lat)
@@ -1147,7 +1000,6 @@ void Mainwindow::ConvWGSToKm(double* x, double *y, double m_Long,double m_Lat)
 }
 void Mainwindow::ConvKmToWGS(double x, double y, double *m_Long, double *m_Lat)
 {
-
     *m_Lat  = mLat +  (y)/(111.132954);
     double refLat = (mLat +(*m_Lat))*0.00872664625997;//3.14159265358979324/180.0/2;
     *m_Long = (x)/(111.31949079327357*cos(refLat))+ mLon;
@@ -1611,9 +1463,8 @@ void Mainwindow::DrawViewFrame(QPainter* p)
     p->setPen(penOuterGrid2);
     p->drawEllipse(scrCtX-scrCtY+25,25,SCR_H -50,SCR_H -50);
     //p->setPen(penOuterGrid2);
-    QFont font10 = p->font() ;
-    font10.setPointSize(10);
-    p->setFont(font10);
+
+    p->setFont(QFont("Times", 10));
     for(short theta=0;theta<360;theta+=10)
     {
         if(CalcAziContour(theta,&points[0],&points[1],&points[2],SCR_H -50))
@@ -1944,12 +1795,10 @@ void MainWindow::sendFrame(const char* hexdata,QHostAddress host,int port )
     delete[] sendBuff;
 }
 */
-void Mainwindow::on_actionExit_triggered()
-{
-    processing->stopThread();
-    processing->wait();
-    ExitProgram();
-}
+//void Mainwindow::on_actionExit_triggered()
+//{
+
+//}
 void Mainwindow::ExitProgram()
 {
     //config.SaveToFile();
@@ -2130,6 +1979,7 @@ void Mainwindow::ViewTrackInfo()
                     selectionExist = true;
                     if(mDistanceUnit==0)//NM
                     {
+                        ui->label_data_ID->setText(QString::number(track->operatorID));
                         ui->label_data_range->setText(QString::number(nm(track->rgKm),'f',2)+"Nm");
                         ui->label_data_azi->setText(QString::number(track->aziDeg,'f',2)+degreeSymbol);
                         ui->label_data_speed->setText(QString::number(nm(track->mSpeedkmhFit),'f',1)+"Kn");
@@ -2138,6 +1988,7 @@ void Mainwindow::ViewTrackInfo()
                     }
                     else
                     {
+                        ui->label_data_ID->setText(QString::number(track->operatorID));
                         ui->label_data_range->setText(QString::number(track->rgKm,'f',2)+"Km");
                         ui->label_data_azi->setText(QString::number(track->aziDeg,'f',2)+degreeSymbol);
                         ui->label_data_speed->setText(QString::number(track->mSpeedkmhFit,'f',1)+"Km/h");
@@ -2935,7 +2786,9 @@ void Mainwindow::on_horizontalSlider_sea_valueChanged(int value)
 
 void Mainwindow::on_toolButton_exit_clicked()
 {
-    on_actionExit_triggered();
+    processing->stopThread();
+    processing->wait();
+    ExitProgram();
 }
 
 //void Mainwindow::on_toolButton_setting_clicked()

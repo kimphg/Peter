@@ -5,7 +5,7 @@
 //#include <QGeoCoordinate>
 #include <QNmeaPositionInfoSource>
 DataBuff dataB[MAX_IREC];
-uchar udpFrameBuffer[MAX_IREC][OUTPUT_FRAME_SIZE];
+//uchar udpFrameBuffer[MAX_IREC][OUTPUT_FRAME_SIZE];
 short iRec=0,iRead=0;
 bool *pIsDrawn;
 bool *pIsPlaying;
@@ -31,14 +31,15 @@ void dataProcessingThread::ReadDataBuffer()
     while(iRec!=iRead)
     {
         nread++;
-        uchar *pData = &udpFrameBuffer[iRead][0];
-        if(nread>400)
+
+        if(nread>=300)
         {
             mRadarData->resetData();
             break;
         }
+        uchar *pData = &(dataB[iRead].data[0]);
         isDrawn = false;
-        unsigned short dataLen = OUTPUT_FRAME_SIZE;
+        unsigned short dataLen = dataB[iRead].len;
         if(!isPlaying)
         {
             mRadarData->processSocketData(pData,dataLen);
@@ -629,9 +630,10 @@ void dataProcessingThread::run()
                 radarSocket->readDatagram((char*)&mReceiveBuff[0],len);
                 ProcessNavData((unsigned char*)mReceiveBuff,len);
             }
-            else
+            else if(len<=MAX_FRAME_SIZE)
             {
-                radarSocket->readDatagram((char*)&udpFrameBuffer[iRec][0],len);
+                dataB[iRec].len = len;
+                radarSocket->readDatagram(( char*)&(dataB[iRec].data[0]),len);
                 iRec++;
                 if(iRec>=MAX_IREC)iRec = 0;
             }

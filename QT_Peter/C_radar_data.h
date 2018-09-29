@@ -27,8 +27,10 @@
    #define PI                       3.14159265358979323846
 #endif
 #define FRAME_HEADER_SIZE 34
-#define RADAR_RESOLUTION 1024
-#define OUTPUT_FRAME_SIZE RADAR_RESOLUTION*2+FRAME_HEADER_SIZE
+#define RADAR_RESOLUTION 2048
+#define MAX_FRAME_SIZE RADAR_RESOLUTION*2+FRAME_HEADER_SIZE
+#define RADAR_RESOLUTION_HALF 1024
+#define MAX_FRAME_SIZE_HALF RADAR_RESOLUTION_HALF*2+FRAME_HEADER_SIZE
 #define CONST_E 2.71828182846
 #define MAX_TRACK_LEN               400
 #define MAX_TRACKS                  199
@@ -169,11 +171,9 @@ typedef struct  {
 
 //using Eigen::MatrixXf;
 enum class TrackState {newDetection=0,
-                       confirmed=1,
-                       operatorConfirmed = 2,
-                       operatorSelected = 3,
-                       lost = 4,
-                       removed=5};
+                       confirmed=3,
+                       lost = 2,
+                       removed=1};
 class track_t
 {
 public:
@@ -205,6 +205,7 @@ public:
         uniqId+=rand();
         isUpdating = false;
         mState = TrackState::newDetection;
+        operatorID = 0;
     }
     ~track_t()
     {
@@ -219,6 +220,7 @@ public:
         return mState==TrackState::lost;
     }
     TrackState mState;
+    int operatorID;
     uint time;
     unsigned long long uniqId;
     bool isUpdating;

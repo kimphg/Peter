@@ -134,7 +134,7 @@ private slots:
     void ExitProgram();
     void gpsOption();
     void processARPA();
-    void on_actionExit_triggered();
+//    void on_actionExit_triggered();
     void UpdateVideo();
     void PlaybackRecFile();
     void on_actionConnect_triggered();

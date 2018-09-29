@@ -35,7 +35,7 @@ struct GPSData
 struct DataBuff// buffer for data frame
 {
     short len;
-    unsigned char data[2500];
+    unsigned char data[MAX_FRAME_SIZE];
 };
 
 class radarStatus_3C
