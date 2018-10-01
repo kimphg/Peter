@@ -71,7 +71,7 @@ void regenerate(int azi)
 	}
 }
 #define NUM_OF_TARG 10
-target_t* target[NUM_OF_TARG];
+target_t* target[NUM_OF_TARG];			
 
 void initTargets()
 {

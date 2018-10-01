@@ -12,7 +12,7 @@
 #define HR2D_PK//
 #define FRAME_LEN 2048
 #define OUTPUT_FRAME_SIZE FRAME_LEN*2+FRAME_HEADER_SIZE
-#define FFT_SIZE 32
+#define FFT_SIZE 128
 #define BANG_KHONG 0
 int mFFTSkip = (FFT_SIZE/10);
 
@@ -69,6 +69,8 @@ public:
 		else
 		{
 			printf("\ncudaSetDevice on ");
+			printf("\ncuda fft size:%d", FFT_SIZE);
+			printf("\nFFT ratio:1/%d", mFFTSkip);
 		}
 		mFrameLen = frameLen;
 		mTichLuySize = ntichluy;
