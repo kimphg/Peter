@@ -12,9 +12,9 @@
 #define HR2D_PK//
 #define FRAME_LEN 2048
 #define OUTPUT_FRAME_SIZE FRAME_LEN*2+FRAME_HEADER_SIZE
-#define FFT_SIZE 128
+#define FFT_SIZE 256
 #define BANG_KHONG 0
-int mFFTSkip = (FFT_SIZE/10);
+int mFFTSkip = (FFT_SIZE/4);
 
 #define MAX_IREC 2400
 #pragma comment(lib, "user32.lib")
