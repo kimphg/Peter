@@ -29,8 +29,6 @@ QFile *exp_file = NULL;
 int sumvar = 0;
 int nNoiseCalculator = 0;
 short lastProcessAzi = 0;
-
-
 typedef struct  {
     //processing dataaziQueue
     unsigned char level [MAX_AZIR][RADAR_RESOLUTION];
@@ -867,7 +865,7 @@ short threshRay[RADAR_RESOLUTION];
 
 void C_radar_data::ProcessData(unsigned short azi,unsigned short lastAzi)
 {
-    float maxRain = 180;//noiseAverage+noiseVar*15;
+    float MAX_RAIN = 180;//noiseAverage+noiseVar*15;
     rainLevel = noiseAverage ;
     //    int leftAzi = curAzir-1;if(leftAzi<0)leftAzi+=MAX_AZIR;
     //int rightAzi = curAzir +1; if(rightAzi>=MAX_AZIR)rightAzi-=MAX_AZIR;
@@ -890,7 +888,7 @@ void C_radar_data::ProcessData(unsigned short azi,unsigned short lastAzi)
     {
         // RGS threshold
         rainLevel += krain_auto*(data_mem.level[azi][r_pos]-rainLevel);
-        if(rainLevel>maxRain)rainLevel = maxRain;
+        if(rainLevel>MAX_RAIN)rainLevel = MAX_RAIN;
         short nthresh = rainLevel + noiseVar*kgain_auto;
         threshRay[r_pos] += (nthresh-threshRay[r_pos])*0.5;
         bool cutoff = data_mem.level[azi][r_pos]<threshRay[r_pos];

@@ -14,7 +14,7 @@
 #define FFT_SIZE 1
 #define BANG_KHONG 0
 //int mFFTSkip = FFT_SIZE/8;
-
+#include <time.h>
 #define MAX_IREC 2400
 #pragma comment(lib, "user32.lib")
 #pragma comment (lib, "Ws2_32.lib")
@@ -115,16 +115,31 @@ void StartProcessing()
 }
 
 
-
+FILE* pFile;
 int main()
 {
 
 	/* start the capture */
 	socketInit();
-	
+
 	StartProcessing();
-	pcapRun();
+
+	char fileName[50];
+	time_t times = time(NULL);
+	int strlen = sprintf(fileName, "raw_data_record_%d.dat", times);
+	pFile = fopen(fileName, "wb");
+	if (!pFile)
+	{
+		printf("\n Error creating .dat file");
+	}
+	else
+	{
+		printf("\nRecord start, file name:");
+		printf(fileName);
+	}
 	
+	pcapRun();
+	fclose(pFile);
     return 0;
 }
 //precompiling code for FFT
@@ -312,17 +327,41 @@ void packet_handler(u_char *param, const struct pcap_pkthdr *pkt_header, const u
 	//    localtime_s(&ltime, &local_tv_sec);
 	//    strftime( timestr, sizeof timestr, "%H:%M:%S", &ltime);
 
-	if (pkt_header->len<1000)return;
+	//if (pkt_header->len<1000)return;
+	
 	//pkt_header->
-	if (((*(pkt_data + 36) << 8) | (*(pkt_data + 37))) != 5000)
+	/*if (((*(pkt_data + 36) << 8) | (*(pkt_data + 37))) != 5000)
 	{
 		//printf("\nport:%d",((*(pkt_data+36)<<8)|(*(pkt_data+37))));
 		return;
-	}
-	int iNext = iReady + 1;
-	if (iNext >= MAX_IREC)iNext = 0;
+	}*/
+	//int iNext = iReady + 1;
+	//if (iNext >= MAX_IREC)iNext = 0;
+	
 	u_char* data = (u_char*)pkt_data + UDP_HEADER_LEN;
-	if (data[0] == 1)		//I chanel first part
+	unsigned char len1 = (pkt_header->len)>>8;
+	unsigned char len2 = (pkt_header->len);
+	fwrite(&len1, 1,1 , pFile);
+	fwrite(&len2, 1, 1, pFile);
+	fwrite(data, 1,pkt_header->len , pFile);
+	if (ftell(pFile) > 100000000)
+	{
+		fclose(pFile);
+		char fileName[50];
+		time_t times = time(NULL);
+		int strlen = sprintf(fileName, "raw_data_record_%d.dat", times);
+		pFile = fopen(fileName, "wb");
+		if (!pFile)
+		{
+			printf("\n Error creating .dat file");
+		}
+		else
+		{
+			printf("\nRecord start, file name:");
+			printf(fileName);
+		}
+	}
+	/*if (data[0] == 1)		//I chanel first part
 	{
 		isUnsigned = false;
 		//dataBuff[iNext].isToFFT = ((iNext%mFFTSkip) == 0);
@@ -345,5 +384,5 @@ void packet_handler(u_char *param, const struct pcap_pkthdr *pkt_header, const u
 		iReady++;
 		if (iReady >= MAX_IREC)iReady = 0;
 	}
-	return;
+	return;*/
 }

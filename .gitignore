@@ -11,3 +11,8 @@
 *.pdb
 *.r2d
 *.tlog
+*.dat_
+*.dat
+*.log
+*.tlog
+*.pdb

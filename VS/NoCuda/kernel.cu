@@ -14,7 +14,7 @@
 #define OUTPUT_FRAME_SIZE FRAME_LEN*2+FRAME_HEADER_SIZE
 #define FFT_SIZE 256
 #define BANG_KHONG 0
-int mFFTSkip = (FFT_SIZE/4);
+int mFFTSkip = (FFT_SIZE / 4);
 
 #define MAX_IREC 2400
 #pragma comment(lib, "user32.lib")
