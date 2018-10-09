@@ -586,6 +586,13 @@ Mainwindow::Mainwindow(QWidget *parent) :
     ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
+    ui->tableWidget->setStyleSheet(//"background-color: rgb(24, 48, 64);"
+                                "QTableView::item{ color:white; background:#000000; font-weight:900; }"
+                               "QTableCornerButton::section { background-color:rgb(24, 48, 64); }"
+                               "QHeaderView::section { color:white; background-color:rgb(24, 48, 64); }");
+    ui->tableWidget_2->setStyleSheet("QTableView::item{ color:white; background:#000000; font-weight:900; }"
+                                     "QTableCornerButton::section { background-color:rgb(24, 48, 64); }"
+                                     "QHeaderView::section { color:white; background-color:rgb(24, 48, 64); }");
     degreeSymbol= QString::fromLocal8Bit("\260");
     //ui->frame_RadarViewOptions->hide();
     QFont font;
@@ -710,7 +717,8 @@ void Mainwindow::DrawMap()
     ConvKmToWGS((double(dx))/mScale,(double(-dy))/mScale,&dLong,&dLat);
     osmap->setCenterPos(dLat,dLong);
     QPixmap pix = osmap->getImage(mScale);
-    mTrans = mTrans.rotate(-mHeadingGPSOld);
+    mTrans.reset();
+    mTrans = mTrans.rotate((-mHeadingGPSOld));
     if(isHeadUp)
     {
         pix=pix.transformed(mTrans);
@@ -1090,10 +1098,22 @@ void Mainwindow::paintEvent(QPaintEvent *event)
                      dxMap,dyMap,SCR_H,SCR_H);
     }
     //draw signal
-    QRectF signRect(RAD_DISPLAY_RES-(radCtX),RAD_DISPLAY_RES-(radCtY),SCR_W,SCR_H);
-    QRectF screen(0,0,SCR_W,SCR_H);
 
-    p.drawImage(screen,*pRadar->img_ppi,signRect,Qt::AutoColor);
+    QRectF screen(0,0,SCR_W,SCR_H);
+    if(isHeadUp)
+    {
+        QImage newImg = pRadar->img_ppi->transformed(mTrans);
+        QRectF signRect(newImg.width()/2-(radCtX),newImg.height()/2-(radCtY),SCR_W,SCR_H);
+        p.drawImage(screen,newImg,signRect,Qt::AutoColor);
+//        pMapPainter.drawPixmap((-pix.width()/2+pMap->width()/2),
+//                     (-pix.height()/2+pMap->height()/2),pix.width(),pix.height(),pix
+//                     );
+    }
+    else
+    {
+        QRectF signRect(RAD_DISPLAY_RES-(radCtX),RAD_DISPLAY_RES-(radCtY),SCR_W,SCR_H);
+        p.drawImage(screen,*pRadar->img_ppi,signRect,Qt::AutoColor);
+    }
 
 //    QPixmap dstPix = QPixmap::fromImage(*pRadar->img_ppi);
 
@@ -1491,13 +1511,14 @@ void Mainwindow::DrawViewFrame(QPainter* p)
         //p->drawText(720,40,200,20,0,"Sector:  "+QString::number(centerAzi,'f',1));
     }*/
     //plot heading azi
+    double radHeading;
+    if(isHeadUp)
+    {
+        radHeading=0;
+    }else radHeading = (mHeadingGPSOld);
     if(mHeadingGPSOld)
     {
-        double radHeading;
-        if(isHeadUp)
-        {
-            radHeading=0;
-        }else radHeading = (mHeadingGPSOld);
+
         if(CalcAziContour(radHeading,SCR_H-SCR_BORDER_SIZE-20))
         {
             p->setPen(QPen(Qt::cyan,2,Qt::SolidLine,Qt::RoundCap));
@@ -1516,15 +1537,15 @@ void Mainwindow::DrawViewFrame(QPainter* p)
     }
 
     //plot cur azi
-    if(CalcAziContour(processing->mAntennaAzi,SCR_H-SCR_BORDER_SIZE-20))
-    {
-        p->setPen(QPen(Qt::red,4,Qt::SolidLine,Qt::RoundCap));
-        p->drawLine(points[2],points[1]);
-        //draw text
-        //p->drawText(720,20,200,20,0,"Antenna: "+QString::number(aziDeg,'f',1));
+//    if(CalcAziContour(processing->mAntennaAzi,SCR_H-SCR_BORDER_SIZE-20))
+//    {
+//        p->setPen(QPen(Qt::red,4,Qt::SolidLine,Qt::RoundCap));
+//        p->drawLine(points[2],points[1]);
+//        //draw text
+//        //p->drawText(720,20,200,20,0,"Antenna: "+QString::number(aziDeg,'f',1));
 
-    }
-    if(CalcAziContour(degrees(pRadar->getCurAziRad()),SCR_H-SCR_BORDER_SIZE-20))
+//    }
+    if(CalcAziContour(degrees(pRadar->getCurAziRad())+radHeading-mHeadingGPSOld,SCR_H-SCR_BORDER_SIZE-20))
     {
         p->setPen(QPen(Qt::cyan,4,Qt::SolidLine,Qt::RoundCap));
         p->drawLine(points[2],points[1]);
@@ -1630,7 +1651,7 @@ void Mainwindow::InitTimer()
     //syncTimer1s.moveToThread(t);
 
     connect(&timerVideoUpdate, SIGNAL(timeout()), this, SLOT(UpdateVideo()));
-    timerVideoUpdate.start(30);//ENVDEP
+    timerVideoUpdate.start(100);//ENVDEP
     //scrUpdateTimer.moveToThread(t2);
     //connect(t2,SIGNAL(finished()),t2,SLOT(deleteLater()));
 

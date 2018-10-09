@@ -6281,18 +6281,7 @@ public:
         tableWidget->raise();
         tableWidget_2->raise();
         toolButton_chi_thi_mt->raise();
-        bt_rg_1->raise();
-        bt_rg_2->raise();
-        bt_rg_7->raise();
-        bt_rg_1->raise();
-        bt_rg_2->raise();
-        bt_rg_3->raise();
-        bt_rg_4->raise();
-        bt_rg_8->raise();
-        bt_rg_5->raise();
-        bt_rg_6->raise();
         groupBox_24->raise();
-        groupBox_gps->raise();
         groupBox_gps->raise();
 #ifndef QT_NO_SHORTCUT
         label_rain->setBuddy(horizontalSlider_rain);
@@ -6302,7 +6291,7 @@ public:
 
         retranslateUi(MainWindow);
 
-        tabWidget_menu->setCurrentIndex(3);
+        tabWidget_menu->setCurrentIndex(2);
         groupBox_3->setCurrentIndex(1);
         comboBox->setCurrentIndex(0);
         tabWidget_iad->setCurrentIndex(5);
