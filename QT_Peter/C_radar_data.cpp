@@ -862,11 +862,11 @@ void C_radar_data::SetHeaderLen( short len)
     }
 }*/
 short threshRay[RADAR_RESOLUTION];
-
+#define MAX_RAIN  180//noiseAverage+noiseVar*15;
 void C_radar_data::ProcessData(unsigned short azi,unsigned short lastAzi)
 {
-    float MAX_RAIN = 180;//noiseAverage+noiseVar*15;
-    rainLevel = noiseAverage ;
+
+    rainLevel = noiseAverage;
     //    int leftAzi = curAzir-1;if(leftAzi<0)leftAzi+=MAX_AZIR;
     //int rightAzi = curAzir +1; if(rightAzi>=MAX_AZIR)rightAzi-=MAX_AZIR;
     //manual threshold

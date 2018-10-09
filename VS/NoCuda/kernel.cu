@@ -200,6 +200,7 @@ void socketDelete()
 	closesocket(mSocket);
 	WSACleanup();
 }
+void ProcessFrame(unsigned char*data, int len);
 
 DWORD WINAPI ProcessDataBuffer(LPVOID lpParam);
 DWORD WINAPI ProcessCommandBuffer(LPVOID lpParam);
@@ -222,16 +223,56 @@ void StartProcessing()
 
 }
 coreFFT *mFFT;
+FILE* pFile;
+unsigned char buff[3000];
 
+void ReplayData(const char* fileName)
+{
+	//char* mfileName = "C:\\Users\\Phuong-T1600\\Documents\\GitHub\\Peter\\VS\\x64\\Release\\raw_data_record_1538999224.dat";
+	pFile = fopen("D:\\HR2D\\raw_data_record_1539052815.dat", "rb");
+	if (!pFile)
+	{
+		printf("\nfopen failed");
+		return;
+	}
+	unsigned char len1, len2;
+	unsigned long long dataSize = 0;
+	while (!feof(pFile))
+	{
 
-int main()
+		fread(&len1, 1, 1, pFile);
+		fread(&len2, 1, 1, pFile);
+		int len = (len1 << 8) | len2;
+		printf("\ndatalen:%d", len);
+		if (len > 3000)
+		{
+			printf("\nwrong datalen");
+			break;
+		}
+		else if (len < 200)continue;
+		fread(buff, 1, len, pFile);
+		dataSize += len;
+		ProcessFrame(buff, len);
+		Sleep(5);
+	}
+	printf("\ntotal data sent:%d", dataSize);
+}
+
+int main(int argc, char **argv)
 {
 
 	/* start the capture */
 	socketInit();
 	mFFT = new coreFFT(FRAME_LEN, FFT_SIZE);
 	StartProcessing();
-	pcapRun();
+	if (argc >= 1)
+	{
+		char *fileName = argv[0];
+		printf("\nreplay data file:");
+		printf(fileName);
+		ReplayData(fileName);
+	}
+	else pcapRun();
 	
     return 0;
 }
@@ -472,59 +513,8 @@ void packet_handler(u_char *param, const struct pcap_pkthdr *pkt_header, const u
 
 		*/
 		u_char* data = (u_char*)pkt_data + UDP_HEADER_LEN;
-		int iNext = iReady + 1;
-		if (iNext >= MAX_IREC)iNext = 0;
-		memcpy(dataBuff[iNext].header, data, FRAME_HEADER_SIZE);
-		bool isLastFrame = false;
-		if (data[0] == 0)		//0: 1024 byte đầu kênh I
-		{
-			//memcpy(dataBuff[iNext].header, data, FRAME_HEADER_SIZE);
-			memcpy(dataBuff[iNext].dataPM_I, data + FRAME_HEADER_SIZE, 1024);
-		}
-		else if (data[0] == 1) //1: 1024 byte sau kênh I
-		{
-			memcpy(dataBuff[iNext].dataPM_I + 1024, data + FRAME_HEADER_SIZE, 1024);
-			
-		}
-		else if (data[0] == 2) //2: 1024 byte đầu kênh Q
-		{
-			memcpy(dataBuff[iNext].dataPM_Q, data + FRAME_HEADER_SIZE, 1024);
-			
-		}
-		else if (data[0] == 3) //3: 1024 byte sau kênh Q
-		{
-			memcpy(dataBuff[iNext].dataPM_Q + 1024, data + FRAME_HEADER_SIZE, 1024);
-			dataBuff[iNext].dataLen = FRAME_LEN;
-			isLastFrame = true;
-			
-		}
-		else if (data[0] == 5) //5: 1024 byte tín hiệu giả L/tục (512 byte đầu là I, 512 byte sau là Q) 
-		{
-			memcpy(dataBuff[iNext].dataPM_I, data + FRAME_HEADER_SIZE, 512);
-			memcpy(dataBuff[iNext].dataPM_Q, data + FRAME_HEADER_SIZE + 512, 512);
-			dataBuff[iNext].dataLen = 512;
-			isLastFrame = true;
-		}
-		else if (data[0] == 6) //6: 1024 byte sau kênh I tín hiệu xung đơn 
-		{
-			memcpy(dataBuff[iNext].dataPM_I, data + FRAME_HEADER_SIZE, 1024);
-			dataBuff[iNext].dataLen = 1024;
-			
-		}
-		else if (data[0] == 7) //7: 1024 byte sau kênh Q tín hiệu xung đơn 
-		{
-			memcpy(dataBuff[iNext].dataPM_Q, data + FRAME_HEADER_SIZE,1024);
-			dataBuff[iNext].dataLen = 1024;
-			isLastFrame = true;
-			
-		}
-		if (isLastFrame)
-		{
-			iReady++;
-			dataBuff[iNext].isToFFT = ((iNext%mFFTSkip) == 0);
-			if (iReady >= MAX_IREC)iReady = 0;
-		}
-		return;
+		ProcessFrame(data, pkt_header->len);
+		
 	}
 	
 	
@@ -558,3 +548,60 @@ void packet_handler(u_char *param, const struct pcap_pkthdr *pkt_header, const u
 	}
 	return;
 }*/
+void ProcessFrame(unsigned char*data, int len)
+{
+	int iNext = iReady + 1;
+	if (iNext >= MAX_IREC)iNext = 0;
+	memcpy(dataBuff[iNext].header, data, FRAME_HEADER_SIZE);
+	bool isLastFrame = false;
+	if (data[0] == 0)		//0: 1024 byte đầu kênh I
+	{
+		//memcpy(dataBuff[iNext].header, data, FRAME_HEADER_SIZE);
+		memcpy(dataBuff[iNext].dataPM_I, data + FRAME_HEADER_SIZE, 1024);
+	}
+	else if (data[0] == 1) //1: 1024 byte sau kênh I
+	{
+		memcpy(dataBuff[iNext].dataPM_I + 1024, data + FRAME_HEADER_SIZE, 1024);
+
+	}
+	else if (data[0] == 2) //2: 1024 byte đầu kênh Q
+	{
+		memcpy(dataBuff[iNext].dataPM_Q, data + FRAME_HEADER_SIZE, 1024);
+
+	}
+	else if (data[0] == 3) //3: 1024 byte sau kênh Q
+	{
+		memcpy(dataBuff[iNext].dataPM_Q + 1024, data + FRAME_HEADER_SIZE, 1024);
+		dataBuff[iNext].dataLen = FRAME_LEN;
+		isLastFrame = true;
+
+	}
+	else if (data[0] == 5) //5: 1024 byte tín hiệu giả L/tục (512 byte đầu là I, 512 byte sau là Q) 
+	{
+		memcpy(dataBuff[iNext].dataPM_I, data + FRAME_HEADER_SIZE, 512);
+		memcpy(dataBuff[iNext].dataPM_Q, data + FRAME_HEADER_SIZE + 512, 512);
+		dataBuff[iNext].dataLen = 512;
+		isLastFrame = true;
+	}
+	else if (data[0] == 6) //6: 1024 byte sau kênh I tín hiệu xung đơn 
+	{
+		memcpy(dataBuff[iNext].dataPM_I, data + FRAME_HEADER_SIZE, 1024);
+		dataBuff[iNext].dataLen = 1024;
+
+	}
+	else if (data[0] == 7) //7: 1024 byte sau kênh Q tín hiệu xung đơn 
+	{
+		memcpy(dataBuff[iNext].dataPM_Q, data + FRAME_HEADER_SIZE, 1024);
+		dataBuff[iNext].dataLen = 1024;
+		isLastFrame = true;
+
+	}
+	if (isLastFrame)
+	{
+		iReady++;
+		dataBuff[iNext].isToFFT = ((iNext%mFFTSkip) == 0);
+		if (iReady >= MAX_IREC)iReady = 0;
+	}
+	return;
+
+}

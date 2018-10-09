@@ -344,6 +344,7 @@ void packet_handler(u_char *param, const struct pcap_pkthdr *pkt_header, const u
 	fwrite(&len1, 1,1 , pFile);
 	fwrite(&len2, 1, 1, pFile);
 	fwrite(data, 1,pkt_header->len , pFile);
+	fflush(pFile);
 	if (ftell(pFile) > 100000000)
 	{
 		fclose(pFile);

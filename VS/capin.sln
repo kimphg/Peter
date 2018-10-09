@@ -11,6 +11,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "EthernetCapture", "Ethernet
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SignalSimulator", "SignalSimulator\SignalSimulator.vcxproj", "{E57D6C92-63DD-4A23-9E70-0CDC79922E58}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "cuda_replay_data", "cuda_replay\cuda_replay.vcxproj", "{E148B3F6-31B2-4B60-B285-1EAB74FBFCBB}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Mixed Platforms = Debug|Mixed Platforms
@@ -61,6 +63,16 @@ Global
 		{E57D6C92-63DD-4A23-9E70-0CDC79922E58}.Release|Win32.ActiveCfg = Release|Win32
 		{E57D6C92-63DD-4A23-9E70-0CDC79922E58}.Release|Win32.Build.0 = Release|Win32
 		{E57D6C92-63DD-4A23-9E70-0CDC79922E58}.Release|x64.ActiveCfg = Release|Win32
+		{E148B3F6-31B2-4B60-B285-1EAB74FBFCBB}.Debug|Mixed Platforms.ActiveCfg = Debug|x64
+		{E148B3F6-31B2-4B60-B285-1EAB74FBFCBB}.Debug|Mixed Platforms.Build.0 = Debug|x64
+		{E148B3F6-31B2-4B60-B285-1EAB74FBFCBB}.Debug|Win32.ActiveCfg = Debug|x64
+		{E148B3F6-31B2-4B60-B285-1EAB74FBFCBB}.Debug|x64.ActiveCfg = Debug|x64
+		{E148B3F6-31B2-4B60-B285-1EAB74FBFCBB}.Debug|x64.Build.0 = Debug|x64
+		{E148B3F6-31B2-4B60-B285-1EAB74FBFCBB}.Release|Mixed Platforms.ActiveCfg = Release|x64
+		{E148B3F6-31B2-4B60-B285-1EAB74FBFCBB}.Release|Mixed Platforms.Build.0 = Release|x64
+		{E148B3F6-31B2-4B60-B285-1EAB74FBFCBB}.Release|Win32.ActiveCfg = Release|x64
+		{E148B3F6-31B2-4B60-B285-1EAB74FBFCBB}.Release|x64.ActiveCfg = Release|x64
+		{E148B3F6-31B2-4B60-B285-1EAB74FBFCBB}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

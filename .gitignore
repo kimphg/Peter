@@ -16,3 +16,4 @@
 *.log
 *.tlog
 *.pdb
+*.deps
