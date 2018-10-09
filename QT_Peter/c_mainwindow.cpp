@@ -710,6 +710,7 @@ void Mainwindow::DrawMap()
     ConvKmToWGS((double(dx))/mScale,(double(-dy))/mScale,&dLong,&dLat);
     osmap->setCenterPos(dLat,dLong);
     QPixmap pix = osmap->getImage(mScale);
+    mTrans = mTrans.rotate(-mHeadingGPSOld);
     if(isHeadUp)
     {
         pix=pix.transformed(mTrans);
@@ -1091,7 +1092,7 @@ void Mainwindow::paintEvent(QPaintEvent *event)
     //draw signal
     QRectF signRect(RAD_DISPLAY_RES-(radCtX),RAD_DISPLAY_RES-(radCtY),SCR_W,SCR_H);
     QRectF screen(0,0,SCR_W,SCR_H);
-    mTrans = mTrans.rotate(-mHeadingGPSOld);
+
     p.drawImage(screen,*pRadar->img_ppi,signRect,Qt::AutoColor);
 
 //    QPixmap dstPix = QPixmap::fromImage(*pRadar->img_ppi);
