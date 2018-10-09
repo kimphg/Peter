@@ -77,6 +77,8 @@ bool c_gps::decode(char c)
     ++_term_number;
     _term_offset = 0;
     _is_checksum_term = (c == '*');//* character
+    if(_is_checksum_term)
+        _is_checksum_term=_is_checksum_term;
     return valid_sentence;
 
   case '$': // sentence begin

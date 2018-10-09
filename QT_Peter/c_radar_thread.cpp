@@ -616,7 +616,7 @@ void packet_handler(u_char *param, const struct pcap_pkthdr *header, const u_cha
     //    printf("\n");
 
 }
-uchar mReceiveBuff[500];
+uchar mReceiveBuff[502];
 void dataProcessingThread::run()
 {
 
@@ -628,7 +628,9 @@ void dataProcessingThread::run()
             if(len<500)// system packets
             {
                 radarSocket->readDatagram((char*)&mReceiveBuff[0],len);
-                ProcessNavData((unsigned char*)mReceiveBuff,len);
+                mReceiveBuff[len]='\r';
+                mReceiveBuff[len+1]='\n';
+                ProcessNavData((unsigned char*)mReceiveBuff,len+2);
             }
             else if(len<=MAX_FRAME_SIZE)
             {

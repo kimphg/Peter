@@ -22,14 +22,14 @@ int                         mDistanceUnit=0;//0:NM;1:KM
 double                      mZoomSizeRg = 2;
 double                      mZoomSizeAz = 10;
 double                      mLat=DEFAULT_LAT,mLon = DEFAULT_LONG;
-double                      mHeadingGPSNew = 0,mHeadingGPSOld=0;
+double                      mHeadingGPSNew = 0,mHeadingGPSOld=20;
 bool                        isMapOutdated = true;
 bool isHeadUp = false;
 short   mMousex =0,mMousey=0;
 dataProcessingThread        *processing;// thread xu ly du lieu radar
 C_radar_data                *pRadar;
 QThread                     *t2,*t1;
-QPen penBackground(QBrush(QColor(24 ,48 ,64,255)),250);
+QPen penBackground(QBrush(QColor(24 ,48 ,64,255)),200+SCR_BORDER_SIZE);
 QPen penOuterGrid4(QBrush(QColor(255,255,50 ,255)),4);//xoay mui tau
 QPen penOuterGrid2(QBrush(QColor(255,255,50 ,255)),2);
 QPen mGridViewPen1(QBrush(QColor(150,150,150,255)),1);
@@ -44,10 +44,10 @@ bool                        displayAlpha = false;
 //QList<CTarget*>             targetDisplayList;
 short                       dxMax,dyMax;
 C_ARPA_data                 arpa_data;
-short                       scrCtX= SCR_H/2 + SCR_LEFT_MARGIN, scrCtY= SCR_H/2;
+short                       scrCtX= SCR_H/2 + SCR_LEFT_MARGIN, scrCtY= SCR_H/2+SCR_TOP_MARGIN;
 short                       dx =0,dy=0,dxMap=0,dyMap=0;
 short                       radCtX= SCR_H/2 + SCR_LEFT_MARGIN;
-short                       radCtY= SCR_H/2;
+short                       radCtY= SCR_H/2+SCR_TOP_MARGIN;
 short                       mZoomCenterx,mZoomCentery,mMouseLastX,mMouseLastY;
 //bool                        isDraging = false;
 bool                        isScaleChanged =true;
@@ -764,7 +764,7 @@ void Mainwindow::DrawGrid(QPainter* p,short centerX,short centerY)
     //pen.setColor(QColor(30,90,150,120));
     pen.setWidth(1);
     p->setPen(pen);
-    for(short i = 1;i<8;i++)
+    for(short i = 1;i<6;i++)
     {
         int rad = i*ringStep*rangeRatio*mScale;
         p->drawEllipse(QPoint(centerX,centerY),
@@ -775,10 +775,8 @@ void Mainwindow::DrawGrid(QPainter* p,short centerX,short centerY)
         p->drawText(centerX+rad+2,centerY+2,100,20,0,QString::number(i*ringStep)+strDistanceUnit);
         p->drawText(centerX-rad+2,centerY+2,100,20,0,QString::number(i*ringStep)+strDistanceUnit);
     }
-
-
     short theta;
-    short gridR = ringStep*1.852f*mScale*7;
+    short gridR = ringStep*1.852f*mScale*5;
     for(theta=0;theta<360;theta+=90){
         QPoint point1,point2;
         short dx = gridR*cos(radians(theta));
@@ -1365,7 +1363,7 @@ void Mainwindow::ReloadSetting()
 
 
 }
-bool Mainwindow::CalcAziContour(double theta, QPoint *point0,QPoint *point1,QPoint *point2,int d)
+bool Mainwindow::CalcAziContour(double theta, int d)
 {
     if(theta>=360)theta-=360.0;
     if(theta<0)theta+=360.0;
@@ -1375,22 +1373,22 @@ bool Mainwindow::CalcAziContour(double theta, QPoint *point0,QPoint *point1,QPoi
 
     if(theta==0)
     {
-        point2->setX(scrCtX  - dx);
-        point2->setY(scrCtY - sqrt((d*d/4.0- dx*dx)));
-        point1->setX(point2->x());
-        point1->setY(point2->y()-5.0);
-        point0->setX(point2->x());
-        point0->setY(point2->y()-18.0);
+        points[2].setX(scrCtX  - dx);
+        points[2].setY(scrCtY - sqrt((d*d/4.0- dx*dx)));
+        points[1].setX(points[2].x());
+        points[1].setY(points[2].y()-5.0);
+        points[0].setX(points[2].x());
+        points[0].setY(points[2].y()-18.0);
     }
     else if(theta==180)
     {
 
-        point2->setX(scrCtX  - dx);
-        point2->setY(scrCtY + sqrt((d*d/4.0- dx*dx)));
-        point1->setX(point2->x());
-        point1->setY(point2->y()+5.0);
-        point0->setX(point2->x());
-        point0->setY(point2->y()+18.0);
+        points[2].setX(scrCtX  - dx);
+        points[2].setY(scrCtY + sqrt((d*d/4.0- dx*dx)));
+        points[1].setX(points[2].x());
+        points[1].setY(points[2].y()+5.0);
+        points[0].setX(points[2].x());
+        points[0].setY(points[2].y()+18.0);
     }
     else if (theta<180)
     {
@@ -1403,12 +1401,12 @@ bool Mainwindow::CalcAziContour(double theta, QPoint *point0,QPoint *point1,QPoi
         double rx = (-b + delta)/2.0/a;
         double ry = -rx/tanA;
         if(abs(rx)<100&&abs(ry)<100)return false;
-        point2->setX(scrCtX + rx -dx);
-        point2->setY(scrCtY + ry-dy);
-        point1->setX(point2->x()+5.0*sinA);
-        point1->setY(point2->y()-5.0*cosA);
-        point0->setX(point2->x()+18.0*sinA);
-        point0->setY(point2->y()-18.0*cosA);
+        points[2].setX(scrCtX + rx -dx);
+        points[2].setY(scrCtY + ry-dy);
+        points[1].setX(points[2].x()+5.0*sinA);
+        points[1].setY(points[2].y()-5.0*cosA);
+        points[0].setX(points[2].x()+18.0*sinA);
+        points[0].setY(points[2].y()-18.0*cosA);
     }
     else
     {
@@ -1423,12 +1421,12 @@ bool Mainwindow::CalcAziContour(double theta, QPoint *point0,QPoint *point1,QPoi
         rx =  (-b - delta)/2.0/a;
         ry = -rx/tanA;
         if(abs(rx)<100&&abs(ry)<100)return false;
-        point2->setX(scrCtX + rx - dx);
-        point2->setY(scrCtY + ry - dy);
-        point1->setX(point2->x()+5.0*sinA);
-        point1->setY(point2->y()-5.0*cosA);
-        point0->setX(point2->x()+18.0*sinA);
-        point0->setY(point2->y()-18.0*cosA);
+        points[2].setX(scrCtX + rx - dx);
+        points[2].setY(scrCtY + ry - dy);
+        points[1].setX(points[2].x()+5.0*sinA);
+        points[1].setY(points[2].y()-5.0*cosA);
+        points[0].setX(points[2].x()+18.0*sinA);
+        points[0].setY(points[2].y()-18.0*cosA);
     }
     return true;
 
@@ -1451,7 +1449,7 @@ void Mainwindow::DrawViewFrame(QPainter* p)
     //fill back ground
 
     p->setBrush(QColor(24,48,64,255));
-    p->drawRect(SCR_H+SCR_LEFT_MARGIN,0,SCR_W-SCR_H-SCR_LEFT_MARGIN,SCR_H);
+    p->drawRect(SCR_H+SCR_LEFT_MARGIN,SCR_TOP_MARGIN,SCR_W-SCR_H-SCR_LEFT_MARGIN,SCR_H);
     p->drawRect(0,0,SCR_LEFT_MARGIN,SCR_H);
     p->setBrush(Qt::NoBrush);
     p->setPen(penBackground);
@@ -1459,15 +1457,16 @@ void Mainwindow::DrawViewFrame(QPainter* p)
 //    {
 //        p->drawEllipse(-i/2+(scrCtX-scrCtY)+25,-i/2+25,SCR_H -50+i,SCR_H -50+i);
 //    }
-    p->drawEllipse(-100+SCR_LEFT_MARGIN,-100,SCR_H+200,SCR_H+200);
+    p->drawEllipse(-220+SCR_BORDER_SIZE+SCR_LEFT_MARGIN,
+                   -220+SCR_BORDER_SIZE+SCR_TOP_MARGIN,SCR_H+200,SCR_H+200);
     p->setPen(penOuterGrid2);
-    p->drawEllipse(scrCtX-scrCtY+25,25,SCR_H -50,SCR_H -50);
+    p->drawEllipse(SCR_LEFT_MARGIN+SCR_BORDER_SIZE/2,SCR_TOP_MARGIN+SCR_BORDER_SIZE/2,SCR_H -SCR_BORDER_SIZE,SCR_H -SCR_BORDER_SIZE);
     //p->setPen(penOuterGrid2);
 
     p->setFont(QFont("Times", 10));
     for(short theta=0;theta<360;theta+=10)
     {
-        if(CalcAziContour(theta,&points[0],&points[1],&points[2],SCR_H -50))
+        if(CalcAziContour(theta,SCR_H -SCR_BORDER_SIZE))
         {
             p->drawLine(points[1],points[2]);
             p->drawText(points[0].x()-25,points[0].y()-10,50,20,
@@ -1492,20 +1491,26 @@ void Mainwindow::DrawViewFrame(QPainter* p)
         if(isHeadUp)
         {
             radHeading=0;
-        }else radHeading = radians(mHeadingGPSOld);
-        p->setPen(QPen(Qt::cyan,6,Qt::SolidLine,Qt::RoundCap));
+        }else radHeading = (mHeadingGPSOld);
+        if(CalcAziContour(radHeading,SCR_H-SCR_BORDER_SIZE-20))
+        {
+            p->setPen(QPen(Qt::cyan,2,Qt::SolidLine,Qt::RoundCap));
+            //int lineLen = (SCR_H-SCR_BORDER_SIZE)/2;
+            //points[0].setX(lineLen*sin(radHeading)+radCtX);
+            //points[0].setY(lineLen*cos(radHeading)+radCtX);
 
-        points[0].setX(20*sin(radHeading)+radCtX);
-        points[0].setY(20*cos(radHeading)+radCtX);
-        double dX = 20*sin(radHeading);
-        double dY = 20*cos(radHeading);
-        p->drawLine(radCtX,radCtY,radCtX+dX,radCtY-dY);
-        //p->drawText(720,60,200,20,0,"Heading: "+QString::number(mHeadingGPS,'f',1));
+            p->drawLine(radCtX,radCtY,
+                        points[1].x(),
+                        points[1].y());
+            //p->drawText(720,60,200,20,0,"Heading: "+QString::number(mHeadingGPS,'f',1));
+
+        }
+
 
     }
 
     //plot cur azi
-    if(CalcAziContour(processing->mAntennaAzi,&points[0],&points[1],&points[2],height()-70))
+    if(CalcAziContour(processing->mAntennaAzi,SCR_H-SCR_BORDER_SIZE-20))
     {
         p->setPen(QPen(Qt::red,4,Qt::SolidLine,Qt::RoundCap));
         p->drawLine(points[2],points[1]);
@@ -1513,7 +1518,7 @@ void Mainwindow::DrawViewFrame(QPainter* p)
         //p->drawText(720,20,200,20,0,"Antenna: "+QString::number(aziDeg,'f',1));
 
     }
-    if(CalcAziContour(degrees(pRadar->getCurAziRad()),&points[0],&points[1],&points[2],height()-70))
+    if(CalcAziContour(degrees(pRadar->getCurAziRad()),SCR_H-SCR_BORDER_SIZE-20))
     {
         p->setPen(QPen(Qt::cyan,4,Qt::SolidLine,Qt::RoundCap));
         p->drawLine(points[2],points[1]);
@@ -2478,13 +2483,13 @@ void Mainwindow::setScaleRange(double srange)
 {
     if(mDistanceUnit==0)
     {
-        mScale = (SCR_H/2.0-5.0)/(rangeRatio*srange );
-        ringStep = srange/6.0f;
+        mScale = (SCR_H-SCR_BORDER_SIZE)/(rangeRatio*srange )/2;
+        ringStep = srange/4;
         ui->label_range->setText(QString::number(srange)+strDistanceUnit);
     }
     else if(mDistanceUnit==1)
     {
-        mScale = (SCR_H/2.0-5.0)/(rangeRatio*srange );
+        mScale = (SCR_H-SCR_BORDER_SIZE)/(rangeRatio*srange )/2;
         ringStep = srange/5;
         ui->label_range->setText(QString::number(srange)+strDistanceUnit);
     }
@@ -2497,38 +2502,38 @@ void Mainwindow::UpdateScale()
     bool isAdaptSn = ui->toolButton_auto_adapt->isChecked();
     if(mDistanceUnit==0)//NM
     {
-        switch(mRangeLevel)
+        switch(mRangeLevel-1)
         {
         case 0:
-            setScaleRange(1.5);
+            setScaleRange(2);
             if(isAdaptSn) sendToRadarString(CConfig::getString("mR0Command"));
             break;
         case 1:
-            setScaleRange(3);
+            setScaleRange(4);
             if(isAdaptSn) sendToRadarString(CConfig::getString("mR1Command"));
             break;
         case 2:
-            setScaleRange(6);
+            setScaleRange(8);
             if(isAdaptSn) sendToRadarString(CConfig::getString("mR2Command"));
             break;
         case 3:
-            setScaleRange(12);
+            setScaleRange(16);
             if(isAdaptSn) sendToRadarString(CConfig::getString("mR3Command"));
             break;
         case 4:
-            setScaleRange(24);
+            setScaleRange(32);
             if(isAdaptSn) sendToRadarString(CConfig::getString("mR4Command"));
             break;
         case 5:
-            setScaleRange(48);
+            setScaleRange(64);
             if(isAdaptSn) sendToRadarString(CConfig::getString("mR5Command"));
             break;
         case 6:
-            setScaleRange(96);
+            setScaleRange(128);
             if(isAdaptSn) sendToRadarString(CConfig::getString("mR6Command"));
             break;
         case 7:
-            setScaleRange(192);
+            setScaleRange(256);
             if(isAdaptSn) sendToRadarString(CConfig::getString("mR7Command"));
             break;
         default:
@@ -3906,6 +3911,8 @@ void Mainwindow::on_toolButton_head_up_toggled(bool checked)
     isHeadUp = checked;
     dx = 0;
     dy = 0;
+    radCtX = scrCtX-dx;
+    radCtY = scrCtY-dy;
     isMapOutdated = true;
 }
 
@@ -4233,4 +4240,97 @@ void Mainwindow::on_toolButton_dk_1_clicked()
 {
     commandMay22[4]=0x00;
     processing->sendCommand(commandMay22,12,false);
+}
+
+void Mainwindow::on_toolButton_chi_thi_mt_clicked(bool checked)
+{
+    //ui->toolButton_chi_thi_mt->sette
+}
+
+void Mainwindow::on_bt_rg_1_toggled(bool checked)
+{
+    if(checked)
+    {
+        mRangeLevel=1;
+        CConfig::setValue("mRangeLevel",mRangeLevel);
+        UpdateScale();
+        isMapOutdated = true;
+    }
+}
+
+void Mainwindow::on_bt_rg_2_toggled(bool checked)
+{
+    if(checked)
+    {
+        mRangeLevel=2;
+        CConfig::setValue("mRangeLevel",mRangeLevel);
+        UpdateScale();
+        isMapOutdated = true;
+    }
+}
+
+void Mainwindow::on_bt_rg_3_toggled(bool checked)
+{
+    if(checked)
+    {
+        mRangeLevel=3;
+        CConfig::setValue("mRangeLevel",mRangeLevel);
+        UpdateScale();
+        isMapOutdated = true;
+    }
+}
+
+void Mainwindow::on_bt_rg_4_toggled(bool checked)
+{
+    if(checked)
+    {
+        mRangeLevel=4;
+        CConfig::setValue("mRangeLevel",mRangeLevel);
+        UpdateScale();
+        isMapOutdated = true;
+    }
+}
+
+void Mainwindow::on_bt_rg_5_toggled(bool checked)
+{
+    if(checked)
+    {
+        mRangeLevel=5;
+        CConfig::setValue("mRangeLevel",mRangeLevel);
+        UpdateScale();
+        isMapOutdated = true;
+    }
+}
+
+void Mainwindow::on_bt_rg_6_toggled(bool checked)
+{
+    if(checked)
+    {
+        mRangeLevel=6;
+        CConfig::setValue("mRangeLevel",mRangeLevel);
+        UpdateScale();
+        isMapOutdated = true;
+    }
+}
+
+void Mainwindow::on_bt_rg_8_toggled(bool checked)
+{
+    if(checked)
+    {
+        mRangeLevel=8;
+        CConfig::setValue("mRangeLevel",mRangeLevel);
+        UpdateScale();
+        isMapOutdated = true;
+    }
+}
+
+void Mainwindow::on_bt_rg_7_toggled(bool checked)
+{
+    if(checked)
+    {
+        mRangeLevel=7;
+        CConfig::setValue("mRangeLevel",mRangeLevel);
+        UpdateScale();
+        isMapOutdated = true;
+    }
 }

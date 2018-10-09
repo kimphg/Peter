@@ -7,7 +7,9 @@
 //#define SCR_H 1080
 #define SCR_W 1280
 #define SCR_H 1024
-#define SCR_LEFT_MARGIN 5
+#define SCR_LEFT_MARGIN -25
+#define SCR_TOP_MARGIN 25
+#define SCR_BORDER_SIZE 120
 #define HR_FILE_EXTENSION ".r2d"
 //#include <qse>
 #include "dialogdocumentation.h"
@@ -502,6 +504,24 @@ private slots:
 
     void on_toolButton_dk_1_clicked();
 
+    void on_toolButton_chi_thi_mt_clicked(bool checked);
+
+    void on_bt_rg_1_toggled(bool checked);
+
+    void on_bt_rg_2_toggled(bool checked);
+
+    void on_bt_rg_3_toggled(bool checked);
+
+    void on_bt_rg_4_toggled(bool checked);
+
+    void on_bt_rg_5_toggled(bool checked);
+
+    void on_bt_rg_6_toggled(bool checked);
+
+    void on_bt_rg_8_toggled(bool checked);
+
+    void on_bt_rg_7_toggled(bool checked);
+
 private:
 
 //    bool mShowobjects,
@@ -518,7 +538,7 @@ private:
     bool isInsideViewZone(short x, short y);
     void UpdateMouseStat(QPainter *p);
     void setMouseMode(mouseMode mode, bool isOn);
-    bool CalcAziContour(double theta, QPoint *point0, QPoint *point1, QPoint *point2, int d);
+    bool CalcAziContour(double theta, int d);
     void DisplayClkAdc(int clk);
     void setDistanceUnit(int unit);
     void keyReleaseEvent(QKeyEvent *event);
