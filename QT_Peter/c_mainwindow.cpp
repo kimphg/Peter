@@ -10,7 +10,7 @@
 //#define CONST_NM 1.852f// he so chuyen doi tu km sang hai ly
 #define MAX_VIEW_RANGE_KM   50
 QStringList                 commandLogList;
-
+QTransform                  mTrans;
 QPixmap                     *pMap=NULL;// painter cho ban do
 //QPixmap                     *pViewFrame=NULL;// painter cho ban do
 CMap *osmap ;
@@ -712,9 +712,7 @@ void Mainwindow::DrawMap()
     QPixmap pix = osmap->getImage(mScale);
     if(isHeadUp)
     {
-        QTransform transform;
-        QTransform trans = transform.rotate(-mHeadingGPSOld);
-        pix=pix.transformed(trans);
+        pix=pix.transformed(mTrans);
     }
     pMapPainter.setOpacity(mMapOpacity);
     pMapPainter.drawPixmap((-pix.width()/2+pMap->width()/2),
@@ -1093,8 +1091,14 @@ void Mainwindow::paintEvent(QPaintEvent *event)
     //draw signal
     QRectF signRect(RAD_DISPLAY_RES-(radCtX),RAD_DISPLAY_RES-(radCtY),SCR_W,SCR_H);
     QRectF screen(0,0,SCR_W,SCR_H);
+    mTrans = mTrans.rotate(-mHeadingGPSOld);
     p.drawImage(screen,*pRadar->img_ppi,signRect,Qt::AutoColor);
 
+//    QPixmap dstPix = QPixmap::fromImage(*pRadar->img_ppi);
+
+
+
+//    p.drawPixmap(screen,dstPix,signRect);
     DrawRadarTargetByPainter(&p);
     //if(ui->toolButton_ais_show->isChecked())drawAisTarget(&p);
     //draw cursor
@@ -1107,6 +1111,7 @@ void Mainwindow::paintEvent(QPaintEvent *event)
     //    p.drawLine(mousePointerX,mousePointerY-10,mousePointerX,mousePointerY-15);
     //    p.drawLine(mousePointerX,mousePointerY+10,mousePointerX,mousePointerY+15);
     //draw mouse coordinates
+
     UpdateMouseStat(&p);
     if(ui->toolButton_ais_show->isChecked())drawAisTarget(&p);
     //ve luoi cu ly phuong vi
@@ -4333,4 +4338,9 @@ void Mainwindow::on_bt_rg_7_toggled(bool checked)
         UpdateScale();
         isMapOutdated = true;
     }
+}
+
+void Mainwindow::on_toolButton_xl_dopler_3_toggled(bool checked)
+{
+
 }

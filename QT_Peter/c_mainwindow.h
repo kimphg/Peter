@@ -522,6 +522,8 @@ private slots:
 
     void on_bt_rg_7_toggled(bool checked);
 
+    void on_toolButton_xl_dopler_3_toggled(bool checked);
+
 private:
 
 //    bool mShowobjects,

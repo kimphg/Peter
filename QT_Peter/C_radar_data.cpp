@@ -1057,7 +1057,8 @@ void C_radar_data::processSocketData(unsigned char* data,short len)
             }
             else
             {
-                newAzi = ((data[2]<<8)|data[3])>>5;
+                newAzi = ((data[2]<<8)|data[3]);
+                newAzi = ssiDecode(newAzi);
             }
 
         }

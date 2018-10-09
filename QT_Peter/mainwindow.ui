@@ -7482,7 +7482,7 @@
      <bool>false</bool>
     </property>
     <property name="currentIndex">
-     <number>3</number>
+     <number>2</number>
     </property>
     <property name="elideMode">
      <enum>Qt::ElideNone</enum>
@@ -38252,18 +38252,7 @@ background-color: rgba(255, 255, 255, 0);</string>
    <zorder>tableWidget</zorder>
    <zorder>tableWidget_2</zorder>
    <zorder>toolButton_chi_thi_mt</zorder>
-   <zorder>bt_rg_1</zorder>
-   <zorder>bt_rg_2</zorder>
-   <zorder>bt_rg_7</zorder>
-   <zorder>bt_rg_1</zorder>
-   <zorder>bt_rg_2</zorder>
-   <zorder>bt_rg_3</zorder>
-   <zorder>bt_rg_4</zorder>
-   <zorder>bt_rg_8</zorder>
-   <zorder>bt_rg_5</zorder>
-   <zorder>bt_rg_6</zorder>
    <zorder>groupBox_24</zorder>
-   <zorder>groupBox_gps</zorder>
    <zorder>groupBox_gps</zorder>
   </widget>
  </widget>
