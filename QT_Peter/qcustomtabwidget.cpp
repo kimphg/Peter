@@ -29,18 +29,21 @@ void QCustomTabWidget::hoverMove(QHoverEvent *)
     //highLight();
 
 }
-void QCustomTabWidget::highLight()
+void QCustomTabWidget::initStyle()
 {
-
-    if(this->currentIndex()>1)
-    {
-        this->setStyleSheet( "QCustomTabWidget{background-color: rgb(0, 0, 0,0);color:rgb(255, 255, 255);font: 12pt \"MS Shell Dlg 2\";}");
-    }
-    else
-    {
-        this->setStyleSheet("QCustomTabWidget{background-color: rgb(30, 50, 70,255);font: 12pt \"MS Shell Dlg 2\";}");
-    }
-    //repaint();
+    setStyleSheet("QCustomTabWidget{background-color: rgb(30, 50, 70,255);color:white;font: 8pt \"MS Shell Dlg 2\"; "
+                  "border-style: groove; border-width: 2px;border-color:white;}"
+                  //"QTabWidget QTabBar{background-color: rgb(30, 50, 70,255);border-style: groove; border-width: 2px;}"
+                  "QTabWidget QTabBar::tab{background-color: rgb(10, 20, 40,255);color:white;border-style: groove;border-right:noborder; border-width: 2px;}"
+                  "QTabWidget QTabBar::tab:selected{background-color: rgb(30, 50, 70,255);color:white;border-bottom:noborder}"
+                  );
+    /*  setStyleSheet("QCustomTabWidget{background-color: rgb(30, 50, 70,255);color:rgb(30, 50, 70,255);font: 12pt \"MS Shell Dlg 2\"; "
+                  "border-style: groove; border-width: 2px;border-color:white;}"
+                  "QTabWidget QTabBar{background-color: #136ba2;width: 256px;}"
+                  "QTabWidget QTabBar::tab{background-color: #136ba2;}"
+                  "QTabWidget QTabBar::tab:selected{background-color: #0f5d90;}"
+                  );
+                  */
 }
 void QCustomTabWidget::paintEvent(QPaintEvent *)
 {
@@ -59,8 +62,7 @@ void QCustomTabWidget::SetTransparent(bool transp)
         setStyleSheet("QCustomTabWidget{background-color: rgb(0, 0, 0,0);color:rgb(30, 50, 70,255);font: 12pt \"MS Shell Dlg 2\"; "
                             "border-style: groove; border-width: 2px;border-color:white;}");
     else
-    setStyleSheet("QCustomTabWidget{background-color: rgb(30, 50, 70,255);color:rgb(30, 50, 70,255);font: 12pt \"MS Shell Dlg 2\"; "
-                        "border-style: groove; border-width: 2px;border-color:white;}");
+        initStyle();
 
 }
 

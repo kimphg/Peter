@@ -30,7 +30,7 @@ dataProcessingThread        *processing;// thread xu ly du lieu radar
 C_radar_data                *pRadar;
 QThread                     *t2,*t1;
 QPen penBackground(QBrush(QColor(24 ,48 ,64,255)),200+SCR_BORDER_SIZE);
-QPen penOuterGrid4(QBrush(QColor(255,255,50 ,255)),4);//xoay mui tau
+QPen penOuterGrid1(QBrush(QColor(50,255,255 ,255)),2);//xoay mui tau
 QPen penOuterGrid2(QBrush(QColor(255,255,50 ,255)),2);
 QPen mGridViewPen1(QBrush(QColor(150,150,150,255)),1);
 QPoint points[6];
@@ -1487,17 +1487,41 @@ void Mainwindow::DrawViewFrame(QPainter* p)
                    -220+SCR_BORDER_SIZE+SCR_TOP_MARGIN,SCR_H+200,SCR_H+200);
     p->setPen(penOuterGrid2);
     p->drawEllipse(SCR_LEFT_MARGIN+SCR_BORDER_SIZE/2,SCR_TOP_MARGIN+SCR_BORDER_SIZE/2,SCR_H -SCR_BORDER_SIZE,SCR_H -SCR_BORDER_SIZE);
-    //p->setPen(penOuterGrid2);
-
     p->setFont(QFont("Times", 10));
+    double trueShift,headShift;
+    if(isHeadUp)
+    {
+        trueShift = -mHeadingGPSOld;
+        headShift = 0;
+    }
+    else
+    {
+        trueShift = 0;
+        headShift = mHeadingGPSOld;
+    }
+    //ve vanh goc ngoai
     for(short theta=0;theta<360;theta+=10)
     {
-        if(CalcAziContour(theta,SCR_H -SCR_BORDER_SIZE))
+        if(CalcAziContour(theta+trueShift,SCR_H - SCR_BORDER_SIZE))
         {
             p->drawLine(points[1],points[2]);
             p->drawText(points[0].x()-25,points[0].y()-10,50,20,
                     Qt::AlignHCenter|Qt::AlignVCenter,
                     QString::number(theta));
+        }
+    }
+    //ve vanh goc trong
+    p->setPen(penOuterGrid1);
+    for(short theta=-0;theta<360;theta+=10)
+    {
+        if(CalcAziContour(theta+headShift,SCR_H - SCR_BORDER_SIZE-40))
+        {
+            int value = theta;
+            if(value>180)value-=360;
+            p->drawLine(points[0],points[1]);
+            p->drawText(points[2].x()-25,points[2].y()-10,50,20,
+                    Qt::AlignHCenter|Qt::AlignVCenter,
+                    QString::number(value));
         }
     }
     //double aziDeg = rad2deg(pRadar->getCurAziRad());
@@ -1519,7 +1543,7 @@ void Mainwindow::DrawViewFrame(QPainter* p)
     if(mHeadingGPSOld)
     {
 
-        if(CalcAziContour(radHeading,SCR_H-SCR_BORDER_SIZE-20))
+        if(CalcAziContour(radHeading,SCR_H-SCR_BORDER_SIZE-18))
         {
             p->setPen(QPen(Qt::cyan,2,Qt::SolidLine,Qt::RoundCap));
             //int lineLen = (SCR_H-SCR_BORDER_SIZE)/2;
@@ -1693,8 +1717,22 @@ void Mainwindow::Update100ms()
             C_radar_data::kmxyToPolarDeg((mMousex - radCtX)/mScale,-(mMousey - radCtY)/mScale,&azi,&rg);
         }
         rg/=rangeRatio;
+        double headAzi ;
+        if(isHeadUp)
+        {
+            headAzi= azi;
+            azi+=mHeadingGPSOld;
+            if(azi<0)azi+=360;
+        }
+        else
+        {
+            headAzi= azi-mHeadingGPSOld;
+        }
+        if(headAzi>180)headAzi-=360;
+        if(headAzi<-180)headAzi+=360;
         ui->label_cursor_range->setText(QString::number(rg,'f',2)+strDistanceUnit);
-        ui->label_cursor_azi->setText(QString::number(azi)+degreeSymbol);
+        ui->label_cursor_azi->setText(QString::number(azi,'f',1)+degreeSymbol);
+        ui->label_cursor_azi_2->setText(QString::number(headAzi,'f',1)+degreeSymbol);
         ui->label_cursor_lat->setText(demicalDegToDegMin( y2lat(-(mMousey - radCtY)))+"'N");
         ui->label_cursor_long->setText(demicalDegToDegMin(x2lon(mMousex - radCtX))+"'E");
     }
@@ -2529,39 +2567,39 @@ void Mainwindow::UpdateScale()
     bool isAdaptSn = ui->toolButton_auto_adapt->isChecked();
     if(mDistanceUnit==0)//NM
     {
-        switch(mRangeLevel-1)
+        switch(mRangeLevel)
         {
         case 0:
             setScaleRange(2);
-            if(isAdaptSn) sendToRadarString(CConfig::getString("mR0Command"));
+            if(isAdaptSn) sendToRadarString(CConfig::getString("mR1Command"));
             break;
         case 1:
             setScaleRange(4);
-            if(isAdaptSn) sendToRadarString(CConfig::getString("mR1Command"));
+            if(isAdaptSn) sendToRadarString(CConfig::getString("mR2Command"));
             break;
         case 2:
             setScaleRange(8);
-            if(isAdaptSn) sendToRadarString(CConfig::getString("mR2Command"));
+            if(isAdaptSn) sendToRadarString(CConfig::getString("mR3Command"));
             break;
         case 3:
             setScaleRange(16);
-            if(isAdaptSn) sendToRadarString(CConfig::getString("mR3Command"));
+            if(isAdaptSn) sendToRadarString(CConfig::getString("mR4Command"));
             break;
         case 4:
             setScaleRange(32);
-            if(isAdaptSn) sendToRadarString(CConfig::getString("mR4Command"));
+            if(isAdaptSn) sendToRadarString(CConfig::getString("mR5Command"));
             break;
         case 5:
             setScaleRange(64);
-            if(isAdaptSn) sendToRadarString(CConfig::getString("mR5Command"));
+            if(isAdaptSn) sendToRadarString(CConfig::getString("mR6Command"));
             break;
         case 6:
             setScaleRange(128);
-            if(isAdaptSn) sendToRadarString(CConfig::getString("mR6Command"));
+            if(isAdaptSn) sendToRadarString(CConfig::getString("mR7Command"));
             break;
         case 7:
             setScaleRange(256);
-            if(isAdaptSn) sendToRadarString(CConfig::getString("mR7Command"));
+            if(isAdaptSn) sendToRadarString(CConfig::getString("mR8Command"));
             break;
         default:
             setScaleRange(48);
@@ -2589,19 +2627,19 @@ void Mainwindow::UpdateScale()
             if(isAdaptSn) sendToRadarString(CConfig::getString("mR3Command"));
             break;
         case 4:
-            setScaleRange(50);
+            setScaleRange(40);
             if(isAdaptSn) sendToRadarString(CConfig::getString("mR4Command"));
             break;
         case 5:
-            setScaleRange(100);
+            setScaleRange(80);
             if(isAdaptSn) sendToRadarString(CConfig::getString("mR5Command"));
             break;
         case 6:
-            setScaleRange(200);
+            setScaleRange(160);
             if(isAdaptSn) sendToRadarString(CConfig::getString("mR6Command"));
             break;
         case 7:
-            setScaleRange(400);
+            setScaleRange(320);
             if(isAdaptSn) sendToRadarString(CConfig::getString("mR7Command"));
             break;
         default:
@@ -4278,7 +4316,7 @@ void Mainwindow::on_bt_rg_1_toggled(bool checked)
 {
     if(checked)
     {
-        mRangeLevel=1;
+        mRangeLevel=0;
         CConfig::setValue("mRangeLevel",mRangeLevel);
         UpdateScale();
         isMapOutdated = true;
@@ -4289,7 +4327,7 @@ void Mainwindow::on_bt_rg_2_toggled(bool checked)
 {
     if(checked)
     {
-        mRangeLevel=2;
+        mRangeLevel=1;
         CConfig::setValue("mRangeLevel",mRangeLevel);
         UpdateScale();
         isMapOutdated = true;
@@ -4300,7 +4338,7 @@ void Mainwindow::on_bt_rg_3_toggled(bool checked)
 {
     if(checked)
     {
-        mRangeLevel=3;
+        mRangeLevel=2;
         CConfig::setValue("mRangeLevel",mRangeLevel);
         UpdateScale();
         isMapOutdated = true;
@@ -4311,7 +4349,7 @@ void Mainwindow::on_bt_rg_4_toggled(bool checked)
 {
     if(checked)
     {
-        mRangeLevel=4;
+        mRangeLevel=3;
         CConfig::setValue("mRangeLevel",mRangeLevel);
         UpdateScale();
         isMapOutdated = true;
@@ -4322,7 +4360,7 @@ void Mainwindow::on_bt_rg_5_toggled(bool checked)
 {
     if(checked)
     {
-        mRangeLevel=5;
+        mRangeLevel=4;
         CConfig::setValue("mRangeLevel",mRangeLevel);
         UpdateScale();
         isMapOutdated = true;
@@ -4333,7 +4371,7 @@ void Mainwindow::on_bt_rg_6_toggled(bool checked)
 {
     if(checked)
     {
-        mRangeLevel=6;
+        mRangeLevel=5;
         CConfig::setValue("mRangeLevel",mRangeLevel);
         UpdateScale();
         isMapOutdated = true;
@@ -4344,7 +4382,7 @@ void Mainwindow::on_bt_rg_8_toggled(bool checked)
 {
     if(checked)
     {
-        mRangeLevel=8;
+        mRangeLevel=7;
         CConfig::setValue("mRangeLevel",mRangeLevel);
         UpdateScale();
         isMapOutdated = true;
@@ -4355,7 +4393,7 @@ void Mainwindow::on_bt_rg_7_toggled(bool checked)
 {
     if(checked)
     {
-        mRangeLevel=7;
+        mRangeLevel=6;
         CConfig::setValue("mRangeLevel",mRangeLevel);
         UpdateScale();
         isMapOutdated = true;

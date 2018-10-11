@@ -18,7 +18,7 @@ protected:
     void mousePressEvent(QMouseEvent *event);
     void mouseReleaseEvent(QMouseEvent *event);
     void mouseMoveEvent(QMouseEvent *event);
-    void highLight();
+    void initStyle();
     void hoverEnter(QHoverEvent *event);
     void hoverLeave(QHoverEvent *event);
     void hoverMove(QHoverEvent *event);

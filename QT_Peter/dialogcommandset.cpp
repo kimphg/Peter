@@ -83,6 +83,7 @@ void DialogCommandSet::on_pushButton_save_clicked()
     QString mR5Command = ui->plainTextEdit_range_13->toPlainText();
     QString mR6Command = ui->plainTextEdit_range_14->toPlainText();
     QString mR7Command = ui->plainTextEdit_range_15->toPlainText();
+    QString mR8Command = ui->plainTextEdit_range_16->toPlainText();
 
     QString mRxCommand = ui->plainTextEdit_command_rx_2->toPlainText();
     QString mTxCommand = ui->plainTextEdit_command_tx_2->toPlainText();
@@ -94,6 +95,7 @@ void DialogCommandSet::on_pushButton_save_clicked()
     CConfig::setValue("mR5Command",mR5Command);
     CConfig::setValue("mR6Command",mR6Command);
     CConfig::setValue("mR7Command",mR7Command);
+    CConfig::setValue("mR8Command",mR8Command);
     CConfig::setValue("mRxCommand",mRxCommand);
     CConfig::setValue("mTxCommand",mTxCommand);
     //
@@ -103,6 +105,12 @@ void DialogCommandSet::on_pushButton_save_clicked()
     QString mFreq4Command =  ui->plainTextEdit_freq_10->toPlainText();
     QString mFreq5Command =  ui->plainTextEdit_freq_11->toPlainText();
     QString mFreq6Command =  ui->plainTextEdit_freq_12->toPlainText();
+    QString mFreq7Command =  ui->plainTextEdit_freq_13->toPlainText();
+    QString mFreq8Command =  ui->plainTextEdit_freq_14->toPlainText();
+    QString mFreq9Command =  ui->plainTextEdit_freq_15->toPlainText();
+    QString mFreq10Command =  ui->plainTextEdit_freq_16->toPlainText();
+    QString mFreq11Command =  ui->plainTextEdit_freq_17->toPlainText();
+    QString mFreq12Command =  ui->plainTextEdit_freq_18->toPlainText();
     //
     CConfig::setValue("mFreq1Command",mFreq1Command);
     CConfig::setValue("mFreq2Command",mFreq2Command);
@@ -110,5 +118,13 @@ void DialogCommandSet::on_pushButton_save_clicked()
     CConfig::setValue("mFreq4Command",mFreq4Command);
     CConfig::setValue("mFreq5Command",mFreq5Command);
     CConfig::setValue("mFreq6Command",mFreq6Command);
+
+    CConfig::setValue("mFreq7Command",mFreq7Command);
+    CConfig::setValue("mFreq8Command",mFreq8Command);
+    CConfig::setValue("mFreq9Command",mFreq9Command);
+    CConfig::setValue("mFreq10Command",mFreq10Command);
+    CConfig::setValue("mFreq11Command",mFreq11Command);
+    CConfig::setValue("mFreq12Command",mFreq12Command);
+    CConfig::SaveToFile();
 
 }

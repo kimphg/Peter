@@ -144,21 +144,10 @@ void dataProcessingThread::ReadNavData()
 }
 void dataProcessingThread::ProcessNavData(unsigned char *mReceiveBuff,int len)
 {
-    if(len<3)return;
+    if(len<7)return;
     if(mReceiveBuff[0]==0xaa&&mReceiveBuff[1]==0x55)//system messages
     {
-        if(mReceiveBuff[2]==0x6e)
-        {
-            //mAntennaAzi = ((mReceiveBuff[4]<<8)|mReceiveBuff[5])/11.377778;
-            //printf("\nmAntennaAzi:%f",mAntennaAzi);
-            /*if(rand()%4==0)
-            {
-                sendCommand(&mReceiveBuff[0],len,false);
-                mAntennaAziOld = mAntennaAzi;
-            }*/
-
-        }
-        else if(mReceiveBuff[2]==0x65)// trang thai may 2-2
+        if(mReceiveBuff[2]==0x65)// trang thai may 2-2
         {
             mRadarStat.ReadStatusMessage(&mReceiveBuff[4]);
         }
@@ -628,9 +617,8 @@ void dataProcessingThread::run()
             if(len<500)// system packets
             {
                 radarSocket->readDatagram((char*)&mReceiveBuff[0],len);
-                mReceiveBuff[len]='\r';
-                mReceiveBuff[len+1]='\n';
-                ProcessNavData((unsigned char*)mReceiveBuff,len+2);
+
+                ProcessNavData((unsigned char*)mReceiveBuff,len);
             }
             else if(len<=MAX_FRAME_SIZE)
             {
