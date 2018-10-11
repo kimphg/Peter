@@ -15,14 +15,12 @@
 #include <QtWidgets/QButtonGroup>
 #include <QtWidgets/QDialog>
 #include <QtWidgets/QFormLayout>
+#include <QtWidgets/QFrame>
 #include <QtWidgets/QGridLayout>
 #include <QtWidgets/QHeaderView>
 #include <QtWidgets/QLabel>
 #include <QtWidgets/QPlainTextEdit>
 #include <QtWidgets/QPushButton>
-#include <QtWidgets/QWidget>
-#include <qcustombutton.h>
-#include <qcustomgroupbox.h>
 
 QT_BEGIN_NAMESPACE
 
@@ -30,13 +28,12 @@ class Ui_DialogCommandSet
 {
 public:
     QGridLayout *gridLayout;
-    QCustomGroupBox *groupBox_control_setting;
+    QFrame *groupBox_control_setting;
     QLabel *label_command_3;
-    QCustomButton *toolButton_set_command_2;
     QPlainTextEdit *plainTextEdit_command_tx_2;
     QLabel *label_command_20;
     QPlainTextEdit *plainTextEdit_command_rx_2;
-    QWidget *layoutWidget_3;
+    QFrame *frame_3;
     QFormLayout *formLayout_12;
     QLabel *label_command_21;
     QPlainTextEdit *plainTextEdit_range_8;
@@ -54,20 +51,34 @@ public:
     QPlainTextEdit *plainTextEdit_range_14;
     QLabel *label_command_28;
     QPlainTextEdit *plainTextEdit_range_15;
-    QWidget *layoutWidget_4;
+    QLabel *label_command_35;
+    QPlainTextEdit *plainTextEdit_range_16;
+    QFrame *frame_4;
     QFormLayout *formLayout_13;
     QLabel *label_command_29;
     QPlainTextEdit *plainTextEdit_freq_7;
     QLabel *label_command_30;
-    QLabel *label_command_31;
-    QLabel *label_command_32;
-    QLabel *label_command_33;
-    QLabel *label_command_34;
     QPlainTextEdit *plainTextEdit_freq_8;
+    QLabel *label_command_31;
     QPlainTextEdit *plainTextEdit_freq_9;
+    QLabel *label_command_32;
     QPlainTextEdit *plainTextEdit_freq_10;
+    QLabel *label_command_33;
     QPlainTextEdit *plainTextEdit_freq_11;
+    QLabel *label_command_34;
     QPlainTextEdit *plainTextEdit_freq_12;
+    QPlainTextEdit *plainTextEdit_freq_13;
+    QLabel *label_command_36;
+    QPlainTextEdit *plainTextEdit_freq_14;
+    QPlainTextEdit *plainTextEdit_freq_15;
+    QPlainTextEdit *plainTextEdit_freq_16;
+    QPlainTextEdit *plainTextEdit_freq_17;
+    QPlainTextEdit *plainTextEdit_freq_18;
+    QLabel *label_command_37;
+    QLabel *label_command_38;
+    QLabel *label_command_39;
+    QLabel *label_command_40;
+    QLabel *label_command_41;
     QPushButton *pushButton_save;
     QPushButton *pushButton_2;
 
@@ -75,10 +86,12 @@ public:
     {
         if (DialogCommandSet->objectName().isEmpty())
             DialogCommandSet->setObjectName(QStringLiteral("DialogCommandSet"));
-        DialogCommandSet->resize(903, 838);
+        DialogCommandSet->resize(1063, 833);
         gridLayout = new QGridLayout(DialogCommandSet);
+        gridLayout->setSpacing(0);
         gridLayout->setObjectName(QStringLiteral("gridLayout"));
-        groupBox_control_setting = new QCustomGroupBox(DialogCommandSet);
+        gridLayout->setContentsMargins(0, 0, 0, 0);
+        groupBox_control_setting = new QFrame(DialogCommandSet);
         groupBox_control_setting->setObjectName(QStringLiteral("groupBox_control_setting"));
         label_command_3 = new QLabel(groupBox_control_setting);
         label_command_3->setObjectName(QStringLiteral("label_command_3"));
@@ -148,12 +161,9 @@ public:
         label_command_3->setFont(font);
         label_command_3->setStyleSheet(QStringLiteral("background-color: rgb(16, 32, 64);"));
         label_command_3->setAlignment(Qt::AlignCenter);
-        toolButton_set_command_2 = new QCustomButton(groupBox_control_setting);
-        toolButton_set_command_2->setObjectName(QStringLiteral("toolButton_set_command_2"));
-        toolButton_set_command_2->setGeometry(QRect(610, 570, 171, 41));
         plainTextEdit_command_tx_2 = new QPlainTextEdit(groupBox_control_setting);
         plainTextEdit_command_tx_2->setObjectName(QStringLiteral("plainTextEdit_command_tx_2"));
-        plainTextEdit_command_tx_2->setGeometry(QRect(210, 10, 671, 71));
+        plainTextEdit_command_tx_2->setGeometry(QRect(210, 10, 821, 71));
         label_command_20 = new QLabel(groupBox_control_setting);
         label_command_20->setObjectName(QStringLiteral("label_command_20"));
         label_command_20->setGeometry(QRect(10, 100, 161, 31));
@@ -211,13 +221,13 @@ public:
         label_command_20->setAlignment(Qt::AlignCenter);
         plainTextEdit_command_rx_2 = new QPlainTextEdit(groupBox_control_setting);
         plainTextEdit_command_rx_2->setObjectName(QStringLiteral("plainTextEdit_command_rx_2"));
-        plainTextEdit_command_rx_2->setGeometry(QRect(210, 90, 671, 61));
-        layoutWidget_3 = new QWidget(groupBox_control_setting);
-        layoutWidget_3->setObjectName(QStringLiteral("layoutWidget_3"));
-        layoutWidget_3->setGeometry(QRect(10, 160, 491, 667));
-        formLayout_12 = new QFormLayout(layoutWidget_3);
+        plainTextEdit_command_rx_2->setGeometry(QRect(210, 90, 821, 61));
+        frame_3 = new QFrame(groupBox_control_setting);
+        frame_3->setObjectName(QStringLiteral("frame_3"));
+        frame_3->setGeometry(QRect(10, 160, 521, 600));
+        formLayout_12 = new QFormLayout(frame_3);
         formLayout_12->setObjectName(QStringLiteral("formLayout_12"));
-        label_command_21 = new QLabel(layoutWidget_3);
+        label_command_21 = new QLabel(frame_3);
         label_command_21->setObjectName(QStringLiteral("label_command_21"));
         sizePolicy.setHeightForWidth(label_command_21->sizePolicy().hasHeightForWidth());
         label_command_21->setSizePolicy(sizePolicy);
@@ -274,12 +284,12 @@ public:
 
         formLayout_12->setWidget(0, QFormLayout::LabelRole, label_command_21);
 
-        plainTextEdit_range_8 = new QPlainTextEdit(layoutWidget_3);
+        plainTextEdit_range_8 = new QPlainTextEdit(frame_3);
         plainTextEdit_range_8->setObjectName(QStringLiteral("plainTextEdit_range_8"));
 
         formLayout_12->setWidget(0, QFormLayout::FieldRole, plainTextEdit_range_8);
 
-        label_command_22 = new QLabel(layoutWidget_3);
+        label_command_22 = new QLabel(frame_3);
         label_command_22->setObjectName(QStringLiteral("label_command_22"));
         sizePolicy.setHeightForWidth(label_command_22->sizePolicy().hasHeightForWidth());
         label_command_22->setSizePolicy(sizePolicy);
@@ -336,12 +346,12 @@ public:
 
         formLayout_12->setWidget(1, QFormLayout::LabelRole, label_command_22);
 
-        plainTextEdit_range_9 = new QPlainTextEdit(layoutWidget_3);
+        plainTextEdit_range_9 = new QPlainTextEdit(frame_3);
         plainTextEdit_range_9->setObjectName(QStringLiteral("plainTextEdit_range_9"));
 
         formLayout_12->setWidget(1, QFormLayout::FieldRole, plainTextEdit_range_9);
 
-        label_command_23 = new QLabel(layoutWidget_3);
+        label_command_23 = new QLabel(frame_3);
         label_command_23->setObjectName(QStringLiteral("label_command_23"));
         sizePolicy.setHeightForWidth(label_command_23->sizePolicy().hasHeightForWidth());
         label_command_23->setSizePolicy(sizePolicy);
@@ -398,12 +408,12 @@ public:
 
         formLayout_12->setWidget(2, QFormLayout::LabelRole, label_command_23);
 
-        plainTextEdit_range_10 = new QPlainTextEdit(layoutWidget_3);
+        plainTextEdit_range_10 = new QPlainTextEdit(frame_3);
         plainTextEdit_range_10->setObjectName(QStringLiteral("plainTextEdit_range_10"));
 
         formLayout_12->setWidget(2, QFormLayout::FieldRole, plainTextEdit_range_10);
 
-        label_command_24 = new QLabel(layoutWidget_3);
+        label_command_24 = new QLabel(frame_3);
         label_command_24->setObjectName(QStringLiteral("label_command_24"));
         sizePolicy.setHeightForWidth(label_command_24->sizePolicy().hasHeightForWidth());
         label_command_24->setSizePolicy(sizePolicy);
@@ -460,12 +470,12 @@ public:
 
         formLayout_12->setWidget(3, QFormLayout::LabelRole, label_command_24);
 
-        plainTextEdit_range_11 = new QPlainTextEdit(layoutWidget_3);
+        plainTextEdit_range_11 = new QPlainTextEdit(frame_3);
         plainTextEdit_range_11->setObjectName(QStringLiteral("plainTextEdit_range_11"));
 
         formLayout_12->setWidget(3, QFormLayout::FieldRole, plainTextEdit_range_11);
 
-        label_command_25 = new QLabel(layoutWidget_3);
+        label_command_25 = new QLabel(frame_3);
         label_command_25->setObjectName(QStringLiteral("label_command_25"));
         sizePolicy.setHeightForWidth(label_command_25->sizePolicy().hasHeightForWidth());
         label_command_25->setSizePolicy(sizePolicy);
@@ -522,12 +532,12 @@ public:
 
         formLayout_12->setWidget(4, QFormLayout::LabelRole, label_command_25);
 
-        plainTextEdit_range_12 = new QPlainTextEdit(layoutWidget_3);
+        plainTextEdit_range_12 = new QPlainTextEdit(frame_3);
         plainTextEdit_range_12->setObjectName(QStringLiteral("plainTextEdit_range_12"));
 
         formLayout_12->setWidget(4, QFormLayout::FieldRole, plainTextEdit_range_12);
 
-        label_command_26 = new QLabel(layoutWidget_3);
+        label_command_26 = new QLabel(frame_3);
         label_command_26->setObjectName(QStringLiteral("label_command_26"));
         sizePolicy.setHeightForWidth(label_command_26->sizePolicy().hasHeightForWidth());
         label_command_26->setSizePolicy(sizePolicy);
@@ -584,12 +594,12 @@ public:
 
         formLayout_12->setWidget(5, QFormLayout::LabelRole, label_command_26);
 
-        plainTextEdit_range_13 = new QPlainTextEdit(layoutWidget_3);
+        plainTextEdit_range_13 = new QPlainTextEdit(frame_3);
         plainTextEdit_range_13->setObjectName(QStringLiteral("plainTextEdit_range_13"));
 
         formLayout_12->setWidget(5, QFormLayout::FieldRole, plainTextEdit_range_13);
 
-        label_command_27 = new QLabel(layoutWidget_3);
+        label_command_27 = new QLabel(frame_3);
         label_command_27->setObjectName(QStringLiteral("label_command_27"));
         sizePolicy.setHeightForWidth(label_command_27->sizePolicy().hasHeightForWidth());
         label_command_27->setSizePolicy(sizePolicy);
@@ -646,12 +656,12 @@ public:
 
         formLayout_12->setWidget(6, QFormLayout::LabelRole, label_command_27);
 
-        plainTextEdit_range_14 = new QPlainTextEdit(layoutWidget_3);
+        plainTextEdit_range_14 = new QPlainTextEdit(frame_3);
         plainTextEdit_range_14->setObjectName(QStringLiteral("plainTextEdit_range_14"));
 
         formLayout_12->setWidget(6, QFormLayout::FieldRole, plainTextEdit_range_14);
 
-        label_command_28 = new QLabel(layoutWidget_3);
+        label_command_28 = new QLabel(frame_3);
         label_command_28->setObjectName(QStringLiteral("label_command_28"));
         sizePolicy.setHeightForWidth(label_command_28->sizePolicy().hasHeightForWidth());
         label_command_28->setSizePolicy(sizePolicy);
@@ -708,20 +718,15 @@ public:
 
         formLayout_12->setWidget(7, QFormLayout::LabelRole, label_command_28);
 
-        plainTextEdit_range_15 = new QPlainTextEdit(layoutWidget_3);
+        plainTextEdit_range_15 = new QPlainTextEdit(frame_3);
         plainTextEdit_range_15->setObjectName(QStringLiteral("plainTextEdit_range_15"));
 
         formLayout_12->setWidget(7, QFormLayout::FieldRole, plainTextEdit_range_15);
 
-        layoutWidget_4 = new QWidget(groupBox_control_setting);
-        layoutWidget_4->setObjectName(QStringLiteral("layoutWidget_4"));
-        layoutWidget_4->setGeometry(QRect(510, 160, 371, 458));
-        formLayout_13 = new QFormLayout(layoutWidget_4);
-        formLayout_13->setObjectName(QStringLiteral("formLayout_13"));
-        label_command_29 = new QLabel(layoutWidget_4);
-        label_command_29->setObjectName(QStringLiteral("label_command_29"));
-        sizePolicy.setHeightForWidth(label_command_29->sizePolicy().hasHeightForWidth());
-        label_command_29->setSizePolicy(sizePolicy);
+        label_command_35 = new QLabel(frame_3);
+        label_command_35->setObjectName(QStringLiteral("label_command_35"));
+        sizePolicy.setHeightForWidth(label_command_35->sizePolicy().hasHeightForWidth());
+        label_command_35->setSizePolicy(sizePolicy);
         QPalette palette10;
         palette10.setBrush(QPalette::Active, QPalette::WindowText, brush);
         palette10.setBrush(QPalette::Active, QPalette::Button, brush1);
@@ -768,22 +773,27 @@ public:
         palette10.setBrush(QPalette::Disabled, QPalette::AlternateBase, brush2);
         palette10.setBrush(QPalette::Disabled, QPalette::ToolTipBase, brush3);
         palette10.setBrush(QPalette::Disabled, QPalette::ToolTipText, brush2);
-        label_command_29->setPalette(palette10);
-        label_command_29->setFont(font);
-        label_command_29->setStyleSheet(QStringLiteral("background-color: rgb(16, 32, 64);"));
-        label_command_29->setAlignment(Qt::AlignCenter);
+        label_command_35->setPalette(palette10);
+        label_command_35->setFont(font);
+        label_command_35->setStyleSheet(QStringLiteral("background-color: rgb(16, 32, 64);"));
+        label_command_35->setAlignment(Qt::AlignCenter);
 
-        formLayout_13->setWidget(0, QFormLayout::LabelRole, label_command_29);
+        formLayout_12->setWidget(8, QFormLayout::LabelRole, label_command_35);
 
-        plainTextEdit_freq_7 = new QPlainTextEdit(layoutWidget_4);
-        plainTextEdit_freq_7->setObjectName(QStringLiteral("plainTextEdit_freq_7"));
+        plainTextEdit_range_16 = new QPlainTextEdit(frame_3);
+        plainTextEdit_range_16->setObjectName(QStringLiteral("plainTextEdit_range_16"));
 
-        formLayout_13->setWidget(0, QFormLayout::FieldRole, plainTextEdit_freq_7);
+        formLayout_12->setWidget(8, QFormLayout::FieldRole, plainTextEdit_range_16);
 
-        label_command_30 = new QLabel(layoutWidget_4);
-        label_command_30->setObjectName(QStringLiteral("label_command_30"));
-        sizePolicy.setHeightForWidth(label_command_30->sizePolicy().hasHeightForWidth());
-        label_command_30->setSizePolicy(sizePolicy);
+        frame_4 = new QFrame(groupBox_control_setting);
+        frame_4->setObjectName(QStringLiteral("frame_4"));
+        frame_4->setGeometry(QRect(540, 160, 491, 601));
+        formLayout_13 = new QFormLayout(frame_4);
+        formLayout_13->setObjectName(QStringLiteral("formLayout_13"));
+        label_command_29 = new QLabel(frame_4);
+        label_command_29->setObjectName(QStringLiteral("label_command_29"));
+        sizePolicy.setHeightForWidth(label_command_29->sizePolicy().hasHeightForWidth());
+        label_command_29->setSizePolicy(sizePolicy);
         QPalette palette11;
         palette11.setBrush(QPalette::Active, QPalette::WindowText, brush);
         palette11.setBrush(QPalette::Active, QPalette::Button, brush1);
@@ -830,17 +840,22 @@ public:
         palette11.setBrush(QPalette::Disabled, QPalette::AlternateBase, brush2);
         palette11.setBrush(QPalette::Disabled, QPalette::ToolTipBase, brush3);
         palette11.setBrush(QPalette::Disabled, QPalette::ToolTipText, brush2);
-        label_command_30->setPalette(palette11);
-        label_command_30->setFont(font);
-        label_command_30->setStyleSheet(QStringLiteral("background-color: rgb(16, 32, 64);"));
-        label_command_30->setAlignment(Qt::AlignCenter);
+        label_command_29->setPalette(palette11);
+        label_command_29->setFont(font);
+        label_command_29->setStyleSheet(QStringLiteral("background-color: rgb(16, 32, 64);"));
+        label_command_29->setAlignment(Qt::AlignCenter);
 
-        formLayout_13->setWidget(1, QFormLayout::LabelRole, label_command_30);
+        formLayout_13->setWidget(0, QFormLayout::LabelRole, label_command_29);
 
-        label_command_31 = new QLabel(layoutWidget_4);
-        label_command_31->setObjectName(QStringLiteral("label_command_31"));
-        sizePolicy.setHeightForWidth(label_command_31->sizePolicy().hasHeightForWidth());
-        label_command_31->setSizePolicy(sizePolicy);
+        plainTextEdit_freq_7 = new QPlainTextEdit(frame_4);
+        plainTextEdit_freq_7->setObjectName(QStringLiteral("plainTextEdit_freq_7"));
+
+        formLayout_13->setWidget(0, QFormLayout::FieldRole, plainTextEdit_freq_7);
+
+        label_command_30 = new QLabel(frame_4);
+        label_command_30->setObjectName(QStringLiteral("label_command_30"));
+        sizePolicy.setHeightForWidth(label_command_30->sizePolicy().hasHeightForWidth());
+        label_command_30->setSizePolicy(sizePolicy);
         QPalette palette12;
         palette12.setBrush(QPalette::Active, QPalette::WindowText, brush);
         palette12.setBrush(QPalette::Active, QPalette::Button, brush1);
@@ -887,17 +902,22 @@ public:
         palette12.setBrush(QPalette::Disabled, QPalette::AlternateBase, brush2);
         palette12.setBrush(QPalette::Disabled, QPalette::ToolTipBase, brush3);
         palette12.setBrush(QPalette::Disabled, QPalette::ToolTipText, brush2);
-        label_command_31->setPalette(palette12);
-        label_command_31->setFont(font);
-        label_command_31->setStyleSheet(QStringLiteral("background-color: rgb(16, 32, 64);"));
-        label_command_31->setAlignment(Qt::AlignCenter);
+        label_command_30->setPalette(palette12);
+        label_command_30->setFont(font);
+        label_command_30->setStyleSheet(QStringLiteral("background-color: rgb(16, 32, 64);"));
+        label_command_30->setAlignment(Qt::AlignCenter);
 
-        formLayout_13->setWidget(2, QFormLayout::LabelRole, label_command_31);
+        formLayout_13->setWidget(1, QFormLayout::LabelRole, label_command_30);
 
-        label_command_32 = new QLabel(layoutWidget_4);
-        label_command_32->setObjectName(QStringLiteral("label_command_32"));
-        sizePolicy.setHeightForWidth(label_command_32->sizePolicy().hasHeightForWidth());
-        label_command_32->setSizePolicy(sizePolicy);
+        plainTextEdit_freq_8 = new QPlainTextEdit(frame_4);
+        plainTextEdit_freq_8->setObjectName(QStringLiteral("plainTextEdit_freq_8"));
+
+        formLayout_13->setWidget(1, QFormLayout::FieldRole, plainTextEdit_freq_8);
+
+        label_command_31 = new QLabel(frame_4);
+        label_command_31->setObjectName(QStringLiteral("label_command_31"));
+        sizePolicy.setHeightForWidth(label_command_31->sizePolicy().hasHeightForWidth());
+        label_command_31->setSizePolicy(sizePolicy);
         QPalette palette13;
         palette13.setBrush(QPalette::Active, QPalette::WindowText, brush);
         palette13.setBrush(QPalette::Active, QPalette::Button, brush1);
@@ -944,17 +964,22 @@ public:
         palette13.setBrush(QPalette::Disabled, QPalette::AlternateBase, brush2);
         palette13.setBrush(QPalette::Disabled, QPalette::ToolTipBase, brush3);
         palette13.setBrush(QPalette::Disabled, QPalette::ToolTipText, brush2);
-        label_command_32->setPalette(palette13);
-        label_command_32->setFont(font);
-        label_command_32->setStyleSheet(QStringLiteral("background-color: rgb(16, 32, 64);"));
-        label_command_32->setAlignment(Qt::AlignCenter);
+        label_command_31->setPalette(palette13);
+        label_command_31->setFont(font);
+        label_command_31->setStyleSheet(QStringLiteral("background-color: rgb(16, 32, 64);"));
+        label_command_31->setAlignment(Qt::AlignCenter);
 
-        formLayout_13->setWidget(3, QFormLayout::LabelRole, label_command_32);
+        formLayout_13->setWidget(2, QFormLayout::LabelRole, label_command_31);
 
-        label_command_33 = new QLabel(layoutWidget_4);
-        label_command_33->setObjectName(QStringLiteral("label_command_33"));
-        sizePolicy.setHeightForWidth(label_command_33->sizePolicy().hasHeightForWidth());
-        label_command_33->setSizePolicy(sizePolicy);
+        plainTextEdit_freq_9 = new QPlainTextEdit(frame_4);
+        plainTextEdit_freq_9->setObjectName(QStringLiteral("plainTextEdit_freq_9"));
+
+        formLayout_13->setWidget(2, QFormLayout::FieldRole, plainTextEdit_freq_9);
+
+        label_command_32 = new QLabel(frame_4);
+        label_command_32->setObjectName(QStringLiteral("label_command_32"));
+        sizePolicy.setHeightForWidth(label_command_32->sizePolicy().hasHeightForWidth());
+        label_command_32->setSizePolicy(sizePolicy);
         QPalette palette14;
         palette14.setBrush(QPalette::Active, QPalette::WindowText, brush);
         palette14.setBrush(QPalette::Active, QPalette::Button, brush1);
@@ -1001,17 +1026,22 @@ public:
         palette14.setBrush(QPalette::Disabled, QPalette::AlternateBase, brush2);
         palette14.setBrush(QPalette::Disabled, QPalette::ToolTipBase, brush3);
         palette14.setBrush(QPalette::Disabled, QPalette::ToolTipText, brush2);
-        label_command_33->setPalette(palette14);
-        label_command_33->setFont(font);
-        label_command_33->setStyleSheet(QStringLiteral("background-color: rgb(16, 32, 64);"));
-        label_command_33->setAlignment(Qt::AlignCenter);
+        label_command_32->setPalette(palette14);
+        label_command_32->setFont(font);
+        label_command_32->setStyleSheet(QStringLiteral("background-color: rgb(16, 32, 64);"));
+        label_command_32->setAlignment(Qt::AlignCenter);
 
-        formLayout_13->setWidget(4, QFormLayout::LabelRole, label_command_33);
+        formLayout_13->setWidget(3, QFormLayout::LabelRole, label_command_32);
 
-        label_command_34 = new QLabel(layoutWidget_4);
-        label_command_34->setObjectName(QStringLiteral("label_command_34"));
-        sizePolicy.setHeightForWidth(label_command_34->sizePolicy().hasHeightForWidth());
-        label_command_34->setSizePolicy(sizePolicy);
+        plainTextEdit_freq_10 = new QPlainTextEdit(frame_4);
+        plainTextEdit_freq_10->setObjectName(QStringLiteral("plainTextEdit_freq_10"));
+
+        formLayout_13->setWidget(3, QFormLayout::FieldRole, plainTextEdit_freq_10);
+
+        label_command_33 = new QLabel(frame_4);
+        label_command_33->setObjectName(QStringLiteral("label_command_33"));
+        sizePolicy.setHeightForWidth(label_command_33->sizePolicy().hasHeightForWidth());
+        label_command_33->setSizePolicy(sizePolicy);
         QPalette palette15;
         palette15.setBrush(QPalette::Active, QPalette::WindowText, brush);
         palette15.setBrush(QPalette::Active, QPalette::Button, brush1);
@@ -1058,37 +1088,451 @@ public:
         palette15.setBrush(QPalette::Disabled, QPalette::AlternateBase, brush2);
         palette15.setBrush(QPalette::Disabled, QPalette::ToolTipBase, brush3);
         palette15.setBrush(QPalette::Disabled, QPalette::ToolTipText, brush2);
-        label_command_34->setPalette(palette15);
+        label_command_33->setPalette(palette15);
+        label_command_33->setFont(font);
+        label_command_33->setStyleSheet(QStringLiteral("background-color: rgb(16, 32, 64);"));
+        label_command_33->setAlignment(Qt::AlignCenter);
+
+        formLayout_13->setWidget(4, QFormLayout::LabelRole, label_command_33);
+
+        plainTextEdit_freq_11 = new QPlainTextEdit(frame_4);
+        plainTextEdit_freq_11->setObjectName(QStringLiteral("plainTextEdit_freq_11"));
+
+        formLayout_13->setWidget(4, QFormLayout::FieldRole, plainTextEdit_freq_11);
+
+        label_command_34 = new QLabel(frame_4);
+        label_command_34->setObjectName(QStringLiteral("label_command_34"));
+        sizePolicy.setHeightForWidth(label_command_34->sizePolicy().hasHeightForWidth());
+        label_command_34->setSizePolicy(sizePolicy);
+        QPalette palette16;
+        palette16.setBrush(QPalette::Active, QPalette::WindowText, brush);
+        palette16.setBrush(QPalette::Active, QPalette::Button, brush1);
+        palette16.setBrush(QPalette::Active, QPalette::Light, brush2);
+        palette16.setBrush(QPalette::Active, QPalette::Midlight, brush2);
+        palette16.setBrush(QPalette::Active, QPalette::Dark, brush2);
+        palette16.setBrush(QPalette::Active, QPalette::Mid, brush2);
+        palette16.setBrush(QPalette::Active, QPalette::Text, brush);
+        palette16.setBrush(QPalette::Active, QPalette::BrightText, brush);
+        palette16.setBrush(QPalette::Active, QPalette::ButtonText, brush);
+        palette16.setBrush(QPalette::Active, QPalette::Base, brush1);
+        palette16.setBrush(QPalette::Active, QPalette::Window, brush1);
+        palette16.setBrush(QPalette::Active, QPalette::Shadow, brush2);
+        palette16.setBrush(QPalette::Active, QPalette::AlternateBase, brush2);
+        palette16.setBrush(QPalette::Active, QPalette::ToolTipBase, brush3);
+        palette16.setBrush(QPalette::Active, QPalette::ToolTipText, brush2);
+        palette16.setBrush(QPalette::Inactive, QPalette::WindowText, brush);
+        palette16.setBrush(QPalette::Inactive, QPalette::Button, brush1);
+        palette16.setBrush(QPalette::Inactive, QPalette::Light, brush2);
+        palette16.setBrush(QPalette::Inactive, QPalette::Midlight, brush2);
+        palette16.setBrush(QPalette::Inactive, QPalette::Dark, brush2);
+        palette16.setBrush(QPalette::Inactive, QPalette::Mid, brush2);
+        palette16.setBrush(QPalette::Inactive, QPalette::Text, brush);
+        palette16.setBrush(QPalette::Inactive, QPalette::BrightText, brush);
+        palette16.setBrush(QPalette::Inactive, QPalette::ButtonText, brush);
+        palette16.setBrush(QPalette::Inactive, QPalette::Base, brush1);
+        palette16.setBrush(QPalette::Inactive, QPalette::Window, brush1);
+        palette16.setBrush(QPalette::Inactive, QPalette::Shadow, brush2);
+        palette16.setBrush(QPalette::Inactive, QPalette::AlternateBase, brush2);
+        palette16.setBrush(QPalette::Inactive, QPalette::ToolTipBase, brush3);
+        palette16.setBrush(QPalette::Inactive, QPalette::ToolTipText, brush2);
+        palette16.setBrush(QPalette::Disabled, QPalette::WindowText, brush2);
+        palette16.setBrush(QPalette::Disabled, QPalette::Button, brush1);
+        palette16.setBrush(QPalette::Disabled, QPalette::Light, brush2);
+        palette16.setBrush(QPalette::Disabled, QPalette::Midlight, brush2);
+        palette16.setBrush(QPalette::Disabled, QPalette::Dark, brush2);
+        palette16.setBrush(QPalette::Disabled, QPalette::Mid, brush2);
+        palette16.setBrush(QPalette::Disabled, QPalette::Text, brush2);
+        palette16.setBrush(QPalette::Disabled, QPalette::BrightText, brush);
+        palette16.setBrush(QPalette::Disabled, QPalette::ButtonText, brush2);
+        palette16.setBrush(QPalette::Disabled, QPalette::Base, brush1);
+        palette16.setBrush(QPalette::Disabled, QPalette::Window, brush1);
+        palette16.setBrush(QPalette::Disabled, QPalette::Shadow, brush2);
+        palette16.setBrush(QPalette::Disabled, QPalette::AlternateBase, brush2);
+        palette16.setBrush(QPalette::Disabled, QPalette::ToolTipBase, brush3);
+        palette16.setBrush(QPalette::Disabled, QPalette::ToolTipText, brush2);
+        label_command_34->setPalette(palette16);
         label_command_34->setFont(font);
         label_command_34->setStyleSheet(QStringLiteral("background-color: rgb(16, 32, 64);"));
         label_command_34->setAlignment(Qt::AlignCenter);
 
         formLayout_13->setWidget(5, QFormLayout::LabelRole, label_command_34);
 
-        plainTextEdit_freq_8 = new QPlainTextEdit(layoutWidget_4);
-        plainTextEdit_freq_8->setObjectName(QStringLiteral("plainTextEdit_freq_8"));
-
-        formLayout_13->setWidget(1, QFormLayout::FieldRole, plainTextEdit_freq_8);
-
-        plainTextEdit_freq_9 = new QPlainTextEdit(layoutWidget_4);
-        plainTextEdit_freq_9->setObjectName(QStringLiteral("plainTextEdit_freq_9"));
-
-        formLayout_13->setWidget(2, QFormLayout::FieldRole, plainTextEdit_freq_9);
-
-        plainTextEdit_freq_10 = new QPlainTextEdit(layoutWidget_4);
-        plainTextEdit_freq_10->setObjectName(QStringLiteral("plainTextEdit_freq_10"));
-
-        formLayout_13->setWidget(3, QFormLayout::FieldRole, plainTextEdit_freq_10);
-
-        plainTextEdit_freq_11 = new QPlainTextEdit(layoutWidget_4);
-        plainTextEdit_freq_11->setObjectName(QStringLiteral("plainTextEdit_freq_11"));
-
-        formLayout_13->setWidget(4, QFormLayout::FieldRole, plainTextEdit_freq_11);
-
-        plainTextEdit_freq_12 = new QPlainTextEdit(layoutWidget_4);
+        plainTextEdit_freq_12 = new QPlainTextEdit(frame_4);
         plainTextEdit_freq_12->setObjectName(QStringLiteral("plainTextEdit_freq_12"));
 
         formLayout_13->setWidget(5, QFormLayout::FieldRole, plainTextEdit_freq_12);
+
+        plainTextEdit_freq_13 = new QPlainTextEdit(frame_4);
+        plainTextEdit_freq_13->setObjectName(QStringLiteral("plainTextEdit_freq_13"));
+
+        formLayout_13->setWidget(7, QFormLayout::FieldRole, plainTextEdit_freq_13);
+
+        label_command_36 = new QLabel(frame_4);
+        label_command_36->setObjectName(QStringLiteral("label_command_36"));
+        sizePolicy.setHeightForWidth(label_command_36->sizePolicy().hasHeightForWidth());
+        label_command_36->setSizePolicy(sizePolicy);
+        QPalette palette17;
+        palette17.setBrush(QPalette::Active, QPalette::WindowText, brush);
+        palette17.setBrush(QPalette::Active, QPalette::Button, brush1);
+        palette17.setBrush(QPalette::Active, QPalette::Light, brush2);
+        palette17.setBrush(QPalette::Active, QPalette::Midlight, brush2);
+        palette17.setBrush(QPalette::Active, QPalette::Dark, brush2);
+        palette17.setBrush(QPalette::Active, QPalette::Mid, brush2);
+        palette17.setBrush(QPalette::Active, QPalette::Text, brush);
+        palette17.setBrush(QPalette::Active, QPalette::BrightText, brush);
+        palette17.setBrush(QPalette::Active, QPalette::ButtonText, brush);
+        palette17.setBrush(QPalette::Active, QPalette::Base, brush1);
+        palette17.setBrush(QPalette::Active, QPalette::Window, brush1);
+        palette17.setBrush(QPalette::Active, QPalette::Shadow, brush2);
+        palette17.setBrush(QPalette::Active, QPalette::AlternateBase, brush2);
+        palette17.setBrush(QPalette::Active, QPalette::ToolTipBase, brush3);
+        palette17.setBrush(QPalette::Active, QPalette::ToolTipText, brush2);
+        palette17.setBrush(QPalette::Inactive, QPalette::WindowText, brush);
+        palette17.setBrush(QPalette::Inactive, QPalette::Button, brush1);
+        palette17.setBrush(QPalette::Inactive, QPalette::Light, brush2);
+        palette17.setBrush(QPalette::Inactive, QPalette::Midlight, brush2);
+        palette17.setBrush(QPalette::Inactive, QPalette::Dark, brush2);
+        palette17.setBrush(QPalette::Inactive, QPalette::Mid, brush2);
+        palette17.setBrush(QPalette::Inactive, QPalette::Text, brush);
+        palette17.setBrush(QPalette::Inactive, QPalette::BrightText, brush);
+        palette17.setBrush(QPalette::Inactive, QPalette::ButtonText, brush);
+        palette17.setBrush(QPalette::Inactive, QPalette::Base, brush1);
+        palette17.setBrush(QPalette::Inactive, QPalette::Window, brush1);
+        palette17.setBrush(QPalette::Inactive, QPalette::Shadow, brush2);
+        palette17.setBrush(QPalette::Inactive, QPalette::AlternateBase, brush2);
+        palette17.setBrush(QPalette::Inactive, QPalette::ToolTipBase, brush3);
+        palette17.setBrush(QPalette::Inactive, QPalette::ToolTipText, brush2);
+        palette17.setBrush(QPalette::Disabled, QPalette::WindowText, brush2);
+        palette17.setBrush(QPalette::Disabled, QPalette::Button, brush1);
+        palette17.setBrush(QPalette::Disabled, QPalette::Light, brush2);
+        palette17.setBrush(QPalette::Disabled, QPalette::Midlight, brush2);
+        palette17.setBrush(QPalette::Disabled, QPalette::Dark, brush2);
+        palette17.setBrush(QPalette::Disabled, QPalette::Mid, brush2);
+        palette17.setBrush(QPalette::Disabled, QPalette::Text, brush2);
+        palette17.setBrush(QPalette::Disabled, QPalette::BrightText, brush);
+        palette17.setBrush(QPalette::Disabled, QPalette::ButtonText, brush2);
+        palette17.setBrush(QPalette::Disabled, QPalette::Base, brush1);
+        palette17.setBrush(QPalette::Disabled, QPalette::Window, brush1);
+        palette17.setBrush(QPalette::Disabled, QPalette::Shadow, brush2);
+        palette17.setBrush(QPalette::Disabled, QPalette::AlternateBase, brush2);
+        palette17.setBrush(QPalette::Disabled, QPalette::ToolTipBase, brush3);
+        palette17.setBrush(QPalette::Disabled, QPalette::ToolTipText, brush2);
+        label_command_36->setPalette(palette17);
+        label_command_36->setFont(font);
+        label_command_36->setStyleSheet(QStringLiteral("background-color: rgb(16, 32, 64);"));
+        label_command_36->setAlignment(Qt::AlignCenter);
+
+        formLayout_13->setWidget(7, QFormLayout::LabelRole, label_command_36);
+
+        plainTextEdit_freq_14 = new QPlainTextEdit(frame_4);
+        plainTextEdit_freq_14->setObjectName(QStringLiteral("plainTextEdit_freq_14"));
+
+        formLayout_13->setWidget(8, QFormLayout::FieldRole, plainTextEdit_freq_14);
+
+        plainTextEdit_freq_15 = new QPlainTextEdit(frame_4);
+        plainTextEdit_freq_15->setObjectName(QStringLiteral("plainTextEdit_freq_15"));
+
+        formLayout_13->setWidget(9, QFormLayout::FieldRole, plainTextEdit_freq_15);
+
+        plainTextEdit_freq_16 = new QPlainTextEdit(frame_4);
+        plainTextEdit_freq_16->setObjectName(QStringLiteral("plainTextEdit_freq_16"));
+
+        formLayout_13->setWidget(10, QFormLayout::FieldRole, plainTextEdit_freq_16);
+
+        plainTextEdit_freq_17 = new QPlainTextEdit(frame_4);
+        plainTextEdit_freq_17->setObjectName(QStringLiteral("plainTextEdit_freq_17"));
+
+        formLayout_13->setWidget(11, QFormLayout::FieldRole, plainTextEdit_freq_17);
+
+        plainTextEdit_freq_18 = new QPlainTextEdit(frame_4);
+        plainTextEdit_freq_18->setObjectName(QStringLiteral("plainTextEdit_freq_18"));
+
+        formLayout_13->setWidget(12, QFormLayout::FieldRole, plainTextEdit_freq_18);
+
+        label_command_37 = new QLabel(frame_4);
+        label_command_37->setObjectName(QStringLiteral("label_command_37"));
+        sizePolicy.setHeightForWidth(label_command_37->sizePolicy().hasHeightForWidth());
+        label_command_37->setSizePolicy(sizePolicy);
+        QPalette palette18;
+        palette18.setBrush(QPalette::Active, QPalette::WindowText, brush);
+        palette18.setBrush(QPalette::Active, QPalette::Button, brush1);
+        palette18.setBrush(QPalette::Active, QPalette::Light, brush2);
+        palette18.setBrush(QPalette::Active, QPalette::Midlight, brush2);
+        palette18.setBrush(QPalette::Active, QPalette::Dark, brush2);
+        palette18.setBrush(QPalette::Active, QPalette::Mid, brush2);
+        palette18.setBrush(QPalette::Active, QPalette::Text, brush);
+        palette18.setBrush(QPalette::Active, QPalette::BrightText, brush);
+        palette18.setBrush(QPalette::Active, QPalette::ButtonText, brush);
+        palette18.setBrush(QPalette::Active, QPalette::Base, brush1);
+        palette18.setBrush(QPalette::Active, QPalette::Window, brush1);
+        palette18.setBrush(QPalette::Active, QPalette::Shadow, brush2);
+        palette18.setBrush(QPalette::Active, QPalette::AlternateBase, brush2);
+        palette18.setBrush(QPalette::Active, QPalette::ToolTipBase, brush3);
+        palette18.setBrush(QPalette::Active, QPalette::ToolTipText, brush2);
+        palette18.setBrush(QPalette::Inactive, QPalette::WindowText, brush);
+        palette18.setBrush(QPalette::Inactive, QPalette::Button, brush1);
+        palette18.setBrush(QPalette::Inactive, QPalette::Light, brush2);
+        palette18.setBrush(QPalette::Inactive, QPalette::Midlight, brush2);
+        palette18.setBrush(QPalette::Inactive, QPalette::Dark, brush2);
+        palette18.setBrush(QPalette::Inactive, QPalette::Mid, brush2);
+        palette18.setBrush(QPalette::Inactive, QPalette::Text, brush);
+        palette18.setBrush(QPalette::Inactive, QPalette::BrightText, brush);
+        palette18.setBrush(QPalette::Inactive, QPalette::ButtonText, brush);
+        palette18.setBrush(QPalette::Inactive, QPalette::Base, brush1);
+        palette18.setBrush(QPalette::Inactive, QPalette::Window, brush1);
+        palette18.setBrush(QPalette::Inactive, QPalette::Shadow, brush2);
+        palette18.setBrush(QPalette::Inactive, QPalette::AlternateBase, brush2);
+        palette18.setBrush(QPalette::Inactive, QPalette::ToolTipBase, brush3);
+        palette18.setBrush(QPalette::Inactive, QPalette::ToolTipText, brush2);
+        palette18.setBrush(QPalette::Disabled, QPalette::WindowText, brush2);
+        palette18.setBrush(QPalette::Disabled, QPalette::Button, brush1);
+        palette18.setBrush(QPalette::Disabled, QPalette::Light, brush2);
+        palette18.setBrush(QPalette::Disabled, QPalette::Midlight, brush2);
+        palette18.setBrush(QPalette::Disabled, QPalette::Dark, brush2);
+        palette18.setBrush(QPalette::Disabled, QPalette::Mid, brush2);
+        palette18.setBrush(QPalette::Disabled, QPalette::Text, brush2);
+        palette18.setBrush(QPalette::Disabled, QPalette::BrightText, brush);
+        palette18.setBrush(QPalette::Disabled, QPalette::ButtonText, brush2);
+        palette18.setBrush(QPalette::Disabled, QPalette::Base, brush1);
+        palette18.setBrush(QPalette::Disabled, QPalette::Window, brush1);
+        palette18.setBrush(QPalette::Disabled, QPalette::Shadow, brush2);
+        palette18.setBrush(QPalette::Disabled, QPalette::AlternateBase, brush2);
+        palette18.setBrush(QPalette::Disabled, QPalette::ToolTipBase, brush3);
+        palette18.setBrush(QPalette::Disabled, QPalette::ToolTipText, brush2);
+        label_command_37->setPalette(palette18);
+        label_command_37->setFont(font);
+        label_command_37->setStyleSheet(QStringLiteral("background-color: rgb(16, 32, 64);"));
+        label_command_37->setAlignment(Qt::AlignCenter);
+
+        formLayout_13->setWidget(8, QFormLayout::LabelRole, label_command_37);
+
+        label_command_38 = new QLabel(frame_4);
+        label_command_38->setObjectName(QStringLiteral("label_command_38"));
+        sizePolicy.setHeightForWidth(label_command_38->sizePolicy().hasHeightForWidth());
+        label_command_38->setSizePolicy(sizePolicy);
+        QPalette palette19;
+        palette19.setBrush(QPalette::Active, QPalette::WindowText, brush);
+        palette19.setBrush(QPalette::Active, QPalette::Button, brush1);
+        palette19.setBrush(QPalette::Active, QPalette::Light, brush2);
+        palette19.setBrush(QPalette::Active, QPalette::Midlight, brush2);
+        palette19.setBrush(QPalette::Active, QPalette::Dark, brush2);
+        palette19.setBrush(QPalette::Active, QPalette::Mid, brush2);
+        palette19.setBrush(QPalette::Active, QPalette::Text, brush);
+        palette19.setBrush(QPalette::Active, QPalette::BrightText, brush);
+        palette19.setBrush(QPalette::Active, QPalette::ButtonText, brush);
+        palette19.setBrush(QPalette::Active, QPalette::Base, brush1);
+        palette19.setBrush(QPalette::Active, QPalette::Window, brush1);
+        palette19.setBrush(QPalette::Active, QPalette::Shadow, brush2);
+        palette19.setBrush(QPalette::Active, QPalette::AlternateBase, brush2);
+        palette19.setBrush(QPalette::Active, QPalette::ToolTipBase, brush3);
+        palette19.setBrush(QPalette::Active, QPalette::ToolTipText, brush2);
+        palette19.setBrush(QPalette::Inactive, QPalette::WindowText, brush);
+        palette19.setBrush(QPalette::Inactive, QPalette::Button, brush1);
+        palette19.setBrush(QPalette::Inactive, QPalette::Light, brush2);
+        palette19.setBrush(QPalette::Inactive, QPalette::Midlight, brush2);
+        palette19.setBrush(QPalette::Inactive, QPalette::Dark, brush2);
+        palette19.setBrush(QPalette::Inactive, QPalette::Mid, brush2);
+        palette19.setBrush(QPalette::Inactive, QPalette::Text, brush);
+        palette19.setBrush(QPalette::Inactive, QPalette::BrightText, brush);
+        palette19.setBrush(QPalette::Inactive, QPalette::ButtonText, brush);
+        palette19.setBrush(QPalette::Inactive, QPalette::Base, brush1);
+        palette19.setBrush(QPalette::Inactive, QPalette::Window, brush1);
+        palette19.setBrush(QPalette::Inactive, QPalette::Shadow, brush2);
+        palette19.setBrush(QPalette::Inactive, QPalette::AlternateBase, brush2);
+        palette19.setBrush(QPalette::Inactive, QPalette::ToolTipBase, brush3);
+        palette19.setBrush(QPalette::Inactive, QPalette::ToolTipText, brush2);
+        palette19.setBrush(QPalette::Disabled, QPalette::WindowText, brush2);
+        palette19.setBrush(QPalette::Disabled, QPalette::Button, brush1);
+        palette19.setBrush(QPalette::Disabled, QPalette::Light, brush2);
+        palette19.setBrush(QPalette::Disabled, QPalette::Midlight, brush2);
+        palette19.setBrush(QPalette::Disabled, QPalette::Dark, brush2);
+        palette19.setBrush(QPalette::Disabled, QPalette::Mid, brush2);
+        palette19.setBrush(QPalette::Disabled, QPalette::Text, brush2);
+        palette19.setBrush(QPalette::Disabled, QPalette::BrightText, brush);
+        palette19.setBrush(QPalette::Disabled, QPalette::ButtonText, brush2);
+        palette19.setBrush(QPalette::Disabled, QPalette::Base, brush1);
+        palette19.setBrush(QPalette::Disabled, QPalette::Window, brush1);
+        palette19.setBrush(QPalette::Disabled, QPalette::Shadow, brush2);
+        palette19.setBrush(QPalette::Disabled, QPalette::AlternateBase, brush2);
+        palette19.setBrush(QPalette::Disabled, QPalette::ToolTipBase, brush3);
+        palette19.setBrush(QPalette::Disabled, QPalette::ToolTipText, brush2);
+        label_command_38->setPalette(palette19);
+        label_command_38->setFont(font);
+        label_command_38->setStyleSheet(QStringLiteral("background-color: rgb(16, 32, 64);"));
+        label_command_38->setAlignment(Qt::AlignCenter);
+
+        formLayout_13->setWidget(9, QFormLayout::LabelRole, label_command_38);
+
+        label_command_39 = new QLabel(frame_4);
+        label_command_39->setObjectName(QStringLiteral("label_command_39"));
+        sizePolicy.setHeightForWidth(label_command_39->sizePolicy().hasHeightForWidth());
+        label_command_39->setSizePolicy(sizePolicy);
+        QPalette palette20;
+        palette20.setBrush(QPalette::Active, QPalette::WindowText, brush);
+        palette20.setBrush(QPalette::Active, QPalette::Button, brush1);
+        palette20.setBrush(QPalette::Active, QPalette::Light, brush2);
+        palette20.setBrush(QPalette::Active, QPalette::Midlight, brush2);
+        palette20.setBrush(QPalette::Active, QPalette::Dark, brush2);
+        palette20.setBrush(QPalette::Active, QPalette::Mid, brush2);
+        palette20.setBrush(QPalette::Active, QPalette::Text, brush);
+        palette20.setBrush(QPalette::Active, QPalette::BrightText, brush);
+        palette20.setBrush(QPalette::Active, QPalette::ButtonText, brush);
+        palette20.setBrush(QPalette::Active, QPalette::Base, brush1);
+        palette20.setBrush(QPalette::Active, QPalette::Window, brush1);
+        palette20.setBrush(QPalette::Active, QPalette::Shadow, brush2);
+        palette20.setBrush(QPalette::Active, QPalette::AlternateBase, brush2);
+        palette20.setBrush(QPalette::Active, QPalette::ToolTipBase, brush3);
+        palette20.setBrush(QPalette::Active, QPalette::ToolTipText, brush2);
+        palette20.setBrush(QPalette::Inactive, QPalette::WindowText, brush);
+        palette20.setBrush(QPalette::Inactive, QPalette::Button, brush1);
+        palette20.setBrush(QPalette::Inactive, QPalette::Light, brush2);
+        palette20.setBrush(QPalette::Inactive, QPalette::Midlight, brush2);
+        palette20.setBrush(QPalette::Inactive, QPalette::Dark, brush2);
+        palette20.setBrush(QPalette::Inactive, QPalette::Mid, brush2);
+        palette20.setBrush(QPalette::Inactive, QPalette::Text, brush);
+        palette20.setBrush(QPalette::Inactive, QPalette::BrightText, brush);
+        palette20.setBrush(QPalette::Inactive, QPalette::ButtonText, brush);
+        palette20.setBrush(QPalette::Inactive, QPalette::Base, brush1);
+        palette20.setBrush(QPalette::Inactive, QPalette::Window, brush1);
+        palette20.setBrush(QPalette::Inactive, QPalette::Shadow, brush2);
+        palette20.setBrush(QPalette::Inactive, QPalette::AlternateBase, brush2);
+        palette20.setBrush(QPalette::Inactive, QPalette::ToolTipBase, brush3);
+        palette20.setBrush(QPalette::Inactive, QPalette::ToolTipText, brush2);
+        palette20.setBrush(QPalette::Disabled, QPalette::WindowText, brush2);
+        palette20.setBrush(QPalette::Disabled, QPalette::Button, brush1);
+        palette20.setBrush(QPalette::Disabled, QPalette::Light, brush2);
+        palette20.setBrush(QPalette::Disabled, QPalette::Midlight, brush2);
+        palette20.setBrush(QPalette::Disabled, QPalette::Dark, brush2);
+        palette20.setBrush(QPalette::Disabled, QPalette::Mid, brush2);
+        palette20.setBrush(QPalette::Disabled, QPalette::Text, brush2);
+        palette20.setBrush(QPalette::Disabled, QPalette::BrightText, brush);
+        palette20.setBrush(QPalette::Disabled, QPalette::ButtonText, brush2);
+        palette20.setBrush(QPalette::Disabled, QPalette::Base, brush1);
+        palette20.setBrush(QPalette::Disabled, QPalette::Window, brush1);
+        palette20.setBrush(QPalette::Disabled, QPalette::Shadow, brush2);
+        palette20.setBrush(QPalette::Disabled, QPalette::AlternateBase, brush2);
+        palette20.setBrush(QPalette::Disabled, QPalette::ToolTipBase, brush3);
+        palette20.setBrush(QPalette::Disabled, QPalette::ToolTipText, brush2);
+        label_command_39->setPalette(palette20);
+        label_command_39->setFont(font);
+        label_command_39->setStyleSheet(QStringLiteral("background-color: rgb(16, 32, 64);"));
+        label_command_39->setAlignment(Qt::AlignCenter);
+
+        formLayout_13->setWidget(10, QFormLayout::LabelRole, label_command_39);
+
+        label_command_40 = new QLabel(frame_4);
+        label_command_40->setObjectName(QStringLiteral("label_command_40"));
+        sizePolicy.setHeightForWidth(label_command_40->sizePolicy().hasHeightForWidth());
+        label_command_40->setSizePolicy(sizePolicy);
+        QPalette palette21;
+        palette21.setBrush(QPalette::Active, QPalette::WindowText, brush);
+        palette21.setBrush(QPalette::Active, QPalette::Button, brush1);
+        palette21.setBrush(QPalette::Active, QPalette::Light, brush2);
+        palette21.setBrush(QPalette::Active, QPalette::Midlight, brush2);
+        palette21.setBrush(QPalette::Active, QPalette::Dark, brush2);
+        palette21.setBrush(QPalette::Active, QPalette::Mid, brush2);
+        palette21.setBrush(QPalette::Active, QPalette::Text, brush);
+        palette21.setBrush(QPalette::Active, QPalette::BrightText, brush);
+        palette21.setBrush(QPalette::Active, QPalette::ButtonText, brush);
+        palette21.setBrush(QPalette::Active, QPalette::Base, brush1);
+        palette21.setBrush(QPalette::Active, QPalette::Window, brush1);
+        palette21.setBrush(QPalette::Active, QPalette::Shadow, brush2);
+        palette21.setBrush(QPalette::Active, QPalette::AlternateBase, brush2);
+        palette21.setBrush(QPalette::Active, QPalette::ToolTipBase, brush3);
+        palette21.setBrush(QPalette::Active, QPalette::ToolTipText, brush2);
+        palette21.setBrush(QPalette::Inactive, QPalette::WindowText, brush);
+        palette21.setBrush(QPalette::Inactive, QPalette::Button, brush1);
+        palette21.setBrush(QPalette::Inactive, QPalette::Light, brush2);
+        palette21.setBrush(QPalette::Inactive, QPalette::Midlight, brush2);
+        palette21.setBrush(QPalette::Inactive, QPalette::Dark, brush2);
+        palette21.setBrush(QPalette::Inactive, QPalette::Mid, brush2);
+        palette21.setBrush(QPalette::Inactive, QPalette::Text, brush);
+        palette21.setBrush(QPalette::Inactive, QPalette::BrightText, brush);
+        palette21.setBrush(QPalette::Inactive, QPalette::ButtonText, brush);
+        palette21.setBrush(QPalette::Inactive, QPalette::Base, brush1);
+        palette21.setBrush(QPalette::Inactive, QPalette::Window, brush1);
+        palette21.setBrush(QPalette::Inactive, QPalette::Shadow, brush2);
+        palette21.setBrush(QPalette::Inactive, QPalette::AlternateBase, brush2);
+        palette21.setBrush(QPalette::Inactive, QPalette::ToolTipBase, brush3);
+        palette21.setBrush(QPalette::Inactive, QPalette::ToolTipText, brush2);
+        palette21.setBrush(QPalette::Disabled, QPalette::WindowText, brush2);
+        palette21.setBrush(QPalette::Disabled, QPalette::Button, brush1);
+        palette21.setBrush(QPalette::Disabled, QPalette::Light, brush2);
+        palette21.setBrush(QPalette::Disabled, QPalette::Midlight, brush2);
+        palette21.setBrush(QPalette::Disabled, QPalette::Dark, brush2);
+        palette21.setBrush(QPalette::Disabled, QPalette::Mid, brush2);
+        palette21.setBrush(QPalette::Disabled, QPalette::Text, brush2);
+        palette21.setBrush(QPalette::Disabled, QPalette::BrightText, brush);
+        palette21.setBrush(QPalette::Disabled, QPalette::ButtonText, brush2);
+        palette21.setBrush(QPalette::Disabled, QPalette::Base, brush1);
+        palette21.setBrush(QPalette::Disabled, QPalette::Window, brush1);
+        palette21.setBrush(QPalette::Disabled, QPalette::Shadow, brush2);
+        palette21.setBrush(QPalette::Disabled, QPalette::AlternateBase, brush2);
+        palette21.setBrush(QPalette::Disabled, QPalette::ToolTipBase, brush3);
+        palette21.setBrush(QPalette::Disabled, QPalette::ToolTipText, brush2);
+        label_command_40->setPalette(palette21);
+        label_command_40->setFont(font);
+        label_command_40->setStyleSheet(QStringLiteral("background-color: rgb(16, 32, 64);"));
+        label_command_40->setAlignment(Qt::AlignCenter);
+
+        formLayout_13->setWidget(11, QFormLayout::LabelRole, label_command_40);
+
+        label_command_41 = new QLabel(frame_4);
+        label_command_41->setObjectName(QStringLiteral("label_command_41"));
+        sizePolicy.setHeightForWidth(label_command_41->sizePolicy().hasHeightForWidth());
+        label_command_41->setSizePolicy(sizePolicy);
+        QPalette palette22;
+        palette22.setBrush(QPalette::Active, QPalette::WindowText, brush);
+        palette22.setBrush(QPalette::Active, QPalette::Button, brush1);
+        palette22.setBrush(QPalette::Active, QPalette::Light, brush2);
+        palette22.setBrush(QPalette::Active, QPalette::Midlight, brush2);
+        palette22.setBrush(QPalette::Active, QPalette::Dark, brush2);
+        palette22.setBrush(QPalette::Active, QPalette::Mid, brush2);
+        palette22.setBrush(QPalette::Active, QPalette::Text, brush);
+        palette22.setBrush(QPalette::Active, QPalette::BrightText, brush);
+        palette22.setBrush(QPalette::Active, QPalette::ButtonText, brush);
+        palette22.setBrush(QPalette::Active, QPalette::Base, brush1);
+        palette22.setBrush(QPalette::Active, QPalette::Window, brush1);
+        palette22.setBrush(QPalette::Active, QPalette::Shadow, brush2);
+        palette22.setBrush(QPalette::Active, QPalette::AlternateBase, brush2);
+        palette22.setBrush(QPalette::Active, QPalette::ToolTipBase, brush3);
+        palette22.setBrush(QPalette::Active, QPalette::ToolTipText, brush2);
+        palette22.setBrush(QPalette::Inactive, QPalette::WindowText, brush);
+        palette22.setBrush(QPalette::Inactive, QPalette::Button, brush1);
+        palette22.setBrush(QPalette::Inactive, QPalette::Light, brush2);
+        palette22.setBrush(QPalette::Inactive, QPalette::Midlight, brush2);
+        palette22.setBrush(QPalette::Inactive, QPalette::Dark, brush2);
+        palette22.setBrush(QPalette::Inactive, QPalette::Mid, brush2);
+        palette22.setBrush(QPalette::Inactive, QPalette::Text, brush);
+        palette22.setBrush(QPalette::Inactive, QPalette::BrightText, brush);
+        palette22.setBrush(QPalette::Inactive, QPalette::ButtonText, brush);
+        palette22.setBrush(QPalette::Inactive, QPalette::Base, brush1);
+        palette22.setBrush(QPalette::Inactive, QPalette::Window, brush1);
+        palette22.setBrush(QPalette::Inactive, QPalette::Shadow, brush2);
+        palette22.setBrush(QPalette::Inactive, QPalette::AlternateBase, brush2);
+        palette22.setBrush(QPalette::Inactive, QPalette::ToolTipBase, brush3);
+        palette22.setBrush(QPalette::Inactive, QPalette::ToolTipText, brush2);
+        palette22.setBrush(QPalette::Disabled, QPalette::WindowText, brush2);
+        palette22.setBrush(QPalette::Disabled, QPalette::Button, brush1);
+        palette22.setBrush(QPalette::Disabled, QPalette::Light, brush2);
+        palette22.setBrush(QPalette::Disabled, QPalette::Midlight, brush2);
+        palette22.setBrush(QPalette::Disabled, QPalette::Dark, brush2);
+        palette22.setBrush(QPalette::Disabled, QPalette::Mid, brush2);
+        palette22.setBrush(QPalette::Disabled, QPalette::Text, brush2);
+        palette22.setBrush(QPalette::Disabled, QPalette::BrightText, brush);
+        palette22.setBrush(QPalette::Disabled, QPalette::ButtonText, brush2);
+        palette22.setBrush(QPalette::Disabled, QPalette::Base, brush1);
+        palette22.setBrush(QPalette::Disabled, QPalette::Window, brush1);
+        palette22.setBrush(QPalette::Disabled, QPalette::Shadow, brush2);
+        palette22.setBrush(QPalette::Disabled, QPalette::AlternateBase, brush2);
+        palette22.setBrush(QPalette::Disabled, QPalette::ToolTipBase, brush3);
+        palette22.setBrush(QPalette::Disabled, QPalette::ToolTipText, brush2);
+        label_command_41->setPalette(palette22);
+        label_command_41->setFont(font);
+        label_command_41->setStyleSheet(QStringLiteral("background-color: rgb(16, 32, 64);"));
+        label_command_41->setAlignment(Qt::AlignCenter);
+
+        formLayout_13->setWidget(12, QFormLayout::LabelRole, label_command_41);
 
         pushButton_save = new QPushButton(groupBox_control_setting);
         pushButton_save->setObjectName(QStringLiteral("pushButton_save"));
@@ -1108,24 +1552,29 @@ public:
     void retranslateUi(QDialog *DialogCommandSet)
     {
         DialogCommandSet->setWindowTitle(QApplication::translate("DialogCommandSet", "Dialog", Q_NULLPTR));
-        groupBox_control_setting->setTitle(QString());
         label_command_3->setText(QApplication::translate("DialogCommandSet", "L\341\273\207nh ph\303\241t:", Q_NULLPTR));
-        toolButton_set_command_2->setText(QApplication::translate("DialogCommandSet", "OK", Q_NULLPTR));
         label_command_20->setText(QApplication::translate("DialogCommandSet", "L\341\273\207nh t\341\272\257t ph\303\241t:", Q_NULLPTR));
-        label_command_21->setText(QApplication::translate("DialogCommandSet", "Thang c\341\273\261 ly 1.5nm:", Q_NULLPTR));
-        label_command_22->setText(QApplication::translate("DialogCommandSet", "Thang c\341\273\261 ly 3nm:", Q_NULLPTR));
-        label_command_23->setText(QApplication::translate("DialogCommandSet", "Thang c\341\273\261 ly 6nm:", Q_NULLPTR));
-        label_command_24->setText(QApplication::translate("DialogCommandSet", "Thang c\341\273\261 ly 12nm:", Q_NULLPTR));
-        label_command_25->setText(QApplication::translate("DialogCommandSet", "Thang c\341\273\261 ly 24nm:", Q_NULLPTR));
-        label_command_26->setText(QApplication::translate("DialogCommandSet", "Thang c\341\273\261 ly 48nm:", Q_NULLPTR));
-        label_command_27->setText(QApplication::translate("DialogCommandSet", "Thang c\341\273\261 ly 96nm:", Q_NULLPTR));
-        label_command_28->setText(QApplication::translate("DialogCommandSet", "Thang c\341\273\261 ly 192nm:", Q_NULLPTR));
+        label_command_21->setText(QApplication::translate("DialogCommandSet", "Thang c\341\273\261 ly 1nm:", Q_NULLPTR));
+        label_command_22->setText(QApplication::translate("DialogCommandSet", "Thang c\341\273\261 ly 2nm:", Q_NULLPTR));
+        label_command_23->setText(QApplication::translate("DialogCommandSet", "Thang c\341\273\261 ly 4nm:", Q_NULLPTR));
+        label_command_24->setText(QApplication::translate("DialogCommandSet", "Thang c\341\273\261 ly 8nm:", Q_NULLPTR));
+        label_command_25->setText(QApplication::translate("DialogCommandSet", "Thang c\341\273\261 ly 16nm:", Q_NULLPTR));
+        label_command_26->setText(QApplication::translate("DialogCommandSet", "Thang c\341\273\261 ly 32nm:", Q_NULLPTR));
+        label_command_27->setText(QApplication::translate("DialogCommandSet", "Thang c\341\273\261 ly 64nm:", Q_NULLPTR));
+        label_command_28->setText(QApplication::translate("DialogCommandSet", "Thang c\341\273\261 ly 128nm:", Q_NULLPTR));
+        label_command_35->setText(QApplication::translate("DialogCommandSet", "Thang c\341\273\261 ly 256nm:", Q_NULLPTR));
         label_command_29->setText(QApplication::translate("DialogCommandSet", "T\341\272\247n s\341\273\221 1:", Q_NULLPTR));
         label_command_30->setText(QApplication::translate("DialogCommandSet", "T\341\272\247n s\341\273\221 2:", Q_NULLPTR));
         label_command_31->setText(QApplication::translate("DialogCommandSet", "T\341\272\247n s\341\273\221 3:", Q_NULLPTR));
         label_command_32->setText(QApplication::translate("DialogCommandSet", "T\341\272\247n s\341\273\221 4:", Q_NULLPTR));
         label_command_33->setText(QApplication::translate("DialogCommandSet", "T\341\272\247n s\341\273\221 5:", Q_NULLPTR));
         label_command_34->setText(QApplication::translate("DialogCommandSet", "T\341\272\247n s\341\273\221 6:", Q_NULLPTR));
+        label_command_36->setText(QApplication::translate("DialogCommandSet", "T\341\272\247n s\341\273\221 7:", Q_NULLPTR));
+        label_command_37->setText(QApplication::translate("DialogCommandSet", "T\341\272\247n s\341\273\221 8:", Q_NULLPTR));
+        label_command_38->setText(QApplication::translate("DialogCommandSet", "T\341\272\247n s\341\273\221 9:", Q_NULLPTR));
+        label_command_39->setText(QApplication::translate("DialogCommandSet", "T\341\272\247n s\341\273\221 10:", Q_NULLPTR));
+        label_command_40->setText(QApplication::translate("DialogCommandSet", "T\341\272\247n s\341\273\221 11:", Q_NULLPTR));
+        label_command_41->setText(QApplication::translate("DialogCommandSet", "T\341\272\247n s\341\273\221 12:", Q_NULLPTR));
         pushButton_save->setText(QApplication::translate("DialogCommandSet", "L\306\260u", Q_NULLPTR));
         pushButton_2->setText(QApplication::translate("DialogCommandSet", "B\341\273\217", Q_NULLPTR));
     } // retranslateUi

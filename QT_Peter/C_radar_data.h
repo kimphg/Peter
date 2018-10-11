@@ -56,7 +56,7 @@
 #define ZOOM_SIZE                   550
 #define DISPLAY_RES_ZOOM            8192
 #define DISPLAY_SCALE_ZOOM          4
-#define nm(x) (x*1.852)
+#define nm(x) (x/1.852)
 //#include "jtarget.h"
 
 #include <vector>

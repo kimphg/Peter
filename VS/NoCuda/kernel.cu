@@ -12,7 +12,7 @@
 #define HR2D_PK//
 #define FRAME_LEN 2048
 #define OUTPUT_FRAME_SIZE FRAME_LEN*2+FRAME_HEADER_SIZE
-#define FFT_SIZE 256
+#define FFT_SIZE 32
 #define BANG_KHONG 0
 int mFFTSkip = (FFT_SIZE / 4);
 
@@ -229,7 +229,7 @@ unsigned char buff[3000];
 void ReplayData(const char* fileName)
 {
 	//char* mfileName = "C:\\Users\\Phuong-T1600\\Documents\\GitHub\\Peter\\VS\\x64\\Release\\raw_data_record_1538999224.dat";
-	pFile = fopen("D:\\HR2D\\raw_data_record_1539052815.dat", "rb");
+	pFile = fopen(fileName, "rb");
 	if (!pFile)
 	{
 		printf("\nfopen failed");
@@ -265,7 +265,7 @@ int main(int argc, char **argv)
 	socketInit();
 	mFFT = new coreFFT(FRAME_LEN, FFT_SIZE);
 	StartProcessing();
-	if (argc >= 1)
+	if (argc > 1)
 	{
 		char *fileName = argv[0];
 		printf("\nreplay data file:");
@@ -567,7 +567,7 @@ void ProcessFrame(unsigned char*data, int len)
 	else if (data[0] == 2) //2: 1024 byte đầu kênh Q
 	{
 		memcpy(dataBuff[iNext].dataPM_Q, data + FRAME_HEADER_SIZE, 1024);
-
+		
 	}
 	else if (data[0] == 3) //3: 1024 byte sau kênh Q
 	{

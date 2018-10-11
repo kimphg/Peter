@@ -536,11 +536,14 @@ private slots:
 
     void on_toolButton_tx_19_clicked();
 
+    void on_toolButton_open_record_2_clicked();
+
 private:
 
 //    bool mShowobjects,
     bool mShowTracks;
-    unsigned long long mSelectedTrackId;
+    double trueShift,headShift;
+//    unsigned long long mSelectedTrackId;
 //    uint mSelectedTrackTime;
     void initActionsConnections();
     void initGraphicView();
@@ -562,6 +565,8 @@ private:
     void UpdateGpsData();
     void UpdateDataStatus();
     void ViewTrackInfo();
+    void gotoCenter();
+    void rotateVector(double angle, short *x, short *y);
 };
 
 #endif // MAINWINDOW_H
