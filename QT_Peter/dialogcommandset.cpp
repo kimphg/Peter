@@ -16,6 +16,7 @@ DialogCommandSet::DialogCommandSet(QWidget *parent) :
     ui->plainTextEdit_range_13->setPlainText(       CConfig::getString("mR5Command"));
     ui->plainTextEdit_range_14->setPlainText(       CConfig::getString("mR6Command"));
     ui->plainTextEdit_range_15->setPlainText(       CConfig::getString("mR7Command"));
+    ui->plainTextEdit_range_16->setPlainText(       CConfig::getString("mR8Command"));
     ui->plainTextEdit_command_rx_2->setPlainText(   CConfig::getString("mRxCommand"));
     ui->plainTextEdit_command_tx_2->setPlainText(   CConfig::getString("mTxCommand"));
     ui->plainTextEdit_freq_7->setPlainText( CConfig::getString("mFreq1Command"));
@@ -24,6 +25,12 @@ DialogCommandSet::DialogCommandSet(QWidget *parent) :
     ui->plainTextEdit_freq_10->setPlainText(CConfig::getString("mFreq4Command"));
     ui->plainTextEdit_freq_11->setPlainText(CConfig::getString("mFreq5Command"));
     ui->plainTextEdit_freq_12->setPlainText(CConfig::getString("mFreq6Command"));
+    ui->plainTextEdit_freq_13->setPlainText(CConfig::getString("mFreq7Command"));
+    ui->plainTextEdit_freq_14->setPlainText(CConfig::getString("mFreq8Command"));
+    ui->plainTextEdit_freq_15->setPlainText(CConfig::getString("mFreq9Command"));
+    ui->plainTextEdit_freq_16->setPlainText(CConfig::getString("mFreq10Command"));
+    ui->plainTextEdit_freq_17->setPlainText(CConfig::getString("mFreq11Command"));
+    ui->plainTextEdit_freq_18->setPlainText(CConfig::getString("mFreq12Command"));
 }
 
 DialogCommandSet::~DialogCommandSet()

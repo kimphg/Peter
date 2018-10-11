@@ -14891,33 +14891,6 @@
        </property>
       </widget>
      </widget>
-     <widget class="QCustomButton" name="toolButton_setRangeUnit">
-      <property name="geometry">
-       <rect>
-        <x>20</x>
-        <y>460</y>
-        <width>201</width>
-        <height>31</height>
-       </rect>
-      </property>
-      <property name="sizePolicy">
-       <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-        <horstretch>0</horstretch>
-        <verstretch>0</verstretch>
-       </sizepolicy>
-      </property>
-      <property name="font">
-       <font>
-        <pointsize>12</pointsize>
-       </font>
-      </property>
-      <property name="text">
-       <string>Đơn vị đo: Hải lý(NM)</string>
-      </property>
-      <property name="checkable">
-       <bool>false</bool>
-      </property>
-     </widget>
      <widget class="QCustomGroupBox" name="groupBox_4">
       <property name="geometry">
        <rect>
@@ -27397,7 +27370,7 @@ background-color: rgba(255, 255, 255, 0);</string>
      <bool>false</bool>
     </property>
     <property name="currentIndex">
-     <number>2</number>
+     <number>1</number>
     </property>
     <property name="elideMode">
      <enum>Qt::ElideNone</enum>
@@ -30422,178 +30395,13 @@ background-color: rgba(255, 255, 255, 0);</string>
        </item>
       </layout>
      </widget>
-     <widget class="QCustomButton" name="toolButton_sled_reset_4">
-      <property name="geometry">
-       <rect>
-        <x>10</x>
-        <y>10</y>
-        <width>121</width>
-        <height>41</height>
-       </rect>
-      </property>
-      <property name="sizePolicy">
-       <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-        <horstretch>0</horstretch>
-        <verstretch>0</verstretch>
-       </sizepolicy>
-      </property>
-      <property name="font">
-       <font>
-        <pointsize>12</pointsize>
-       </font>
-      </property>
-      <property name="focusPolicy">
-       <enum>Qt::NoFocus</enum>
-      </property>
-      <property name="toolTip">
-       <string>Hiển thị các quỹ đạo mục tiêu</string>
-      </property>
-      <property name="text">
-       <string>Quỹ đạo</string>
-      </property>
-      <property name="checkable">
-       <bool>true</bool>
-      </property>
-     </widget>
-     <widget class="QCustomButton" name="toolButton_sled">
-      <property name="geometry">
-       <rect>
-        <x>140</x>
-        <y>10</y>
-        <width>91</width>
-        <height>41</height>
-       </rect>
-      </property>
-      <property name="sizePolicy">
-       <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-        <horstretch>0</horstretch>
-        <verstretch>0</verstretch>
-       </sizepolicy>
-      </property>
-      <property name="font">
-       <font>
-        <pointsize>12</pointsize>
-       </font>
-      </property>
-      <property name="focusPolicy">
-       <enum>Qt::NoFocus</enum>
-      </property>
-      <property name="toolTip">
-       <string>Hiện vết di chuyển của mục tiêu</string>
-      </property>
-      <property name="text">
-       <string>Hiện vết</string>
-      </property>
-      <property name="checkable">
-       <bool>true</bool>
-      </property>
-     </widget>
-     <widget class="QCustomButton" name="toolButton_xl_nguong_4">
-      <property name="geometry">
-       <rect>
-        <x>10</x>
-        <y>60</y>
-        <width>121</width>
-        <height>41</height>
-       </rect>
-      </property>
-      <property name="sizePolicy">
-       <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-        <horstretch>0</horstretch>
-        <verstretch>0</verstretch>
-       </sizepolicy>
-      </property>
-      <property name="font">
-       <font>
-        <pointsize>12</pointsize>
-       </font>
-      </property>
-      <property name="focusPolicy">
-       <enum>Qt::NoFocus</enum>
-      </property>
-      <property name="toolTip">
-       <string>Gạt nền tạp trên hiện sóng</string>
-      </property>
-      <property name="text">
-       <string>Lọc tạp</string>
-      </property>
-      <property name="checkable">
-       <bool>true</bool>
-      </property>
-     </widget>
-     <widget class="QCustomButton" name="toolButton_sled_reset">
-      <property name="geometry">
-       <rect>
-        <x>140</x>
-        <y>60</y>
-        <width>91</width>
-        <height>41</height>
-       </rect>
-      </property>
-      <property name="sizePolicy">
-       <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-        <horstretch>0</horstretch>
-        <verstretch>0</verstretch>
-       </sizepolicy>
-      </property>
-      <property name="font">
-       <font>
-        <pointsize>12</pointsize>
-       </font>
-      </property>
-      <property name="focusPolicy">
-       <enum>Qt::NoFocus</enum>
-      </property>
-      <property name="toolTip">
-       <string>Xóa các vết di chuyển cũ</string>
-      </property>
-      <property name="text">
-       <string>Xóa vết</string>
-      </property>
-      <property name="checkable">
-       <bool>false</bool>
-      </property>
-     </widget>
-     <widget class="QCustomButton" name="toolButton_iad">
-      <property name="enabled">
-       <bool>true</bool>
-      </property>
-      <property name="geometry">
-       <rect>
-        <x>240</x>
-        <y>60</y>
-        <width>51</width>
-        <height>41</height>
-       </rect>
-      </property>
-      <property name="sizePolicy">
-       <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-        <horstretch>0</horstretch>
-        <verstretch>0</verstretch>
-       </sizepolicy>
-      </property>
-      <property name="font">
-       <font>
-        <pointsize>12</pointsize>
-       </font>
-      </property>
-      <property name="toolTip">
-       <string>Màn hiện sóng phóng to</string>
-      </property>
-      <property name="text">
-       <string>IAD</string>
-      </property>
-      <property name="checkable">
-       <bool>false</bool>
-      </property>
-     </widget>
      <widget class="QCustomGroupBox" name="groupBox_13">
       <property name="geometry">
        <rect>
         <x>10</x>
         <y>540</y>
         <width>281</width>
-        <height>121</height>
+        <height>111</height>
        </rect>
       </property>
       <property name="palette">
@@ -31174,18 +30982,179 @@ background-color: rgba(255, 255, 255, 0);</string>
        <property name="checkable">
         <bool>true</bool>
        </property>
+       <property name="checked">
+        <bool>true</bool>
+       </property>
       </widget>
      </widget>
-     <zorder>groupBox_17</zorder>
-     <zorder>groupBox_11</zorder>
-     <zorder>tabWidget_menu_3</zorder>
-     <zorder>groupBox_9</zorder>
-     <zorder>toolButton_sled_reset_4</zorder>
-     <zorder>toolButton_sled</zorder>
-     <zorder>toolButton_xl_nguong_4</zorder>
-     <zorder>toolButton_sled_reset</zorder>
-     <zorder>toolButton_iad</zorder>
-     <zorder>groupBox_13</zorder>
+     <widget class="QWidget" name="">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>10</y>
+        <width>271</width>
+        <height>120</height>
+       </rect>
+      </property>
+      <layout class="QGridLayout" name="gridLayout_9">
+       <item row="0" column="0">
+        <widget class="QCustomButton" name="toolButton_sled_reset_4">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="font">
+          <font>
+           <pointsize>12</pointsize>
+          </font>
+         </property>
+         <property name="focusPolicy">
+          <enum>Qt::NoFocus</enum>
+         </property>
+         <property name="toolTip">
+          <string>Hiển thị các quỹ đạo mục tiêu</string>
+         </property>
+         <property name="text">
+          <string>Quỹ đạo</string>
+         </property>
+         <property name="checkable">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="1">
+        <widget class="QCustomButton" name="toolButton_sled">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="font">
+          <font>
+           <pointsize>12</pointsize>
+          </font>
+         </property>
+         <property name="focusPolicy">
+          <enum>Qt::NoFocus</enum>
+         </property>
+         <property name="toolTip">
+          <string>Hiện vết di chuyển của mục tiêu</string>
+         </property>
+         <property name="text">
+          <string>Hiện vết</string>
+         </property>
+         <property name="checkable">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="0">
+        <widget class="QCustomButton" name="toolButton_xl_nguong_4">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="font">
+          <font>
+           <pointsize>12</pointsize>
+          </font>
+         </property>
+         <property name="focusPolicy">
+          <enum>Qt::NoFocus</enum>
+         </property>
+         <property name="toolTip">
+          <string>Gạt nền tạp trên hiện sóng</string>
+         </property>
+         <property name="text">
+          <string>Lọc tạp</string>
+         </property>
+         <property name="checkable">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="1">
+        <widget class="QCustomButton" name="toolButton_sled_reset">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="font">
+          <font>
+           <pointsize>12</pointsize>
+          </font>
+         </property>
+         <property name="focusPolicy">
+          <enum>Qt::NoFocus</enum>
+         </property>
+         <property name="toolTip">
+          <string>Xóa các vết di chuyển cũ</string>
+         </property>
+         <property name="text">
+          <string>Xóa vết</string>
+         </property>
+         <property name="checkable">
+          <bool>false</bool>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="1">
+        <widget class="QCustomButton" name="toolButton_iad">
+         <property name="enabled">
+          <bool>true</bool>
+         </property>
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="font">
+          <font>
+           <pointsize>12</pointsize>
+          </font>
+         </property>
+         <property name="toolTip">
+          <string>Màn hiện sóng phóng to</string>
+         </property>
+         <property name="text">
+          <string>IAD</string>
+         </property>
+         <property name="checkable">
+          <bool>false</bool>
+         </property>
+        </widget>
+       </item>
+       <item row="3" column="0" colspan="2">
+        <widget class="QCustomButton" name="toolButton_setRangeUnit">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="font">
+          <font>
+           <pointsize>12</pointsize>
+          </font>
+         </property>
+         <property name="text">
+          <string>Đơn vị đo: Hải lý(NM)</string>
+         </property>
+         <property name="checkable">
+          <bool>false</bool>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
     </widget>
     <widget class="QWidget" name="tab_23">
      <attribute name="title">
@@ -34206,10 +34175,10 @@ background-color: rgba(255, 255, 255, 0);</string>
    <widget class="QCustomTabWidget" name="tabWidget_menu_3">
     <property name="geometry">
      <rect>
-      <x>897</x>
-      <y>710</y>
+      <x>900</x>
+      <y>720</y>
       <width>375</width>
-      <height>261</height>
+      <height>251</height>
      </rect>
     </property>
     <property name="font">
@@ -34303,6 +34272,11 @@ background-color: rgba(255, 255, 255, 0);</string>
         <string>Tốc độ</string>
        </property>
       </column>
+      <item row="0" column="0">
+       <property name="flags">
+        <set>ItemIsDragEnabled|ItemIsUserCheckable|ItemIsEnabled</set>
+       </property>
+      </item>
      </widget>
     </widget>
     <widget class="QWidget" name="tab_25">
@@ -37377,9 +37351,6 @@ background-color: rgba(255, 255, 255, 0);</string>
    <zorder>tabWidget_menu_2</zorder>
    <zorder>tabWidget_menu_3</zorder>
    <zorder>groupBox_5</zorder>
-   <zorder>label_sn_type</zorder>
-   <zorder>label_speed_2</zorder>
-   <zorder>label_range_resolution</zorder>
    <zorder>groupBox_gps_2</zorder>
    <zorder>toolButton_chi_thi_mt</zorder>
   </widget>
@@ -37387,15 +37358,15 @@ background-color: rgba(255, 255, 255, 0);</string>
  <layoutdefault spacing="6" margin="11"/>
  <customwidgets>
   <customwidget>
-   <class>QCustomButton</class>
-   <extends>QToolButton</extends>
-   <header location="global">qcustombutton.h</header>
-  </customwidget>
-  <customwidget>
    <class>QCustomGroupBox</class>
    <extends>QGroupBox</extends>
    <header location="global">qcustomgroupbox.h</header>
    <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>QCustomButton</class>
+   <extends>QToolButton</extends>
+   <header location="global">qcustombutton.h</header>
   </customwidget>
   <customwidget>
    <class>QCustomComboBox</class>

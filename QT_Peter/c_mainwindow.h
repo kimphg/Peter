@@ -524,6 +524,18 @@ private slots:
 
     void on_toolButton_xl_dopler_3_toggled(bool checked);
 
+    void on_toolButton_tx_14_clicked();
+
+    void on_toolButton_tx_15_clicked();
+
+    void on_toolButton_tx_16_clicked();
+
+    void on_toolButton_tx_17_clicked();
+
+    void on_toolButton_tx_18_clicked();
+
+    void on_toolButton_tx_19_clicked();
+
 private:
 
 //    bool mShowobjects,

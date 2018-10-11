@@ -14,11 +14,23 @@
    <string>Dialog</string>
   </property>
   <layout class="QGridLayout" name="gridLayout">
+   <property name="leftMargin">
+    <number>0</number>
+   </property>
+   <property name="topMargin">
+    <number>0</number>
+   </property>
+   <property name="rightMargin">
+    <number>0</number>
+   </property>
+   <property name="bottomMargin">
+    <number>0</number>
+   </property>
+   <property name="spacing">
+    <number>0</number>
+   </property>
    <item row="0" column="0">
-    <widget class="QCustomGroupBox" name="groupBox_control_setting">
-     <property name="title">
-      <string/>
-     </property>
+    <widget class="QFrame" name="groupBox_control_setting">
      <widget class="QLabel" name="label_command_3">
       <property name="geometry">
        <rect>
@@ -10265,14 +10277,6 @@
    </item>
   </layout>
  </widget>
- <customwidgets>
-  <customwidget>
-   <class>QCustomGroupBox</class>
-   <extends>QGroupBox</extends>
-   <header location="global">qcustomgroupbox.h</header>
-   <container>1</container>
-  </customwidget>
- </customwidgets>
  <resources/>
  <connections/>
 </ui>

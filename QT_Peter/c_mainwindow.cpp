@@ -22,7 +22,7 @@ int                         mDistanceUnit=0;//0:NM;1:KM
 double                      mZoomSizeRg = 2;
 double                      mZoomSizeAz = 10;
 double                      mLat=DEFAULT_LAT,mLon = DEFAULT_LONG;
-double                      mHeadingGPSNew = 0,mHeadingGPSOld=20;
+double                      mHeadingGPSNew = -50,mHeadingGPSOld=20;
 bool                        isMapOutdated = true;
 bool isHeadUp = false;
 short   mMousex =0,mMousey=0;
@@ -30,7 +30,7 @@ dataProcessingThread        *processing;// thread xu ly du lieu radar
 C_radar_data                *pRadar;
 QThread                     *t2,*t1;
 QPen penBackground(QBrush(QColor(24 ,48 ,64,255)),200+SCR_BORDER_SIZE);
-QPen penOuterGrid1(QBrush(QColor(50,255,255 ,255)),2);//xoay mui tau
+QPen penOuterGrid1(QBrush(QColor(50,255,255 ,255)),1);//xoay mui tau
 QPen penOuterGrid2(QBrush(QColor(255,255,50 ,255)),2);
 QPen mGridViewPen1(QBrush(QColor(150,150,150,255)),1);
 QPoint points[6];
@@ -1512,12 +1512,13 @@ void Mainwindow::DrawViewFrame(QPainter* p)
     }
     //ve vanh goc trong
     p->setPen(penOuterGrid1);
-    for(short theta=-0;theta<360;theta+=10)
+    for(short theta=0;theta<360;theta+=10)
     {
         if(CalcAziContour(theta+headShift,SCR_H - SCR_BORDER_SIZE-40))
         {
             int value = theta;
             if(value>180)value-=360;
+            if(!value)continue;
             p->drawLine(points[0],points[1]);
             p->drawText(points[2].x()-25,points[2].y()-10,50,20,
                     Qt::AlignHCenter|Qt::AlignVCenter,
@@ -1540,25 +1541,19 @@ void Mainwindow::DrawViewFrame(QPainter* p)
     {
         radHeading=0;
     }else radHeading = (mHeadingGPSOld);
-    if(mHeadingGPSOld)
+
+    if(CalcAziContour(radHeading,SCR_H-SCR_BORDER_SIZE-18))
     {
-
-        if(CalcAziContour(radHeading,SCR_H-SCR_BORDER_SIZE-18))
-        {
-            p->setPen(QPen(Qt::cyan,2,Qt::SolidLine,Qt::RoundCap));
-            //int lineLen = (SCR_H-SCR_BORDER_SIZE)/2;
-            //points[0].setX(lineLen*sin(radHeading)+radCtX);
-            //points[0].setY(lineLen*cos(radHeading)+radCtX);
-
-            p->drawLine(radCtX,radCtY,
-                        points[1].x(),
-                        points[1].y());
-            //p->drawText(720,60,200,20,0,"Heading: "+QString::number(mHeadingGPS,'f',1));
-
-        }
-
+        p->setPen(QPen(Qt::cyan,2,Qt::SolidLine,Qt::RoundCap));
+        p->drawLine(radCtX,radCtY,
+                    points[1].x(),
+                points[1].y());
+        //p->drawText(720,60,200,20,0,"Heading: "+QString::number(mHeadingGPS,'f',1));
 
     }
+
+
+
 
     //plot cur azi
 //    if(CalcAziContour(processing->mAntennaAzi,SCR_H-SCR_BORDER_SIZE-20))
@@ -1698,7 +1693,7 @@ void Mainwindow::Update100ms()
         if(gpsHeadingDiff>180)gpsHeadingDiff-=360;
         mHeadingGPSOld+=gpsHeadingDiff/3.0;
         isMapOutdated = true;
-    }
+    }else mHeadingGPSOld = mHeadingGPSNew;
     DrawMap();
     mMousex=this->mapFromGlobal(QCursor::pos()).x();
     mMousey=this->mapFromGlobal(QCursor::pos()).y();
@@ -4403,4 +4398,34 @@ void Mainwindow::on_bt_rg_7_toggled(bool checked)
 void Mainwindow::on_toolButton_xl_dopler_3_toggled(bool checked)
 {
 
+}
+
+void Mainwindow::on_toolButton_tx_14_clicked()
+{
+    sendToRadarString(CConfig::getString("mFreq7Command"));
+}
+
+void Mainwindow::on_toolButton_tx_15_clicked()
+{
+    sendToRadarString(CConfig::getString("mFreq8Command"));
+}
+
+void Mainwindow::on_toolButton_tx_16_clicked()
+{
+    sendToRadarString(CConfig::getString("mFreq9Command"));
+}
+
+void Mainwindow::on_toolButton_tx_17_clicked()
+{
+    sendToRadarString(CConfig::getString("mFreq10Command"));
+}
+
+void Mainwindow::on_toolButton_tx_18_clicked()
+{
+    sendToRadarString(CConfig::getString("mFreq11Command"));
+}
+
+void Mainwindow::on_toolButton_tx_19_clicked()
+{
+    sendToRadarString(CConfig::getString("mFreq12Command"));
 }
