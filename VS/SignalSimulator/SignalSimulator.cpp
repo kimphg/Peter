@@ -157,10 +157,15 @@ int _tmain(int argc, _TCHAR* argv[])
 			Sleep(500);
 		}
 		//if (rand() % 10 == 0)regenerate(azi);
+		/*if (rand() % 10 == 0)
+		{
+			memset((char*)(&outputFrame[azi][0]), 0, OUTPUT_FRAME_SIZE);
+		}*/
 		outputFrame[azi][0] = 0x55;
 		outputFrame[azi][2] = azi >> 8;
 		outputFrame[azi][3] = azi;
 		outputFrame[azi][4] = n_clk_adc;
+		
 		sendto(mSocket, (char*)(&outputFrame[azi][0]), OUTPUT_FRAME_SIZE, 0, (struct sockaddr *) &si_peter, sizeof(si_peter));
 		//outputFrame[azi][0] = 2;
 		//sendto(mSocket, (char*)(&outputFrame[azi][0]), OUTPUT_FRAME_SIZE, 0, (struct sockaddr *) &si_peter, sizeof(si_peter));
