@@ -922,6 +922,7 @@ void C_radar_data::ProcessData(unsigned short azi,unsigned short lastAzi)
             data_mem.sled[azi][r_pos] -= (data_mem.sled[azi][r_pos])/20.0f;
             if(rgs_auto)displayVal= 0;
         }
+        if(displayVal>255)displayVal=255;
         data_mem.level_disp[azi][r_pos]=displayVal;
 
     }
