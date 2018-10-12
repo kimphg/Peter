@@ -443,7 +443,7 @@ void dataProcessingThread::playbackRadarData()
             buff.resize(len);
 
             signRepFile.read(buff.data(),len);
-            if(len>1000){
+            if(len>300){
                 //mRadarData->assembleDataFrame((unsigned char*)buff.data(),buff.size());
                 mRadarData->processSocketData((unsigned char*)buff.data(),len);
             }

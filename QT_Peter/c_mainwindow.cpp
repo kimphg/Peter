@@ -2,12 +2,6 @@
 #include "statuswindow.h"
 #include "ui_mainwindow.h"
 
-//#include "gdal/ogr/ogrsf_frmts/ogrsf_frmts.h"
-//#include "gdal/gcore/gdal.h"
-//#define mapWidth 2000
-//#define mapWidth mapWidth
-//#define mapHeight mapWidth
-//#define CONST_NM 1.852f// he so chuyen doi tu km sang hai ly
 track_t* trackTable[24];
 unsigned long long trackIDTable[24];
 #define MAX_VIEW_RANGE_KM   50
@@ -3568,7 +3562,7 @@ void Mainwindow::on_toolButton_auto_adapt_clicked()
 
 void Mainwindow::on_toolButton_set_header_size_clicked()
 {
-    pRadar->SetHeaderLen(ui->textEdit_header_len->text().toInt());
+//    pRadar->SetHeaderLen(ui->textEdit_header_len->text().toInt());
 }
 
 void Mainwindow::on_toolButton_xl_nguong_clicked()

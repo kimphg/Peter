@@ -22,9 +22,9 @@
 FILE *logfile;
 
 short waitForData = 0;
-short headerLen = RADAR_HEADER_LEN;
+//short headerLen = RADAR_HEADER_LEN;
 unsigned char curFrameId;
-unsigned char dataBuff[RADAR_HEADER_LEN + RADAR_DATA_MAX_SIZE];
+//unsigned char dataBuff[RADAR_HEADER_LEN + RADAR_DATA_MAX_SIZE];
 QFile *exp_file = NULL;
 int sumvar = 0;
 int nNoiseCalculator = 0;
@@ -32,6 +32,7 @@ short lastProcessAzi = 0;
 typedef struct  {
     //processing dataaziQueue
     unsigned char level [MAX_AZIR][RADAR_RESOLUTION];
+    unsigned char may_hoi[MAX_AZIR][RADAR_RESOLUTION];
     unsigned char level_disp [MAX_AZIR][RADAR_RESOLUTION];
     bool          detect[MAX_AZIR][RADAR_RESOLUTION];
     //unsigned char rainLevel[MAX_AZIR][RADAR_RESOLUTION];
@@ -494,7 +495,6 @@ bool C_radar_data::checkFeedback(unsigned char *command)
 
 void C_radar_data::drawSgn(short azi_draw, short r_pos)
 {
-
     unsigned char value = data_mem.display_ray[r_pos][0];
     unsigned char dopler    = data_mem.display_ray[r_pos][1];
     unsigned char sled     = data_mem.display_ray[r_pos][2];
@@ -771,10 +771,10 @@ void  C_radar_data::getNoiseLevel()
     sumvar = 0;
 
 }
-void C_radar_data::SetHeaderLen( short len)
+/*void C_radar_data::SetHeaderLen( short len)
 {
     headerLen = len;
-}
+}*/
 //bool C_radar_data::getDoubleFilter() const
 //{
 //    return doubleFilter;
@@ -887,6 +887,7 @@ void C_radar_data::ProcessData(unsigned short azi,unsigned short lastAzi)
     for(short r_pos=0;r_pos<range_max;r_pos++)
     {
         // RGS threshold
+        short displayVal;
         rainLevel += krain_auto*(data_mem.level[azi][r_pos]-rainLevel);
         if(rainLevel>MAX_RAIN)rainLevel = MAX_RAIN;
         short nthresh = rainLevel + noiseVar*kgain_auto;
@@ -899,10 +900,13 @@ void C_radar_data::ProcessData(unsigned short azi,unsigned short lastAzi)
             short dif = (data_mem.level[azi][r_pos]+32+ noiseVar*kgain_auto -threshRay[r_pos]);
             if(dif<0)dif=0;
             else if(dif>255)dif=255;
-            data_mem.level_disp[azi][r_pos]=dif;
+            displayVal=dif;
         }
         else
-            data_mem.level_disp[azi][r_pos]=data_mem.level[azi][r_pos];
+            displayVal=data_mem.level[azi][r_pos];
+        if(data_mem.may_hoi[azi][r_pos])
+            displayVal+=20;
+
         data_mem.detect[azi][r_pos] = (!cutoff);
         //data_mem.detect[azi][r_pos] = (!cutoff);
         //detect = vuot nguong & dopler lap lai
@@ -916,9 +920,9 @@ void C_radar_data::ProcessData(unsigned short azi,unsigned short lastAzi)
         else
         {
             data_mem.sled[azi][r_pos] -= (data_mem.sled[azi][r_pos])/20.0f;
-            if(rgs_auto)data_mem.level_disp[azi][r_pos]= 0;
+            if(rgs_auto)displayVal= 0;
         }
-
+        data_mem.level_disp[azi][r_pos]=displayVal;
 
     }
     return ;
@@ -1001,10 +1005,17 @@ int C_radar_data::ssiDecode(ushort nAzi)
     mEncoderVal = nAzi;
     return nAzi>>1;
 }
-
-int rot;
+void C_radar_data::ProcessGOData(unsigned char* data,short len, int azi)
+{
+    if(len<300)return;
+    for(int i=0;i<range_max;i++)
+    {
+        data_mem.may_hoi[azi][i] = (data[i/8+RADAR_HEADER_LEN]>>(i%8))&0x01;
+    }
+}
 void C_radar_data::processSocketData(unsigned char* data,short len)
 {
+
     if(len==MAX_FRAME_SIZE)
         range_max = RADAR_RESOLUTION;
     else if(len==MAX_FRAME_SIZE_HALF)
@@ -1070,6 +1081,11 @@ void C_radar_data::processSocketData(unsigned char* data,short len)
 
     }
     newAzi&=0x07ff;
+    if(data[0]==4)// du lieu may hoi
+    {
+        ProcessGOData(data, len,newAzi);
+        return;
+    }
     if(curAzir==newAzi)return;
     //if(newAzi==0)dir= !dir;
     int dazi = newAzi-curAzir;
@@ -1155,24 +1171,24 @@ void C_radar_data::SelfRotationOff()
     isSelfRotation = false;
 }
 
-int C_radar_data::getNewAzi()
-{
-    int newAzi;
-    if(isSelfRotation)
-    {
-        selfRotationAzi-=selfRotationDazi;
-        if(selfRotationAzi>=MAX_AZIR)selfRotationAzi = 0;
-        if(selfRotationAzi<0)selfRotationAzi += MAX_AZIR;
-        newAzi = selfRotationAzi;
-    }
-    else
-    {
-        newAzi = (0xfff & (dataBuff[4] << 8 | dataBuff[5]))>>1;
-    }
-    if(newAzi>MAX_AZIR||newAzi<0)
-        return 0;
-    return newAzi;
-}
+//int C_radar_data::getNewAzi()
+//{
+//    int newAzi;
+//    if(isSelfRotation)
+//    {
+//        selfRotationAzi-=selfRotationDazi;
+//        if(selfRotationAzi>=MAX_AZIR)selfRotationAzi = 0;
+//        if(selfRotationAzi<0)selfRotationAzi += MAX_AZIR;
+//        newAzi = selfRotationAzi;
+//    }
+//    else
+//    {
+//        newAzi = (0xfff & (dataBuff[4] << 8 | dataBuff[5]))>>1;
+//    }
+//    if(newAzi>MAX_AZIR||newAzi<0)
+//        return 0;
+//    return newAzi;
+//}
 void C_radar_data::ProcessDataFrame()
 {/*
     int newAzi = getNewAzi();
@@ -1397,83 +1413,7 @@ void C_radar_data::UpdateData()
     }
 
 }
-void C_radar_data::assembleDataFrame(unsigned char* data,unsigned short dataLen)
-{
 
-    if((dataLen<headerLen)){printf("Too short data.1\n");return;}
-    char dataId = data[0]&0x0f;
-    if(dataId==1)
-    {
-        //printf("%x-",data[0]);
-        curFrameId = (data[0]&0xf0)>>4;
-        range_max = (dataLen - headerLen)*4/3 - RAD_S_PULSE_RES;
-        //printf("range_max:%d\n",range_max);
-        if(range_max < RAD_S_PULSE_RES){printf("Too short data.2\n");return;}
-        if(range_max > RADAR_RESOLUTION){printf("Too long data.3\n");return;}
-        memcpy(dataBuff,data,dataLen);
-        waitForData = dataLen;
-    }
-    else if(dataId==2)
-    {
-        //check if we are waiting for second half data frame
-        if(!waitForData){printf("First frame is mising\n");return;}
-        //check if frame ID is the one that we are expecting
-        short secondFrameId = (data[0]&0xf0)>>4;
-        if(curFrameId!=secondFrameId){
-            printf("\nWrong data.-%d-%d-%d",secondFrameId,curFrameId,dataLen);
-            printf("\nWrong:%x\n",data[0]);
-            //return;
-        }
-        // check if the data size is correct
-        if(dataLen!=waitForData){printf("Wrong data.6\n");return;}
-        //load data to buffer
-        memcpy(dataBuff + waitForData,data + headerLen,dataLen-headerLen);
-        //process data
-        ProcessDataFrame();
-        waitForData = 0;
-    }
-    else{
-        printf("\nWrong data id. ID = %d",dataId);
-    }
-    //if(!dopler){frameId = data[0]>>4; }else {if(frameId =! (data[0]>>4))return;}//check id of dopler data
-
-    /*
-    short azi = 0xfff & (buff[ADDR_AZI_H] << 8 | buff[ADDR_AZI_L]);
-    if(curAzir==azi) return GetData();
-    curAzir = azi;
-    if(curAzir==4095){
-        curPeriodIndex++;
-        procTracks();
-    }
-    for(short r = 1; r < 1023; r++)
-    {
-        short i = (r>>3);
-        short j = (r&0x0007);
-        if((buff[VIDEO_RAW_LENGTH+i]>>j & 0x1))
-        {
-
-
-            //signal_map.frame[azi].raw_map[r].level = signal_map.frame[azi].raw_map[r].level<<
-            //if(signal_map.frame[azi].raw_map[r].level<80)
-            signal_map.frame[azi].raw_map[r].displaylevel  = 1;
-            signal_map.frame[azi].raw_map[r].level = buff[r];
-            signal_map.frame[azi].raw_map[r].vet = float(signal_map.frame[azi].raw_map[r].vet*0.95 + 0.05);//255*0.125;
-
-            procPix(azi,r);
-        }
-        else
-        {
-            signal_map.frame[azi].raw_map[r].displaylevel  = 0;
-            signal_map.frame[azi].raw_map[r].level = buff[r];
-            signal_map.frame[azi].raw_map[r].vet = float(signal_map.frame[azi].raw_map[r].vet*0.95);
-            //signal_map.frame[azi].raw_map[r].level = 0;
-        }
-
-    }
-    delete[] buff;
-    return azi;*/
-
-}
 unsigned int doplerHistogram[256];
 void C_radar_data::procPLot(plot_t* mPlot)
 {
@@ -2057,6 +1997,7 @@ void C_radar_data::resetData()
     memset(data_mem.detect,     0,dataLen);
     memset(data_mem.plotIndex,  0,dataLen);
     memset(data_mem.hot,        0,dataLen);
+    memset(data_mem.may_hoi,    0,dataLen);
     std::queue<int> empty;
     std::swap( aziToProcess, empty );
     //memset(data_mem.terrain,    TERRAIN_INIT,dataLen);

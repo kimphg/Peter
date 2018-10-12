@@ -370,7 +370,7 @@ public:
     void drawRamp();
 
     //______________________________________//
-    void        assembleDataFrame(unsigned char *data, unsigned short dataLen);
+//    void        assembleDataFrame(unsigned char *data, unsigned short dataLen);
     void        UpdateData();
     void        ProcessDataFrame();
     void        ProcessData(unsigned short azi, unsigned short lastAzi);
@@ -404,7 +404,7 @@ public:
         return (unsigned char*)&command_feedback[0];
     }
     void        resetTrack();
-    void SetHeaderLen(short len);
+//    void SetHeaderLen(short len);
 //    bool getDoubleFilter() const;
 //    void setDoubleFilter(bool value);
 
@@ -452,7 +452,7 @@ private:
 //    void decodeData(int azi);
     //void initZoomAR(int a0, int r0);
     bool DrawZoomAR(int a,int r,short val,short dopler,short sled);
-    int getNewAzi();
+//    int getNewAzi();
     void ProcessEach90Deg();
     int ssiDecode(ushort nAzi);
 //    void DetectTracks();
@@ -464,7 +464,8 @@ private:
     void CreateTrack(object_t *obj1, object_t *obj2);
 //    void LinearFit(track_t *track);
     void LeastSquareFit(track_t* track);
-//    double LinearFitCost(track_t *track, object_t *myobj);
+    //    double LinearFitCost(track_t *track, object_t *myobj);
+    void ProcessGOData(unsigned char *data, short len, int azi);
 public:
     unsigned char mSledValue;
     int mEncoderVal;
