@@ -538,6 +538,28 @@ private slots:
 
     void on_toolButton_open_record_2_clicked();
 
+    void on_bt_rg_6_clicked();
+
+    void on_bt_rg_7_clicked();
+
+    void on_bt_rg_8_clicked();
+
+    void on_bt_rg_1_clicked();
+
+    void on_bt_rg_2_clicked();
+
+    void on_bt_rg_3_clicked();
+
+    void on_bt_rg_4_clicked();
+
+    void on_bt_rg_5_clicked();
+
+    void on_toolButton_xl_nguong_5_clicked(bool checked);
+
+    void on_toolButton_second_azi_clicked(bool checked);
+
+    void on_on_toolButton_xl_nguong_3_toggled(bool checked);
+
 private:
 
 //    bool mShowobjects,
@@ -567,6 +589,7 @@ private:
     void ViewTrackInfo();
     void gotoCenter();
     void rotateVector(double angle, short *x, short *y);
+    void SendScaleCommand();
 };
 
 #endif // MAINWINDOW_H

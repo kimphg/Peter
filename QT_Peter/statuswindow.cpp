@@ -1,6 +1,7 @@
 #include "statuswindow.h"
 #include "ui_statuswindow.h"
 double lookupTable5V[256];
+
 StatusWindow::StatusWindow(dataProcessingThread *radar,QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::StatusWindow)
@@ -124,10 +125,10 @@ bool StatusWindow::receiveRes()
 
 void StatusWindow::timerEvent(QTimerEvent *event)
 {
-    if(!mRadar->isConnected())
+    /*if(!mRadar->isConnected())
     {
         return;
-    }
+    }*/
     warningBlink=!warningBlink;
     ansTrue = receiveRes();
     sendReq();

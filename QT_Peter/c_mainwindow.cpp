@@ -1,9 +1,15 @@
 #include "c_mainwindow.h"
 #include "statuswindow.h"
 #include "ui_mainwindow.h"
-
-track_t* trackTable[24];
-unsigned long long trackIDTable[24];
+typedef struct {
+    track_t* track;
+    unsigned long long trackID;
+}TrackPointer;
+#define TRACK_TABLE_SIZE 24
+#define TARGET_TABLE_SIZE 6
+TrackPointer    trackTable[TRACK_TABLE_SIZE];
+TrackPointer    targetTable[TARGET_TABLE_SIZE];
+unsigned long long selectedTrackID =0;
 #define MAX_VIEW_RANGE_KM   50
 QStringList                 commandLogList;
 QTransform                  mTrans;
@@ -18,7 +24,7 @@ int                         mDistanceUnit=0;//0:NM;1:KM
 double                      mZoomSizeRg = 2;
 double                      mZoomSizeAz = 10;
 double                      mLat=DEFAULT_LAT,mLon = DEFAULT_LONG;
-double                      mHeadingGPSNew = -50,mHeadingGPSOld=20;
+double                      mHeadingGPSNew = -50,mShipHeading=20;
 bool                        isMapOutdated = true;
 bool isHeadUp = false;
 short   mMousex =0,mMousey=0;
@@ -143,34 +149,48 @@ void Mainwindow::mouseDoubleClickEvent( QMouseEvent * e )
             {
                 track_t* track = &(pRadar->mTrackList[i]);
                 if(track->isRemoved())continue;
-                object_t* obj1 = &(track->objectList.back()) ;
-                int sx = abs((obj1->xkm*mScale + radCtX)  - mMousex);
-                int sy = abs((-obj1->ykm*mScale + radCtY) - mMousey);
+                short sx = track->xkm*mScale ;
+                short sy = -track->ykm*mScale ;
+                rotateVector(trueShift,&sx,&sy);
+                sx   = abs(sx+ radCtX - mMousex);
+                sy   = abs(sy+ radCtY - mMousey);
                 if(sx+sy<minDistanceToCursor)
                 {
                     minDistanceToCursor = sx+sy;
                     //trackMin = track->uniqId;
                     trackSel = track;
+
                     //                tracktime = track->time;
                 }
 
             }
             if(minDistanceToCursor<10)
             {
-                for (uint i = 0;i<24;i++)
+                for (uint i = 0;i<TRACK_TABLE_SIZE;i++)
                 {
-                    if(!trackTable[i])
+                    if(trackTable[i].track)
+                        if(trackTable[i].track == trackSel)
                     {
-                        trackTable[i] = trackSel;
-                        trackIDTable[i] = trackSel->uniqId;
+                        //selectedTrackID=trackTable[i].track->uniqId;
+                        return;
+                    }
+                }
+                for (uint i = 0;i<TRACK_TABLE_SIZE;i++)
+                {
+                    if(!trackTable[i].track)
+                    {
+                        trackTable[i].track = trackSel;
+                        trackSel->operatorID = i+1;
+                        selectedTrackID = trackTable[i].trackID = trackSel->uniqId;
                         break;
                     }
                     else
                     {
-                        if(trackTable[i]->isRemoved()||(trackTable[i]->uniqId!=trackIDTable[i]))
+                        if(trackTable[i].track->isRemoved()||(trackTable[i].track->uniqId!=trackTable[i].trackID))
                         {
-                            trackTable[i] = trackSel;
-                            trackIDTable[i] = trackSel->uniqId;
+                            trackTable[i].track = trackSel;
+                            selectedTrackID = trackTable[i].trackID = trackSel->uniqId;
+                            trackSel->operatorID = i+1;
                             break;
                         }
                     }
@@ -205,9 +225,10 @@ void Mainwindow::sendToRadarString(QString command)
 }
 void Mainwindow::sendToRadarHS(const char* hexdata)//todo:move to radar class
 {
-    short len = strlen(hexdata)/2;
-    if(len>8)return;
+    short len = strlen(hexdata);
+    if(len>16)return;
     if(len%2)return;
+    len/=2;
     unsigned char sendBuff[]={0,0,0,0,0,0,0,0};
     hex2bin(hexdata,sendBuff);
     processing->sendCommand(sendBuff,8);
@@ -423,29 +444,32 @@ void Mainwindow::keyPressEvent(QKeyEvent *event)
                               mZoomSizeRg,mZoomSizeAz);
         pRadar->setZoomRectXY((mMousex - radCtX),(mMousey - radCtY));
     }
-    else if((!controlPressed)&&key >= Qt::Key_0&&key<=Qt::Key_9)
+    else if((!controlPressed)&&key >= Qt::Key_1&&key<=Qt::Key_6)
     {
-        /*int keyNum = key-Qt::Key_0;
-        if(keyNum>0){
+        int keyNum = key-Qt::Key_1;
+        if(keyNum>=TARGET_TABLE_SIZE)return;
+        if(!selectedTrackID)return;
+        /*if(keyNum>0){
             for(int i=0;i<pRadar->mTrackList.size();i++)
             {
                 track_t* track=&( pRadar->mTrackList[i]);
-                if(track->operatorID==keyNum)
+                if(track->uniqId==selectedTrackID)
                 {
 
                     mSelectedTrackId=track->uniqId;
                     return;
                 }
             }
-        }
+        }*/
         for(int i=0;i<pRadar->mTrackList.size();i++)
         {
             track_t* track=&( pRadar->mTrackList[i]);
-            if(mSelectedTrackId==track->uniqId)
+            if(selectedTrackID==track->uniqId)
             {
-                track->operatorID = keyNum;
+                targetTable[keyNum].track = track;
+                targetTable[keyNum].trackID = track->uniqId;
             }
-        }*/
+        }
     }
 
 }
@@ -509,29 +533,53 @@ void Mainwindow::mousePressEvent(QMouseEvent *event)
     mMouseLastY = (event->y());
     if(!isInsideViewZone(mMouseLastX,mMouseLastY))return;
     if(event->buttons() & Qt::LeftButton) {
-        if(mouse_mode&MouseAutoSelect)//(ui->toolButton_auto_select->isChecked())
+        mMousex=this->mapFromGlobal(QCursor::pos()).x();
+        mMousey=this->mapFromGlobal(QCursor::pos()).y();
+        if(isInsideViewZone(mMousex,mMousey))
         {
-            if(isSelectingTarget)
+            //select radar target
+            int minDistanceToCursor = 10;
+            //unsigned long long trackMin = 0;
+            track_t* trackSel;
+            for (uint i = 0;i<pRadar->mTrackList.size();i++)
             {
-                selZone_x2 = mMouseLastX;
-                selZone_y2 = mMouseLastY;
-                detectZone();
-                isSelectingTarget = false;
-            }else
+                track_t* track = &(pRadar->mTrackList[i]);
+                if(track->isRemoved())continue;
+                short sx = track->xkm*mScale ;
+                short sy = -track->ykm*mScale ;
+                rotateVector(trueShift,&sx,&sy);
+                sx   = abs(sx+ radCtX - mMousex);
+                sy   = abs(sy+ radCtY - mMousey);
+                if(sx+sy<minDistanceToCursor)
+                {
+                    minDistanceToCursor = sx+sy;
+                    //trackMin = track->uniqId;
+                    trackSel = track;
+
+                    //                tracktime = track->time;
+                }
+
+            }
+            if(minDistanceToCursor<10)
             {
-                selZone_x1 = mMouseLastX;
-                selZone_y1 = mMouseLastY;
-                isSelectingTarget = true;
+                for (uint i = 0;i<TRACK_TABLE_SIZE;i++)
+                {
+                    if(trackTable[i].track&&trackTable[i].track == trackSel)
+                    {
+                        selectedTrackID=trackTable[i].track->uniqId;
+                        return;
+                    }
+                }
             }
         }
-        else if(mouse_mode&MouseScope)
+        if(mouse_mode&MouseScope)
         {
             double azid,rg;
             C_radar_data::kmxyToPolarDeg((mMouseLastX - radCtX)/mScale,-(mMouseLastY - radCtY)/mScale,&azid,&rg);
 
             pRadar->drawRamp(azid);
         }
-        /*else if(ui->toolButton_create_zone->isChecked())
+                /*else if(ui->toolButton_create_zone->isChecked())
         {
             gz1.isActive = 1;
             gz1.x1 = event->x();
@@ -880,14 +928,14 @@ void Mainwindow::DrawRadarTargetByPainter(QPainter* p)//draw radar target from p
     unsigned int now_ms  = QDateTime::currentMSecsSinceEpoch() - pRadar->time_start_ms;
     bool blink = (now_ms/500)%2;
     //draw operator indexed tracks
-    for (uint i = 0;i<24;i++)
+    for (uint i = 0;i<TRACK_TABLE_SIZE;i++)
     {
-        track_t* track = trackTable[i];
+        track_t* track = trackTable[i].track;
         if(!track)break;
         if(track->isRemoved())continue;
-        if(track->uniqId==trackIDTable[i])//draw operator selected targets
+        if(track->uniqId==trackTable[i].trackID)//draw operator selected targets
         {
-            /*if(mSelectedTrackId== track->uniqId)//selected
+            if(selectedTrackID== track->uniqId)//selected
             {
                 // draw history
                 p->setPen(penSelTarget);
@@ -909,7 +957,7 @@ void Mainwindow::DrawRadarTargetByPainter(QPainter* p)//draw radar target from p
                 }
                 p->setPen(penTargetSelected);
             }
-            else */p->setPen(penTarget);
+            else p->setPen(penTarget);
             if(track->isLost())
             {
                 if(blink)
@@ -963,7 +1011,7 @@ void Mainwindow::DrawRadarTargetByPainter(QPainter* p)//draw radar target from p
             }
             //draw target number
 
-            p->drawText(sx1+6,sy1+6,100,50,0,QString::number(i+1));
+            p->drawText(sx1+6,sy1+6,100,50,0,QString::number(track->operatorID));
         }
         /*else if(mShowTracks||mSelectedTrackId== track->uniqId)
         {
@@ -1140,15 +1188,15 @@ void Mainwindow::paintEvent(QPaintEvent *event)
 {
     if(isHeadUp)
     {
-        trueShift = -mHeadingGPSOld;
+        trueShift = -mShipHeading;
         headShift = 0;
         mTrans.reset();
-        mTrans = mTrans.rotate((-mHeadingGPSOld));
+        mTrans = mTrans.rotate((-mShipHeading));
     }
     else
     {
         trueShift = 0;
-        headShift = mHeadingGPSOld;
+        headShift = mShipHeading;
     }
 
 
@@ -1412,7 +1460,7 @@ void Mainwindow::InitSetting()
     dyMax = SCR_H/4-10;
     mZoomCenterx = scrCtX ;
     mZoomCentery = scrCtY ;
-    UpdateScale();
+
 
     //ui->horizontalSlider_2->setValue(config.m_config.cfarThresh);
 
@@ -1429,8 +1477,7 @@ void Mainwindow::InitSetting()
     connect(ui->lineEdit_byte_5, SIGNAL(returnPressed()),ui->toolButton_send_command,SIGNAL(clicked()));
     connect(ui->lineEdit_byte_6, SIGNAL(returnPressed()),ui->toolButton_send_command,SIGNAL(clicked()));
     connect(ui->lineEdit_byte_7, SIGNAL(returnPressed()),ui->toolButton_send_command,SIGNAL(clicked()));
-    //setCursor(QCursor(Qt::ArrowCursor));
-    UpdateScale();
+
 
 
     //vnmap.setUp(config.m_config.lat(), config.m_config.lon(), 200,config.m_config.mapFilename.data());
@@ -1442,9 +1489,13 @@ void Mainwindow::InitSetting()
     // hide menu
     ui->tabWidget_menu->setGeometry(200,-800,ui->tabWidget_menu->width(),ui->tabWidget_menu->height());
     ui->tabWidget_menu->hide();
+    ui->tabWidget_menu->mMoveable = true;
+    ui->tabWidget_menu->raise();
     //hide iad
     ui->tabWidget_iad->setGeometry(200,-800,ui->tabWidget_iad->width(),ui->tabWidget_iad->height());
     ui->tabWidget_iad->hide();
+    ui->tabWidget_iad->mMoveable = true;
+    ui->tabWidget_iad->raise();
 }
 void Mainwindow::ReloadSetting()
 {
@@ -1593,7 +1644,7 @@ void Mainwindow::DrawViewFrame(QPainter* p)
     if(isHeadUp)
     {
         radHeading=0;
-    }else radHeading = (mHeadingGPSOld);
+    }else radHeading = (mShipHeading);
 
     if(CalcAziContour(radHeading,SCR_H-SCR_BORDER_SIZE-18))
     {
@@ -1617,7 +1668,7 @@ void Mainwindow::DrawViewFrame(QPainter* p)
     //        //p->drawText(720,20,200,20,0,"Antenna: "+QString::number(aziDeg,'f',1));
 
     //    }
-    if(CalcAziContour(degrees(pRadar->getCurAziRad())+radHeading-mHeadingGPSOld,SCR_H-SCR_BORDER_SIZE-20))
+    if(CalcAziContour(degrees(pRadar->getCurAziRad())+radHeading-mShipHeading,SCR_H-SCR_BORDER_SIZE-20))
     {
         p->setPen(QPen(Qt::cyan,4,Qt::SolidLine,Qt::RoundCap));
         p->drawLine(points[2],points[1]);
@@ -1739,14 +1790,14 @@ void Mainwindow::InitTimer()
 void Mainwindow::Update100ms()
 {
     //smooth the heading
-    float gpsHeadingDiff = mHeadingGPSNew-mHeadingGPSOld;
-    if(abs(gpsHeadingDiff)>0.1)
+    float gpsHeadingDiff = pRadar->mHeading-mShipHeading;
+    if(abs(gpsHeadingDiff)>0.5)
     {
         if(gpsHeadingDiff<-180)gpsHeadingDiff+=360;
         if(gpsHeadingDiff>180)gpsHeadingDiff-=360;
-        mHeadingGPSOld+=gpsHeadingDiff/3.0;
+        mShipHeading+=gpsHeadingDiff/3.0;
         isMapOutdated = true;
-    }else mHeadingGPSOld = mHeadingGPSNew;
+    }else mShipHeading = pRadar->mHeading;
     DrawMap();
     mMousex=this->mapFromGlobal(QCursor::pos()).x();
     mMousey=this->mapFromGlobal(QCursor::pos()).y();
@@ -1769,12 +1820,12 @@ void Mainwindow::Update100ms()
         if(isHeadUp)
         {
             headAzi= azi;
-            azi+=mHeadingGPSOld;
+            azi+=mShipHeading;
             if(azi<0)azi+=360;
         }
         else
         {
-            headAzi= azi-mHeadingGPSOld;
+            headAzi= azi-mShipHeading;
         }
         if(headAzi>180)headAzi-=360;
         if(headAzi<-180)headAzi+=360;
@@ -2083,16 +2134,43 @@ void Mainwindow::UpdateDataStatus()
 }
 void Mainwindow::ViewTrackInfo()
 {
-    for(int i=0;i<24;i++)
+    //track table
+    for(int i=0;i<TRACK_TABLE_SIZE;i++)
     {
-        if(trackTable[i])
+        if(trackTable[i].track)
         {
-            if(trackIDTable[i] == trackTable[i]->uniqId)
+            if(trackTable[i].trackID == trackTable[i].track->uniqId)
             {
-                QTableWidgetItem* item2 = new QTableWidgetItem(QString::number(nm(trackTable[i]->rgKm)));
-                QTableWidgetItem* item1 = new QTableWidgetItem(QString::number(trackTable[i]->aziDeg));
-                ui->tableWidget->setItem(i,0,item1);
-                ui->tableWidget->setItem(i,1,item2);
+                QTableWidgetItem* itemrange = new QTableWidgetItem(QString::number(nm(trackTable[i].track->rgKm),'f',2));
+                QTableWidgetItem* itemazi1 = new QTableWidgetItem(QString::number(trackTable[i].track->aziDeg,'f',1));
+                double shipBearing = trackTable[i].track->aziDeg-pRadar->mHeading;
+                if(shipBearing>180)shipBearing-=360;
+                QTableWidgetItem* itemazi2 = new QTableWidgetItem(QString::number(shipBearing,'f',1));
+                ui->tableWidget->setItem(i,0,itemazi1);
+                ui->tableWidget->setItem(i,1,itemazi2);
+                ui->tableWidget->setItem(i,1,itemrange);
+            }
+        }
+
+    }
+    //target table
+    for(int i=0;i<TARGET_TABLE_SIZE;i++)
+    {
+        if(targetTable[i].track)
+        {
+            track_t* track = targetTable[i].track;
+            if(targetTable[i].trackID == track->uniqId)
+            {
+                QTableWidgetItem* itemID= new QTableWidgetItem(QString::number(track->operatorID));
+                QTableWidgetItem* itemrange = new QTableWidgetItem(QString::number(nm(track->rgKm),'f',2));
+                QTableWidgetItem* itemazi1 = new QTableWidgetItem(QString::number(track->aziDeg,'f',1));
+                double shipBearing = track->aziDeg-pRadar->mHeading;
+                if(shipBearing>180)shipBearing-=360;
+                QTableWidgetItem* itemazi2 = new QTableWidgetItem(QString::number(shipBearing,'f',1));
+                ui->tableWidget_2->setItem(i,1,itemazi1);
+                ui->tableWidget_2->setItem(i,2,itemazi2);
+                ui->tableWidget_2->setItem(i,3,itemrange);
+                ui->tableWidget_2->setItem(i,0,itemID);
             }
         }
 
@@ -2626,43 +2704,42 @@ void Mainwindow::UpdateScale()
 {
     float oldScale = mScale;
 
-    //char byte2;
-    bool isAdaptSn = ui->toolButton_auto_adapt->isChecked();
+
     if(mDistanceUnit==0)//NM
     {
         switch(mRangeLevel)
         {
         case 0:
             setScaleRange(2);
-            if(isAdaptSn) sendToRadarString(CConfig::getString("mR1Command"));
+
             break;
         case 1:
             setScaleRange(4);
-            if(isAdaptSn) sendToRadarString(CConfig::getString("mR2Command"));
+            //if(isAdaptSn) sendToRadarString(CConfig::getString("mR2Command"));
             break;
         case 2:
             setScaleRange(8);
-            if(isAdaptSn) sendToRadarString(CConfig::getString("mR3Command"));
+            //if(isAdaptSn) sendToRadarString(CConfig::getString("mR3Command"));
             break;
         case 3:
             setScaleRange(16);
-            if(isAdaptSn) sendToRadarString(CConfig::getString("mR4Command"));
+            //if(isAdaptSn) sendToRadarString(CConfig::getString("mR4Command"));
             break;
         case 4:
             setScaleRange(32);
-            if(isAdaptSn) sendToRadarString(CConfig::getString("mR5Command"));
+            //if(isAdaptSn) sendToRadarString(CConfig::getString("mR5Command"));
             break;
         case 5:
             setScaleRange(64);
-            if(isAdaptSn) sendToRadarString(CConfig::getString("mR6Command"));
+            //if(isAdaptSn) sendToRadarString(CConfig::getString("mR6Command"));
             break;
         case 6:
             setScaleRange(128);
-            if(isAdaptSn) sendToRadarString(CConfig::getString("mR7Command"));
+            //if(isAdaptSn) sendToRadarString(CConfig::getString("mR7Command"));
             break;
         case 7:
             setScaleRange(256);
-            if(isAdaptSn) sendToRadarString(CConfig::getString("mR8Command"));
+            //if(isAdaptSn) sendToRadarString(CConfig::getString("mR8Command"));
             break;
         default:
             setScaleRange(48);
@@ -2675,35 +2752,35 @@ void Mainwindow::UpdateScale()
         {
         case 0:
             setScaleRange(2.5);
-            if(isAdaptSn) sendToRadarString(CConfig::getString("mR0Command"));
+//            if(isAdaptSn) sendToRadarString(CConfig::getString("mR0Command"));
             break;
         case 1:
             setScaleRange(5);
-            if(isAdaptSn) sendToRadarString(CConfig::getString("mR1Command"));
+//            if(isAdaptSn) sendToRadarString(CConfig::getString("mR1Command"));
             break;
         case 2:
             setScaleRange(10);
-            if(isAdaptSn) sendToRadarString(CConfig::getString("mR2Command"));
+//            if(isAdaptSn) sendToRadarString(CConfig::getString("mR2Command"));
             break;
         case 3:
             setScaleRange(20);
-            if(isAdaptSn) sendToRadarString(CConfig::getString("mR3Command"));
+//            if(isAdaptSn) sendToRadarString(CConfig::getString("mR3Command"));
             break;
         case 4:
             setScaleRange(40);
-            if(isAdaptSn) sendToRadarString(CConfig::getString("mR4Command"));
+//            if(isAdaptSn) sendToRadarString(CConfig::getString("mR4Command"));
             break;
         case 5:
             setScaleRange(80);
-            if(isAdaptSn) sendToRadarString(CConfig::getString("mR5Command"));
+//            if(isAdaptSn) sendToRadarString(CConfig::getString("mR5Command"));
             break;
         case 6:
             setScaleRange(160);
-            if(isAdaptSn) sendToRadarString(CConfig::getString("mR6Command"));
+//            if(isAdaptSn) sendToRadarString(CConfig::getString("mR6Command"));
             break;
         case 7:
             setScaleRange(320);
-            if(isAdaptSn) sendToRadarString(CConfig::getString("mR7Command"));
+//            if(isAdaptSn) sendToRadarString(CConfig::getString("mR7Command"));
             break;
         default:
             break;
@@ -3158,10 +3235,49 @@ void Mainwindow::on_toolButton_zoom_in_clicked()
 {
     if(mRangeLevel >0) mRangeLevel-=1;
     CConfig::setValue("mRangeLevel",mRangeLevel);
+
     UpdateScale();
+    SendScaleCommand();
+
     isMapOutdated = true;
 }
+void Mainwindow::SendScaleCommand()
+{
+    if(!ui->toolButton_auto_adapt->isChecked())return;
+    switch(mRangeLevel)
+    {
+    case 0:
+        sendToRadarString(CConfig::getString("mR1Command"));
+        break;
+    case 1:
+        sendToRadarString(CConfig::getString("mR2Command"));
+        break;
+    case 2:
+        sendToRadarString(CConfig::getString("mR3Command"));
+        break;
+    case 3:
+        sendToRadarString(CConfig::getString("mR4Command"));
+        break;
+    case 4:
+        sendToRadarString(CConfig::getString("mR5Command"));
+        break;
+    case 5:
+        sendToRadarString(CConfig::getString("mR6Command"));
+        break;
+    case 6:
+        sendToRadarString(CConfig::getString("mR7Command"));
+        break;
+    case 7:
+        sendToRadarString(CConfig::getString("mR8Command"));
+        break;
+    case 8:
+        sendToRadarString(CConfig::getString("mR9Command"));
+        break;
+    default:
+        break;
+    }
 
+}
 void Mainwindow::on_toolButton_zoom_out_clicked()
 {
     if(mRangeLevel <7) mRangeLevel+=1;
@@ -4382,6 +4498,7 @@ void Mainwindow::on_bt_rg_1_toggled(bool checked)
         mRangeLevel=0;
         CConfig::setValue("mRangeLevel",mRangeLevel);
         UpdateScale();
+        SendScaleCommand();
         isMapOutdated = true;
     }
 }
@@ -4393,6 +4510,7 @@ void Mainwindow::on_bt_rg_2_toggled(bool checked)
         mRangeLevel=1;
         CConfig::setValue("mRangeLevel",mRangeLevel);
         UpdateScale();
+        SendScaleCommand();
         isMapOutdated = true;
     }
 }
@@ -4404,6 +4522,7 @@ void Mainwindow::on_bt_rg_3_toggled(bool checked)
         mRangeLevel=2;
         CConfig::setValue("mRangeLevel",mRangeLevel);
         UpdateScale();
+        SendScaleCommand();
         isMapOutdated = true;
     }
 }
@@ -4415,6 +4534,7 @@ void Mainwindow::on_bt_rg_4_toggled(bool checked)
         mRangeLevel=3;
         CConfig::setValue("mRangeLevel",mRangeLevel);
         UpdateScale();
+        SendScaleCommand();
         isMapOutdated = true;
     }
 }
@@ -4426,19 +4546,14 @@ void Mainwindow::on_bt_rg_5_toggled(bool checked)
         mRangeLevel=4;
         CConfig::setValue("mRangeLevel",mRangeLevel);
         UpdateScale();
+        SendScaleCommand();
         isMapOutdated = true;
     }
 }
 
 void Mainwindow::on_bt_rg_6_toggled(bool checked)
 {
-    if(checked)
-    {
-        mRangeLevel=5;
-        CConfig::setValue("mRangeLevel",mRangeLevel);
-        UpdateScale();
-        isMapOutdated = true;
-    }
+
 }
 
 void Mainwindow::on_bt_rg_8_toggled(bool checked)
@@ -4448,6 +4563,7 @@ void Mainwindow::on_bt_rg_8_toggled(bool checked)
         mRangeLevel=7;
         CConfig::setValue("mRangeLevel",mRangeLevel);
         UpdateScale();
+        SendScaleCommand();
         isMapOutdated = true;
     }
 }
@@ -4459,6 +4575,7 @@ void Mainwindow::on_bt_rg_7_toggled(bool checked)
         mRangeLevel=6;
         CConfig::setValue("mRangeLevel",mRangeLevel);
         UpdateScale();
+        SendScaleCommand();
         isMapOutdated = true;
     }
 }
@@ -4506,4 +4623,92 @@ void Mainwindow::on_toolButton_open_record_2_clicked()
     sprintf(command,"D:\\HR2D64\\cudaCv.exe %s",filename.toStdString().data());
     system(command);
     ui->label_record_file_name->setText(filename);
+}
+
+void Mainwindow::on_bt_rg_6_clicked()
+{
+    mRangeLevel=5;
+    CConfig::setValue("mRangeLevel",mRangeLevel);
+    UpdateScale();
+    SendScaleCommand();
+    isMapOutdated = true;
+}
+
+void Mainwindow::on_bt_rg_7_clicked()
+{
+    mRangeLevel=6;
+    CConfig::setValue("mRangeLevel",mRangeLevel);
+    UpdateScale();
+    SendScaleCommand();
+    isMapOutdated = true;
+}
+
+void Mainwindow::on_bt_rg_8_clicked()
+{
+    mRangeLevel=7;
+    CConfig::setValue("mRangeLevel",mRangeLevel);
+    UpdateScale();
+    SendScaleCommand();
+    isMapOutdated = true;
+}
+
+void Mainwindow::on_bt_rg_1_clicked()
+{
+    mRangeLevel=0;
+    CConfig::setValue("mRangeLevel",mRangeLevel);
+    UpdateScale();
+    SendScaleCommand();
+    isMapOutdated = true;
+}
+
+void Mainwindow::on_bt_rg_2_clicked()
+{
+    mRangeLevel=1;
+    CConfig::setValue("mRangeLevel",mRangeLevel);
+    UpdateScale();
+    SendScaleCommand();
+    isMapOutdated = true;
+}
+
+void Mainwindow::on_bt_rg_3_clicked()
+{
+    mRangeLevel=2;
+    CConfig::setValue("mRangeLevel",mRangeLevel);
+    UpdateScale();
+    SendScaleCommand();
+    isMapOutdated = true;
+}
+
+void Mainwindow::on_bt_rg_4_clicked()
+{
+    mRangeLevel=3;
+    CConfig::setValue("mRangeLevel",mRangeLevel);
+    UpdateScale();
+    SendScaleCommand();
+    isMapOutdated = true;
+}
+
+void Mainwindow::on_bt_rg_5_clicked()
+{
+    mRangeLevel=4;
+    CConfig::setValue("mRangeLevel",mRangeLevel);
+    UpdateScale();
+    SendScaleCommand();
+    isMapOutdated = true;
+}
+
+void Mainwindow::on_toolButton_xl_nguong_5_clicked(bool checked)
+{
+        pRadar->cut_thresh = checked;
+}
+
+void Mainwindow::on_toolButton_second_azi_clicked(bool checked)
+{
+   pRadar->giaQuayPhanCung=checked;
+
+}
+
+void Mainwindow::on_on_toolButton_xl_nguong_3_toggled(bool checked)
+{
+
 }

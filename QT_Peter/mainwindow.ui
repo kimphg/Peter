@@ -475,8 +475,8 @@
    <widget class="QCustomTabWidget" name="tabWidget_menu">
     <property name="geometry">
      <rect>
-      <x>1380</x>
-      <y>20</y>
+      <x>1310</x>
+      <y>10</y>
       <width>531</width>
       <height>541</height>
      </rect>
@@ -15015,7 +15015,7 @@
    <widget class="QCustomTabWidget" name="tabWidget_iad">
     <property name="geometry">
      <rect>
-      <x>1380</x>
+      <x>1310</x>
       <y>580</y>
       <width>531</width>
       <height>541</height>
@@ -15030,7 +15030,7 @@
      <bool>false</bool>
     </property>
     <property name="currentIndex">
-     <number>3</number>
+     <number>5</number>
     </property>
     <property name="elideMode">
      <enum>Qt::ElideNone</enum>
@@ -25900,7 +25900,7 @@ background-color: rgba(255, 255, 255, 0);</string>
       <x>960</x>
       <y>10</y>
       <width>315</width>
-      <height>681</height>
+      <height>700</height>
      </rect>
     </property>
     <property name="font">
@@ -25912,7 +25912,7 @@ background-color: rgba(255, 255, 255, 0);</string>
      <bool>false</bool>
     </property>
     <property name="currentIndex">
-     <number>3</number>
+     <number>1</number>
     </property>
     <property name="elideMode">
      <enum>Qt::ElideNone</enum>
@@ -25937,7 +25937,7 @@ background-color: rgba(255, 255, 255, 0);</string>
        <string notr="true"/>
       </property>
       <attribute name="horizontalHeaderDefaultSectionSize">
-       <number>71</number>
+       <number>58</number>
       </attribute>
       <attribute name="verticalHeaderDefaultSectionSize">
        <number>27</number>
@@ -26014,6 +26014,11 @@ background-color: rgba(255, 255, 255, 0);</string>
       </row>
       <row>
        <property name="text">
+        <string>15</string>
+       </property>
+      </row>
+      <row>
+       <property name="text">
         <string>16</string>
        </property>
       </row>
@@ -26059,7 +26064,12 @@ background-color: rgba(255, 255, 255, 0);</string>
       </row>
       <column>
        <property name="text">
-        <string>P.vị (độ)</string>
+        <string>P.vị bắc</string>
+       </property>
+      </column>
+      <column>
+       <property name="text">
+        <string>P.vị tàu</string>
        </property>
       </column>
       <column>
@@ -29703,6 +29713,33 @@ background-color: rgba(255, 255, 255, 0);</string>
          </property>
         </widget>
        </item>
+       <item row="2" column="0">
+        <widget class="QCustomButton" name="toolButton_xl_nguong_5">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="font">
+          <font>
+           <pointsize>12</pointsize>
+          </font>
+         </property>
+         <property name="focusPolicy">
+          <enum>Qt::NoFocus</enum>
+         </property>
+         <property name="toolTip">
+          <string>Gạt nền tạp trên hiện sóng</string>
+         </property>
+         <property name="text">
+          <string>Chuẩn hóa nền tạp</string>
+         </property>
+         <property name="checkable">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
       </layout>
      </widget>
     </widget>
@@ -29714,7 +29751,7 @@ background-color: rgba(255, 255, 255, 0);</string>
       <property name="geometry">
        <rect>
         <x>10</x>
-        <y>30</y>
+        <y>50</y>
         <width>291</width>
         <height>441</height>
        </rect>
@@ -30185,9 +30222,9 @@ background-color: rgba(255, 255, 255, 0);</string>
       <property name="geometry">
        <rect>
         <x>10</x>
-        <y>450</y>
+        <y>490</y>
         <width>291</width>
-        <height>201</height>
+        <height>161</height>
        </rect>
       </property>
       <property name="autoFillBackground">
@@ -32724,7 +32761,7 @@ background-color: rgba(255, 255, 255, 0);</string>
       <property name="geometry">
        <rect>
         <x>20</x>
-        <y>230</y>
+        <y>290</y>
         <width>241</width>
         <height>201</height>
        </rect>
@@ -34199,15 +34236,48 @@ background-color: rgba(255, 255, 255, 0);</string>
        </item>
       </layout>
      </widget>
+     <widget class="QCustomButton" name="toolButton_second_azi">
+      <property name="geometry">
+       <rect>
+        <x>30</x>
+        <y>250</y>
+        <width>211</width>
+        <height>26</height>
+       </rect>
+      </property>
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
+      <property name="font">
+       <font>
+        <pointsize>12</pointsize>
+       </font>
+      </property>
+      <property name="focusPolicy">
+       <enum>Qt::NoFocus</enum>
+      </property>
+      <property name="toolTip">
+       <string>Đưa tâm màn hình về tâm đài</string>
+      </property>
+      <property name="text">
+       <string>Giả quay phần cứng</string>
+      </property>
+      <property name="checkable">
+       <bool>true</bool>
+      </property>
+     </widget>
     </widget>
    </widget>
    <widget class="QCustomTabWidget" name="tabWidget_menu_3">
     <property name="geometry">
      <rect>
-      <x>900</x>
-      <y>720</y>
-      <width>375</width>
-      <height>251</height>
+      <x>914</x>
+      <y>730</y>
+      <width>361</width>
+      <height>241</height>
      </rect>
     </property>
     <property name="font">
@@ -34236,7 +34306,7 @@ background-color: rgba(255, 255, 255, 0);</string>
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>372</width>
+        <width>361</width>
         <height>205</height>
        </rect>
       </property>
@@ -34244,7 +34314,7 @@ background-color: rgba(255, 255, 255, 0);</string>
        <string notr="true"/>
       </property>
       <attribute name="horizontalHeaderDefaultSectionSize">
-       <number>71</number>
+       <number>56</number>
       </attribute>
       <row>
        <property name="text">
@@ -34283,7 +34353,12 @@ background-color: rgba(255, 255, 255, 0);</string>
       </column>
       <column>
        <property name="text">
-        <string>P.vị (độ)</string>
+        <string>P.vị (bắc)</string>
+       </property>
+      </column>
+      <column>
+       <property name="text">
+        <string>P.vị (mũi)</string>
        </property>
       </column>
       <column>
@@ -34302,6 +34377,9 @@ background-color: rgba(255, 255, 255, 0);</string>
        </property>
       </column>
       <item row="0" column="0">
+       <property name="text">
+        <string/>
+       </property>
        <property name="flags">
         <set>ItemIsDragEnabled|ItemIsUserCheckable|ItemIsEnabled</set>
        </property>
@@ -35684,7 +35762,7 @@ background-color: rgba(255, 255, 255, 0);</string>
     <property name="geometry">
      <rect>
       <x>690</x>
-      <y>990</y>
+      <y>980</y>
       <width>581</width>
       <height>31</height>
      </rect>
@@ -37382,6 +37460,9 @@ background-color: rgba(255, 255, 255, 0);</string>
    <zorder>groupBox_5</zorder>
    <zorder>groupBox_gps_2</zorder>
    <zorder>toolButton_chi_thi_mt</zorder>
+   <zorder>groupBox_11</zorder>
+   <zorder>groupBox_17</zorder>
+   <zorder>layoutWidget</zorder>
   </widget>
  </widget>
  <layoutdefault spacing="6" margin="11"/>

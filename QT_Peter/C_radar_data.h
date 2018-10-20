@@ -334,6 +334,7 @@ public:
     qint64 time_start_ms;
     double sn_scale;
     bool isGrayAzi;
+    double mHeading;
     unsigned     long int   now_ms ;
 //    bool                    isEncoderAzi;
 //    int                     mEncoderAzi;
@@ -398,6 +399,7 @@ public:
     void        setProcessing(bool onOff);
     //bool        getDataOverload(){if(isDataTooLarge) {isDataTooLarge =false;return true;} else return false;}
     bool        checkFeedback(unsigned char* command);
+    bool giaQuayPhanCung;
     unsigned char* getFeedback()
     {
 
