@@ -13,7 +13,7 @@ public:
     explicit QCustomTabWidget(QWidget *parent = 0);
     dataProcessingThread *processing;
     void SetTransparent(bool transp);
-    bool isDragging;
+    bool isDragging,mMoveable;
 protected:
     void mousePressEvent(QMouseEvent *event);
     void mouseReleaseEvent(QMouseEvent *event);

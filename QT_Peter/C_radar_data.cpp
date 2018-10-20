@@ -343,6 +343,8 @@ double xsum=0,x2sum=0,ysum=0,xysum=0;
 
 C_radar_data::C_radar_data()
 {
+    giaQuayPhanCung = false;
+    mHeading = 0;
     isGrayAzi = true;
     rgStdErr = sn_scale*pow(2,clk_adc);
     azi_er_rad = CConfig::getDouble("azi_er_rad",AZI_ERROR_STD);
@@ -922,6 +924,7 @@ void C_radar_data::ProcessData(unsigned short azi,unsigned short lastAzi)
             data_mem.sled[azi][r_pos] -= (data_mem.sled[azi][r_pos])/20.0f;
             if(rgs_auto)displayVal= 0;
         }
+        if(displayVal>255)displayVal=255;
         data_mem.level_disp[azi][r_pos]=displayVal;
 
     }
@@ -1040,7 +1043,11 @@ void C_radar_data::processSocketData(unsigned char* data,short len)
     //memcpy(command_feedback,&dataBuff[RADAR_COMMAND_FEEDBACK],8);
     //memcpy(noise_level,&dataBuff[RADAR_COMMAND_FEEDBACK+8],8);
     uint newAzi =0;
-    if(isSelfRotation)
+    if(giaQuayPhanCung)
+    {
+        newAzi = ((data[11]<<8)|data[12])>>5;
+    }
+    else if(isSelfRotation)
     {
         selfRotationAzi+=selfRotationDazi;
         if(selfRotationAzi>=MAX_AZIR)
@@ -1063,12 +1070,17 @@ void C_radar_data::processSocketData(unsigned char* data,short len)
             {
                 newAzi = (data[9]<<24)|(data[10]<<16)|(data[11]<<8)|(data[12]);
                 newAzi>>=3;
-                newAzi&=0xffff;
+                newAzi&=    0xffff;
+                int heading = ((data[15]<<8)|data[16])>>5;
+                mHeading = (double)heading/MAX_AZIR;
                 newAzi = ssiDecode(newAzi);
+                newAzi += heading;
             }
             else
             {
-                newAzi = ((data[2]<<8)|data[3]);
+                newAzi = (data[9]<<24)|(data[10]<<16)|(data[11]<<8)|(data[12]);
+                newAzi>>=3;
+                newAzi&=0xffff;
                 newAzi = ssiDecode(newAzi);
             }
 
@@ -1154,7 +1166,7 @@ void C_radar_data::SelfRotationOn( double rate)
     isSelfRotation = true;
     printf("\nself rotation");
     SelfRotationReset();
-    selfRotationDazi = 2;
+    selfRotationDazi = 0.2;
     cur_timeMSecs =0;
     selfRotationRate = rate;
     if(selfRotationRate<1)selfRotationRate=1;

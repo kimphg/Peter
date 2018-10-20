@@ -10,6 +10,7 @@ QCustomTabWidget::QCustomTabWidget(QWidget *parent) : QTabWidget(parent)
     setAttribute(Qt::WA_Hover);
     this->setCursor(Qt::ArrowCursor);
     SetTransparent(false);
+    mMoveable = false;
     //this->setMovable(true);
 }
 
@@ -68,7 +69,7 @@ void QCustomTabWidget::SetTransparent(bool transp)
 
 void QCustomTabWidget::mousePressEvent(QMouseEvent *event)
 {
-
+    if(!mMoveable)return;
      mMX= event->pos().x();
      mMY= event->pos().y();
      isDragging = true;
@@ -81,7 +82,7 @@ void QCustomTabWidget::mouseReleaseEvent(QMouseEvent *event)
 
 void QCustomTabWidget::mouseMoveEvent(QMouseEvent *event)
 {
-    //if(!isDragging)return;
+    if(!mMoveable)return;
     if(event->buttons() & Qt::LeftButton)
     {
 //        QRect rect = this->geometry();
