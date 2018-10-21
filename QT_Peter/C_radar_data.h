@@ -338,7 +338,7 @@ public:
     unsigned     long int   now_ms ;
 //    bool                    isEncoderAzi;
 //    int                     mEncoderAzi;
-    unsigned char           spectre[16];
+    unsigned char           mHeader[FRAME_HEADER_SIZE];
     unsigned char           overload, init_time, clk_adc;
     float                   scale_ppi,scale_zoom_ppi;
     short                   curAzir,arcMinAzi,arcMaxAzi,arcWidth;
@@ -347,7 +347,7 @@ public:
     unsigned int            sn_stat,chu_ky;
     unsigned short          *tb_tap;
     double                  tb_tap_k;
-    int                     get_tb_tap();
+//    int                     get_tb_tap();
     bool                    is_do_bup_song;
     bool                    isClkAdcChanged,xl_dopler,cut_thresh,isSled,filter2of3;
     bool                    isManualTune,rgs_auto,bo_bang_0,data_export;
@@ -360,7 +360,7 @@ public:
     float                   aziOffset;
     DataOverLay             dataOver;
 //    unsigned char           noise_level[8];
-    unsigned char           tempType,rotation_speed;
+    unsigned char           rotation_speed;
     unsigned short          range_max;
     QImage                  *img_ppi,*img_RAmp,*img_zoom_ppi,*img_histogram,*img_spectre,*img_zoom_ar;
     int                     zoom_ar_w,zoom_ar_h,zoom_ar_a0,zoom_ar_r0,zoom_ar_a1,zoom_ar_r1;

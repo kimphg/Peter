@@ -1,6 +1,6 @@
 #include "statuswindow.h"
 #include "ui_statuswindow.h"
-double lookupTable5V[256];
+//double lookupTable5V[256];
 
 StatusWindow::StatusWindow(dataProcessingThread *radar,QWidget *parent) :
     QMainWindow(parent),
@@ -9,7 +9,7 @@ StatusWindow::StatusWindow(dataProcessingThread *radar,QWidget *parent) :
     ansTrue = false;
     ui->setupUi(this);
     mRadar = radar;
-    timerId = startTimer(500);
+    timerId = startTimer(600);
     moduleId = 0;
     paramId = 0xaa;
     command[0]=0xaa;
@@ -26,28 +26,68 @@ void StatusWindow::closeEvent(QCloseEvent *event)
 {
     killTimer(timerId);
 }
+/*
+1. DDS: aaab03cc
+
+2. VCO1: aaab03bb
+
+3. VCO2: aaab02bb
+
+4. vào TK: aaab03dd
+
+5. ra TK: aaab01cc
+
+các tham số trên nằm trong 3 byte 1,2,3  trong khung truyền:
+-byte 1: loại mô-đun
+-byte 2: loại tham số
+-byte 3: giá trị tham số
+
+6. thu: giá trị nằm 2 byte: 7 và 8 trong khung truyền:
+*/
 void StatusWindow::sendReq()
 {
-    if(ansTrue)
-    {
-        paramId++;
-        ansTrue = false;
+    moduleId++;
+    if(moduleId>5)moduleId=1;
+    switch (moduleId) {
+    case 1:
+        command[2]=0x03;
+        command[3]=0xcc;
+        break;
+    case 2:
+        command[2]=0x03;
+        command[3]=0xbb;
+        break;
+    case 3:
+        command[2]=0x02;
+        command[3]=0xbb;
+        break;
+    case 4:
+        command[2]=0x03;
+        command[3]=0xdd;
+    case 5:
+        command[2]=0x01;
+        command[3]=0xcc;
+        break;
+    default:
+        return;
     }
-    if(paramId>0xac)
-    {
-        paramId = 0xaa;
-        moduleId++;
-        if(moduleId>3)moduleId = 0;
-    }
-    command[2]=moduleId;
-    command[3]=paramId;
     mRadar->sendCommand(&command[0],7);
     mRadar->sendCommand(&command[0],7);
     mRadar->sendCommand(&command[0],7);
 }
 bool StatusWindow::receiveRes()
 {
-    QString resVal;
+    unsigned char* header = mRadar->mRadarData->mHeader;
+    int moduleIndex = header[1];
+    int paramIndex  = header[2];
+    int paramValue  = header[3];
+    int recvValue   = (header[7]<<8)+header[8];
+    ui->label_byte_1->setText(QString::number(moduleIndex));
+    ui->label_byte_2->setText(QString::number(paramIndex));
+    ui->label_byte_3->setText(QString::number(paramValue));
+    ui->label_byte_4->setText(QString::number(recvValue));
+    return true;
+    /*QString resVal;
     double hsTap = mRadar->mRadarData->get_tb_tap();
     hsTap = 20*log10(hsTap/165.0)+77.0;
     ui->label_res_receiver->setText(QString::number(hsTap,'f',1));
@@ -120,7 +160,7 @@ bool StatusWindow::receiveRes()
         return true;
     }
     printf("wrong respond:%d;%d\n",paramId,moduleId);
-    return false;
+    return false;*/
 }
 
 void StatusWindow::timerEvent(QTimerEvent *event)

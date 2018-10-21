@@ -486,8 +486,8 @@ short selZone_x1, selZone_x2, selZone_y1, selZone_y2;
 bool isSelectingTarget = false;
 void Mainwindow::detectZone()
 {
-    short sx,sy;
-    float scale_ppi = pRadar->scale_ppi;
+    //short sx,sy;
+    //float scale_ppi = pRadar->scale_ppi;
     if(selZone_x1>selZone_x2)
     {
         short tmp = selZone_x1;
@@ -1668,9 +1668,9 @@ void Mainwindow::DrawViewFrame(QPainter* p)
     //        //p->drawText(720,20,200,20,0,"Antenna: "+QString::number(aziDeg,'f',1));
 
     //    }
-    if(CalcAziContour(degrees(pRadar->getCurAziRad())+radHeading-mShipHeading,SCR_H-SCR_BORDER_SIZE-20))
+    if(CalcAziContour(degrees(pRadar->getCurAziRad())-trueShift,SCR_H-SCR_BORDER_SIZE-20))
     {
-        p->setPen(QPen(Qt::cyan,4,Qt::SolidLine,Qt::RoundCap));
+        p->setPen(QPen(Qt::red,4,Qt::SolidLine,Qt::RoundCap));
         p->drawLine(points[2],points[1]);
         //draw text
         //p->drawText(720,20,200,20,0,"Antenna: "+QString::number(aziDeg,'f',1));
@@ -2295,14 +2295,14 @@ void Mainwindow::sync1S()//period 1 second
     unsigned int chuKy = 1000000/(pRadar->chu_ky*(pow(2,pRadar->clk_adc))/10.0);
 
     ui->label_sn_freq->setText(QString::number(chuKy));
-    ui->label_he_so_tap->setText(QString::fromUtf8("Hệ số tạp: ")+QString::number(pRadar->get_tb_tap()));
+    /*ui->label_he_so_tap->setText(QString::fromUtf8("Hệ số tạp: ")+QString::number(pRadar->get_tb_tap()));
     if(ui->toolButton_auto_freq->isChecked())
     {
         if(pRadar->get_tb_tap()>mMaxTapMayThu)
         {
             this->autoSwitchFreq();
         }
-    }
+    }*/
     int value;
     switch((pRadar->sn_stat>>8)&0x07)
     {

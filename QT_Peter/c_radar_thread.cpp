@@ -124,7 +124,7 @@ dataProcessingThread::dataProcessingThread()
         port++;
     }
     connect(&commandSendTimer, &QTimer::timeout, this, &dataProcessingThread::PushCommandQueue);
-    commandSendTimer.start(200);
+    commandSendTimer.start(100);
     connect(&readUdpBuffTimer, &QTimer::timeout, this, &dataProcessingThread::ReadDataBuffer);
     readUdpBuffTimer.start(10);
     initSerialComm();

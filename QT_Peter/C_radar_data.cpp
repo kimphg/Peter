@@ -1023,6 +1023,8 @@ void C_radar_data::processSocketData(unsigned char* data,short len)
         range_max = RADAR_RESOLUTION;
     else if(len==MAX_FRAME_SIZE_HALF)
         range_max = RADAR_RESOLUTION_HALF;
+
+    memcpy(mHeader,data,FRAME_HEADER_SIZE);
     unsigned char n_clk_adc = data[4];
     sn_stat = (data[5]<<8)+data[6];
     if(clk_adc != n_clk_adc)
@@ -1033,15 +1035,6 @@ void C_radar_data::processSocketData(unsigned char* data,short len)
         UpdateData();
         resetData();
     }
-    //isClkAdcChanged = true;
-    //moduleVal = dataBuff[3];//
-    //tempType = dataBuff[2]&0x0f;
-    //if(tempType>4)printf("Wrong temperature\n");
-    //sn_stat = dataBuff[14]<<8|dataBuff[15];
-    //chu_ky = dataBuff[16]<<8|dataBuff[17];
-    //tb_tap[newAzi] = dataBuff[18]<<8|dataBuff[19];
-    //memcpy(command_feedback,&dataBuff[RADAR_COMMAND_FEEDBACK],8);
-    //memcpy(noise_level,&dataBuff[RADAR_COMMAND_FEEDBACK+8],8);
     uint newAzi =0;
     if(giaQuayPhanCung)
     {
@@ -1844,11 +1837,11 @@ void C_radar_data::setZoomRectXY(float ctx, float cty)
 }
 
 
-int C_radar_data::get_tb_tap(){
+//int C_radar_data::get_tb_tap(){
 
-    hsTap += ((tb_tap[curAzir])-hsTap)/5.0;
-    return int(hsTap);
-}
+//    hsTap += ((tb_tap[curAzir])-hsTap)/5.0;
+//    return int(hsTap);
+//}
 
 void C_radar_data::setTb_tap_k(double value)
 {
