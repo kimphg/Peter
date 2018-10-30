@@ -14911,6 +14911,21 @@
      <string>Điều khiển ra đa</string>
     </property>
     <layout class="QGridLayout" name="gridLayout_3">
+     <property name="leftMargin">
+      <number>4</number>
+     </property>
+     <property name="topMargin">
+      <number>4</number>
+     </property>
+     <property name="rightMargin">
+      <number>4</number>
+     </property>
+     <property name="bottomMargin">
+      <number>4</number>
+     </property>
+     <property name="spacing">
+      <number>2</number>
+     </property>
      <item row="1" column="0">
       <widget class="QCustomButton" name="toolButton_tx_off">
        <property name="enabled">
@@ -22110,8 +22125,8 @@
     </property>
     <property name="geometry">
      <rect>
-      <x>870</x>
-      <y>140</y>
+      <x>10</x>
+      <y>860</y>
       <width>81</width>
       <height>41</height>
      </rect>
@@ -22142,7 +22157,7 @@
      <rect>
       <x>180</x>
       <y>10</y>
-      <width>531</width>
+      <width>481</width>
       <height>41</height>
      </rect>
     </property>
@@ -22182,7 +22197,7 @@
         <enum>Qt::NoFocus</enum>
        </property>
        <property name="toolTip">
-        <string>Hiện vết di chuyển của mục tiêu</string>
+        <string>Chuyển thang cự ly</string>
        </property>
        <property name="text">
         <string>2 NM</string>
@@ -22212,7 +22227,7 @@
         <enum>Qt::NoFocus</enum>
        </property>
        <property name="toolTip">
-        <string>Hiện vết di chuyển của mục tiêu</string>
+        <string>Chuyển thang cự ly</string>
        </property>
        <property name="text">
         <string>4 NM</string>
@@ -22242,7 +22257,7 @@
         <enum>Qt::NoFocus</enum>
        </property>
        <property name="toolTip">
-        <string>Hiện vết di chuyển của mục tiêu</string>
+        <string>Chuyển thang cự ly</string>
        </property>
        <property name="text">
         <string>8 NM</string>
@@ -22272,7 +22287,7 @@
         <enum>Qt::NoFocus</enum>
        </property>
        <property name="toolTip">
-        <string>Hiện vết di chuyển của mục tiêu</string>
+        <string>Chuyển thang cự ly</string>
        </property>
        <property name="text">
         <string>16 NM</string>
@@ -22302,7 +22317,7 @@
         <enum>Qt::NoFocus</enum>
        </property>
        <property name="toolTip">
-        <string>Hiện vết di chuyển của mục tiêu</string>
+        <string>Chuyển thang cự ly</string>
        </property>
        <property name="text">
         <string>32 NM</string>
@@ -22332,7 +22347,7 @@
         <enum>Qt::NoFocus</enum>
        </property>
        <property name="toolTip">
-        <string>Hiện vết di chuyển của mục tiêu</string>
+        <string>Chuyển thang cự ly</string>
        </property>
        <property name="text">
         <string>64 NM</string>
@@ -22362,7 +22377,7 @@
         <enum>Qt::NoFocus</enum>
        </property>
        <property name="toolTip">
-        <string>Hiện vết di chuyển của mục tiêu</string>
+        <string>Chuyển thang cự ly</string>
        </property>
        <property name="text">
         <string>128 NM</string>
@@ -22392,7 +22407,7 @@
         <enum>Qt::NoFocus</enum>
        </property>
        <property name="toolTip">
-        <string>Hiện vết di chuyển của mục tiêu</string>
+        <string>Chuyển thang cự ly</string>
        </property>
        <property name="text">
         <string>256 NM</string>
@@ -33415,7 +33430,7 @@
      <bool>false</bool>
     </property>
     <property name="currentIndex">
-     <number>1</number>
+     <number>0</number>
     </property>
     <property name="elideMode">
      <enum>Qt::ElideNone</enum>
@@ -33531,10 +33546,10 @@
    <widget class="QCustomGroupBox" name="groupBox_5">
     <property name="geometry">
      <rect>
-      <x>720</x>
-      <y>10</y>
-      <width>231</width>
-      <height>121</height>
+      <x>790</x>
+      <y>70</y>
+      <width>161</width>
+      <height>91</height>
      </rect>
     </property>
     <property name="autoFillBackground">
@@ -33544,6 +33559,21 @@
      <string notr="true" comment="asd ">Con trỏ</string>
     </property>
     <layout class="QGridLayout" name="gridLayout_7">
+     <property name="leftMargin">
+      <number>4</number>
+     </property>
+     <property name="topMargin">
+      <number>4</number>
+     </property>
+     <property name="rightMargin">
+      <number>4</number>
+     </property>
+     <property name="bottomMargin">
+      <number>4</number>
+     </property>
+     <property name="verticalSpacing">
+      <number>2</number>
+     </property>
      <item row="2" column="1">
       <widget class="QLabel" name="label_cursor_azi">
        <property name="palette">
@@ -34444,7 +34474,7 @@
         </font>
        </property>
        <property name="text">
-        <string>P. vị (mũi):</string>
+        <string>P. vị (H):</string>
        </property>
       </widget>
      </item>
@@ -37452,6 +37482,117 @@ background-color: rgba(255, 255, 255, 0);</string>
      <string>--</string>
     </property>
    </widget>
+   <widget class="QCustomGroupBox" name="groupBox_15">
+    <property name="geometry">
+     <rect>
+      <x>670</x>
+      <y>0</y>
+      <width>281</width>
+      <height>64</height>
+     </rect>
+    </property>
+    <property name="autoFillBackground">
+     <bool>false</bool>
+    </property>
+    <property name="title">
+     <string notr="true" comment="asd ">Loại tín hiệu</string>
+    </property>
+    <layout class="QHBoxLayout" name="horizontalLayout_2">
+     <property name="leftMargin">
+      <number>4</number>
+     </property>
+     <property name="topMargin">
+      <number>4</number>
+     </property>
+     <property name="rightMargin">
+      <number>4</number>
+     </property>
+     <property name="bottomMargin">
+      <number>4</number>
+     </property>
+     <item>
+      <widget class="QCustomButton" name="toolButton_signal_type_1">
+       <property name="enabled">
+        <bool>true</bool>
+       </property>
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="font">
+        <font>
+         <pointsize>12</pointsize>
+        </font>
+       </property>
+       <property name="text">
+        <string>Xung đơn</string>
+       </property>
+       <property name="checkable">
+        <bool>true</bool>
+       </property>
+       <property name="autoExclusive">
+        <bool>true</bool>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QCustomButton" name="toolButton_signal_type_2">
+       <property name="enabled">
+        <bool>true</bool>
+       </property>
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="font">
+        <font>
+         <pointsize>12</pointsize>
+        </font>
+       </property>
+       <property name="text">
+        <string>TH Phức tạp</string>
+       </property>
+       <property name="checkable">
+        <bool>true</bool>
+       </property>
+       <property name="autoExclusive">
+        <bool>true</bool>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QCustomButton" name="toolButton_signal_type_3">
+       <property name="enabled">
+        <bool>true</bool>
+       </property>
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="font">
+        <font>
+         <pointsize>12</pointsize>
+        </font>
+       </property>
+       <property name="text">
+        <string>Giả liên tục</string>
+       </property>
+       <property name="checkable">
+        <bool>true</bool>
+       </property>
+       <property name="autoExclusive">
+        <bool>true</bool>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </widget>
    <zorder>groupBox_16</zorder>
    <zorder>toolButton_menu</zorder>
    <zorder>toolButton_head_up</zorder>
@@ -37466,6 +37607,7 @@ background-color: rgba(255, 255, 255, 0);</string>
    <zorder>toolButton_chi_thi_mt</zorder>
    <zorder>label_azi_antenna_head_true</zorder>
    <zorder>label_azi_antenna_head_ship</zorder>
+   <zorder>groupBox_15</zorder>
   </widget>
  </widget>
  <layoutdefault spacing="6" margin="11"/>

@@ -560,6 +560,12 @@ private slots:
 
     void on_on_toolButton_xl_nguong_3_toggled(bool checked);
 
+    void on_toolButton_signal_type_1_clicked();
+
+    void on_toolButton_signal_type_2_clicked();
+
+    void on_toolButton_signal_type_3_clicked();
+
 private:
 
 //    bool mShowobjects,

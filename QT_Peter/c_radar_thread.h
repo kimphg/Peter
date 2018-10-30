@@ -74,6 +74,7 @@ struct  RadarCommand// radar control commmand
 {
     unsigned char bytes[8];
 };
+enum RadarSignMode { ModeSimpleSignal=0, ModeComplexSignal=1, ModeContinuos=2};
 //extern class CGPS{};
 typedef std::queue<RadarCommand> RadarCommandQueue;
 class dataProcessingThread:public QThread
@@ -81,9 +82,9 @@ class dataProcessingThread:public QThread
     Q_OBJECT
 public:
     std::queue<GPSData> mGpsData;
-    unsigned char    connect_timeout;
-    //QMutex  mutex_data_change;
-    unsigned short    playRate;
+    unsigned char       connect_timeout;
+    RadarSignMode       mRadMode;
+    unsigned short      playRate;
     DataBuff*   dataBuff;
     c_gps mGPS;
     float   k_vet;

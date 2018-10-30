@@ -86,6 +86,7 @@ double dataProcessingThread::getSelsynAzi() const
 }
 dataProcessingThread::dataProcessingThread()
 {
+    mRadMode = ModeComplexSignal;
     mAntennaAzi = 0;
     failureCount = 0;
     isHeadingAvaible=false;

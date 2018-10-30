@@ -1390,6 +1390,8 @@ void Mainwindow::setDistanceUnit(int unit)//0:NM, 1:KM
 }
 void Mainwindow::InitSetting()
 {
+
+    on_toolButton_signal_type_2_clicked();
     qApp->setStyleSheet("QToolTip { color: #ffffff; background-color: #2a82da; border: 1px solid white; }");
     ui->tabWidget_iad->SetTransparent(true);
     QApplication::setOverrideCursor(Qt::CrossCursor);
@@ -3244,38 +3246,43 @@ void Mainwindow::on_toolButton_zoom_in_clicked()
 void Mainwindow::SendScaleCommand()
 {
     if(!ui->toolButton_auto_adapt->isChecked())return;
+    QString commandString;
     switch(mRangeLevel)
     {
     case 0:
-        sendToRadarString(CConfig::getString("mR1Command"));
+        commandString = (CConfig::getString("mR1Command"));
         break;
     case 1:
-        sendToRadarString(CConfig::getString("mR2Command"));
+        commandString = (CConfig::getString("mR2Command"));
         break;
     case 2:
-        sendToRadarString(CConfig::getString("mR3Command"));
+        commandString = (CConfig::getString("mR3Command"));
         break;
     case 3:
-        sendToRadarString(CConfig::getString("mR4Command"));
+        commandString = (CConfig::getString("mR4Command"));
         break;
     case 4:
-        sendToRadarString(CConfig::getString("mR5Command"));
+        commandString = (CConfig::getString("mR5Command"));
         break;
     case 5:
-        sendToRadarString(CConfig::getString("mR6Command"));
+        commandString = (CConfig::getString("mR6Command"));
         break;
     case 6:
-        sendToRadarString(CConfig::getString("mR7Command"));
+        commandString = (CConfig::getString("mR7Command"));
         break;
     case 7:
-        sendToRadarString(CConfig::getString("mR8Command"));
+        commandString = (CConfig::getString("mR8Command"));
         break;
     case 8:
-        sendToRadarString(CConfig::getString("mR9Command"));
+        commandString = (CConfig::getString("mR9Command"));
         break;
     default:
         break;
     }
+    QStringList comm = commandString.split('*');
+    if(processing->mRadMode<comm.size())
+    commandString = comm.at(processing->mRadMode);
+    sendToRadarString(commandString);
 
 }
 void Mainwindow::on_toolButton_zoom_out_clicked()
@@ -4711,4 +4718,45 @@ void Mainwindow::on_toolButton_second_azi_clicked(bool checked)
 void Mainwindow::on_on_toolButton_xl_nguong_3_toggled(bool checked)
 {
 
+}
+
+void Mainwindow::on_toolButton_signal_type_1_clicked()
+{
+    processing->mRadMode = ModeSimpleSignal;
+//    ui->bt_rg_0->setEnabled(false);
+    ui->bt_rg_1->setHidden(false);
+    ui->bt_rg_2->setHidden(false);
+    ui->bt_rg_3->setHidden(false);
+    ui->bt_rg_4->setHidden(false);
+    ui->bt_rg_5->setHidden(false);
+    ui->bt_rg_6->setHidden(true);
+    ui->bt_rg_7->setHidden(true);
+    ui->bt_rg_8->setHidden(true);
+
+}
+
+void Mainwindow::on_toolButton_signal_type_2_clicked()
+{
+    processing->mRadMode = ModeComplexSignal;
+    ui->bt_rg_1->setHidden(true);
+    ui->bt_rg_2->setHidden(false);
+    ui->bt_rg_3->setHidden(false);
+    ui->bt_rg_4->setHidden(false);
+    ui->bt_rg_5->setHidden(false);
+    ui->bt_rg_6->setHidden(false);
+    ui->bt_rg_7->setHidden(false);
+    ui->bt_rg_8->setHidden(false);
+}
+
+void Mainwindow::on_toolButton_signal_type_3_clicked()
+{
+    processing->mRadMode = ModeContinuos;
+    ui->bt_rg_1->setHidden(true);
+    ui->bt_rg_2->setHidden(false);
+    ui->bt_rg_3->setHidden(false);
+    ui->bt_rg_4->setHidden(false);
+    ui->bt_rg_5->setHidden(false);
+    ui->bt_rg_6->setHidden(false);
+    ui->bt_rg_7->setHidden(false);
+    ui->bt_rg_8->setHidden(false);
 }
