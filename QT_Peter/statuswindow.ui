@@ -34,7 +34,7 @@
      </font>
     </property>
     <property name="title">
-     <string>Trạng thái các mô đun</string>
+     <string>Trạng thái các mô đun máy 2-1</string>
     </property>
     <widget class="QFrame" name="frame_5">
      <property name="geometry">
@@ -282,7 +282,7 @@ border: 2px solid darkgreen;
        </widget>
       </item>
       <item row="1" column="1">
-       <widget class="QLabel" name="label_vco2_output">
+       <widget class="QLabel" name="label_vco_output_2">
         <property name="font">
          <font>
           <pointsize>12</pointsize>
@@ -368,7 +368,7 @@ border: 2px solid darkgreen;
        </widget>
       </item>
       <item row="1" column="1">
-       <widget class="QLabel" name="label_vco2_output_2">
+       <widget class="QLabel" name="label_vco_output_1">
         <property name="font">
          <font>
           <pointsize>12</pointsize>
@@ -502,7 +502,7 @@ border: 2px solid darkgreen;
          </font>
         </property>
         <property name="text">
-         <string>Mô đun phát</string>
+         <string>Mô đun tiền khuếch</string>
         </property>
         <property name="alignment">
          <set>Qt::AlignCenter</set>
@@ -620,47 +620,11 @@ border: 2px solid darkgreen;
       <enum>Qt::Vertical</enum>
      </property>
     </widget>
-    <widget class="Line" name="line_4">
-     <property name="geometry">
-      <rect>
-       <x>620</x>
-       <y>240</y>
-       <width>20</width>
-       <height>131</height>
-      </rect>
-     </property>
-     <property name="font">
-      <font>
-       <pointsize>12</pointsize>
-      </font>
-     </property>
-     <property name="orientation">
-      <enum>Qt::Vertical</enum>
-     </property>
-    </widget>
-    <widget class="Line" name="line_5">
-     <property name="geometry">
-      <rect>
-       <x>740</x>
-       <y>280</y>
-       <width>20</width>
-       <height>51</height>
-      </rect>
-     </property>
-     <property name="font">
-      <font>
-       <pointsize>12</pointsize>
-      </font>
-     </property>
-     <property name="orientation">
-      <enum>Qt::Vertical</enum>
-     </property>
-    </widget>
     <widget class="QFrame" name="frame_7">
      <property name="geometry">
       <rect>
        <x>670</x>
-       <y>210</y>
+       <y>310</y>
        <width>161</width>
        <height>91</height>
       </rect>
@@ -690,51 +654,7 @@ border-color: rgb(100,100,10);</string>
          </font>
         </property>
         <property name="text">
-         <string>Chuyển mạch
-thu phát</string>
-        </property>
-        <property name="alignment">
-         <set>Qt::AlignCenter</set>
-        </property>
-       </widget>
-      </item>
-     </layout>
-    </widget>
-    <widget class="QFrame" name="frame_8">
-     <property name="geometry">
-      <rect>
-       <x>680</x>
-       <y>330</y>
-       <width>141</width>
-       <height>61</height>
-      </rect>
-     </property>
-     <property name="font">
-      <font>
-       <pointsize>12</pointsize>
-      </font>
-     </property>
-     <property name="styleSheet">
-      <string notr="true">background-color: rgb(200, 200, 50);
-border: 2px;
-border-color: rgb(100,100,10);</string>
-     </property>
-     <property name="frameShape">
-      <enum>QFrame::StyledPanel</enum>
-     </property>
-     <property name="frameShadow">
-      <enum>QFrame::Raised</enum>
-     </property>
-     <layout class="QGridLayout" name="gridLayout_8">
-      <item row="0" column="0">
-       <widget class="QLabel" name="label_9">
-        <property name="font">
-         <font>
-          <pointsize>12</pointsize>
-         </font>
-        </property>
-        <property name="text">
-         <string>Ăng ten</string>
+         <string>Máy 2-2</string>
         </property>
         <property name="alignment">
          <set>Qt::AlignCenter</set>
@@ -785,7 +705,7 @@ border-color: rgb(100,100,10);</string>
        <x>740</x>
        <y>170</y>
        <width>20</width>
-       <height>41</height>
+       <height>141</height>
       </rect>
      </property>
      <property name="font">
@@ -802,25 +722,7 @@ border-color: rgb(100,100,10);</string>
       <rect>
        <x>540</x>
        <y>360</y>
-       <width>91</width>
-       <height>20</height>
-      </rect>
-     </property>
-     <property name="font">
-      <font>
-       <pointsize>12</pointsize>
-      </font>
-     </property>
-     <property name="orientation">
-      <enum>Qt::Horizontal</enum>
-     </property>
-    </widget>
-    <widget class="Line" name="line_10">
-     <property name="geometry">
-      <rect>
-       <x>630</x>
-       <y>230</y>
-       <width>41</width>
+       <width>131</width>
        <height>20</height>
       </rect>
      </property>
@@ -1043,7 +945,7 @@ border-color: rgb(100,100,10);</string>
       </item>
      </layout>
     </widget>
-    <widget class="QWidget" name="">
+    <widget class="QWidget" name="layoutWidget">
      <property name="geometry">
       <rect>
        <x>320</x>

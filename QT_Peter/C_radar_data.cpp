@@ -906,8 +906,9 @@ void C_radar_data::ProcessData(unsigned short azi,unsigned short lastAzi)
         }
         else
             displayVal=data_mem.level[azi][r_pos];
-        if(data_mem.may_hoi[azi][r_pos])
-            displayVal+=20;
+        if(data_mem.may_hoi[azi][r_pos]>data_mem.may_hoi[lastAzi][r_pos]
+                ||data_mem.may_hoi[azi][r_pos]>data_mem.may_hoi[azi][r_pos-1])
+            displayVal+=100;
 
         data_mem.detect[azi][r_pos] = (!cutoff);
         //data_mem.detect[azi][r_pos] = (!cutoff);
@@ -1057,7 +1058,7 @@ void C_radar_data::processSocketData(unsigned char* data,short len)
     }
     else
     {
-        if(data[0]!=0x55)
+        if(data[0]!=0x55)// tao gia bang simulator
         {
             if(isGrayAzi)
             {

@@ -26,7 +26,7 @@ private:
     bool warningBlink;
     bool ansTrue;
     int timerId;
-    unsigned char command[7];
+    unsigned char command[8];
     unsigned char moduleId;
     unsigned char paramId;
     dataProcessingThread *mRadar;

@@ -19,6 +19,7 @@ StatusWindow::StatusWindow(dataProcessingThread *radar,QWidget *parent) :
     command[4]=0x00;
     command[5]=0x00;
     command[6]=0x00;
+    command[7]=0x00;
     this->setWindowFlags(Qt::WindowStaysOnTopHint);
 
 }
@@ -71,10 +72,21 @@ void StatusWindow::sendReq()
     default:
         return;
     }
-    mRadar->sendCommand(&command[0],7);
-    mRadar->sendCommand(&command[0],7);
-    mRadar->sendCommand(&command[0],7);
+    mRadar->sendCommand(&command[0],8);
+    mRadar->sendCommand(&command[0],8);
+    mRadar->sendCommand(&command[0],8);
 }
+/*
+1. DDS: aaab03cc
+
+2. VCO1: aaab03bb
+
+3. VCO2: aaab02bb
+
+4. vào TK: aaab03dd
+
+5. ra TK: aaab01cc
+*/
 bool StatusWindow::receiveRes()
 {
     unsigned char* header = mRadar->mRadarData->mHeader;
@@ -86,6 +98,11 @@ bool StatusWindow::receiveRes()
     ui->label_byte_2->setText(QString::number(paramIndex));
     ui->label_byte_3->setText(QString::number(paramValue));
     ui->label_byte_4->setText(QString::number(recvValue));
+    if(moduleIndex==3&&paramIndex==0xcc)ui->label_res_dds_out->setText(QString::number(paramValue));
+    if(moduleIndex==3&&paramIndex==0xbb)ui->label_vco_output_1->setText(QString::number(paramValue));
+    if(moduleIndex==2&&paramIndex==0xbb)ui->label_vco_output_2->setText(QString::number(paramValue));
+    if(moduleIndex==3&&paramIndex==0xdd)ui->label_trans_input->setText(QString::number(paramValue));
+    if(moduleIndex==1&&paramIndex==0xcc)ui->label_trans_output->setText(QString::number(paramValue));
     return true;
     /*QString resVal;
     double hsTap = mRadar->mRadarData->get_tb_tap();
