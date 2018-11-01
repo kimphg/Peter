@@ -26,7 +26,8 @@ public:
     static QString getString(QString key, QString defaultValue="0");
     static int     getInt(QString key, int defaultValue=0);
     static void    setDefault();
-    static void SaveToFile();
+    static void     SaveToFile();
+    static double shipHeadingDeg;
     //static QXmlStreamReader xml;
 private:
     static QHash<QString, QString> readFile();

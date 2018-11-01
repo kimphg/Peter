@@ -50,6 +50,7 @@ QString CConfig::getString(QString key,QString defaultValue )
 CConfig::CConfig(void)
 {
     //hashData.;
+    shipHeadingDeg = 0;
     readFile();
 }
 

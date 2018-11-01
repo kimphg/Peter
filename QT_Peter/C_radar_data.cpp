@@ -344,8 +344,8 @@ double xsum=0,x2sum=0,ysum=0,xysum=0;
 C_radar_data::C_radar_data()
 {
     giaQuayPhanCung = false;
-    mHeading = 0;
-    isGrayAzi = true;
+//    mShipHeading = 0;
+    isTrueHeading = true;
     rgStdErr = sn_scale*pow(2,clk_adc);
     azi_er_rad = CConfig::getDouble("azi_er_rad",AZI_ERROR_STD);
     time_start_ms = QDateTime::currentMSecsSinceEpoch();
@@ -1060,18 +1060,19 @@ void C_radar_data::processSocketData(unsigned char* data,short len)
     {
         if(data[0]!=0x55)// tao gia bang simulator
         {
-            if(isGrayAzi)
+            if(isTrueHeading)
             {
                 newAzi = (data[9]<<24)|(data[10]<<16)|(data[11]<<8)|(data[12]);
                 newAzi>>=3;
                 newAzi&=    0xffff;
                 int heading = ((data[15]<<8)|data[16])>>5;
-                mHeading = (double)heading/MAX_AZIR;
+                CConfig::shipHeadingDeg = heading/double(MAX_AZIR)*180.0;
                 newAzi = ssiDecode(newAzi);
                 newAzi += heading;
             }
             else
             {
+
                 newAzi = (data[9]<<24)|(data[10]<<16)|(data[11]<<8)|(data[12]);
                 newAzi>>=3;
                 newAzi&=0xffff;

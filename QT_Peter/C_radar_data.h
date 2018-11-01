@@ -333,8 +333,8 @@ public:
     float rgStdErr;
     qint64 time_start_ms;
     double sn_scale;
-    bool isGrayAzi;
-    double mHeading;
+    bool isTrueHeading;
+//    double mShipHeading;
     unsigned     long int   now_ms ;
 //    bool                    isEncoderAzi;
 //    int                     mEncoderAzi;

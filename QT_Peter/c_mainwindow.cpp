@@ -1785,14 +1785,14 @@ void Mainwindow::InitTimer()
 void Mainwindow::Update100ms()
 {
     //smooth the heading
-    float gpsHeadingDiff = pRadar->mHeading-mShipHeading;
+    double gpsHeadingDiff = CConfig::shipHeadingDeg-mShipHeading;
     if(abs(gpsHeadingDiff)>0.5)
     {
         if(gpsHeadingDiff<-180)gpsHeadingDiff+=360;
         if(gpsHeadingDiff>180)gpsHeadingDiff-=360;
         mShipHeading+=gpsHeadingDiff/3.0;
         isMapOutdated = true;
-    }else mShipHeading = pRadar->mHeading;
+    }else mShipHeading = CConfig::shipHeadingDeg;
     DrawMap();
     mMousex=this->mapFromGlobal(QCursor::pos()).x();
     mMousey=this->mapFromGlobal(QCursor::pos()).y();
@@ -2138,7 +2138,7 @@ void Mainwindow::ViewTrackInfo()
             {
                 QTableWidgetItem* itemrange = new QTableWidgetItem(QString::number(nm(mTargetMan.trackTable[i].track->rgKm),'f',2));
                 QTableWidgetItem* itemazi1 = new QTableWidgetItem(QString::number(mTargetMan.trackTable[i].track->aziDeg,'f',1));
-                double shipBearing = mTargetMan.trackTable[i].track->aziDeg-pRadar->mHeading;
+                double shipBearing = mTargetMan.trackTable[i].track->aziDeg-CConfig::shipHeadingDeg;
                 if(shipBearing>180)shipBearing-=360;
                 QTableWidgetItem* itemazi2 = new QTableWidgetItem(QString::number(shipBearing,'f',1));
                 ui->tableWidget->setItem(i,0,itemazi1);
@@ -2159,7 +2159,7 @@ void Mainwindow::ViewTrackInfo()
                 QTableWidgetItem* itemID= new QTableWidgetItem(QString::number(track->operatorID));
                 QTableWidgetItem* itemrange = new QTableWidgetItem(QString::number(nm(track->rgKm),'f',2));
                 QTableWidgetItem* itemazi1 = new QTableWidgetItem(QString::number(track->aziDeg,'f',1));
-                double shipBearing = track->aziDeg-pRadar->mHeading;
+                double shipBearing = track->aziDeg-CConfig::shipHeadingDeg;
                 if(shipBearing>180)shipBearing-=360;
                 QTableWidgetItem* itemazi2 = new QTableWidgetItem(QString::number(shipBearing,'f',1));
                 ui->tableWidget_2->setItem(i,1,itemazi1);
@@ -4473,7 +4473,7 @@ void Mainwindow::on_toolButton_setRangeUnit_toggled(bool checked)
 
 void Mainwindow::on_toolButton_xl_dopler_3_clicked(bool checked)
 {
-    pRadar->isGrayAzi = checked;
+    pRadar->isTrueHeading = checked;
 }
 
 void Mainwindow::on_toolButton_head_up_clicked(bool checked)

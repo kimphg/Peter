@@ -16,6 +16,7 @@ class c_target_manager
 {
 public:
     unsigned char kasudatagram[KASU_DATA_SIZE];
+
     TrackPointer    *trackTable;
     TrackPointer    *targetTable;
     QUdpSocket      *udpSocketSend;
