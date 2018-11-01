@@ -43,7 +43,8 @@ SOURCES += main.cpp\
     dialogmenudisplay.cpp \
     c_mainwindow.cpp \
 #    c_decision_tree.cpp
-    c_gps.cpp
+    c_gps.cpp \
+    c_target_manager.cpp
 
 
 HEADERS  += \
@@ -70,7 +71,8 @@ HEADERS  += \
     dialogmenudisplay.h \
     c_mainwindow.h \
 #    c_decision_tree.h
-    c_gps.h
+    c_gps.h \
+    c_target_manager.h
 
 FORMS    += mainwindow.ui \
     dialogdocumentation.ui \

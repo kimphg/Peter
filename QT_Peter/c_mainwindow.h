@@ -23,26 +23,16 @@
 #include <c_config.h>
 #include <c_radar_thread.h>
 #include <QDesktopWidget>
-#include <c_radar_data.h>
+#include "c_radar_data.h"
 #include <QFileDialog>
 #include <QImage>
 #include <QHostAddress>
-#include <jtarget.h>
+//#include <jtarget.h>
+#include "c_target_manager.h"
 #include "Cmap/cmap.h"
 #include "dialogcommandlog.h"
 #include "dialogcommandset.h"
-//#include <jviewport.h>
-//#include "ctarget.h"
-//#include "radarcontroldialog.h"
-//#include "c_arpa_data.h"
 
-//#ifdef TIXML_USE_STL
-//    #include <iostream>
-//    #include <sstream>
-//    using namespace std;
-//#else
-//    #include <stdio.h>
-//#endif
 namespace Ui {
 class MainWindow;
 class DialogDocumentation;
@@ -70,7 +60,7 @@ protected:
     enum radarSate   { DISCONNECTED,CONNECTED,CONNECTED_ROTATE9_TXOFF,CONNECTED_ROTATE12_TXOFF, CONNECTED_ROTATE9_TXON,CONNECTED_ROTATE12_TXON } radar_state;
 private:
     QString degreeSymbol ;
-    //void updateTargets();
+    c_target_manager mTargetMan;
     void DrawGrid(QPainter* p,short centerX,short centerY);
     void CameraControl(int x,int y, int zoom);
     void CameraControl(int direction);

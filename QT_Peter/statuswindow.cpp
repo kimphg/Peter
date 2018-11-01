@@ -65,6 +65,7 @@ void StatusWindow::sendReq()
     case 4:
         command[2]=0x03;
         command[3]=0xdd;
+        break;
     case 5:
         command[2]=0x01;
         command[3]=0xcc;

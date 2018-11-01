@@ -1,19 +1,12 @@
 #include "c_mainwindow.h"
 #include "statuswindow.h"
 #include "ui_mainwindow.h"
-typedef struct {
-    track_t* track;
-    unsigned long long trackID;
-}TrackPointer;
-#define TRACK_TABLE_SIZE 24
-#define TARGET_TABLE_SIZE 6
-TrackPointer    trackTable[TRACK_TABLE_SIZE];
-TrackPointer    targetTable[TARGET_TABLE_SIZE];
-unsigned long long selectedTrackID =0;
+
+
 #define MAX_VIEW_RANGE_KM   50
 QStringList                 commandLogList;
 QTransform                  mTrans;
-QPixmap                     *pMap=NULL;// painter cho ban do
+QPixmap                     *pMap=nullptr;// painter cho ban do
 //QPixmap                     *pViewFrame=NULL;// painter cho ban do
 CMap *osmap ;
 bool toolButton_grid_checked = true;
@@ -144,7 +137,7 @@ void Mainwindow::mouseDoubleClickEvent( QMouseEvent * e )
             //select radar target
             int minDistanceToCursor = 10;
             //unsigned long long trackMin = 0;
-            track_t* trackSel;
+            track_t* trackSel = nullptr;
             for (uint i = 0;i<pRadar->mTrackList.size();i++)
             {
                 track_t* track = &(pRadar->mTrackList[i]);
@@ -164,38 +157,38 @@ void Mainwindow::mouseDoubleClickEvent( QMouseEvent * e )
                 }
 
             }
-            if(minDistanceToCursor<10)
+            if(trackSel!=nullptr)
             {
                 for (uint i = 0;i<TRACK_TABLE_SIZE;i++)
                 {
-                    if(trackTable[i].track)
-                        if(trackTable[i].track == trackSel)
+                    if(mTargetMan.trackTable[i].track)
+                        if(mTargetMan.trackTable[i].track == trackSel)
                     {
-                        //selectedTrackID=trackTable[i].track->uniqId;
+                        //mTargetMan.selectedTrackID=mTargetMan.trackTable[i].track->uniqId;
                         return;
                     }
                 }
                 for (uint i = 0;i<TRACK_TABLE_SIZE;i++)
                 {
-                    if(!trackTable[i].track)
+                    if(!mTargetMan.trackTable[i].track)
                     {
-                        trackTable[i].track = trackSel;
+                        mTargetMan.trackTable[i].track = trackSel;
                         trackSel->operatorID = i+1;
-                        selectedTrackID = trackTable[i].trackID = trackSel->uniqId;
+                        mTargetMan.selectedTrackID = mTargetMan.trackTable[i].trackID = trackSel->uniqId;
                         break;
                     }
                     else
                     {
-                        if(trackTable[i].track->isRemoved()||(trackTable[i].track->uniqId!=trackTable[i].trackID))
+                        if(mTargetMan.trackTable[i].track->isRemoved()||(mTargetMan.trackTable[i].track->uniqId!=mTargetMan.trackTable[i].trackID))
                         {
-                            trackTable[i].track = trackSel;
-                            selectedTrackID = trackTable[i].trackID = trackSel->uniqId;
+                            mTargetMan.trackTable[i].track = trackSel;
+                            mTargetMan.selectedTrackID = mTargetMan.trackTable[i].trackID = trackSel->uniqId;
                             trackSel->operatorID = i+1;
                             break;
                         }
                     }
                 }
-//                mSelectedTrackId = trackMin;
+//                mmTargetMan.selectedTrackID = trackMin;
                 //            mSelectedTrackTime = tracktime;
             }
 
@@ -448,15 +441,15 @@ void Mainwindow::keyPressEvent(QKeyEvent *event)
     {
         int keyNum = key-Qt::Key_1;
         if(keyNum>=TARGET_TABLE_SIZE)return;
-        if(!selectedTrackID)return;
+        if(!mTargetMan.selectedTrackID)return;
         /*if(keyNum>0){
             for(int i=0;i<pRadar->mTrackList.size();i++)
             {
                 track_t* track=&( pRadar->mTrackList[i]);
-                if(track->uniqId==selectedTrackID)
+                if(track->uniqId==mTargetMan.selectedTrackID)
                 {
 
-                    mSelectedTrackId=track->uniqId;
+                    mmTargetMan.selectedTrackID=track->uniqId;
                     return;
                 }
             }
@@ -464,10 +457,10 @@ void Mainwindow::keyPressEvent(QKeyEvent *event)
         for(int i=0;i<pRadar->mTrackList.size();i++)
         {
             track_t* track=&( pRadar->mTrackList[i]);
-            if(selectedTrackID==track->uniqId)
+            if(mTargetMan.selectedTrackID==track->uniqId)
             {
-                targetTable[keyNum].track = track;
-                targetTable[keyNum].trackID = track->uniqId;
+                mTargetMan.targetTable[keyNum].track = track;
+                mTargetMan.targetTable[keyNum].trackID = track->uniqId;
             }
         }
     }
@@ -564,9 +557,9 @@ void Mainwindow::mousePressEvent(QMouseEvent *event)
             {
                 for (uint i = 0;i<TRACK_TABLE_SIZE;i++)
                 {
-                    if(trackTable[i].track&&trackTable[i].track == trackSel)
+                    if(mTargetMan.trackTable[i].track&&mTargetMan.trackTable[i].track == trackSel)
                     {
-                        selectedTrackID=trackTable[i].track->uniqId;
+                        mTargetMan.selectedTrackID=mTargetMan.trackTable[i].track->uniqId;
                         return;
                     }
                 }
@@ -930,12 +923,12 @@ void Mainwindow::DrawRadarTargetByPainter(QPainter* p)//draw radar target from p
     //draw operator indexed tracks
     for (uint i = 0;i<TRACK_TABLE_SIZE;i++)
     {
-        track_t* track = trackTable[i].track;
+        track_t* track = mTargetMan.trackTable[i].track;
         if(!track)break;
         if(track->isRemoved())continue;
-        if(track->uniqId==trackTable[i].trackID)//draw operator selected targets
+        if(track->uniqId==mTargetMan.trackTable[i].trackID)//draw operator selected targets
         {
-            if(selectedTrackID== track->uniqId)//selected
+            if(mTargetMan.selectedTrackID== track->uniqId)//selected
             {
                 // draw history
                 p->setPen(penSelTarget);
@@ -1013,9 +1006,9 @@ void Mainwindow::DrawRadarTargetByPainter(QPainter* p)//draw radar target from p
 
             p->drawText(sx1+6,sy1+6,100,50,0,QString::number(track->operatorID));
         }
-        /*else if(mShowTracks||mSelectedTrackId== track->uniqId)
+        /*else if(mShowTracks||mmTargetMan.selectedTrackID== track->uniqId)
         {
-            if(mSelectedTrackId== track->uniqId)
+            if(mmTargetMan.selectedTrackID== track->uniqId)
             {
                 p->setPen(penSelTarget);
                 for (int j = 0;j<track->objectHistory.size()-1;j++)
@@ -2139,13 +2132,13 @@ void Mainwindow::ViewTrackInfo()
     //track table
     for(int i=0;i<TRACK_TABLE_SIZE;i++)
     {
-        if(trackTable[i].track)
+        if(mTargetMan.trackTable[i].track)
         {
-            if(trackTable[i].trackID == trackTable[i].track->uniqId)
+            if(mTargetMan.trackTable[i].trackID == mTargetMan.trackTable[i].track->uniqId)
             {
-                QTableWidgetItem* itemrange = new QTableWidgetItem(QString::number(nm(trackTable[i].track->rgKm),'f',2));
-                QTableWidgetItem* itemazi1 = new QTableWidgetItem(QString::number(trackTable[i].track->aziDeg,'f',1));
-                double shipBearing = trackTable[i].track->aziDeg-pRadar->mHeading;
+                QTableWidgetItem* itemrange = new QTableWidgetItem(QString::number(nm(mTargetMan.trackTable[i].track->rgKm),'f',2));
+                QTableWidgetItem* itemazi1 = new QTableWidgetItem(QString::number(mTargetMan.trackTable[i].track->aziDeg,'f',1));
+                double shipBearing = mTargetMan.trackTable[i].track->aziDeg-pRadar->mHeading;
                 if(shipBearing>180)shipBearing-=360;
                 QTableWidgetItem* itemazi2 = new QTableWidgetItem(QString::number(shipBearing,'f',1));
                 ui->tableWidget->setItem(i,0,itemazi1);
@@ -2158,10 +2151,10 @@ void Mainwindow::ViewTrackInfo()
     //target table
     for(int i=0;i<TARGET_TABLE_SIZE;i++)
     {
-        if(targetTable[i].track)
+        if(mTargetMan.targetTable[i].track)
         {
-            track_t* track = targetTable[i].track;
-            if(targetTable[i].trackID == track->uniqId)
+            track_t* track = mTargetMan.targetTable[i].track;
+            if(mTargetMan.targetTable[i].trackID == track->uniqId)
             {
                 QTableWidgetItem* itemID= new QTableWidgetItem(QString::number(track->operatorID));
                 QTableWidgetItem* itemrange = new QTableWidgetItem(QString::number(nm(track->rgKm),'f',2));
@@ -2187,7 +2180,7 @@ void Mainwindow::ViewTrackInfo()
         {
             if(!track->isLost())
             {
-                if((mSelectedTrackId==track->uniqId))
+                if((mmTargetMan.selectedTrackID==track->uniqId))
                 {
                     selectionExist = true;
                     if(mDistanceUnit==0)//NM
@@ -2226,6 +2219,7 @@ void Mainwindow::sync1S()//period 1 second
     UpdateDataStatus();
     UpdateGpsData();
     ViewTrackInfo();
+    mTargetMan.OutputTargetData();
     if(isScaleChanged ) {
 
         pRadar->setScalePPI(mScale);
