@@ -22,6 +22,7 @@ public:
     unsigned long long selectedTrackID =0;
     c_target_manager();
     void OutputTargetData();
+    void initDataGram();
 };
 
 #endif // C_TARGET_MANAGER_H
