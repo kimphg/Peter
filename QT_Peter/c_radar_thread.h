@@ -4,9 +4,10 @@
 #include <queue>
 #include <QTimer>
 #include <QGeoPositionInfo>
+#include "c_config.h"
 #include "c_radar_data.h"
 #include "c_arpa_data.h"
-#include "c_config.h"
+
 #include "c_gps.h"
 #include "AIS/AIS.h"
 //#include "c_gps_parser.h"

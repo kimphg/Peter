@@ -35,6 +35,7 @@ void c_target_manager::OutputTargetData()
     for(int i=0;i<6;i++)
     {
         track_t* target = targetTable[i].track;
+        if(target==nullptr)continue;
         dataPacket[0] = (unsigned char)(i+1);
         //distance
         int distance = int(target->rgKm*1000);
@@ -45,8 +46,10 @@ void c_target_manager::OutputTargetData()
         dataPacket[3] = (unsigned char)(distance>>16);
         dataPacket[4] = (unsigned char)(distance>>24);
         //peleng
-        int peleng = int(target->aziDeg-CConfig::shipHeadingDeg);
-        peleng
+        int peleng = int(target->aziDeg/180.0*16384);
+        dataPacket[5] = (unsigned char)(peleng);
+        dataPacket[6] = (unsigned char)(peleng>>8);
+        int course = int(target->courseRadFit/180.0*16384);
 
     }
     udpSocketSend->connectToHost(QHostAddress(CConfig::getString("KASU_IP","192.168.0.1")),30000,QIODevice::ReadWrite);

@@ -1,6 +1,8 @@
 
 #include "c_config.h"
 //CConfig         mGlobbalConfig;
+
+double CConfig::shipHeadingDeg=0;
 QHash<QString, QString> CConfig::mHashData = CConfig::readFile();
 
 void CConfig::setValue(QString key, double value)
@@ -50,7 +52,7 @@ QString CConfig::getString(QString key,QString defaultValue )
 CConfig::CConfig(void)
 {
     //hashData.;
-    shipHeadingDeg = 0;
+    //shipHeadingDeg = 0;
     readFile();
 }
 

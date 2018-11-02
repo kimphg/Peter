@@ -225,7 +225,7 @@ double track_t::estimateScore(object_t *obj1)
     double distancekm = sqrt(dx*dx+dy*dy);
     double distanceCoeff = distancekm/(TARGET_MAX_SPEED_MARINE*dtime   + obj1->rgKm*AZI_ERROR_STD);
     if(distanceCoeff>1.0)return 0;
-    double dBearing = ConvXYToAziRad(dx,dy)-this->bearingRad;
+    double dBearing = ConvXYToAziRad(dx,dy)-this->courseRad;
     double speedkmh = distancekm/(dtime);
     if(speedkmh>500.0)return 0;
     double dSpeed = speedkmh-(this->mSpeedkmh*cosFast(-dBearing));
@@ -1921,12 +1921,12 @@ void C_radar_data::setAutorgs(bool aut)
 }
 void C_radar_data::raw_map_init()
 {
-    float theta=aziOffset;
-    float dTheta = 2*PI/MAX_AZIR_DRAW;
+    double theta=aziOffset;
+    double dTheta = 2*PI/MAX_AZIR_DRAW;
     for(short azir = 0; azir < MAX_AZIR_DRAW; azir++)
     {
-        float cost = cosf(theta);
-        float sint = sinf(theta);
+        double cost = cos(theta);
+        double sint = sin(theta);
         for(short range = 0;range<RAD_DISPLAY_RES;range++)
         {
             data_mem.xkm[azir][range]     =  short(sint*(range+1))+RAD_DISPLAY_RES;

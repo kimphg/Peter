@@ -14,11 +14,13 @@
 #include <QFile>
 #include <QHash>
 #include <QXmlStreamReader>
+//#include <QSettings>
 class CConfig
 {
 public:
     CConfig(void);
     ~CConfig(void);
+    static double shipHeadingDeg;
     static QHash<QString, QString> mHashData;
     static void    setValue(QString key, double value);
     static void    setValue(QString key,QString value);
@@ -27,7 +29,7 @@ public:
     static int     getInt(QString key, int defaultValue=0);
     static void    setDefault();
     static void     SaveToFile();
-    static double shipHeadingDeg;
+
     //static QXmlStreamReader xml;
 private:
     static QHash<QString, QString> readFile();

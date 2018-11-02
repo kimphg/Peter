@@ -58,7 +58,7 @@
 #define DISPLAY_SCALE_ZOOM          4
 #define nm(x) (x/1.852)
 //#include "jtarget.h"
-
+#include "c_config.h"
 #include <vector>
 #include <QImage>
 #include <QDateTime>
@@ -187,9 +187,9 @@ public:
 //        isRemoved  = false;
         mSpeedkmh  = sqrt(dx*dx+dy*dy)/dtime;
 //        isLost     = false;
-        bearingRad = ConvXYToAziRad(dx,dy);
+        courseRad = ConvXYToAziRad(dx,dy);
         mSpeedkmhFit    = sqrt(dx*dx+dy*dy)/dtime;
-        bearingRadFit   = ConvXYToAziRad(dx,dy);
+        courseRadFit   = ConvXYToAziRad(dx,dy);
         possibleMaxScore = 0;
         xkm             = obj1->xkm;
         ykm             = obj1->ykm;
@@ -261,7 +261,7 @@ public:
             double dtime    = (obj1->timeMs-obj2->timeMs)/3600000.0;
             rgSpeedkmh      = (obj1->rgKm-obj2->rgKm)/dtime;
             mSpeedkmhFit    = sqrt(dx*dx+dy*dy)/dtime;
-            bearingRadFit   = ConvXYToAziRad(dx,dy);
+            courseRadFit   = ConvXYToAziRad(dx,dy);
             xkm             = obj1->xkm;
             ykm             = obj1->ykm;
             rgKm            = ConvXYToRange(xkm,ykm);
@@ -277,7 +277,7 @@ public:
             double dtime    = (obj1->timeMs-obj2->timeMs)/3600000.0;
             rgSpeedkmh      = (obj1->rgKm-obj2->rgKm)/dtime;
             mSpeedkmhFit    = sqrt(dx*dx+dy*dy)/dtime;
-            bearingRadFit   = ConvXYToAziRad(dx,dy);
+            courseRadFit   = ConvXYToAziRad(dx,dy);
             xkm             = obj1->xkm;
             ykm             = obj1->ykm;
             rgKm            = ConvXYToRange(xkm,ykm);
@@ -286,24 +286,22 @@ public:
         isUpdating = false;
     }
     //uint  dtime;
-    float lineScore;
-    float mSpeedkmhFit;
+    double lineScore;
+    double mSpeedkmhFit;
     std::vector<object_t> objectList;
     std::vector<object_t> objectHistory;
     object_t possibleObj;
     float possibleMaxScore;
-    float bearingRadFit;
-    float rgSpeedkmh;
+    double courseRadFit;
+    double rgSpeedkmh;
     double xkm,ykm;
-//    float xkmo,ykmo;
-//    bool isRemoved,isLost;
     qint64          lastTimeMs;
     void LinearFit();
     void addPossible(object_t *obj, double score);
     double LinearFitCost(object_t *myobj);
     double estimateScore(object_t *obj1);
     static double estimateScore(object_t *obj1, object_t *obj2);
-    double bearingRad;
+    double courseRad;
     double mSpeedkmh;
     double aziDeg,rgKm;
 };
@@ -357,7 +355,7 @@ public:
     void setAutorgs( bool aut);
     void                    clearPPI();
     unsigned char           moduleVal;
-    float                   aziOffset;
+    double                   aziOffset;
     DataOverLay             dataOver;
 //    unsigned char           noise_level[8];
     unsigned char           rotation_speed;

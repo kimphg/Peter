@@ -982,8 +982,8 @@ void Mainwindow::DrawRadarTargetByPainter(QPainter* p)//draw radar target from p
 
                     p->drawEllipse(sx1-size/2,sy1-size/2,size,size);
                     if(track->mSpeedkmhFit>10){
-                        sx = sx1+10*sinFast(track->bearingRadFit);
-                        sy = sy1-10*cosFast(track->bearingRadFit);
+                        sx = sx1+short(10*sinFast(track->courseRadFit));
+                        sy = sy1-short(10*cosFast(track->courseRadFit));
 
                         p->drawLine(sx,sy,sx1,sy1);
                     }

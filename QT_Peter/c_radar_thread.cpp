@@ -1,4 +1,4 @@
-#include "c_config.h"
+
 #include "c_radar_thread.h"
 
 #define MAX_IREC 500
