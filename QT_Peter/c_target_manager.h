@@ -22,6 +22,7 @@ public:
     QUdpSocket      *udpSocketSend;
     unsigned long long selectedTrackID =0;
     c_target_manager();
+    ~c_target_manager();
     void OutputTargetData();
     void initDataGram();
 };

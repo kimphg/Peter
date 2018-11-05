@@ -426,8 +426,11 @@ void Mainwindow::keyPressEvent(QKeyEvent *event)
         if(!isInsideViewZone(mMousex,mMousey))return;
         double azid,rg;
         C_radar_data::kmxyToPolarDeg((mMousex - radCtX)/mScale,-(mMousey - radCtY)/mScale,&azid,&rg);
-        int aziBinary = azid/360.0*4096;
-        unsigned char command[]={0xaa,0x55,0x6a,0x09,aziBinary>>8,aziBinary,0x00,0x00,0x00,0x00,0x00,0x00};
+        int aziBinary = int(azid/360.0*4096);
+        unsigned char command[]={0xaa,0x55,0x6a,0x09,
+                                 static_cast<unsigned char>(aziBinary>>8),
+                                 static_cast<unsigned char>(aziBinary),
+                                 0x00,0x00,0x00,0x00,0x00,0x00};
         processing->sendCommand(command,9,false);
         mZoomCenterx = mMousex;
         mZoomCentery = mMousey;

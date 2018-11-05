@@ -11,6 +11,12 @@ c_target_manager::c_target_manager()
     initDataGram();
 
 }
+
+c_target_manager::~c_target_manager()
+{
+    delete [] trackTable;
+    delete [] targetTable;
+}
 void c_target_manager::initDataGram()
 {
     kasudatagram[0] = 0x16;
@@ -38,7 +44,7 @@ void c_target_manager::OutputTargetData()
         if(target==nullptr)continue;
         dataPacket[0] = (unsigned char)(i+1);
         //distance
-        int distance = int(target->rgKm*1000);
+        int distance = int(target->rgKm*1000.0);
         if(distance<100||distance>260000)
         { printf("\nTarget %d wrong distance value: %d",i+1,distance);}
         dataPacket[1] = (unsigned char)(distance);
@@ -50,8 +56,11 @@ void c_target_manager::OutputTargetData()
         dataPacket[5] = (unsigned char)(peleng);
         dataPacket[6] = (unsigned char)(peleng>>8);
         int course = int(target->courseRadFit/180.0*16384);
+        dataPacket[7] = (unsigned char)(course);
+        dataPacket[8] = (unsigned char)(course>>8);
+        int speed = int(target->mSpeedkmhFit);
 
     }
     udpSocketSend->connectToHost(QHostAddress(CConfig::getString("KASU_IP","192.168.0.1")),30000,QIODevice::ReadWrite);
-    udpSocketSend->write((char*)&kasudatagram[0],KASU_DATA_SIZE);
+    udpSocketSend->write(reinterpret_cast<char*>(&kasudatagram[0]),KASU_DATA_SIZE);
 }
