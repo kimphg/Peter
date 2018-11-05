@@ -293,42 +293,42 @@ int c_gps::gpsstrcmp(const char *str1, const char *str2)
 }
 
 /* static */
-float c_gps::distance_between (float lat1, float long1, float lat2, float long2)
+double c_gps::distance_between (double lat1, double long1, double lat2, double long2)
 {
   // returns distance in meters between two positions, both specified
   // as signed decimal-degrees latitude and longitude. Uses great-circle
   // distance computation for hypothetical sphere of radius 6372795 meters.
   // Because Earth is no exact sphere, rounding errors may be up to 0.5%.
   // Courtesy of Maarten Lamers
-  float delta = radians(long1-long2);
-  float sdlong = sin(delta);
-  float cdlong = cos(delta);
+  double delta = radians(long1-long2);
+  double sdlong = sin(delta);
+  double cdlong = cos(delta);
   lat1 = radians(lat1);
   lat2 = radians(lat2);
-  float slat1 = sin(lat1);
-  float clat1 = cos(lat1);
-  float slat2 = sin(lat2);
-  float clat2 = cos(lat2);
+  double slat1 = sin(lat1);
+  double clat1 = cos(lat1);
+  double slat2 = sin(lat2);
+  double clat2 = cos(lat2);
   delta = (clat1 * slat2) - (slat1 * clat2 * cdlong);
   delta = sq(delta);
   delta += sq(clat2 * sdlong);
   delta = sqrt(delta);
-  float denom = (slat1 * slat2) + (clat1 * clat2 * cdlong);
+  double denom = (slat1 * slat2) + (clat1 * clat2 * cdlong);
   delta = atan2(delta, denom);
   return delta * 6372795;
 }
 
-float c_gps::course_to (float lat1, float long1, float lat2, float long2)
+double c_gps::course_to (double lat1, double long1, double lat2, double long2)
 {
   // returns course in degrees (North=0, West=270) from position 1 to position 2,
   // both specified as signed decimal-degrees latitude and longitude.
   // Because Earth is no exact sphere, calculated course may be off by a tiny fraction.
   // Courtesy of Maarten Lamers
-  float dlon = radians(long2-long1);
+  double dlon = radians(long2-long1);
   lat1 = radians(lat1);
   lat2 = radians(lat2);
-  float a1 = sin(dlon) * cos(lat2);
-  float a2 = sin(lat1) * cos(lat2) * cos(dlon);
+  double a1 = sin(dlon) * cos(lat2);
+  double a2 = sin(lat1) * cos(lat2) * cos(dlon);
   a2 = cos(lat1) * sin(lat2) - a2;
   a2 = atan2(a1, a2);
   if (a2 < 0.0)
@@ -338,7 +338,7 @@ float c_gps::course_to (float lat1, float long1, float lat2, float long2)
   return degrees(a2);
 }
 
-const char *c_gps::cardinal (float course)
+const char *c_gps::cardinal (double course)
 {
   static const char* directions[] = {"N", "NNE", "NE", "ENE", "E", "ESE", "SE", "SSE", "S", "SSW", "SW", "WSW", "W", "WNW", "NW", "NNW"};
 
@@ -365,7 +365,7 @@ void c_gps::get_datetime(unsigned long *date, unsigned long *time, unsigned long
    GPS_INVALID_AGE : millis() - _last_time_fix;
 }
 
-void c_gps::get_position(float *latitude, float *longitude, unsigned long *fix_age)
+void c_gps::get_position(double *latitude, double *longitude, unsigned long *fix_age)
 {
   long lat, lon;
   get_position(&lat, &lon, fix_age);
@@ -391,39 +391,39 @@ void c_gps::crack_datetime(int *year, unsigned char *month, unsigned char *day,
   if (hundredths) *hundredths = time % 100;
 }
 
-float c_gps::get_altitude()
+double c_gps::get_altitude()
 {
   return _altitude == GPS_INVALID_ALTITUDE ? GPS_INVALID_F_ALTITUDE : _altitude / 100.0;
 }
 
-float c_gps::get_course()
+double c_gps::get_course()
 {
   return _course == GPS_INVALID_ANGLE ? GPS_INVALID_F_ANGLE : _course / 100.0;
 }
 
-float c_gps::get_speed_knots()
+double c_gps::get_speed_knots()
 {
   return _speed == GPS_INVALID_SPEED ? GPS_INVALID_F_SPEED : _speed / 100.0;
 }
 
-float c_gps::f_speed_mph()
+double c_gps::f_speed_mph()
 {
-  float sk = get_speed_knots();
+  double sk = get_speed_knots();
   return sk == GPS_INVALID_F_SPEED ? GPS_INVALID_F_SPEED : _GPS_MPH_PER_KNOT * sk;
 }
 
-float c_gps::f_speed_mps()
+double c_gps::f_speed_mps()
 {
-  float sk = get_speed_knots();
+  double sk = get_speed_knots();
   return sk == GPS_INVALID_F_SPEED ? GPS_INVALID_F_SPEED : _GPS_MPS_PER_KNOT * sk;
 }
 
-float c_gps::get_speed_kmph()
+double c_gps::get_speed_kmph()
 {
-  float sk = get_speed_knots();
+  double sk = get_speed_knots();
   return sk == GPS_INVALID_F_SPEED ? GPS_INVALID_F_SPEED : _GPS_KMPH_PER_KNOT * sk;
 }
 
-const float c_gps::GPS_INVALID_F_ANGLE = 1000.0;
-const float c_gps::GPS_INVALID_F_ALTITUDE = 1000000.0;
-const float c_gps::GPS_INVALID_F_SPEED = -1.0;
+const double c_gps::GPS_INVALID_F_ANGLE = 1000.0;
+const double c_gps::GPS_INVALID_F_ALTITUDE = 1000000.0;
+const double c_gps::GPS_INVALID_F_SPEED = -1.0;

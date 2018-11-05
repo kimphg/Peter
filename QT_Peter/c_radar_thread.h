@@ -28,8 +28,8 @@
 using namespace std;
 struct GPSData
 {
-    float lat,lon;
-    float heading,speed;
+    double lat,lon;
+    double heading,speed;
     long long timeStamp;
     bool isFixed;
 };

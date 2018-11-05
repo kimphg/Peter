@@ -53,7 +53,7 @@ public:
     GPS_INVALID_HDOP = 0xFFFFFFFF
   };
 
-  static const float GPS_INVALID_F_ANGLE, GPS_INVALID_F_ALTITUDE, GPS_INVALID_F_SPEED;
+  static const double GPS_INVALID_F_ANGLE, GPS_INVALID_F_ALTITUDE, GPS_INVALID_F_SPEED;
 
   c_gps();
   bool decode(char c); // process one character received from GPS
@@ -81,21 +81,21 @@ public:
   // horizontal dilution of precision in 100ths
   inline unsigned long hdop() { return _hdop; }
 
-  void get_position(float *latitude, float *longitude, unsigned long *fix_age = 0);
+  void get_position(double *latitude, double *longitude, unsigned long *fix_age = 0);
   void crack_datetime(int *year, unsigned char *month, unsigned char *day,
     unsigned char *hour, unsigned char *minute, unsigned char *second, unsigned char *hundredths = 0, unsigned long *fix_age = 0);
-  float get_altitude();
-  float get_course();
-  float get_speed_knots();
-  float f_speed_mph();
-  float f_speed_mps();
-  float get_speed_kmph();
+  double get_altitude();
+  double get_course();
+  double get_speed_knots();
+  double f_speed_mph();
+  double f_speed_mps();
+  double get_speed_kmph();
 
   static int library_version() { return _GPS_VERSION; }
 
-  static float distance_between (float lat1, float long1, float lat2, float long2);
-  static float course_to (float lat1, float long1, float lat2, float long2);
-  static const char *cardinal(float course);
+  static double distance_between (double lat1, double long1, double lat2, double long2);
+  static double course_to (double lat1, double long1, double lat2, double long2);
+  static const char *cardinal(double course);
 
 #ifndef _GPS_NO_STATS
   void stats(unsigned long *chars, unsigned short *good_sentences, unsigned short *failed_cs);
@@ -151,7 +151,7 @@ private:
 //#undef char
 //#undef long
 //#undef unsigned char
-//#undef float
+//#undef double
 //#undef abs
 //#undef round
 //#endif
