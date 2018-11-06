@@ -301,9 +301,9 @@ void pcapRun()
 	{
 		printf("\n%d. %s", ++i, d->name);
 		if (d->description)
-			printf(" (%s)\n", d->description);
+			printf(" (%s)", d->description);
 		else
-			printf(" (No description available)\n");
+			printf(" (No description available)");
 	}
 	d = alldevs;
 	if ((adhandle = pcap_open(d->name,          // name of the device
