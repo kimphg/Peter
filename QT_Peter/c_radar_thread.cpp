@@ -153,6 +153,10 @@ void dataProcessingThread::ProcessNavData(unsigned char *mReceiveBuff,int len)
             mRadarStat.ReadStatusMessage(&mReceiveBuff[4]);
         }
     }
+    else if(mReceiveBuff[0]==0x5a&&mReceiveBuff[1]==0xa5&&len>=32)//gyro messages
+    {
+        CConfig::shipHeadingDeg = (((mReceiveBuff[6])<<8)|mReceiveBuff[7])/182.044444444;//*360.0/65535.0;
+    }
     else if(mReceiveBuff[0]=='!'&&mReceiveBuff[1]=='A')//AIS
     {
         processARPAData(QByteArray((char*)mReceiveBuff,len));

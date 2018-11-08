@@ -857,7 +857,7 @@ void Mainwindow::DrawDetectZones(QPainter* p)//draw radar target from pRadar->mT
 {
     for (uint i = 0;i<pRadar->mDetectZonesList.size();i++)
     {
-        DetectionWindow *dw = &pRadar->mDetectZonesList[i];
+        DetectionWindow *dw = &pRadar->mDetectZonesList[i];//todo:finish here
 
     }
 
