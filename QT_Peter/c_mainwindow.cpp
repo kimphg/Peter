@@ -853,6 +853,16 @@ void Mainwindow::rotateVector(double angle,short* x,short* y)
     (*x) = px;
     (*y) = py;
 }
+void Mainwindow::DrawDetectZones(QPainter* p)//draw radar target from pRadar->mTrackList
+{
+    for (uint i = 0;i<pRadar->mDetectZonesList.size();i++)
+    {
+        DetectionWindow *dw = &pRadar->mDetectZonesList[i];
+
+    }
+
+}
+
 #define TARG_SIZE 12
 void Mainwindow::DrawRadarTargetByPainter(QPainter* p)//draw radar target from pRadar->mTrackList
 {
@@ -1183,7 +1193,7 @@ void Mainwindow::paintEvent(QPaintEvent *event)
     UpdateMouseStat(&p);
     if(ui->toolButton_ais_show->isChecked())drawAisTarget(&p);
     //ve luoi cu ly phuong vi
-
+    DrawDetectZones(&p);
     DrawViewFrame(&p);
     DrawIADArea(&p);
     clkEnd = clock();

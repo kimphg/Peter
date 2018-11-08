@@ -441,8 +441,9 @@ public:
     double getArcMaxAziRad() const;
     double getArcMinAziRad() const;
     void addDetectionZone(double x, double y,double dazi,double drg);
-private:
     std::vector<DetectionWindow> mDetectZonesList;
+private:
+
     int mFalsePositiveCount;
     float hsTap ;
     std::queue<int>  aziToProcess;//hàng chờ các frame cần xử lý

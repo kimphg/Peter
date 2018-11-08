@@ -594,6 +594,7 @@ private:
     void gotoCenter();
     void rotateVector(double angle, short *x, short *y);
     void SendScaleCommand();
+    void DrawDetectZones(QPainter *p);
 };
 
 #endif // MAINWINDOW_H
