@@ -19,6 +19,7 @@
 #include <QtCore>
 #include <QtGui>
 #include "pkp.h"
+#include <time.h>
 #include <dialogaisinfo.h>
 //#include <CLocal.h>
 

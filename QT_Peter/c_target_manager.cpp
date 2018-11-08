@@ -121,7 +121,7 @@ TrackPointer* c_target_manager::getTargetById(int id)
 {
     for(int i=0;i<TARGET_TABLE_SIZE;i++)
     {
-        if(targetTable[i].trackUniqID==id)getTargetAt(i);
+        if(targetTable[i].trackUniqID==id)return getTargetAt(i);
     }
     return nullptr;
 }

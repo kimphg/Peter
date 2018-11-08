@@ -292,7 +292,7 @@ public:
     QCustomButton *toolButton_open_record_2;
     QCustomButton *toolButton_second_azi;
     QCustomButton *toolButton_xl_dopler_3;
-    QWidget *widget;
+    QWidget *layoutWidget6;
     QVBoxLayout *verticalLayout_2;
     QCustomButton *toolButton_centerView;
     QCustomButton *toolButton_grid;
@@ -320,7 +320,7 @@ public:
     QCustomTabWidget *tabWidget_menu_3;
     QWidget *tab_24;
     QTableWidget *tableWidgetTarget_2;
-    QWidget *widget1;
+    QWidget *layoutWidget7;
     QHBoxLayout *horizontalLayout_3;
     QCustomButton *toolButton_del_tget_table;
     QCustomButton *toolButton_chi_thi_mt;
@@ -349,6 +349,7 @@ public:
     QCustomButton *toolButton_signal_type_2;
     QCustomButton *toolButton_signal_type_3;
     QLabel *label_speed_ship;
+    QLabel *label_frame_rate;
     QButtonGroup *buttonGroup;
 
     void setupUi(QMainWindow *MainWindow)
@@ -5519,15 +5520,15 @@ public:
         toolButton_xl_dopler_3->setFocusPolicy(Qt::NoFocus);
         toolButton_xl_dopler_3->setCheckable(true);
         toolButton_xl_dopler_3->setChecked(true);
-        widget = new QWidget(tab_27);
-        widget->setObjectName(QStringLiteral("widget"));
-        widget->setGeometry(QRect(20, 10, 131, 167));
-        verticalLayout_2 = new QVBoxLayout(widget);
+        layoutWidget6 = new QWidget(tab_27);
+        layoutWidget6->setObjectName(QStringLiteral("layoutWidget6"));
+        layoutWidget6->setGeometry(QRect(20, 10, 131, 167));
+        verticalLayout_2 = new QVBoxLayout(layoutWidget6);
         verticalLayout_2->setSpacing(6);
         verticalLayout_2->setContentsMargins(11, 11, 11, 11);
         verticalLayout_2->setObjectName(QStringLiteral("verticalLayout_2"));
         verticalLayout_2->setContentsMargins(0, 0, 0, 0);
-        toolButton_centerView = new QCustomButton(widget);
+        toolButton_centerView = new QCustomButton(layoutWidget6);
         toolButton_centerView->setObjectName(QStringLiteral("toolButton_centerView"));
         sizePolicy1.setHeightForWidth(toolButton_centerView->sizePolicy().hasHeightForWidth());
         toolButton_centerView->setSizePolicy(sizePolicy1);
@@ -5536,7 +5537,7 @@ public:
 
         verticalLayout_2->addWidget(toolButton_centerView);
 
-        toolButton_grid = new QCustomButton(widget);
+        toolButton_grid = new QCustomButton(layoutWidget6);
         toolButton_grid->setObjectName(QStringLiteral("toolButton_grid"));
         sizePolicy1.setHeightForWidth(toolButton_grid->sizePolicy().hasHeightForWidth());
         toolButton_grid->setSizePolicy(sizePolicy1);
@@ -5546,7 +5547,7 @@ public:
 
         verticalLayout_2->addWidget(toolButton_grid);
 
-        toolButton_VRM = new QCustomButton(widget);
+        toolButton_VRM = new QCustomButton(layoutWidget6);
         toolButton_VRM->setObjectName(QStringLiteral("toolButton_VRM"));
         sizePolicy1.setHeightForWidth(toolButton_VRM->sizePolicy().hasHeightForWidth());
         toolButton_VRM->setSizePolicy(sizePolicy1);
@@ -5555,7 +5556,7 @@ public:
 
         verticalLayout_2->addWidget(toolButton_VRM);
 
-        toolButton_ELB = new QCustomButton(widget);
+        toolButton_ELB = new QCustomButton(layoutWidget6);
         toolButton_ELB->setObjectName(QStringLiteral("toolButton_ELB"));
         sizePolicy1.setHeightForWidth(toolButton_ELB->sizePolicy().hasHeightForWidth());
         toolButton_ELB->setSizePolicy(sizePolicy1);
@@ -5564,7 +5565,7 @@ public:
 
         verticalLayout_2->addWidget(toolButton_ELB);
 
-        toolButton_measuring = new QCustomButton(widget);
+        toolButton_measuring = new QCustomButton(layoutWidget6);
         toolButton_measuring->setObjectName(QStringLiteral("toolButton_measuring"));
         sizePolicy1.setHeightForWidth(toolButton_measuring->sizePolicy().hasHeightForWidth());
         toolButton_measuring->setSizePolicy(sizePolicy1);
@@ -5794,15 +5795,15 @@ public:
         tableWidgetTarget_2->setGeometry(QRect(0, 0, 361, 211));
         tableWidgetTarget_2->setStyleSheet(QStringLiteral(""));
         tableWidgetTarget_2->horizontalHeader()->setDefaultSectionSize(68);
-        widget1 = new QWidget(tab_24);
-        widget1->setObjectName(QStringLiteral("widget1"));
-        widget1->setGeometry(QRect(10, 217, 331, 31));
-        horizontalLayout_3 = new QHBoxLayout(widget1);
+        layoutWidget7 = new QWidget(tab_24);
+        layoutWidget7->setObjectName(QStringLiteral("layoutWidget7"));
+        layoutWidget7->setGeometry(QRect(10, 217, 331, 31));
+        horizontalLayout_3 = new QHBoxLayout(layoutWidget7);
         horizontalLayout_3->setSpacing(6);
         horizontalLayout_3->setContentsMargins(11, 11, 11, 11);
         horizontalLayout_3->setObjectName(QStringLiteral("horizontalLayout_3"));
         horizontalLayout_3->setContentsMargins(0, 0, 0, 0);
-        toolButton_del_tget_table = new QCustomButton(widget1);
+        toolButton_del_tget_table = new QCustomButton(layoutWidget7);
         toolButton_del_tget_table->setObjectName(QStringLiteral("toolButton_del_tget_table"));
         sizePolicy1.setHeightForWidth(toolButton_del_tget_table->sizePolicy().hasHeightForWidth());
         toolButton_del_tget_table->setSizePolicy(sizePolicy1);
@@ -5812,7 +5813,7 @@ public:
 
         horizontalLayout_3->addWidget(toolButton_del_tget_table);
 
-        toolButton_chi_thi_mt = new QCustomButton(widget1);
+        toolButton_chi_thi_mt = new QCustomButton(layoutWidget7);
         toolButton_chi_thi_mt->setObjectName(QStringLiteral("toolButton_chi_thi_mt"));
         sizePolicy1.setHeightForWidth(toolButton_chi_thi_mt->sizePolicy().hasHeightForWidth());
         toolButton_chi_thi_mt->setSizePolicy(sizePolicy1);
@@ -6453,6 +6454,58 @@ public:
         label_speed_ship->setFont(font3);
         label_speed_ship->setStyleSheet(QLatin1String("color: rgb(85, 255, 255);\n"
 "background-color: rgba(255, 255, 255, 0);"));
+        label_frame_rate = new QLabel(centralWidget);
+        label_frame_rate->setObjectName(QStringLiteral("label_frame_rate"));
+        label_frame_rate->setGeometry(QRect(870, 170, 81, 21));
+        QPalette palette81;
+        palette81.setBrush(QPalette::Active, QPalette::WindowText, brush);
+        palette81.setBrush(QPalette::Active, QPalette::Button, brush13);
+        palette81.setBrush(QPalette::Active, QPalette::Light, brush14);
+        palette81.setBrush(QPalette::Active, QPalette::Midlight, brush14);
+        palette81.setBrush(QPalette::Active, QPalette::Dark, brush14);
+        palette81.setBrush(QPalette::Active, QPalette::Mid, brush14);
+        palette81.setBrush(QPalette::Active, QPalette::Text, brush);
+        palette81.setBrush(QPalette::Active, QPalette::BrightText, brush);
+        palette81.setBrush(QPalette::Active, QPalette::ButtonText, brush);
+        palette81.setBrush(QPalette::Active, QPalette::Base, brush13);
+        palette81.setBrush(QPalette::Active, QPalette::Window, brush13);
+        palette81.setBrush(QPalette::Active, QPalette::Shadow, brush6);
+        palette81.setBrush(QPalette::Active, QPalette::AlternateBase, brush15);
+        palette81.setBrush(QPalette::Active, QPalette::ToolTipBase, brush7);
+        palette81.setBrush(QPalette::Active, QPalette::ToolTipText, brush6);
+        palette81.setBrush(QPalette::Inactive, QPalette::WindowText, brush);
+        palette81.setBrush(QPalette::Inactive, QPalette::Button, brush13);
+        palette81.setBrush(QPalette::Inactive, QPalette::Light, brush14);
+        palette81.setBrush(QPalette::Inactive, QPalette::Midlight, brush14);
+        palette81.setBrush(QPalette::Inactive, QPalette::Dark, brush14);
+        palette81.setBrush(QPalette::Inactive, QPalette::Mid, brush14);
+        palette81.setBrush(QPalette::Inactive, QPalette::Text, brush);
+        palette81.setBrush(QPalette::Inactive, QPalette::BrightText, brush);
+        palette81.setBrush(QPalette::Inactive, QPalette::ButtonText, brush);
+        palette81.setBrush(QPalette::Inactive, QPalette::Base, brush13);
+        palette81.setBrush(QPalette::Inactive, QPalette::Window, brush13);
+        palette81.setBrush(QPalette::Inactive, QPalette::Shadow, brush6);
+        palette81.setBrush(QPalette::Inactive, QPalette::AlternateBase, brush15);
+        palette81.setBrush(QPalette::Inactive, QPalette::ToolTipBase, brush7);
+        palette81.setBrush(QPalette::Inactive, QPalette::ToolTipText, brush6);
+        palette81.setBrush(QPalette::Disabled, QPalette::WindowText, brush14);
+        palette81.setBrush(QPalette::Disabled, QPalette::Button, brush13);
+        palette81.setBrush(QPalette::Disabled, QPalette::Light, brush14);
+        palette81.setBrush(QPalette::Disabled, QPalette::Midlight, brush14);
+        palette81.setBrush(QPalette::Disabled, QPalette::Dark, brush14);
+        palette81.setBrush(QPalette::Disabled, QPalette::Mid, brush14);
+        palette81.setBrush(QPalette::Disabled, QPalette::Text, brush14);
+        palette81.setBrush(QPalette::Disabled, QPalette::BrightText, brush);
+        palette81.setBrush(QPalette::Disabled, QPalette::ButtonText, brush14);
+        palette81.setBrush(QPalette::Disabled, QPalette::Base, brush13);
+        palette81.setBrush(QPalette::Disabled, QPalette::Window, brush13);
+        palette81.setBrush(QPalette::Disabled, QPalette::Shadow, brush6);
+        palette81.setBrush(QPalette::Disabled, QPalette::AlternateBase, brush14);
+        palette81.setBrush(QPalette::Disabled, QPalette::ToolTipBase, brush7);
+        palette81.setBrush(QPalette::Disabled, QPalette::ToolTipText, brush6);
+        label_frame_rate->setPalette(palette81);
+        label_frame_rate->setStyleSheet(QStringLiteral("background-color: rgb(16, 32, 64);"));
+        label_frame_rate->setAlignment(Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter);
         MainWindow->setCentralWidget(centralWidget);
         groupBox_16->raise();
         toolButton_menu->raise();
@@ -6469,6 +6522,7 @@ public:
         label_head_ship->raise();
         groupBox_15->raise();
         label_speed_ship->raise();
+        label_frame_rate->raise();
 #ifndef QT_NO_SHORTCUT
         label_rain->setBuddy(horizontalSlider_rain);
         label_sea->setBuddy(horizontalSlider_sea);
@@ -6954,6 +7008,10 @@ public:
         label_speed_ship->setToolTip(QApplication::translate("MainWindow", "V\341\272\255n t\341\273\221c t\303\240u ta", Q_NULLPTR));
 #endif // QT_NO_TOOLTIP
         label_speed_ship->setText(QApplication::translate("MainWindow", "Vc:", Q_NULLPTR));
+#ifndef QT_NO_TOOLTIP
+        label_frame_rate->setToolTip(QApplication::translate("MainWindow", "Lo\341\272\241i t\303\255n hi\341\273\207u", Q_NULLPTR));
+#endif // QT_NO_TOOLTIP
+        label_frame_rate->setText(QApplication::translate("MainWindow", "--", Q_NULLPTR));
     } // retranslateUi
 
 };

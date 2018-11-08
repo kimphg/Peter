@@ -7,6 +7,9 @@
 
 
 #define MAX_VIEW_RANGE_KM   50
+static clock_t clkBegin = clock();
+static clock_t clkEnd = clock();
+static int frameRate = 20;
 static QStringList                 commandLogList;
 static QTransform                  mTrans;
 static QPixmap                     *pMap=nullptr;// painter cho ban do
@@ -34,7 +37,7 @@ static QPen mGridViewPen1(QBrush(QColor(150,150,150,255)),1);
 static QPoint points[6];
 static double                      mMapOpacity;
 static int                         mMaxTapMayThu=18;
-static QTimer                      timerVideoUpdate,timerMapUpdate;
+static QTimer                      timerVideoUpdate,timerMetaUpdate;
 static QTimer                      syncTimer1s,syncTimer5p ;
 static QTimer                      dataPlaybackTimer ;
 static short                       dxMax,dyMax;
@@ -120,6 +123,10 @@ void Mainwindow::mouseDoubleClickEvent( QMouseEvent * e )
         mMousey=this->mapFromGlobal(QCursor::pos()).y();
         if(isInsideViewZone(mMousex,mMousey))
         {
+            double xrad,yrad;//todo:write a function to convert
+            xrad = (mMousex-radCtX)/mScale;
+            yrad = -(mMousey-radCtY)/mScale;
+            pRadar->addDetectionZone(xrad,yrad,5,20.0/mScale);
             //select radar target
             int minDistanceToCursor = 10;
             //unsigned long long trackMin = 0;
@@ -1124,22 +1131,11 @@ void Mainwindow::UpdateMouseStat(QPainter *p)
         p->drawLine(mMousex,selZone_y1,mMousex,mMousey);
     }
 }
+
 void Mainwindow::paintEvent(QPaintEvent *event)
 {
-    if(isHeadUp)
-    {
-        trueShift = -mShipHeading;
-        headShift = 0;
-        mTrans.reset();
-        mTrans = mTrans.rotate((-mShipHeading));
-    }
-    else
-    {
-        trueShift = 0;
-        headShift = mShipHeading;
-    }
 
-
+    clkBegin = clock();
     QPainter p(this);
     p.setRenderHint(QPainter::Antialiasing, true);
     if(pMap)
@@ -1190,8 +1186,8 @@ void Mainwindow::paintEvent(QPaintEvent *event)
 
     DrawViewFrame(&p);
     DrawIADArea(&p);
-
-    //    updateTargets();
+    clkEnd = clock();
+    frameRate = (CLOCKS_PER_SEC/(clkEnd-clkBegin));
 }
 void Mainwindow::DrawIADArea(QPainter* p)
 {
@@ -1373,7 +1369,7 @@ void Mainwindow::removeCurrTrack()
 {
     if(currTrackPt)
     {
-        currTrackPt->track->uniqId =-1;
+
         currTrackPt->track = nullptr;
     }
 
@@ -1802,13 +1798,14 @@ void Mainwindow::InitTimer()
     processing->start(QThread::TimeCriticalPriority);
     t2->start(QThread::HighPriority);
 
-    connect(&timerMapUpdate, SIGNAL(timeout()), this, SLOT(Update100ms()));
-    timerMapUpdate.start(100);//ENVDEP
+    connect(&timerMetaUpdate, SIGNAL(timeout()), this, SLOT(Update100ms()));
+    timerMetaUpdate.start(100);//ENVDEP
 
 }
 void Mainwindow::Update100ms()
 {
     //smooth the heading
+
     ui->label_head_ship->setText(QString::number(CConfig::shipHeadingDeg,'f',1));
     double headingDiff = CConfig::shipHeadingDeg-mShipHeading;
     if(abs(headingDiff)>0.5)
@@ -1818,6 +1815,20 @@ void Mainwindow::Update100ms()
         mShipHeading+=headingDiff/3.0;
         isMapOutdated = true;
     }else mShipHeading = CConfig::shipHeadingDeg;
+    //calculate heading
+    if(isHeadUp)
+    {
+        trueShift = -mShipHeading;
+        headShift = 0;
+        mTrans.reset();
+        mTrans = mTrans.rotate((-mShipHeading));
+    }
+    else
+    {
+        trueShift = 0;
+        headShift = mShipHeading;
+    }
+
     DrawMap();
     mMousex=this->mapFromGlobal(QCursor::pos()).x();
     mMousey=this->mapFromGlobal(QCursor::pos()).y();
@@ -2200,7 +2211,7 @@ void Mainwindow::ViewTrackInfo()
         {
             for(int col = 0;col<5;col++)
             {
-                QTableWidgetItem* item = ui->tableWidgetTarget_2->item(row,col);
+                QTableWidgetItem* item = ui->tableWidgetTarget_2->item(i,col);
                 if(item)item->setText("");
             }
         }
@@ -2275,6 +2286,11 @@ void Mainwindow::sync1S()//period 1 second
     UpdateDataStatus();
     UpdateGpsData();
     ViewTrackInfo();
+    int sampleTime = CLOCKS_PER_SEC*1.4/frameRate;
+    if(sampleTime>25)sampleTime=25;
+    timerVideoUpdate.start(sampleTime);
+    timerMetaUpdate.start(sampleTime*4);
+    ui->label_frame_rate->setText("FR:"+QString::number(frameRate));
     if(ui->toolButton_chi_thi_mt->isChecked())mTargetMan.OutputTargetToKasu();
     if(isScaleChanged ) {
 
@@ -2755,8 +2771,6 @@ void Mainwindow::setScaleRange(double srange)
 void Mainwindow::UpdateScale()
 {
     float oldScale = mScale;
-
-
     if(mDistanceUnit==0)//NM
     {
         switch(mRangeLevel)

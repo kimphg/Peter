@@ -39,7 +39,7 @@
 #define MAX_AZIR_DRAW               6144
 //#define RAD_M_PULSE_RES             1536
 #define RAD_S_PULSE_RES             256
-#define RAD_DISPLAY_RES             768
+#define RAD_DISPLAY_RES             600//768
 #define RAD_FULL_RES                1792
 #define SIGNAL_SCALE_7              0.24113 //215.38461538461538461538461538461
 #define SIGNAL_SCALE_6              0.24113//184.61538461538461538461538461538
@@ -66,31 +66,6 @@
 //#include <Eigen/Dense>
 #include <queue>
 
-
-//#include <QDebug> //REMLATER
-//#ifdef _WIN32
-//#include <armadillo>
-//#else
-//#include <armadilloLinux/armadillo>
-//#endif
-//using namespace arma;
-//#include <list>
-//using namespace std;
-//using namespace Eigen;
-/*typedef struct {
-    short x,y;
-    unsigned char level;
-    unsigned char displaylevel;
-    unsigned char vet;
-    unsigned char dopler;
-    float terrain;
-    short markIndex;
-}raw_point_t;
-
-typedef struct {
-    raw_point_t raw_map[RAD_FULL_RES];
-}frame_t;
-*/
 inline double sinFast(double a)
 {
     while (a>PI) {
@@ -123,6 +98,12 @@ inline double ConvXYToAziRad(double x, double y)
         return azi;
     }
 }
+typedef struct
+{
+    int trackCount;
+    double xkm,ykm;
+    double maxDrg,maxDaz;
+}DetectionWindow;
 typedef struct  {
     short lastA,riseA,fallA;
     short maxA1,maxA2;
@@ -358,13 +339,13 @@ public:
     ~C_radar_data();
 //    float k_vet;// !!!!
 
-    short             rotDir;
-    double                   rotation_per_min ;
-    double                   azi_er_rad;
+    short                       rotDir;
+    double                      rotation_per_min ;
+    double                      azi_er_rad;
     std::vector<track_t>        mTrackList;
-    std::vector<plot_t>     plot_list;
-    std::vector<object_t>     mFreeObjList;
-    unsigned     long int   mPeriodCount;
+    std::vector<plot_t>         plot_list;
+    std::vector<object_t>       mFreeObjList;
+    unsigned     long int       mPeriodCount;
     float rgStdErr;
     qint64 time_start_ms;
     double sn_scale;
@@ -459,7 +440,9 @@ public:
 
     double getArcMaxAziRad() const;
     double getArcMinAziRad() const;
+    void addDetectionZone(double x, double y,double dazi,double drg);
 private:
+    std::vector<DetectionWindow> mDetectZonesList;
     int mFalsePositiveCount;
     float hsTap ;
     std::queue<int>  aziToProcess;//hàng chờ các frame cần xử lý

@@ -531,6 +531,17 @@ double C_radar_data::getArcMinAziRad() const
     return (result );
 }
 
+void C_radar_data::addDetectionZone(double x, double y, double dazi, double drg)
+{
+    DetectionWindow dw;
+    dw.trackCount=1;
+    dw.xkm=x;
+    dw.ykm=y;
+    dw.maxDaz = radians(dazi);
+    dw.maxDrg = drg;
+    mDetectZonesList.push_back(dw);
+}
+
 double C_radar_data::getSelfRotationAzi() const
 {
     return selfRotationAzi;
