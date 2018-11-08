@@ -19,12 +19,12 @@
 #define degrees(x) (x*57.295779513)
 #define radians(x) (x/57.295779513)
 #ifndef CONST_NM
-    #define CONST_NM 1.852f// he so chuyen doi tu km sang hai ly
+#define CONST_NM 1.852f// he so chuyen doi tu km sang hai ly
 #endif
 #define PI_NHAN2                    6.2831853072
 #define PI_CHIA2                    1.5707963268
 #ifndef PI
-   #define PI                       3.14159265358979323846
+#define PI                       3.14159265358979323846
 #endif
 #define FRAME_HEADER_SIZE 34
 #define RADAR_RESOLUTION 2048
@@ -33,7 +33,7 @@
 #define MAX_FRAME_SIZE_HALF RADAR_RESOLUTION_HALF*2+FRAME_HEADER_SIZE
 #define CONST_E 2.71828182846
 #define MAX_TRACK_LEN               400
-#define MAX_TRACKS                  199
+#define MAX_TRACKS                  800
 #define ENCODER_RES                 5000
 #define MAX_AZIR                    2048
 #define MAX_AZIR_DRAW               6144
@@ -134,25 +134,25 @@ typedef struct  {
     bool isUsed;
 } plot_t;
 typedef struct  {
-//    int uniqID;
+    //    int uniqID;
     double          azRad ,rg,xkm,ykm;
-//    double          xkmfit,ykmfit;
-//    double          azRadfit,rgKmfit;
+    //    double          xkmfit,ykmfit;
+    //    double          azRadfit,rgKmfit;
     double          rgKm;
     short           dazi,drg;
     short           size;
     char            dopler;
-//    bool            isProcessed;
+    //    bool            isProcessed;
     bool            isRemoved;
-//    float           p;
-//    float          terrain;
-    float           rgStdEr;
-    float           aziStdEr;
-    unsigned int          timeMs;
-//    float           scorepObj,scorep2;
-//    float scoreTrack;
+    //    float           p;
+    //    float          terrain;
+    double           rgStdEr;
+    double           aziStdEr;
+    long long          timeMs;
+    //    float           scorepObj,scorep2;
+    //    float scoreTrack;
     unsigned long int period;
-//    uint len;
+    //    uint len;
 }object_t;
 //struct object_line
 //{
@@ -177,16 +177,21 @@ enum class TrackState {newDetection=0,
 class track_t
 {
 public:
-    track_t(object_t* obj1,object_t* obj2)
+    track_t()
+    {
+        mState=TrackState::removed;
+        isUpdating = false;
+    }
+    void init(object_t* obj1,object_t* obj2)
     {
 
         double dtime = (obj1->timeMs-obj2->timeMs)/3600000.0;
         double dx = obj1->xkm - obj2->xkm;
         double dy = obj1->ykm - obj2->ykm;
         rgSpeedkmh = (obj1->rgKm-obj2->rgKm)/dtime;
-//        isRemoved  = false;
+        //        isRemoved  = false;
         mSpeedkmh  = sqrt(dx*dx+dy*dy)/dtime;
-//        isLost     = false;
+        //        isLost     = false;
         courseRad = ConvXYToAziRad(dx,dy);
         mSpeedkmhFit    = sqrt(dx*dx+dy*dy)/dtime;
         courseRadFit   = ConvXYToAziRad(dx,dy);
@@ -199,18 +204,17 @@ public:
         objectList.push_back(*obj2);
         objectList.push_back(*obj1);
         objectHistory.push_back(*obj1);
-        time=obj2->timeMs;
-        uniqId = time;
-        uniqId<<=32;
-        uniqId+=rand();
+//        time=obj2->timeMs;
+        uniqId =-1;
         isUpdating = false;
         mState = TrackState::newDetection;
-        operatorID = 0;
+        //        operatorID = 0;
     }
     ~track_t()
     {
 
     }
+    static int IDCounter ;
     bool isRemoved()
     {
         return mState==TrackState::removed;
@@ -220,68 +224,94 @@ public:
         return mState==TrackState::lost;
     }
     TrackState mState;
-    int operatorID;
-    uint time;
-    unsigned long long uniqId;
+    uint ageMs;
+    //    int operatorID;
+//    uint time;
+    int uniqId;
     bool isUpdating;
     void update(uint now_ms)
     {
         isUpdating = true;
-        objectList.push_back(possibleObj);
-        while(objectList.size()>4)
-        {
-            objectList.erase(objectList.begin());
-
-        }
-        switch (mState) {
-        case TrackState::newDetection:
-            if(objectList.size()>3)         mState = TrackState::confirmed;
-            if(now_ms-lastTimeMs>80000)     mState = TrackState::removed;
-            break;
-        case TrackState::confirmed:
-            if(now_ms-lastTimeMs>80000)     mState = TrackState::lost;
-            break;
-        case TrackState::lost:
-            if(now_ms-lastTimeMs>160000)    mState = TrackState::removed;
-            break;
-
-        default:
-            break;
-        }
-        lastTimeMs = possibleObj.timeMs;
-        if((lastTimeMs-objectHistory.back().timeMs)>60000)
-            objectHistory.push_back(possibleObj);
-        possibleMaxScore = 0;
-        if(objectList.size()<4)
-        {
-            object_t* obj1  = &(objectList.back());
-            object_t* obj2  = &(objectList.back())-1;
-            double dx       = obj1->xkm - obj2->xkm;
-            double dy       = obj1->ykm - obj2->ykm;
-            double dtime    = (obj1->timeMs-obj2->timeMs)/3600000.0;
-            rgSpeedkmh      = (obj1->rgKm-obj2->rgKm)/dtime;
-            mSpeedkmhFit    = sqrt(dx*dx+dy*dy)/dtime;
-            courseRadFit   = ConvXYToAziRad(dx,dy);
-            xkm             = obj1->xkm;
-            ykm             = obj1->ykm;
-            rgKm            = ConvXYToRange(xkm,ykm);
-            aziDeg          = degrees(ConvXYToAziRad(xkm,ykm));
-        }
+        ageMs=now_ms-lastTimeMs;
+        if(ageMs>180000)
+            mState = TrackState::removed;
         else
+            if(ageMs>120000)
+                mState = TrackState::lost;
+        if(possibleMaxScore>0)
         {
-            LinearFit();
-            object_t* obj1  = &(objectList.back());
-            object_t* obj2  = &(objectList.back())-3;
-            double dx       = obj1->xkm - obj2->xkm;
-            double dy       = obj1->ykm - obj2->ykm;
-            double dtime    = (obj1->timeMs-obj2->timeMs)/3600000.0;
-            rgSpeedkmh      = (obj1->rgKm-obj2->rgKm)/dtime;
-            mSpeedkmhFit    = sqrt(dx*dx+dy*dy)/dtime;
-            courseRadFit   = ConvXYToAziRad(dx,dy);
-            xkm             = obj1->xkm;
-            ykm             = obj1->ykm;
-            rgKm            = ConvXYToRange(xkm,ykm);
-            aziDeg          = degrees(ConvXYToAziRad(xkm,ykm));
+            if(now_ms-possibleObj.timeMs>300)
+            {
+                objectList.push_back(possibleObj);
+                while(objectList.size()>4)
+                {
+                    objectList.erase(objectList.begin());
+
+                }
+                if(objectList.size()>3)         mState = TrackState::confirmed;
+                lastTimeMs = possibleObj.timeMs;
+                if((lastTimeMs-objectHistory.back().timeMs)>60000)
+                    objectHistory.push_back(possibleObj);
+                possibleMaxScore = 0;
+                if(objectList.size()<4)
+                {//new target
+                    object_t* obj1  = &(objectList.back());
+                    object_t* obj2  = &(objectList.back())-1;
+                    double dx       = obj1->xkm - obj2->xkm;
+                    double dy       = obj1->ykm - obj2->ykm;
+                    double dtime    = (obj1->timeMs-obj2->timeMs)/3600000.0;
+                    rgSpeedkmh      = (obj1->rgKm-obj2->rgKm)/dtime;
+                    //speed param
+                    mSpeedkmhFit    = sqrt(dx*dx+dy*dy)/dtime;
+                    sko_spd         = mSpeedkmhFit/2.0;
+                    //course param
+                    courseRadFit    = ConvXYToAziRad(dx,dy);
+                    courseDeg = degrees(courseRadFit);
+                    sko_cour = 30.0;
+                    //xy coordinates
+                    xkm             = obj1->xkm;
+                    ykm             = obj1->ykm;
+                    //range
+                    rgKm            = ConvXYToRange(xkm,ykm);
+                    sko_rgKm          = obj1->rgStdEr;
+                    //azi
+                    aziDeg          = degrees(ConvXYToAziRad(xkm,ykm));
+                    sko_aziDeg         = degrees((obj1->aziStdEr));
+                }
+                else
+                {
+                    LinearFit();
+                    object_t* obj1  = &(objectList.back());
+                    object_t* obj2  = &(objectList.back())-3;
+                    double dx       = obj1->xkm - obj2->xkm;
+                    double dy       = obj1->ykm - obj2->ykm;
+                    double dtime    = (obj1->timeMs-obj2->timeMs)/3600000.0;
+                    rgSpeedkmh      = (obj1->rgKm-obj2->rgKm)/dtime;
+                    //speed param
+                    double mSpeedkmhFitNew    = sqrt(dx*dx+dy*dy)/dtime;
+                    double sko_spdNew = abs(mSpeedkmhFitNew-mSpeedkmhFit);
+                    sko_spd         +=(sko_spdNew-sko_spd)/5.0;
+                    mSpeedkmhFit    +=(mSpeedkmhFitNew-mSpeedkmhFit)/2.0;
+                    //course param
+                    courseRadFit   = ConvXYToAziRad(dx,dy);
+                    double courseDegNew = degrees(courseRadFit);
+                    double sko_courNew = abs(courseDegNew-courseDeg);
+                    courseDeg       +=(courseDegNew-courseDeg)/2.0;
+                    sko_cour        +=(sko_courNew-sko_cour)/5.0;
+                    //xy
+                    xkm             = obj1->xkm;
+                    ykm             = obj1->ykm;
+                    //range
+                    rgKm            = ConvXYToRange(xkm,ykm);
+                    double sko_rgNew         = abs(rgKm-obj1->rgKm);
+                    sko_rgKm+=(sko_rgNew-sko_rgKm)/5.0;
+                    //azi
+                    aziDeg          = degrees(ConvXYToAziRad(xkm,ykm));
+                    double sko_aziNew         = abs(aziDeg-degrees(obj1->azRad));
+                    sko_aziDeg += (sko_aziNew-sko_aziDeg)/5.0;
+                }
+            }
+
         }
         isUpdating = false;
     }
@@ -291,11 +321,16 @@ public:
     std::vector<object_t> objectList;
     std::vector<object_t> objectHistory;
     object_t possibleObj;
-    float possibleMaxScore;
-    double courseRadFit;
-    double rgSpeedkmh;
-    double xkm,ykm;
-    qint64          lastTimeMs;
+    float                   possibleMaxScore;
+    double                  courseRadFit;
+    double                  courseDeg;
+    double                  rgSpeedkmh;
+    double                  xkm,ykm;
+    double                  sko_aziDeg;
+    double                  sko_rgKm;
+    double                  sko_spd;
+    double                  sko_cour;
+    uint          lastTimeMs;
     void LinearFit();
     void addPossible(object_t *obj, double score);
     double LinearFitCost(object_t *myobj);
@@ -306,7 +341,7 @@ private:
     double courseRad;
     double mSpeedkmh;
 };
-typedef std::vector<track_t> trackList;
+
 //______________________________________//
 enum imgDrawMode
 {
@@ -321,11 +356,12 @@ public:
 
     C_radar_data();
     ~C_radar_data();
-    float k_vet;// !!!!
+//    float k_vet;// !!!!
+
     short             rotDir;
-    float                   rotation_per_min ;
-    float                   azi_er_rad;
-    trackList               mTrackList;
+    double                   rotation_per_min ;
+    double                   azi_er_rad;
+    std::vector<track_t>        mTrackList;
     std::vector<plot_t>     plot_list;
     std::vector<object_t>     mFreeObjList;
     unsigned     long int   mPeriodCount;
@@ -333,10 +369,10 @@ public:
     qint64 time_start_ms;
     double sn_scale;
     bool isTrueHeading;
-//    double mShipHeading;
-    unsigned     long int   now_ms ;
-//    bool                    isEncoderAzi;
-//    int                     mEncoderAzi;
+    //    double mShipHeading;
+    uint   now_ms ;
+    //    bool                    isEncoderAzi;
+    //    int                     mEncoderAzi;
     unsigned char           mHeader[FRAME_HEADER_SIZE];
     unsigned char           overload, init_time, clk_adc;
     float                   scale_ppi,scale_zoom_ppi;
@@ -346,7 +382,7 @@ public:
     unsigned int            sn_stat,chu_ky;
     unsigned short          *tb_tap;
     double                  tb_tap_k;
-//    int                     get_tb_tap();
+    //    int                     get_tb_tap();
     bool                    is_do_bup_song;
     bool                    isClkAdcChanged,xl_dopler,cut_thresh,isSled,filter2of3;
     bool                    isManualTune,rgs_auto,bo_bang_0,data_export;
@@ -358,7 +394,7 @@ public:
     unsigned char           moduleVal;
     double                   aziOffset;
     DataOverLay             dataOver;
-//    unsigned char           noise_level[8];
+    //    unsigned char           noise_level[8];
     unsigned char           rotation_speed;
     unsigned short          range_max;
     QImage                  *img_ppi,*img_RAmp,*img_zoom_ppi,*img_histogram,*img_spectre,*img_zoom_ar;
@@ -366,11 +402,11 @@ public:
     int                     zoom_ar_size_a,zoom_ar_size_r;
     imgDrawMode             imgMode;
     //double                  sn_scale;
-//    void deleteTrack(ushort trackNum);
+    //    void deleteTrack(ushort trackNum);
     void drawRamp();
 
     //______________________________________//
-//    void        assembleDataFrame(unsigned char *data, unsigned short dataLen);
+    //    void        assembleDataFrame(unsigned char *data, unsigned short dataLen);
     void        UpdateData();
     void        ProcessDataFrame();
     void        ProcessData(unsigned short azi, unsigned short lastAzi);
@@ -379,9 +415,9 @@ public:
     void        drawAzi(short azi);
     void        drawBlackAzi(short azi_draw);
     void        DrawZoom(short azi_draw, short r_pos);
-//    void        blackLine(short x0, short y0, short x1, short y1);
-//    void        addTrackManual(double x, double y);
-//    void        addTrack(object_t *mObject);
+    //    void        blackLine(short x0, short y0, short x1, short y1);
+    //    void        addTrackManual(double x, double y);
+    //    void        addTrack(object_t *mObject);
     static    void        kmxyToPolarDeg(double x, double y, double *azi, double *range);
     void        setAziOffset(double trueN_deg){
 
@@ -405,9 +441,9 @@ public:
         return (unsigned char*)&command_feedback[0];
     }
     void        resetTrack();
-//    void SetHeaderLen(short len);
-//    bool getDoubleFilter() const;
-//    void setDoubleFilter(bool value);
+    //    void SetHeaderLen(short len);
+    //    bool getDoubleFilter() const;
+    //    void setDoubleFilter(bool value);
 
     void SelfRotationOn(double rate);
     void SelfRotationOff();
@@ -432,7 +468,7 @@ private:
     double      selfRotationAzi;
     bool        isVtorih;
     bool        avtodetect;
-//    bool        doubleFilter;
+    //    bool        doubleFilter;
     uint        getColor(unsigned char pvalue, unsigned char dopler, unsigned char sled);
     void        drawSgn(short azi_draw, short r_pos);
     void        drawSgnZoom(short azi_draw, short r_pos);
@@ -443,27 +479,27 @@ private:
     float       noiseAverage,rainLevel,noiseVar;
     void        getNoiseLevel();
     void        procPix(short proc_azi,short range);
-//    void        procTracks(unsigned short curA);
+    //    void        procTracks(unsigned short curA);
     void        procPLot(plot_t* mPlot);
-//    bool procObjectAvto(object_t* pObject);
-//    bool procObjectManual(object_t* pObject);
+    //    bool procObjectAvto(object_t* pObject);
+    //    bool procObjectManual(object_t* pObject);
     //void status_start();
     //FILE *pFile;
 
-//    void decodeData(int azi);
+    //    void decodeData(int azi);
     //void initZoomAR(int a0, int r0);
     bool DrawZoomAR(int a,int r,short val,short dopler,short sled);
-//    int getNewAzi();
+    //    int getNewAzi();
     void ProcessEach90Deg();
     int ssiDecode(ushort nAzi);
-//    void DetectTracks();
-//    double estimateScore(object_t *obj1, object_t *obj2);
+    //    void DetectTracks();
+    //    double estimateScore(object_t *obj1, object_t *obj2);
     void ProcessTracks();
     bool checkBelongToTrack(object_t *obj1);
     bool checkBelongToObj(object_t *obj1);
-//    double estimateScore(object_t *obj1, track_t *track);
+    //    double estimateScore(object_t *obj1, track_t *track);
     void CreateTrack(object_t *obj1, object_t *obj2);
-//    void LinearFit(track_t *track);
+    //    void LinearFit(track_t *track);
     void LeastSquareFit(track_t* track);
     //    double LinearFitCost(track_t *track, object_t *myobj);
     void ProcessGOData(unsigned char *data, short len, int azi);
@@ -479,9 +515,9 @@ public:
     void setSelfRotationAzi(int value);
     void processSocketData(unsigned char *data, short len);
     bool ProcessObject(object_t *obj1);
-//    void ProcessObjects();
-//    inline static double ConvXYToRange(double x, double y);
-//    inline static double ConvXYToAziRad(double x, double y);
+    //    void ProcessObjects();
+    //    inline static double ConvXYToRange(double x, double y);
+    //    inline static double ConvXYToAziRad(double x, double y);
     void resetGain();
 };
 

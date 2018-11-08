@@ -19,16 +19,117 @@
 #define RADAR_GAIN_MAX 9.0
 #define AZI_ERROR_STD 0.01746
 #define TARGET_OBSERV_PERIOD 6500//ENVAR max periods to save object in the memory
-FILE *logfile;
+static  FILE *logfile;
+int track_t::IDCounter =1;
+static int sumvar = 0;
+static int nNoiseCalculator = 0;
+static short lastProcessAzi = 0;
 
-short waitForData = 0;
-//short headerLen = RADAR_HEADER_LEN;
-unsigned char curFrameId;
-//unsigned char dataBuff[RADAR_HEADER_LEN + RADAR_DATA_MAX_SIZE];
-QFile *exp_file = NULL;
-int sumvar = 0;
-int nNoiseCalculator = 0;
-short lastProcessAzi = 0;
+/*
++-------+-----------+-----------------------------------------------------+
+|       |           |                                                     |
+|   STT |   Byte    |   Chức                                              |
+|       |           |   năng                                              |
+|       |           |                                                     |
++-------+-----------+-----------------------------------------------------+
+|       |           |                                                     |
+|   1   |   0       |   Id gói                                            |
+|       |           |   tin:                                              |
+|       |           |   0,1,2,3:                                          |
+|       |           |   iq th mã pha (mỗi kênh 2048 byte)                 |
+|       |           |   4: 256                                            |
+|       |           |   byte máy hỏi, mỗi bít một o_cu_ly                 |
+|       |           |   5: iq th                                          |
+|       |           |   giả liên tục, 512 byte i, 512 byte q              |
+|       |           |   6,7: iq                                           |
+|       |           |   cho tín hiệu xung đơn, mỗi kênh 1024 byte         |
+|       |           |                                                     |
++-------+-----------+-----------------------------------------------------+
+|       |           |                                                     |
+|   2   |   1, 2, 3 |   Byte cho                                          |
+|       |           |   báo hỏng:                                         |
+|       |           |   1: loại                                           |
+|       |           |   mô-đun, (0, 1, 2, 3)                              |
+|       |           |   2: Loại                                           |
+|       |           |   tham số (bb, cc, dd)                              |
+|       |           |   3: Tham                                           |
+|       |           |   số mô-đun                                         |
+|       |           |                                                     |
++-------+-----------+-----------------------------------------------------+
+|       |           |                                                     |
+|   3   |   4       |   Phân giải                                         |
+|       |           |   ra đa: 0 (15m), 1 (30m)......                     |
+|       |           |                                                     |
++-------+-----------+-----------------------------------------------------+
+|       |           |                                                     |
+|   4   |   5,6     |   Loại tín                                          |
+|       |           |   hiệu phát và tham số:                             |
+|       |           |   5: loại                                           |
+|       |           |   th phát (0: xung đơn; 1: mã pha; 2: giả ltuc)     |
+|       |           |   6: tham                                           |
+|       |           |   số cho loại th trên                               |
+|       |           |                                                     |
++-------+-----------+-----------------------------------------------------+
+|       |           |                                                     |
+|   5   |   7,8     |   Hai byte                                          |
+|       |           |   trung bình tạp máy thu (ktra báo hỏng tuyến thu)  |
+|       |           |                                                     |
++-------+-----------+-----------------------------------------------------+
+|       |           |                                                     |
+|   6   |   9, 10,  |   4 byte                                            |
+|       |   11, 12  |   quay an-ten                                       |
+|       |           |                                                     |
++-------+-----------+-----------------------------------------------------+
+|       |           |                                                     |
+|   7   |   13, 14  |   Hai byte                                          |
+|       |           |   hướng tàu                                         |
+|       |           |                                                     |
++-------+-----------+-----------------------------------------------------+
+|       |           |                                                     |
+|   8   |   15, 16  |   Hai byte                                          |
+|       |           |   hướng mũi tàu                                     |
+|       |           |                                                     |
++-------+-----------+-----------------------------------------------------+
+|       |           |                                                     |
+|   9   |   17, 18  |   Hai byte                                          |
+|       |           |   tốc độ tàu                                        |
+|       |           |                                                     |
++-------+-----------+-----------------------------------------------------+
+|       |           |                                                     |
+|   10  |   19      |   Thông                                             |
+|       |           |   báo chế độ chủ đông - bị động, tốc độ quay an-ten |
+|       |           |   - bít thấp                                        |
+|       |           |   thông báo cđ-bđ (1: chủ động)                     |
+|       |           |   - 4 bít                                           |
+|       |           |   cao là tốc độ an-ten                              |
+|       |           |                                                     |
++-------+-----------+-----------------------------------------------------+
+|       |           |                                                     |
+|   11  |   20      |   Thông                                             |
+|       |           |   báo tần số phát và đặt mức tín hiệu:              |
+|       |           |   - 4 bít                                           |
+|       |           |   cuối là tần số phát                               |
+|       |           |   - 4 bít                                           |
+|       |           |   cao là đặt mức th                                 |
+|       |           |                                                     |
++-------+-----------+-----------------------------------------------------+
+|       |           |                                                     |
+|   12  |   21      |   Thông                                             |
+|       |           |   báo chọn thang cự ly và bật/tắt AM2:              |
+|       |           |   - 4 bít                                           |
+|       |           |   cuối là thang cự ly (0: 2 lý; 1: 4 lý.....)       |
+|       |           |   - 4 bít                                           |
+|       |           |   cao là báo bật/tắt AM2: 0: tắt, 1: bật            |
+|       |           |                                                     |
++-------+-----------+-----------------------------------------------------+
+|       |           |                                                     |
+|   13  |   22      |   Thông                                             |
+|       |           |   báo số điểm FFT:                                  |
+|       |           |   1(fft8);                                          |
+|       |           |   2(fft16) ;...;32(fft256)                          |
+|       |           |                                                     |
++-------+-----------+-----------------------------------------------------+
+*/
 typedef struct  {
     //processing dataaziQueue
     unsigned char level [MAX_AZIR][RADAR_RESOLUTION];
@@ -55,11 +156,11 @@ typedef struct  {
     short yzoom[MAX_AZIR_DRAW][DISPLAY_RES_ZOOM];
 } signal_map_t;
 
-short curIdCount = 1;
-qint64 cur_timeMSecs = 0;//QDateTime::currentMSecsSinceEpoch();
-signal_map_t data_mem;
-float                   rot_period_sec =0;
-short histogram[256];
+static short curIdCount = 1;
+static qint64 cur_timeMSecs = 0;//QDateTime::currentMSecsSinceEpoch();
+static signal_map_t data_mem;
+static float                   rot_period_sec =0;
+static short histogram[256];
 void track_t::addPossible(object_t *obj,double score)
 {
     possibleObj=(*obj);
@@ -68,18 +169,13 @@ void track_t::addPossible(object_t *obj,double score)
 
 double track_t::estimateScore(object_t *obj1,object_t *obj2)
 {
-    //if(obj1->dopler==obj2->dopler)return 1;
-    //else return 0;
-    //
-    //[ 0.4587003  -0.00102045 -0.02371061 -0.0084888 ]
-    //0.936885388565
     double dtime = (obj1->timeMs - obj2->timeMs);
     if(dtime<500)return -1;
     dtime/=3600000.0;//time in hours
     //ENVAR min time between plots in a line(1s)
 
-    float dx = obj1->xkm - obj2->xkm;
-    float dy = obj1->ykm - obj2->ykm;
+    double dx = obj1->xkm - obj2->xkm;
+    double dy = obj1->ykm - obj2->ykm;
 
     double distancekm = sqrt(dx*dx+dy*dy);
 
@@ -87,19 +183,8 @@ double track_t::estimateScore(object_t *obj1,object_t *obj2)
     if(speedkmh>500)return -1;
     double distanceCoeff = distancekm/(TARGET_MAX_SPEED_MARINE*dtime+ obj1->rgKm*AZI_ERROR_STD);
     if(distanceCoeff>1.0)return -1;
-    float rgSpeedkmh = abs(obj1->rgKm - obj2->rgKm)/(dtime);
-    /*fprintf(logfile,"%f,",rgSpeedkmh);
-    fprintf(logfile,"%f,",distanceCoeff);
-    fprintf(logfile,"%f,",speedkmh);
-    if(obj1->dopler==obj2->dopler)
-    {fprintf(logfile,"1\n");
-        return 1;
-    }
-    else
-    {
-        fprintf(logfile,"-1\n");
-        return -1;
-    }*/
+    double rgSpeedkmh = abs(obj1->rgKm - obj2->rgKm)/(dtime);
+
     if(rgSpeedkmh>150.0)return -1;
     return 3.0 - speedkmh/430.0 - distanceCoeff - abs(rgSpeedkmh)/120.0;
     //return 0.4587003 - 0.00102045*speedkmh - 0.02371061*rgSpeedkmh -0.0084888*distanceCoeff;
@@ -219,8 +304,8 @@ double track_t::estimateScore(object_t *obj1)
     if(dtime<300)
         return -1;//ENVAR min time between plots in a line(1s)
     dtime/=3600000.0;
-    float dx = obj1->xkm - obj2->xkm;
-    float dy = obj1->ykm - obj2->ykm;
+    double dx = obj1->xkm - obj2->xkm;
+    double dy = obj1->ykm - obj2->ykm;
 
     double distancekm = sqrt(dx*dx+dy*dy);
     double distanceCoeff = distancekm/(TARGET_MAX_SPEED_MARINE*dtime   + obj1->rgKm*AZI_ERROR_STD);
@@ -286,13 +371,13 @@ double xsum=0,x2sum=0,ysum=0,xysum=0;
     for (i=0;i<n;i++)
         y_fit[i]=a*x[i]+b;
 */
-    int nEle=4;
+    uint nEle=4;
     if(this->objectList.size()<nEle)return;
     object_t* obj = &(this->objectList[(this->objectList.size()- nEle)]) ;
     double *y1 = new double[nEle];
     double *y2 = new double[nEle];
     double *t  = new double[nEle];
-    for(int i=0;i<nEle;i++)
+    for(uint i=0;i<nEle;i++)
     {
         y1[i] = obj[i].xkm;
         y2[i] = obj[i].ykm;
@@ -304,7 +389,7 @@ double xsum=0,x2sum=0,ysum=0,xysum=0;
     double t2sum = 0;
     double y1tsum = 0;
     double y2tsum = 0;
-    for(int i=0;i<nEle;i++)
+    for(uint i=0;i<nEle;i++)
     {
         y1sum+=y1[i];
         y2sum+=y2[i];
@@ -317,20 +402,20 @@ double xsum=0,x2sum=0,ysum=0,xysum=0;
 //    b=(x2sum*ysum-xsum*xysum)/(x2sum*n-xsum*xsum);
     double y1a = (nEle*y1tsum-tsum*y1sum)/(nEle*t2sum-tsum*tsum);
     double y1b = (t2sum*y1sum-tsum*y1tsum)/(t2sum*nEle-tsum*tsum);
-    for(int i=0;i<nEle;i++)
+    for(uint i=0;i<nEle;i++)
     {
         y1[i]=y1a*t[i]+y1b;
     }
     double y2a=(nEle*y2tsum-tsum*y2sum)/(nEle*t2sum-tsum*tsum);
     double y2b=(t2sum*y2sum-tsum*y2tsum)/(t2sum*nEle-tsum*tsum);
-    for(int i=0;i<nEle;i++)// !!index start from 1
+    for(uint i=0;i<nEle;i++)// !!index start from 1
     {
         y2[i]=y2a*t[i]+y2b;
     }
-    for(int i=1;i<nEle;i++)// !!index start from 1
+    for(uint i=1;i<nEle;i++)// !!index start from 1
     {
-        obj[i].xkm+=(y1[i]-obj[i].xkm)*i/float(nEle);
-        obj[i].ykm+=(y2[i]-obj[i].ykm)*i/float(nEle);
+        obj[i].xkm+=(y1[i]-obj[i].xkm)*i/double(nEle);
+        obj[i].ykm+=(y2[i]-obj[i].ykm)*i/double(nEle);
     }
 //    rgSpeedkmh = (obj[nEle-1].rgKmfit-obj[nEle-2].rgKmfit)/
 //            ((obj[nEle-1].timeMs-obj[nEle-2].timeMs)/3600000.0);
@@ -343,6 +428,8 @@ double xsum=0,x2sum=0,ysum=0,xysum=0;
 
 C_radar_data::C_radar_data()
 {
+    track_t track;
+    mTrackList = std::vector<track_t>(MAX_TRACKS,track);
     giaQuayPhanCung = false;
 //    mShipHeading = 0;
     isTrueHeading = true;
@@ -942,7 +1029,7 @@ void C_radar_data::ProcessEach90Deg()
 
         if(!mFreeObjList.at(i).isRemoved)
         {
-            if((now_ms-mFreeObjList.at(i).timeMs)>20000)
+            if((now_ms-mFreeObjList.at(i).timeMs)>80000)
                 mFreeObjList.at(i).isRemoved = true;
             else nObj++;
         }
@@ -954,8 +1041,9 @@ void C_radar_data::ProcessEach90Deg()
         if(kgain_auto<7.5)kgain_auto*=1.01;
         printf("\ntoo many obj,kgain_auto:%f",kgain_auto);
     }
-    else if(nObj<20)if(kgain_auto>4.2)kgain_auto/=1.01;
-    else if(mFalsePositiveCount>15)//ENVAR
+    else if(nObj<20)
+    {if(kgain_auto>4.2)kgain_auto/=1.01;}
+    if(mFalsePositiveCount>100)//ENVAR
     {
         if(kgain_auto<10)kgain_auto*=1.01;
         printf("\ntoo many false positive kgain_auto:%f",kgain_auto);
@@ -1421,7 +1509,7 @@ void C_radar_data::UpdateData()
 
 }
 
-unsigned int doplerHistogram[256];
+static  unsigned int doplerHistogram[256];
 void C_radar_data::procPLot(plot_t* mPlot)
 {
     if(init_time)
@@ -1450,7 +1538,7 @@ void C_radar_data::procPLot(plot_t* mPlot)
     }
     if(dAz>30)return;//ENVDEP
     if(ctA >= MAX_AZIR)ctA -= MAX_AZIR;
-    
+
     //if(mPlot->minR<500)return;
     if(xl_dopler)
     {
@@ -1523,7 +1611,6 @@ void C_radar_data::procPLot(plot_t* mPlot)
     newobject.xkm = newobject.rgKm*sin( newobject.azRad);
     newobject.ykm = newobject.rgKm*cos( newobject.azRad);
     ProcessObject(&newobject);
-
     mPlot->isUsed = false;
 }
 
@@ -1877,7 +1964,7 @@ void C_radar_data::setZoomRectAR(float ctx, float cty,double sizeKM,double sizeD
     img_zoom_ar = new QImage(zoom_ar_size_r+1,zoom_ar_size_a+1,QImage::Format_ARGB32);
     //img_zoom_ar->// toto:resize
     //drawZoomAR(a0,r0);
-    
+
 }
 bool C_radar_data::DrawZoomAR(int a,int r,short val,short dopler,short sled)
 {
@@ -2167,14 +2254,13 @@ void C_radar_data::resetTrack()
 {
     init_time += 3;
     curIdCount = 1;
-    mTrackList.clear();
-    //    for(unsigned short i=0;i<mTrackList.size();i++)
-    //    {
-    //        if(mTrackList.at(i).state)
-    //        {
-    //            mTrackList.at(i).state = 0;
-    //        }
-    //    }
+    //mTrackList.clear();
+    for(unsigned short i=0;i<mTrackList.size();i++)
+    {
+
+            mTrackList[i].mState = TrackState::removed;
+
+    }
 }
 
 void C_radar_data::ProcessTracks()
@@ -2185,14 +2271,9 @@ void C_radar_data::ProcessTracks()
     {
         track_t* track = &(mTrackList[j]);
         if(track->mState==TrackState::removed)continue;
-        // find maximum score from possibleList
-        if(track->possibleMaxScore>0)
-        {
-            if(now_ms-track->possibleObj.timeMs>300)
-            {
-                track->update(now_ms);
-            }
-        }
+        if(track->mState==TrackState::lost)continue;
+        track->update(now_ms);
+
 
     }
 }
@@ -2208,7 +2289,7 @@ bool C_radar_data::ProcessObject(object_t *obj1)
     if(checkBelongToObj(obj1))return true;
     // add to mObjList
     bool full = true;
-    for(int i=0;i<mFreeObjList.size(); i++)
+    for(uint i=0;i<mFreeObjList.size(); i++)
     {
         if(mFreeObjList.at(i).isRemoved)
         {
@@ -2228,7 +2309,7 @@ bool C_radar_data::ProcessObject(object_t *obj1)
 bool C_radar_data::checkBelongToTrack(object_t *obj1)
 {
     bool isBelongingToTrack = false;
-    track_t* chosenTrack ;
+    track_t* chosenTrack =nullptr;
     double maxScore=0;
     for (ushort j=0;j<mTrackList.size();j++)
     {
@@ -2289,26 +2370,37 @@ bool C_radar_data::checkBelongToTrack(object_t *obj1)
 
 void C_radar_data::CreateTrack(object_t* obj1,object_t* obj2)
 {
+//    if(mTrackList.size()<800)
+//    {
+//        track_t newTrack(obj1,obj2);
+//        mTrackList.push_back(newTrack);
+//    }
+//    else
     for (ushort j=0;j<mTrackList.size();j++)
     {
         if(mTrackList[j].mState==TrackState::removed)
         {
-            track_t newTrack(obj1,obj2);
-            mTrackList[j] = newTrack;
+//            track_t newTrack(obj1,obj2);
+            mTrackList[j].init(obj1,obj2);
             return;
         }
     }
-    if(mTrackList.size()<800)
+    for (ushort j=0;j<mTrackList.size();j++)
     {
-        track_t newTrack(obj1,obj2);
-        mTrackList.push_back(newTrack);
+        if(mTrackList[j].mState==TrackState::lost)
+        {
+//            track_t newTrack(obj1,obj2);
+            mTrackList[j].init(obj1,obj2);
+            return;
+        }
     }
 
+    printf("\nmTrackList is full");
 
 }
 bool C_radar_data::checkBelongToObj(object_t* obj1)
 {
-    object_t *objLast;
+    object_t *objLast = nullptr;
     double maxScore=0;
     for (ushort j=0;j<mFreeObjList.size();j++)
     {

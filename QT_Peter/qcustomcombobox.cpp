@@ -32,13 +32,13 @@ void QCustomComboBox::highLight()
 void QCustomComboBox::resetView()
 {
     //this->setStyleSheet("background-color: rgb(16, 32, 64);color:rgb(255, 255, 255);");
-    this->setStyleSheet("background-color: rgb(16, 32, 64);color:rgb(255, 255, 255);font: 12pt \"MS Shell Dlg 2\";");
+    this->setStyleSheet("color:gray;background-color: rgb(16, 32, 64);color:rgb(255, 255, 255);font: 12pt \"MS Shell Dlg 2\";");
     repaint();
 
 }
 bool QCustomComboBox::event(QEvent *event)
 {
-    switch(event->type())
+    /*switch(event->type())
     {
     case QEvent::HoverEnter:
         hoverEnter(static_cast<QHoverEvent*>(event));
@@ -54,6 +54,6 @@ bool QCustomComboBox::event(QEvent *event)
         break;
     default:
         break;
-    }
+    }*/
     return QWidget::event(event);
 }

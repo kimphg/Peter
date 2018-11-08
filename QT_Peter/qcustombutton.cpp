@@ -22,33 +22,33 @@ void QCustomButton::hoverLeave(QHoverEvent *)
 
 void QCustomButton::hoverMove(QHoverEvent *)
 {
-    highLight();
+    //highLight();
 
 }
 void QCustomButton::highLight()
 {
-    if(this->isEnabled())
-    {
-        this->setStyleSheet("background-color: rgb(40, 80, 120);color:rgb(255, 255, 255);");
-        //font: bold 12pt \"MS Shell Dlg 2\"
-        //if(QToolButton::isChecked())this->setStyleSheet("color: #fff;border: none;border-radius: 5px;padding: 10px;background: qradialgradient(cx: 0.3, cy: -0.4,fx: 0.3, fy: -0.4,radius: 1.35, stop: 0 #012, stop: 1 #357);");
-        //else                        this->setStyleSheet("color: #fff;border: none;border-radius: 5px;padding: 10px;background: qradialgradient(cx: 0.3, cy: -0.4,fx: 0.3, fy: -0.4,radius: 1.35, stop: 0 #357, stop: 1 #012);");
-        repaint();
-    }
+
 }
 void QCustomButton::resetView()
 {
-    this->setStyleSheet("background-color: rgb(16, 32, 64);color:rgb(255, 255, 255);"
-                        );
-    //    if(QToolButton::isChecked())this->setStyleSheet("color: #fff;border: none;border-radius: 5px;padding: 10px;background: qradialgradient(cx: 0.3, cy: -0.4,fx: 0.3, fy: -0.4,radius: 1.35, stop: 0 #012, stop: 1 #357);");
-    //    else                        this->setStyleSheet("color: #fff;border: none;border-radius: 5px;padding: 10px;background: qradialgradient(cx: 0.3, cy: -0.4,fx: 0.3, fy: -0.4,radius: 1.35, stop: 0 #357, stop: 1 #012);");
-    //this->setStyleSheet("background-color: rgb(16, 32, 64);color:rgb(255, 255, 255);font: 12pt \"MS Shell Dlg 2\";");
+    //this->setStyleSheet("background-color: rgb(16, 32, 64);color:rgb(255, 255, 255);");
+    setStyleSheet("\
+                    QCustomButton {   \
+                        color:white; background-color: rgb(32, 72, 72);   \
+                    }   \
+                    QCustomButton:checked{\
+                        color:white; background-color: rgb(72, 72, 72);\
+                    }\
+                    QCustomButton:hover{  \
+                        color:white; background-color: grey; \
+                    }  \
+                    ");
     repaint();
 
 }
 bool QCustomButton::event(QEvent *event)
 {
-    switch(event->type())
+    /*switch(event->type())
     {
     case QEvent::HoverEnter:
         hoverEnter(static_cast<QHoverEvent*>(event));
@@ -64,6 +64,6 @@ bool QCustomButton::event(QEvent *event)
         break;
     default:
         break;
-    }
+    }*/
     return QWidget::event(event);
 }

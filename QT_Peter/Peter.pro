@@ -21,7 +21,6 @@ QMAKE_CXXFLAGS_WARN_OFF -= -Wunused-parameter
 TARGET = Peter
 TEMPLATE = app
 SOURCES += main.cpp\
-    c_arpa_data.cpp \
     qcustombutton.cpp \
     qcustomframe.cpp \
     qcustomcombobox.cpp \
@@ -48,7 +47,6 @@ SOURCES += main.cpp\
 
 
 HEADERS  += \
-    c_arpa_data.h \
     qcustombutton.h \
     qcustomframe.h \
     qcustomcombobox.h \

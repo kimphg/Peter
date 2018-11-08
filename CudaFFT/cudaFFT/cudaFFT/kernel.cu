@@ -12,19 +12,17 @@
 #define HR2D_PK//
 #define FRAME_LEN 2048
 #define OUTPUT_FRAME_SIZE FRAME_LEN*2+FRAME_HEADER_SIZE
-#define FFT_SIZE 32
+#define FFT_SIZE_MAX 256
 #define BANG_KHONG 0
-int mFFTSkip = (FFT_SIZE / 4);
+int mFFTSize = 32;
+#define FFT_STEP (mFFTSize / 4)
 
 #define MAX_IREC 2400
 #pragma comment(lib, "user32.lib")
 #pragma comment (lib, "Ws2_32.lib")
 //file mapping
 #define FRAME_HEADER_SIZE 34
-
-//using namespace cv;
 using namespace std;
-//#include "FFTcore.cuh"
 // includes for FFT
 #include "cuda_runtime.h"
 #include "device_launch_parameters.h"
@@ -69,16 +67,12 @@ public:
 		else
 		{
 			printf("\ncudaSetDevice on ");
-			printf("\ncuda fft size:%d", FFT_SIZE);
-			printf("\nFFT ratio:1/%d", mFFTSkip);
+			printf("\ncuda fft size:%d", ntichluy);
+			printf("\nFFT ratio:1/%d", FFT_STEP);
 		}
 		mFrameLen = frameLen;
 		mTichLuySize = ntichluy;
 		mMemSizeTL = sizeof(cufftComplex)* mTichLuySize*frameLen;
-		//mMemSizeNen = sizeof(cufftComplex)*frameLen;
-		//mMemSizeImage = sizeof(cufftComplex)*frameLen;
-
-
 		if (cufftPlan1d(&planTL, mTichLuySize, CUFFT_C2C, frameLen) != CUFFT_SUCCESS)
 		{
 			printf("\nFFT planTL failed to init");
@@ -263,7 +257,7 @@ int main(int argc, char **argv)
 
 	/* start the capture */
 	socketInit();
-	mFFT = new coreFFT(FRAME_LEN, FFT_SIZE);
+	mFFT = new coreFFT(FRAME_LEN, mFFTSize);
 	StartProcessing();
 	if (argc > 1)
 	{
@@ -325,7 +319,7 @@ void pcapRun()
 u_char dataOut[FRAME_LEN];
 long int nFrames = 0;
 
-cufftComplex ramSignalTL[FRAME_LEN][FFT_SIZE];
+cufftComplex ramSignalTL[FRAME_LEN][FFT_SIZE_MAX];
 cufftComplex ramSignalNen[MAX_IREC][FRAME_LEN];
 cufftComplex ramImage[FRAME_LEN];
 char recvDatagram[1000];
@@ -420,7 +414,7 @@ DWORD WINAPI ProcessDataBuffer(LPVOID lpParam)
 			for (int ir = 0; ir < FRAME_LEN; ir++)
 			{
 				ia = iProcessing;
-				for (int i = 0; i < FFT_SIZE; i++)
+				for (int i = 0; i < mFFTSize; i++)
 				{
 					ramSignalTL[ir][i] = ramSignalNen[ia][ir];
 					ia--;
@@ -450,9 +444,9 @@ DWORD WINAPI ProcessDataBuffer(LPVOID lpParam)
 			{
 				float maxAmp = 0;
 				int indexMaxFFT = 0;
-				//for (int j = 0; j<FFT_SIZE; j++)
-				int fftSkip = BANG_KHONG*FFT_SIZE / 16;
-				for (int j = fftSkip; j<FFT_SIZE - fftSkip; j++)
+				//for (int j = 0; j<FFT_SIZE_MAX; j++)
+				int fftSkip = BANG_KHONG*mFFTSize / 16;
+				for (int j = fftSkip; j < mFFTSize - fftSkip; j++)
 				{
 					float ampl = (ramSignalTL[i][j].x * ramSignalTL[i][j].x) + (ramSignalTL[i][j].y * ramSignalTL[i][j].y);
 					if (ampl>maxAmp)
@@ -461,10 +455,10 @@ DWORD WINAPI ProcessDataBuffer(LPVOID lpParam)
 						indexMaxFFT = j;
 					}
 				}
-				float res = sqrt(float(maxAmp) / float(FFT_SIZE));
+				float res = sqrt(double(maxAmp) / double(mFFTSize));
 				if (res > 255)res = 255;
-				outputFrame[i + FRAME_HEADER_SIZE] = res;// u_char(sqrt(float(maxAmp)) / float(FFT_SIZE));
-				outputFrame[i + FRAME_LEN + FRAME_HEADER_SIZE] = u_char(indexMaxFFT*16.0 / (FFT_SIZE));
+				outputFrame[i + FRAME_HEADER_SIZE] = res;// u_char(sqrt(float(maxAmp)) / float(FFT_SIZE_MAX));
+				outputFrame[i + FRAME_LEN + FRAME_HEADER_SIZE] = u_char(indexMaxFFT*16.0 / (mFFTSize));
 			}
 			sendto(mSocket, (char*)outputFrame, OUTPUT_FRAME_SIZE, 0, (struct sockaddr *) &si_peter, sizeof(si_peter));
 
@@ -548,11 +542,137 @@ memcpy(dataBuff[iReady].dataPM_Q + 1024, data + FRAME_HEADER_SIZE, 1024);
 }
 return;
 }*/
+/*
++-------+-----------+-----------------------------------------------------+
+|       |           |                                                     |
+|   STT |   Byte    |   Chức                                              |
+|       |           |   năng                                              |
+|       |           |                                                     |
++-------+-----------+-----------------------------------------------------+
+|       |           |                                                     |
+|   1   |   0       |   Id gói                                            |
+|       |           |   tin:                                              |
+|       |           |   0,1,2,3:                                          |
+|       |           |   iq th mã pha (mỗi kênh 2048 byte)                 |
+|       |           |   4: 256                                            |
+|       |           |   byte máy hỏi, mỗi bít một o_cu_ly                 |
+|       |           |   5: iq th                                          |
+|       |           |   giả liên tục, 512 byte i, 512 byte q              |
+|       |           |   6,7: iq                                           |
+|       |           |   cho tín hiệu xung đơn, mỗi kênh 1024 byte         |
+|       |           |                                                     |
++-------+-----------+-----------------------------------------------------+
+|       |           |                                                     |
+|   2   |   1, 2, 3 |   Byte cho                                          |
+|       |           |   báo hỏng:                                         |
+|       |           |   1: loại                                           |
+|       |           |   mô-đun, (0, 1, 2, 3)                              |
+|       |           |   2: Loại                                           |
+|       |           |   tham số (bb, cc, dd)                              |
+|       |           |   3: Tham                                           |
+|       |           |   số mô-đun                                         |
+|       |           |                                                     |
++-------+-----------+-----------------------------------------------------+
+|       |           |                                                     |
+|   3   |   4       |   Phân giải                                         |
+|       |           |   ra đa: 0 (15m), 1 (30m)......                     |
+|       |           |                                                     |
++-------+-----------+-----------------------------------------------------+
+|       |           |                                                     |
+|   4   |   5,6     |   Loại tín                                          |
+|       |           |   hiệu phát và tham số:                             |
+|       |           |   5: loại                                           |
+|       |           |   th phát (0: xung đơn; 1: mã pha; 2: giả ltuc)     |
+|       |           |   6: tham                                           |
+|       |           |   số cho loại th trên                               |
+|       |           |                                                     |
++-------+-----------+-----------------------------------------------------+
+|       |           |                                                     |
+|   5   |   7,8     |   Hai byte                                          |
+|       |           |   trung bình tạp máy thu (ktra báo hỏng tuyến thu)  |
+|       |           |                                                     |
++-------+-----------+-----------------------------------------------------+
+|       |           |                                                     |
+|   6   |   9, 10,  |   4 byte                                            |
+|       |   11, 12  |   quay an-ten                                       |
+|       |           |                                                     |
++-------+-----------+-----------------------------------------------------+
+|       |           |                                                     |
+|   7   |   13, 14  |   Hai byte                                          |
+|       |           |   hướng tàu                                         |
+|       |           |                                                     |
++-------+-----------+-----------------------------------------------------+
+|       |           |                                                     |
+|   8   |   15, 16  |   Hai byte                                          |
+|       |           |   hướng mũi tàu                                     |
+|       |           |                                                     |
++-------+-----------+-----------------------------------------------------+
+|       |           |                                                     |
+|   9   |   17, 18  |   Hai byte                                          |
+|       |           |   tốc độ tàu                                        |
+|       |           |                                                     |
++-------+-----------+-----------------------------------------------------+
+|       |           |                                                     |
+|   10  |   19      |   Thông                                             |
+|       |           |   báo chế độ chủ đông - bị động, tốc độ quay an-ten |
+|       |           |   - bít thấp                                        |
+|       |           |   thông báo cđ-bđ (1: chủ động)                     |
+|       |           |   - 4 bít                                           |
+|       |           |   cao là tốc độ an-ten                              |
+|       |           |                                                     |
++-------+-----------+-----------------------------------------------------+
+|       |           |                                                     |
+|   11  |   20      |   Thông                                             |
+|       |           |   báo tần số phát và đặt mức tín hiệu:              |
+|       |           |   - 4 bít                                           |
+|       |           |   cuối là tần số phát                               |
+|       |           |   - 4 bít                                           |
+|       |           |   cao là đặt mức th                                 |
+|       |           |                                                     |
++-------+-----------+-----------------------------------------------------+
+|       |           |                                                     |
+|   12  |   21      |   Thông                                             |
+|       |           |   báo chọn thang cự ly và bật/tắt AM2:              |
+|       |           |   - 4 bít                                           |
+|       |           |   cuối là thang cự ly (0: 2 lý; 1: 4 lý.....)       |
+|       |           |   - 4 bít                                           |
+|       |           |   cao là báo bật/tắt AM2: 0: tắt, 1: bật            |
+|       |           |                                                     |
++-------+-----------+-----------------------------------------------------+
+|       |           |                                                     |
+|   13  |   22      |   Thông                                             |
+|       |           |   báo số điểm FFT:                                  |
+|       |           |   1(fft8);                                          |
+|       |           |   2(fft16) ;...;32(fft256)                          |
+|       |           |                                                     |
++-------+-----------+-----------------------------------------------------+
+Id gói                                            |
+|       |           |   tin:                                              |
+|       |           |   0,1,2,3:                                          |
+|       |           |   iq th mã pha (mỗi kênh 2048 byte)                 |
+|       |           |   4: 256                                            |
+|       |           |   byte máy hỏi, mỗi bít một o_cu_ly                 |
+|       |           |   5: iq th                                          |
+|       |           |   giả liên tục, 512 byte i, 512 byte q              |
+|       |           |   6,7: iq                                           |
+|       |           |   cho tín hiệu xung đơn, mỗi kênh 1024 byte
+*/
+static int fftID = -1;
 void ProcessFrame(unsigned char*data, int len)
 {
 	int iNext = iReady + 1;
 	if (iNext >= MAX_IREC)iNext = 0;
+	int newfftID = data[22];
+	if(fftID!=newfftID)
+	{
+		fftID = newfftID;
+		mFFTSize = pow(2.0, fftID + 2);
+		if (mFFTSize > 512 || mFFTSize < 4)mFFTSize = 32;
+		if (mFFT)delete mFFT;
+		mFFT = new coreFFT(FRAME_LEN, mFFTSize);
+	}
 	memcpy(dataBuff[iNext].header, data, FRAME_HEADER_SIZE);
+	
 	bool isLastFrame = false;
 	if (data[0] == 0)		//0: 1024 byte đầu kênh I
 	{
@@ -574,6 +694,13 @@ void ProcessFrame(unsigned char*data, int len)
 		memcpy(dataBuff[iNext].dataPM_Q + 1024, data + FRAME_HEADER_SIZE, 1024);
 		dataBuff[iNext].dataLen = FRAME_LEN;
 		isLastFrame = true;
+
+	}
+	else if (data[0] == 4) //4: máy hỏi
+	{
+		
+		sendto(mSocket, (char*)data, len, 0, (struct sockaddr *) &si_peter, sizeof(si_peter));
+		//isLastFrame = true;
 
 	}
 	else if (data[0] == 5) //5: 1024 byte tín hiệu giả L/tục (512 byte đầu là I, 512 byte sau là Q) 
@@ -599,7 +726,7 @@ void ProcessFrame(unsigned char*data, int len)
 	if (isLastFrame)
 	{
 		iReady++;
-		dataBuff[iNext].isToFFT = ((iNext%mFFTSkip) == 0);
+		dataBuff[iNext].isToFFT = ((iNext%FFT_STEP) == 0);
 		if (iReady >= MAX_IREC)iReady = 0;
 	}
 	return;

@@ -26,8 +26,8 @@ void QCustomGroupBox::hoverMove(QHoverEvent *)
 }
 void QCustomGroupBox::highLight()
 {
-    this->setStyleSheet("background-color: rgb(30, 50, 70);color:rgb(255, 255, 255);font: 12pt \"MS Shell Dlg 2\";");
-    repaint();
+    //this->setStyleSheet("background-color: rgb(30, 50, 70);color:rgb(255, 255, 255);font: 12pt \"MS Shell Dlg 2\";");
+    //repaint();
 }
 void QCustomGroupBox::resetView()
 {

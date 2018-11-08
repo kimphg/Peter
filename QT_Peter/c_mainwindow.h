@@ -107,12 +107,16 @@ private:
 
     void ReloadSetting();
     void SendCommandControl();
-    void SetGPS(double lat, double lon, double heading);
+    void SetGPS(double lat, double lon);
 public slots:
 //    void UpdateSetting();
 //    void UpdateSignScale();
     void UpdateScale();
     void setCodeType(short index);
+    void trackTableItemMenu(int row, int col);
+    void removeCurrTrack();
+    void addCurrTrackToTargets();
+    void targetTableItemMenu(int row, int col);
 private:
     void setRadarState(radarSate radarState);
     bool ProcDataAIS(BYTE *szBuff, int nLeng );
@@ -344,7 +348,7 @@ private slots:
 
 //    void on_toolButton_set_commands_clicked(bool checked);
 
-    void on_toolButton_set_command_clicked();
+//    void on_toolButton_set_command_clicked();
 
     void on_toolButton_grid_clicked(bool checked);
 
@@ -557,6 +561,8 @@ private slots:
 
     void on_toolButton_signal_type_3_clicked();
 
+    void on_toolButton_del_tget_table_clicked();
+
 private:
 
 //    bool mShowobjects,
@@ -571,7 +577,7 @@ private:
     void ConvKmToWGS(double x, double y, double *m_Long, double *m_Lat);
     void setScaleRange(double srange);
     void DrawIADArea(QPainter *p);
-    bool isInsideViewZone(short x, short y);
+    bool isInsideViewZone(int x, int y);
     void UpdateMouseStat(QPainter *p);
     void setMouseMode(mouseMode mode, bool isOn);
     bool CalcAziContour(double theta, int d);

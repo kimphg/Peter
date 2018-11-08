@@ -9,8 +9,8 @@
 #define HR_CONFIG_FILE    "D:/HR2D/radar_config.xml"
 #define HR_CONFIG_FILE_DF "D:/HR2D/radar_config_default.xml"
 #define XML_ELEM_NAME     "radar_config"
-#define DEFAULT_LAT		20.707f
-#define DEFAULT_LONG	106.78f
+#define DEFAULT_LAT		20.707
+#define DEFAULT_LONG	106.78
 #include <QFile>
 #include <QHash>
 #include <QXmlStreamReader>
@@ -21,6 +21,7 @@ public:
     CConfig(void);
     ~CConfig(void);
     static double shipHeadingDeg;
+    static volatile long long int time_now_ms;
     static QHash<QString, QString> mHashData;
     static void    setValue(QString key, double value);
     static void    setValue(QString key,QString value);

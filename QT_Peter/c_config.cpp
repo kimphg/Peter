@@ -4,7 +4,7 @@
 
 double CConfig::shipHeadingDeg=0;
 QHash<QString, QString> CConfig::mHashData = CConfig::readFile();
-
+volatile long long int CConfig::time_now_ms = 0;
 void CConfig::setValue(QString key, double value)
 {
     QString strValue = QString::number(value);

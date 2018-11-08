@@ -15,7 +15,7 @@ bool *pIsPlaying;
 dataProcessingThread::~dataProcessingThread()
 {
     delete mRadarData;
-    delete arpaData;
+//    delete arpaData;
 }
 
 void dataProcessingThread::ReadDataBuffer()
@@ -99,7 +99,7 @@ dataProcessingThread::dataProcessingThread()
     isDrawn = true;
     pIsPlaying = &isPlaying;
     playRate = 10;
-    arpaData = new C_ARPA_data();
+//    arpaData = new C_ARPA_data();
     isRecording = false;
     mRadarData = new C_radar_data();
     isPlaying = false;
