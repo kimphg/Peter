@@ -1,11 +1,9 @@
 #include "c_target_manager.h"
-
-
+TrackPointer    *c_target_manager::targetTable = new TrackPointer[TARGET_TABLE_SIZE];
+TrackPointer    *c_target_manager::trackTable = new TrackPointer[TRACK_TABLE_SIZE];
 c_target_manager::c_target_manager()
 {
-    trackTable = new TrackPointer[TRACK_TABLE_SIZE];
     memset(trackTable,0,sizeof(TrackPointer)*TRACK_TABLE_SIZE);
-    targetTable = new TrackPointer[TARGET_TABLE_SIZE];
     memset(targetTable,0,sizeof(TrackPointer)*TARGET_TABLE_SIZE);
     udpSocketSend = new QUdpSocket();
     initDataGram();
@@ -87,16 +85,25 @@ bool c_target_manager::addTarget(track_t * track)
     }
     return false;
 }
+
+bool c_target_manager::checkIDExist(int id)
+{
+    //search for empty slot
+    for (uint i = 0;i<TRACK_TABLE_SIZE;i++)
+    {
+        if(trackTable[i].trackUniqID ==id)return true;
+
+    }
+    return false;
+}
 bool c_target_manager::addTrack(track_t* track)
 {
     //search for empty slot
     for (uint i = 0;i<TRACK_TABLE_SIZE;i++)
     {
-
         if(trackTable[i].track ==nullptr)
         {
             trackTable[i].track = track;
-            track->uniqId = track_t::IDCounter++;
             trackTable[i].trackUniqID = track->uniqId;
             return true;
         }

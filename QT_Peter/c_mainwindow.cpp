@@ -7,6 +7,13 @@
 
 
 #define MAX_VIEW_RANGE_KM   50
+static QPen penTarget(Qt::darkMagenta);
+static QPen penSelTarget(Qt::darkMagenta);
+static QPen penTargetSelected(Qt::magenta);
+static QPen penBackground(QBrush(QColor(24 ,48 ,64,255)),200+SCR_BORDER_SIZE);
+static QPen penCyan(QBrush(QColor(50,255,255 ,255)),1);//xoay mui tau
+static QPen penYellow(QBrush(QColor(255,255,50 ,255)),2);
+static QPen mGridViewPen1(QBrush(QColor(150,150,150,255)),1);
 static clock_t clkBegin = clock();
 static clock_t clkEnd = clock();
 static int frameRate = 20;
@@ -30,10 +37,6 @@ static int   mMousex =0,mMousey=0;
 static dataProcessingThread        *processing;// thread xu ly du lieu radar
 static C_radar_data                *pRadar;
 static QThread                     *t2,*t1;
-static QPen penBackground(QBrush(QColor(24 ,48 ,64,255)),200+SCR_BORDER_SIZE);
-static QPen penOuterGrid1(QBrush(QColor(50,255,255 ,255)),1);//xoay mui tau
-static QPen penOuterGrid2(QBrush(QColor(255,255,50 ,255)),2);
-static QPen mGridViewPen1(QBrush(QColor(150,150,150,255)),1);
 static QPoint points[6];
 static double                      mMapOpacity;
 static int                         mMaxTapMayThu=18;
@@ -126,9 +129,9 @@ void Mainwindow::mouseDoubleClickEvent( QMouseEvent * e )
             double xrad,yrad;//todo:write a function to convert
             xrad = (mMousex-radCtX)/mScale;
             yrad = -(mMousey-radCtY)/mScale;
-            pRadar->addDetectionZone(xrad,yrad,5,20.0/mScale);
+            pRadar->addDetectionZone(xrad,yrad,2,7.0/mScale);
             //select radar target
-            int minDistanceToCursor = 10;
+            /*int minDistanceToCursor = 10;
             //unsigned long long trackMin = 0;
             track_t* trackSel = nullptr;
             for (uint i = 0;i<pRadar->mTrackList.size();i++)
@@ -137,7 +140,7 @@ void Mainwindow::mouseDoubleClickEvent( QMouseEvent * e )
                 if(track->isRemoved())continue;
                 short sx = track->xkm*mScale ;
                 short sy = -track->ykm*mScale ;
-                rotateVector(trueShift,&sx,&sy);
+                rotateVector(trueShiftDeg,&sx,&sy);
                 sx   = abs(sx+ radCtX - mMousex);
                 sy   = abs(sy+ radCtY - mMousey);
                 if(sx+sy<minDistanceToCursor)
@@ -155,7 +158,7 @@ void Mainwindow::mouseDoubleClickEvent( QMouseEvent * e )
                 if(trackSel->uniqId<=0)
                 mTargetMan.addTrack(trackSel);
 
-            }
+            }*/
 
             //select ais target
             if(ui->toolButton_ais_show->isChecked())
@@ -508,7 +511,7 @@ void Mainwindow::mousePressEvent(QMouseEvent *event)
                 if(ptrack==nullptr)continue;
                 short sx = ptrack->track->xkm*mScale ;
                 short sy = -ptrack->track->ykm*mScale ;
-                rotateVector(trueShift,&sx,&sy);
+                rotateVector(trueShiftDeg,&sx,&sy);
                 sx   = abs(sx+ radCtX - mMousex);
                 sy   = abs(sy+ radCtY - mMousey);
                 if(sx+sy<minDistanceToCursor)
@@ -855,10 +858,26 @@ void Mainwindow::rotateVector(double angle,short* x,short* y)
 }
 void Mainwindow::DrawDetectZones(QPainter* p)//draw radar target from pRadar->mTrackList
 {
+    p->setPen((penYellow));
     for (uint i = 0;i<pRadar->mDetectZonesList.size();i++)
     {
         DetectionWindow *dw = &pRadar->mDetectZonesList[i];//todo:finish here
+        if(dw->trackCount==0)continue;
 
+        int dazi = dw->maxDazDeg;
+        double azi = 90.0-(trueShiftDeg+dw->aziDeg);
+        int drg =  int(dw->maxDrg*mScale);
+        int rg = int(dw->rg*mScale)-drg;
+        /*short sx = dw->xkm*mScale ;//+ radCtX;
+        short sy = -dw->ykm*mScale ;//+ radCtY;
+        rotateVector(trueShift,&sx,&sy);*/
+        int x1 = radCtX-rg;
+        int y1 = radCtY-rg;
+        p->drawArc(x1,y1,rg*2,rg*2,int(azi-dazi)*5760/360,int(dazi*2)*5760/360);
+        rg+=(drg*2);
+        x1 = radCtX-rg;
+        y1 = radCtY-rg;
+        p->drawArc(x1,y1,rg*2,rg*2,int(azi-dazi)*5760/360,int(dazi*2)*5760/360);
     }
 
 }
@@ -867,13 +886,8 @@ void Mainwindow::DrawDetectZones(QPainter* p)//draw radar target from pRadar->mT
 void Mainwindow::DrawRadarTargetByPainter(QPainter* p)//draw radar target from pRadar->mTrackList
 {
     p->setFont(QFont("Times", 8));
-    QPen penTarget(Qt::darkMagenta);
-    penTarget.setWidth(2);
-    QPen penSelTarget(Qt::darkMagenta);
-    penSelTarget.setWidth(2);
-    penSelTarget.setStyle(Qt::DashLine);
-    QPen penTargetSelected(Qt::magenta);
-    penTargetSelected.setWidth(3);
+
+
     //penTargetBlue.setStyle(Qt::DashLine);
     //QPen penARPATrack(Qt::darkYellow);
     //draw radar targets
@@ -886,6 +900,23 @@ void Mainwindow::DrawRadarTargetByPainter(QPainter* p)//draw radar target from p
     //    p->setPen(penTargetBlue);
 
     bool blink = (CConfig::time_now_ms/500)%2;
+    //draw targeted tracks
+    p->setPen(penTarget);
+    for (uint i = 0;i<TARGET_TABLE_SIZE;i++)
+    {
+        TrackPointer* trackPt = mTargetMan.getTargetAt(i);
+        if(!trackPt)continue;
+        track_t* track = trackPt->track;
+        sx1 = track->xkm*mScale ;
+        sy1 = -track->ykm*mScale ;
+        rotateVector(trueShiftDeg,&sx1,&sy1);
+        sx1   += radCtX;
+        sy1   += radCtY;
+        p->drawLine(sx1-20,sy1,sx1-10,sy1);
+        p->drawLine(sx1+20,sy1,sx1+10,sy1);
+        p->drawLine(sx1,sy1-20,sx1,sy1-10);
+        p->drawLine(sx1,sy1+20,sx1,sy1+10);
+    }
     //draw all tracks
     for (uint i = 0;i<TRACK_TABLE_SIZE;i++)
     {
@@ -902,12 +933,12 @@ void Mainwindow::DrawRadarTargetByPainter(QPainter* p)//draw radar target from p
                 object_t* obj2 = &(track->objectHistory[j+1]);
                 sx = obj1->xkm*mScale ;//+ radCtX;
                 sy = -obj1->ykm*mScale ;//+ radCtY;
-                rotateVector(trueShift,&sx,&sy);
+                rotateVector(trueShiftDeg,&sx,&sy);
                 sx   += radCtX;
                 sy   += radCtY;
                 sx1 = obj2->xkm*mScale ;
                 sy1 = -obj2->ykm*mScale ;
-                rotateVector(trueShift,&sx1,&sy1);
+                rotateVector(trueShiftDeg,&sx1,&sy1);
                 sx1   += radCtX;
                 sy1   += radCtY;
                 p->drawLine(sx,sy,sx1,sy1);
@@ -922,7 +953,7 @@ void Mainwindow::DrawRadarTargetByPainter(QPainter* p)//draw radar target from p
                 //object_t* obj1 = &(track->objectList.back());
                 sx = track->xkm*mScale ;
                 sy = -track->ykm*mScale ;
-                rotateVector(trueShift,&sx,&sy);
+                rotateVector(trueShiftDeg,&sx,&sy);
                 sx   += radCtX;
                 sy   += radCtY;
                 p->drawRect(sx-5,sy-5,10,10);
@@ -936,7 +967,7 @@ void Mainwindow::DrawRadarTargetByPainter(QPainter* p)//draw radar target from p
             //object_t* obj1 = &(track->objectList.back());
             sx1 = track->xkm*mScale ;
             sy1 = -track->ykm*mScale ;
-            rotateVector(trueShift,&sx1,&sy1);
+            rotateVector(trueShiftDeg,&sx1,&sy1);
             sx1   += radCtX;
             sy1   += radCtY;
             int size = 18000.0/(CConfig::time_now_ms - track->lastTimeMs+400);
@@ -1399,6 +1430,10 @@ void Mainwindow::addCurrTrackToTargets()
 }
 void Mainwindow::InitSetting()
 {
+    penTargetSelected.setWidth(3);
+    penTarget.setWidth(2);
+    penSelTarget.setWidth(2);
+    penSelTarget.setStyle(Qt::DashLine);
     ui->tableWidgetTarget->setStyleSheet("QTableView{gridline-color: gray;}"
                                          "QTableView::item{color:white; background:#000000; font-weight:900; }"
                                          "QHeaderView::section { color:white; background-color:rgb(24, 48, 64); }");
@@ -1623,14 +1658,14 @@ void Mainwindow::DrawViewFrame(QPainter* p)
     //    }
     p->drawEllipse(-220+SCR_BORDER_SIZE+SCR_LEFT_MARGIN,
                    -220+SCR_BORDER_SIZE+SCR_TOP_MARGIN,SCR_H+200,SCR_H+200);
-    p->setPen(penOuterGrid2);
+    p->setPen(penYellow);
     p->drawEllipse(SCR_LEFT_MARGIN+SCR_BORDER_SIZE/2,SCR_TOP_MARGIN+SCR_BORDER_SIZE/2,SCR_H -SCR_BORDER_SIZE,SCR_H -SCR_BORDER_SIZE);
     p->setFont(QFont("Times", 10));
 
     //ve vanh goc ngoai
     for(short theta=0;theta<360;theta+=10)
     {
-        if(CalcAziContour(theta+trueShift,SCR_H - SCR_BORDER_SIZE))
+        if(CalcAziContour(theta+trueShiftDeg,SCR_H - SCR_BORDER_SIZE))
         {
             p->drawLine(points[1],points[2]);
             p->drawText(points[0].x()-25,points[0].y()-10,50,20,
@@ -1639,7 +1674,7 @@ void Mainwindow::DrawViewFrame(QPainter* p)
         }
     }
     //ve vanh goc trong
-    p->setPen(penOuterGrid1);
+    p->setPen(penCyan);
     for(short theta=0;theta<360;theta+=10)
     {
         if(CalcAziContour(theta+headShift,SCR_H - SCR_BORDER_SIZE-40))
@@ -1692,7 +1727,7 @@ void Mainwindow::DrawViewFrame(QPainter* p)
     //        //p->drawText(720,20,200,20,0,"Antenna: "+QString::number(aziDeg,'f',1));
 
     //    }
-    if(CalcAziContour(degrees(pRadar->getCurAziRad())-trueShift,SCR_H-SCR_BORDER_SIZE-20))
+    if(CalcAziContour(degrees(pRadar->getCurAziRad())-trueShiftDeg,SCR_H-SCR_BORDER_SIZE-20))
     {
         p->setPen(QPen(Qt::red,4,Qt::SolidLine,Qt::RoundCap));
         p->drawLine(points[2],points[1]);
@@ -1814,6 +1849,12 @@ void Mainwindow::InitTimer()
 }
 void Mainwindow::Update100ms()
 {
+    //find new tracks
+    for(uint i =0;i<pRadar->mTrackList.size();i++)
+    {
+        if(!mTargetMan.checkIDExist(pRadar->mTrackList[i].uniqId))
+            mTargetMan.addTrack(&pRadar->mTrackList[i]);
+    }
     //smooth the heading
 
     ui->label_head_ship->setText(QString::number(CConfig::shipHeadingDeg,'f',1));
@@ -1828,14 +1869,14 @@ void Mainwindow::Update100ms()
     //calculate heading
     if(isHeadUp)
     {
-        trueShift = -mShipHeading;
+        trueShiftDeg = -mShipHeading;
         headShift = 0;
         mTrans.reset();
         mTrans = mTrans.rotate((-mShipHeading));
     }
     else
     {
-        trueShift = 0;
+        trueShiftDeg = 0;
         headShift = mShipHeading;
     }
 
@@ -3017,21 +3058,21 @@ void Mainwindow::setCodeType(short index)// chuyen ma
 
 void Mainwindow::on_horizontalSlider_gain_valueChanged(int value)
 {
-    pRadar->kgain = 7-(float)value/(ui->horizontalSlider_gain->maximum())*10;
-    ui->label_gain->setText("Gain:"+QString::number(-pRadar->kgain));
+    pRadar->kgain = 8-float(value)/(ui->horizontalSlider_gain->maximum())*8;
+    ui->label_gain->setText("Gain:"+QString::number(-pRadar->kgain,'f',2));
     //printf("pRadar->kgain %f \n",pRadar->kgain);
 }
 
 void Mainwindow::on_horizontalSlider_rain_valueChanged(int value)
 {
-    pRadar->krain = (float)value/(ui->horizontalSlider_rain->maximum()+ui->horizontalSlider_rain->maximum()/3);
+    pRadar->krain = (float)value/(ui->horizontalSlider_rain->maximum());
     ui->label_rain->setText("Rain:" + QString::number(pRadar->krain,'f',2));
 }
 
 void Mainwindow::on_horizontalSlider_sea_valueChanged(int value)
 {
     pRadar->ksea = (float)value/(ui->horizontalSlider_sea->maximum());
-    //ui->label_rain->setText("Rain:" + QString::number(-pRadar->krain));
+    ui->label_sea->setText("Sea:" + QString::number(pRadar->ksea,'f',2));
 }
 
 
@@ -3453,20 +3494,13 @@ void Mainwindow::on_toolButton_xl_dopler_toggled(bool checked)
 
 void Mainwindow::on_toolButton_xl_nguong_3_toggled(bool checked)
 {
-    pRadar->cut_thresh = checked;
+    pRadar->noise_nornalize = checked;
 }
 
-void Mainwindow::on_groupBox_3_currentChanged(int index)
-{
-    if(index==1)
-    {
-        pRadar->isManualTune = true;
-    }
-    else
-    {
-        pRadar->isManualTune = false;
-    }
-}
+//void Mainwindow::on_groupBox_3_currentChanged(int index)
+//{
+
+//}
 
 void Mainwindow::on_toolButton_xl_dopler_2_toggled(bool checked)
 {
@@ -4368,21 +4402,13 @@ void Mainwindow::on_toolButton_dk_13_toggled(bool checked)
 void Mainwindow::on_toolButton_dk_15_toggled(bool checked)
 {
     return;
-    if(checked)
-    {
-        commandMay22[8]=0x00;
-        processing->sendCommand(commandMay22,12,false);
-    }
+
 }
 
 void Mainwindow::on_toolButton_dk_11_toggled(bool checked)
 {
     return;
-    if(checked)
-    {
-        commandMay22[7]=0x00;
-        processing->sendCommand(commandMay22,12,false);
-    }
+
 }
 
 void Mainwindow::on_toolButton_dk_16_toggled(bool checked)
@@ -4528,7 +4554,7 @@ void Mainwindow::on_toolButton_sled_reset_4_clicked(bool checked)
 
 void Mainwindow::on_on_toolButton_xl_nguong_3_clicked(bool checked)
 {
-    pRadar->cut_thresh = checked;
+    pRadar->noise_nornalize = checked;
 }
 
 void Mainwindow::on_toolButton_xl_nguong_4_clicked(bool checked)
@@ -4701,7 +4727,8 @@ void Mainwindow::on_toolButton_open_record_2_clicked()
     char command[100];
     QString filename = QFileDialog::getOpenFileName(this,    tr("Open signal file"), NULL, tr("HR raw record files (*.dat)"));
     system("taskkill /f /im cudaCv.exe");
-    sprintf(command,"D:\\HR2D64\\cudaCv.exe %s",filename.toStdString().data());
+    sprintf(command,"D:\\HR2D\\cudaFFT.exe %s",filename.toStdString().data());
+    printf("\n%s", (const char*)&command);
     system(command);
     ui->label_record_file_name->setText(filename);
 }
@@ -4780,7 +4807,7 @@ void Mainwindow::on_bt_rg_5_clicked()
 
 void Mainwindow::on_toolButton_xl_nguong_5_clicked(bool checked)
 {
-    pRadar->cut_thresh = checked;
+    pRadar->noise_nornalize = checked;
 }
 
 void Mainwindow::on_toolButton_second_azi_clicked(bool checked)
@@ -4859,4 +4886,16 @@ void Mainwindow::on_toolButton_signal_type_3_clicked()
 void Mainwindow::on_toolButton_del_tget_table_clicked()
 {
     mTargetMan.ClearTargetTable();
+}
+
+void Mainwindow::on_toolButton_manual_tune_clicked(bool checked)
+{
+    if(checked)
+    {
+        pRadar->isManualTune = true;
+    }
+    else
+    {
+        pRadar->isManualTune = false;
+    }
 }

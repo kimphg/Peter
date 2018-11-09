@@ -33,7 +33,7 @@
 #define MAX_FRAME_SIZE_HALF RADAR_RESOLUTION_HALF*2+FRAME_HEADER_SIZE
 #define CONST_E 2.71828182846
 #define MAX_TRACK_LEN               400
-#define MAX_TRACKS                  800
+#define MAX_TRACKS                  400
 #define ENCODER_RES                 5000
 #define MAX_AZIR                    2048
 #define MAX_AZIR_DRAW               6144
@@ -57,7 +57,6 @@
 #define DISPLAY_RES_ZOOM            8192
 #define DISPLAY_SCALE_ZOOM          4
 #define nm(x) (x/1.852)
-//#include "jtarget.h"
 #include "c_config.h"
 #include <vector>
 #include <QImage>
@@ -65,7 +64,7 @@
 #include <QFile>
 //#include <Eigen/Dense>
 #include <queue>
-
+//#include <c_target_manager.h>
 inline double sinFast(double a)
 {
     while (a>PI) {
@@ -101,8 +100,10 @@ inline double ConvXYToAziRad(double x, double y)
 typedef struct
 {
     int trackCount;
+    uint timeStart;
     double xkm,ykm;
-    double maxDrg,maxDaz;
+    double aziDeg,rg;
+    double maxDrg,maxDazDeg;
 }DetectionWindow;
 typedef struct  {
     short lastA,riseA,fallA;
@@ -163,7 +164,7 @@ public:
         mState=TrackState::removed;
         isUpdating = false;
     }
-    void init(object_t* obj1,object_t* obj2)
+    void init(object_t* obj1,object_t* obj2,int id=-1)
     {
 
         double dtime = (obj1->timeMs-obj2->timeMs)/3600000.0;
@@ -186,7 +187,7 @@ public:
         objectList.push_back(*obj1);
         objectHistory.push_back(*obj1);
 //        time=obj2->timeMs;
-        uniqId =-1;
+        uniqId =id;
         isUpdating = false;
         mState = TrackState::newDetection;
         //        operatorID = 0;
@@ -365,8 +366,8 @@ public:
     double                  tb_tap_k;
     //    int                     get_tb_tap();
     bool                    is_do_bup_song;
-    bool                    isClkAdcChanged,xl_dopler,cut_thresh,isSled,filter2of3;
-    bool                    isManualTune,rgs_auto,bo_bang_0,data_export;
+    bool                    isClkAdcChanged,xl_dopler,noise_nornalize,isSled,filter2of3;
+    bool                    isManualTune,cut_noise,bo_bang_0,data_export;
     bool                    isSelfRotation;
     double                   krain,kgain,ksea,brightness;
     double                   krain_auto,kgain_auto,ksea_auto;

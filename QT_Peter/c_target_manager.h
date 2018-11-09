@@ -3,7 +3,7 @@
 #include "C_radar_data.h"
 #include "c_config.h"
 #include <QUdpSocket>
-#define TRACK_TABLE_SIZE 200
+#define TRACK_TABLE_SIZE 100
 #define TARGET_TABLE_SIZE 6
 #define KASU_DATA_SIZE 144
 typedef struct {
@@ -30,11 +30,12 @@ public:
     TrackPointer *getTrackAt(int i);
     bool addTrack(track_t *);
     bool addTarget(track_t *);
+    bool checkIDExist(int id);
     void setSelectedTrack(int uniqID);
     TrackPointer *getTargetAt(int i);
 private:
-    TrackPointer    *trackTable;
-    TrackPointer    *targetTable;
+    static TrackPointer    *trackTable;
+    static TrackPointer    *targetTable;
     QUdpSocket      *udpSocketSend;
 };
 

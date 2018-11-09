@@ -232,7 +232,7 @@ private slots:
 
     void on_toolButton_xl_nguong_3_toggled(bool checked);
 
-    void on_groupBox_3_currentChanged(int index);
+//    void on_groupBox_3_currentChanged(int index);
 
     void on_toolButton_xl_dopler_2_toggled(bool checked);
 
@@ -564,11 +564,13 @@ private slots:
 
     void on_toolButton_del_tget_table_clicked();
 
+    void on_toolButton_manual_tune_clicked(bool checked);
+
 private:
 
 //    bool mShowobjects,
     bool mShowTracks;
-    double trueShift,headShift;
+    double trueShiftDeg,headShift;
 //    unsigned long long mSelectedTrackId;
 //    uint mSelectedTrackTime;
     void initActionsConnections();
