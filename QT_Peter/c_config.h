@@ -21,6 +21,8 @@ public:
     CConfig(void);
     ~CConfig(void);
     static double shipHeadingDeg;
+    static double shipSpeed;
+    static double antennaAziDeg;
     static volatile long long int time_now_ms;
     static QHash<QString, QString> mHashData;
     static void    setValue(QString key, double value);

@@ -119,6 +119,7 @@ void Mainwindow::mouseDoubleClickEvent( QMouseEvent * e )
     if ( e->button() == Qt::RightButton )
     {
 
+
     }
     else
     {
@@ -161,10 +162,7 @@ void Mainwindow::mouseDoubleClickEvent( QMouseEvent * e )
             }*/
 
             //select ais target
-            if(ui->toolButton_ais_show->isChecked())
-            {
-                checkClickAIS(e->x(),e->y());
-            }
+
 
         }
         //ui->toolButton_manual_track->setChecked(false);
@@ -216,8 +214,11 @@ void Mainwindow::drawAisTarget(QPainter *p)
 
         double fx,fy;
         ConvWGSToKm(&fx,&fy,aisObj.mLong,aisObj.mLat);
-        short x = (fx*mScale)+radCtX;
-        short y = (fy*mScale)+radCtY;
+        short x = (fx*mScale);//+;
+        short y = (fy*mScale);//+radCtY;
+        rotateVector(trueShiftDeg,&x,&y);
+        x+=radCtX;
+        y+=radCtY;
         if((aisObj.mType/10)==3)continue;
         if(aisObj.isNewest)
         {
@@ -561,7 +562,13 @@ void Mainwindow::mousePressEvent(QMouseEvent *event)
             //mouse_mode=MouseDrag;//isDraging = true;
         }
     }
-
+    else
+    {
+        if(ui->toolButton_ais_show->isChecked())
+        {
+            checkClickAIS(event->x(),event->y());
+        }
+    }
 
 }
 void Mainwindow::checkClickAIS(int xclick, int yclick)
@@ -1727,7 +1734,7 @@ void Mainwindow::DrawViewFrame(QPainter* p)
     //        //p->drawText(720,20,200,20,0,"Antenna: "+QString::number(aziDeg,'f',1));
 
     //    }
-    if(CalcAziContour(degrees(pRadar->getCurAziRad())-trueShiftDeg,SCR_H-SCR_BORDER_SIZE-20))
+    if(CalcAziContour((CConfig::antennaAziDeg)+trueShiftDeg,SCR_H-SCR_BORDER_SIZE-20))
     {
         p->setPen(QPen(Qt::red,4,Qt::SolidLine,Qt::RoundCap));
         p->drawLine(points[2],points[1]);
@@ -1858,6 +1865,7 @@ void Mainwindow::Update100ms()
     //smooth the heading
 
     ui->label_head_ship->setText(QString::number(CConfig::shipHeadingDeg,'f',1));
+    ui->label_speed_ship->setText(QString::number(CConfig::shipSpeed,'f',1));
     double headingDiff = CConfig::shipHeadingDeg-mShipHeading;
     if(abs(headingDiff)>0.5)
     {
@@ -1883,7 +1891,8 @@ void Mainwindow::Update100ms()
     DrawMap();
     mMousex=this->mapFromGlobal(QCursor::pos()).x();
     mMousey=this->mapFromGlobal(QCursor::pos()).y();
-    this->ui->label_azi_antenna_head_true->setText(QString::number(degrees(pRadar->getCurAziRad())));
+    CConfig::antennaAziDeg = degrees(pRadar->getCurAziRad());
+    this->ui->label_azi_antenna_head_true->setText(QString::number(CConfig::antennaAziDeg,'f',1));
     if(isInsideViewZone(mMousex,mMousey))
     {
         QApplication::setOverrideCursor(Qt::CrossCursor);

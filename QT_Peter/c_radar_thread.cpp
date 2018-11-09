@@ -153,9 +153,12 @@ void dataProcessingThread::ProcessNavData(unsigned char *mReceiveBuff,int len)
             mRadarStat.ReadStatusMessage(&mReceiveBuff[4]);
         }
     }
-    else if(mReceiveBuff[0]==0x5a&&mReceiveBuff[1]==0xa5&&len>=32)//gyro messages
+    else if(mReceiveBuff[0]==0x5a&&mReceiveBuff[1]==0xa5&&mReceiveBuff[31]==0xAA&&len>=32)//gyro messages
     {
         CConfig::shipHeadingDeg = (((mReceiveBuff[6])<<8)|mReceiveBuff[7])/182.044444444;//*360.0/65535.0;
+        int vy = (((mReceiveBuff[18])<<8)|mReceiveBuff[19]);
+        int vx = (((mReceiveBuff[20])<<8)|mReceiveBuff[21]);
+        CConfig::shipSpeed = sqrt(vy*vy+vx*vx)*0.00388768898488120950323974082073;//*2/1000000/CONST_NM*36000; kn
     }
     else if(mReceiveBuff[0]=='!'&&mReceiveBuff[1]=='A')//AIS
     {
@@ -619,7 +622,7 @@ void dataProcessingThread::run()
         while(radarSocket->hasPendingDatagrams())
         {
             int len = radarSocket->pendingDatagramSize();
-            if(len<500)// system packets
+            if(len<1000)// system packets
             {
                 radarSocket->readDatagram((char*)&mReceiveBuff[0],len);
 

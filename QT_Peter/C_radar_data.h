@@ -19,7 +19,7 @@
 #define degrees(x) (x*57.295779513)
 #define radians(x) (x/57.295779513)
 #ifndef CONST_NM
-#define CONST_NM 1.852f// he so chuyen doi tu km sang hai ly
+#define CONST_NM 1.852// he so chuyen doi tu km sang hai ly
 #endif
 #define PI_NHAN2                    6.2831853072
 #define PI_CHIA2                    1.5707963268
@@ -374,7 +374,7 @@ public:
     void setAutorgs( bool aut);
     void                    clearPPI();
     unsigned char           moduleVal;
-    double                   aziOffset;
+    double                   aziOffsetRad;
     DataOverLay             dataOver;
     //    unsigned char           noise_level[8];
     unsigned char           rotation_speed;
@@ -405,7 +405,7 @@ public:
 
         while(trueN_deg<0)trueN_deg+=360;
         while(trueN_deg>=360)trueN_deg-=360;
-        aziOffset =(trueN_deg/360.0*PI_NHAN2);
+        aziOffsetRad =(trueN_deg/360.0*PI_NHAN2);
         raw_map_init();
         resetTrack();
     }

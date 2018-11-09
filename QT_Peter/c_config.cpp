@@ -2,7 +2,9 @@
 #include "c_config.h"
 //CConfig         mGlobbalConfig;
 
-double CConfig::shipHeadingDeg=0;
+double CConfig::shipHeadingDeg=5;
+double CConfig::shipSpeed=0;
+double CConfig::antennaAziDeg=0;
 QHash<QString, QString> CConfig::mHashData = CConfig::readFile();
 volatile long long int CConfig::time_now_ms = 0;
 void CConfig::setValue(QString key, double value)
