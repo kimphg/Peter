@@ -26,7 +26,7 @@ SOURCES += main.cpp\
     qcustomcombobox.cpp \
     qcustomgroupbox.cpp \
     qcustomtabwidget.cpp \
-    ctarget.cpp \
+#    ctarget.cpp \
     jtarget.cpp \
     jgraphictarget.cpp \
     Cmap/cmap.cpp\
@@ -43,7 +43,8 @@ SOURCES += main.cpp\
     c_mainwindow.cpp \
 #    c_decision_tree.cpp
     c_gps.cpp \
-    c_target_manager.cpp
+    c_target_manager.cpp \
+#    c_radar_simulation.cpp
 
 
 HEADERS  += \
@@ -53,7 +54,6 @@ HEADERS  += \
     qcustomgroupbox.h \
     qcustomtabwidget.h \
     pkp.h \
-    ctarget.h \
     jtarget.h \
     jgraphictarget.h \
     Cmap/cmap.h\
@@ -70,7 +70,9 @@ HEADERS  += \
     c_mainwindow.h \
 #    c_decision_tree.h
     c_gps.h \
-    c_target_manager.h
+    c_target_manager.h \
+    c_target.h \
+    c_radar_simulation.h
 
 FORMS    += mainwindow.ui \
     dialogdocumentation.ui \

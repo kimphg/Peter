@@ -622,7 +622,7 @@ void ProcessFrame(unsigned char*data, int len)
 		if (mFFTSize > 512 || mFFTSize < 4)mFFTSize = 32;
 		isPaused = true;
 		Sleep(20);
-		if (mFFT)delete mFFT;
+		//if (mFFT)delete mFFT;
 		mFFT = new coreFFT(FRAME_LEN, mFFTSize);
 		Sleep(5);
 		isPaused = false;

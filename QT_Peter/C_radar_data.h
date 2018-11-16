@@ -81,12 +81,12 @@ inline double cosFast(double a)
     double a2 = a*a;
     return 1.0-a2/2.0+a2*a2/24.0-a2*a2*a2/720.0;
 }
-inline double ConvXYToRange(double x, double y)
+inline double ConvXYToRg(double x, double y)
 {
     return sqrt(x*x + y*y);
 
 }
-inline double ConvXYToAziRad(double x, double y)
+inline double ConvXYToAziRd(double x, double y)
 {
     if (!y)        return (x>0 ? PI_CHIA2 : (PI_NHAN2 - PI_CHIA2));
     else
@@ -163,6 +163,13 @@ public:
     {
         mState=TrackState::removed;
         isUpdating = false;
+        uniqId =-1;
+    }
+    void Remove()
+    {
+        mState=TrackState::removed;
+        isUpdating = false;
+        uniqId =-1;
     }
     void init(object_t* obj1,object_t* obj2,int id=-1)
     {
@@ -174,14 +181,14 @@ public:
         //        isRemoved  = false;
         mSpeedkmh  = sqrt(dx*dx+dy*dy)/dtime;
         //        isLost     = false;
-        courseRad = ConvXYToAziRad(dx,dy);
+        courseRad = ConvXYToAziRd(dx,dy);
         mSpeedkmhFit    = sqrt(dx*dx+dy*dy)/dtime;
-        courseRadFit   = ConvXYToAziRad(dx,dy);
+        courseRadFit   = ConvXYToAziRd(dx,dy);
         possibleMaxScore = 0;
         xkm             = obj1->xkm;
         ykm             = obj1->ykm;
-        rgKm            = ConvXYToRange(xkm,ykm);
-        aziDeg          = degrees(ConvXYToAziRad(xkm,ykm));
+        rgKm            = ConvXYToRg(xkm,ykm);
+        aziDeg          = degrees(ConvXYToAziRd(xkm,ykm));
         lastTimeMs = obj1->timeMs;
         objectList.push_back(*obj2);
         objectList.push_back(*obj1);
@@ -247,17 +254,17 @@ public:
                     mSpeedkmhFit    = sqrt(dx*dx+dy*dy)/dtime;
                     sko_spd         = mSpeedkmhFit/2.0;
                     //course param
-                    courseRadFit    = ConvXYToAziRad(dx,dy);
+                    courseRadFit    = ConvXYToAziRd(dx,dy);
                     courseDeg = degrees(courseRadFit);
                     sko_cour = 30.0;
                     //xy coordinates
                     xkm             = obj1->xkm;
                     ykm             = obj1->ykm;
                     //range
-                    rgKm            = ConvXYToRange(xkm,ykm);
+                    rgKm            = ConvXYToRg(xkm,ykm);
                     sko_rgKm          = obj1->rgStdEr;
                     //azi
-                    aziDeg          = degrees(ConvXYToAziRad(xkm,ykm));
+                    aziDeg          = degrees(ConvXYToAziRd(xkm,ykm));
                     sko_aziDeg         = degrees((obj1->aziStdEr));
                 }
                 else
@@ -275,7 +282,7 @@ public:
                     sko_spd         +=(sko_spdNew-sko_spd)/5.0;
                     mSpeedkmhFit    +=(mSpeedkmhFitNew-mSpeedkmhFit)/2.0;
                     //course param
-                    courseRadFit   = ConvXYToAziRad(dx,dy);
+                    courseRadFit   = ConvXYToAziRd(dx,dy);
                     double courseDegNew = degrees(courseRadFit);
                     double sko_courNew = abs(courseDegNew-courseDeg);
                     courseDeg       +=(courseDegNew-courseDeg)/2.0;
@@ -284,11 +291,11 @@ public:
                     xkm             = obj1->xkm;
                     ykm             = obj1->ykm;
                     //range
-                    rgKm            = ConvXYToRange(xkm,ykm);
+                    rgKm            = ConvXYToRg(xkm,ykm);
                     double sko_rgNew         = abs(rgKm-obj1->rgKm);
                     sko_rgKm+=(sko_rgNew-sko_rgKm)/5.0;
                     //azi
-                    aziDeg          = degrees(ConvXYToAziRad(xkm,ykm));
+                    aziDeg          = degrees(ConvXYToAziRd(xkm,ykm));
                     double sko_aziNew         = abs(aziDeg-degrees(obj1->azRad));
                     sko_aziDeg += (sko_aziNew-sko_aziDeg)/5.0;
                 }

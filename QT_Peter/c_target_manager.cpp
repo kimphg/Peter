@@ -15,6 +15,35 @@ c_target_manager::~c_target_manager()
     delete [] trackTable;
     delete [] targetTable;
 }
+
+void c_target_manager::setCurToEnemy()
+{
+    if(currTrackPt)
+    {
+        currTrackPt->flag=1;
+    }
+}
+
+void c_target_manager::setCurToFriend()
+{
+    if(currTrackPt)
+    {
+        currTrackPt->flag=-1;
+    }
+}
+
+QString c_target_manager::addCurrTrackToTargets()
+{
+    if(currTrackPt)
+    {
+        if(currTrackPt->flag<0)return QString::fromUtf8("Không thể đặt chỉ thị mục tiêu gắn cờ ta");
+        if(!addTarget(currTrackPt->track))
+        {
+            return QString::fromUtf8("Được phép đặt chỉ thị tối đa 6 mục tiêu");
+        }
+    }
+    return QString();
+}
 TrackPointer* c_target_manager::getTrackById(int id)
 {
     for(int i=0;i<TRACK_TABLE_SIZE;i++)
@@ -53,7 +82,6 @@ bool c_target_manager::addTarget(track_t * track)
     //search for duplication
     for (uint i = 0;i<TARGET_TABLE_SIZE;i++)
     {
-
         if(targetTable[i].track ==track)
         {
             return true;
@@ -62,10 +90,10 @@ bool c_target_manager::addTarget(track_t * track)
     //search for empty slot
     for (uint i = 0;i<TARGET_TABLE_SIZE;i++)
     {
-
-        if(targetTable[i].track ==nullptr)
+        if(targetTable[i].track == nullptr)
         {
             targetTable[i].track = track;
+            targetTable[i].flag = 0;
             targetTable[i].trackUniqID = track->uniqId;
             return true;
         }

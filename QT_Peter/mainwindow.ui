@@ -19228,8 +19228,8 @@
      <rect>
       <x>960</x>
       <y>10</y>
-      <width>315</width>
-      <height>700</height>
+      <width>311</width>
+      <height>711</height>
      </rect>
     </property>
     <property name="font">
@@ -19241,7 +19241,7 @@
      <bool>false</bool>
     </property>
     <property name="currentIndex">
-     <number>2</number>
+     <number>0</number>
     </property>
     <property name="elideMode">
      <enum>Qt::ElideNone</enum>
@@ -31140,6 +31140,250 @@
       </layout>
      </widget>
     </widget>
+    <widget class="QWidget" name="tab_7">
+     <attribute name="title">
+      <string>Tạo giả</string>
+     </attribute>
+     <widget class="QCustomButton" name="toolButton_start_simulation_start">
+      <property name="enabled">
+       <bool>true</bool>
+      </property>
+      <property name="geometry">
+       <rect>
+        <x>9</x>
+        <y>358</y>
+        <width>70</width>
+        <height>25</height>
+       </rect>
+      </property>
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
+      <property name="font">
+       <font>
+        <pointsize>12</pointsize>
+       </font>
+      </property>
+      <property name="text">
+       <string>Bắt đầu</string>
+      </property>
+      <property name="checkable">
+       <bool>true</bool>
+      </property>
+      <property name="autoExclusive">
+       <bool>true</bool>
+      </property>
+     </widget>
+     <widget class="QCustomButton" name="toolButton_start_simulation_stop">
+      <property name="enabled">
+       <bool>true</bool>
+      </property>
+      <property name="geometry">
+       <rect>
+        <x>231</x>
+        <y>358</y>
+        <width>56</width>
+        <height>25</height>
+       </rect>
+      </property>
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
+      <property name="font">
+       <font>
+        <pointsize>12</pointsize>
+       </font>
+      </property>
+      <property name="text">
+       <string>Dừng</string>
+      </property>
+      <property name="checkable">
+       <bool>true</bool>
+      </property>
+      <property name="autoExclusive">
+       <bool>true</bool>
+      </property>
+     </widget>
+     <widget class="QFrame" name="frame">
+      <property name="geometry">
+       <rect>
+        <x>-1</x>
+        <y>-1</y>
+        <width>301</width>
+        <height>271</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <pointsize>12</pointsize>
+       </font>
+      </property>
+      <layout class="QGridLayout" name="gridLayout_10">
+       <property name="leftMargin">
+        <number>10</number>
+       </property>
+       <property name="topMargin">
+        <number>10</number>
+       </property>
+       <property name="rightMargin">
+        <number>10</number>
+       </property>
+       <property name="bottomMargin">
+        <number>10</number>
+       </property>
+       <item row="5" column="0">
+        <widget class="QDoubleSpinBox" name="doubleSpinBox_8"/>
+       </item>
+       <item row="4" column="0">
+        <widget class="QDoubleSpinBox" name="doubleSpinBox_7"/>
+       </item>
+       <item row="6" column="0">
+        <widget class="QDoubleSpinBox" name="doubleSpinBox_9"/>
+       </item>
+       <item row="7" column="0">
+        <widget class="QDoubleSpinBox" name="doubleSpinBox_19"/>
+       </item>
+       <item row="1" column="3">
+        <widget class="QDoubleSpinBox" name="doubleSpinBox_4"/>
+       </item>
+       <item row="1" column="2">
+        <widget class="QDoubleSpinBox" name="doubleSpinBox_3"/>
+       </item>
+       <item row="1" column="1">
+        <widget class="QDoubleSpinBox" name="doubleSpinBox_2"/>
+       </item>
+       <item row="0" column="1">
+        <widget class="QLabel" name="label_3">
+         <property name="font">
+          <font>
+           <pointsize>12</pointsize>
+          </font>
+         </property>
+         <property name="text">
+          <string>P.vị</string>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="0">
+        <widget class="QDoubleSpinBox" name="doubleSpinBox"/>
+       </item>
+       <item row="0" column="2">
+        <widget class="QLabel" name="label_4">
+         <property name="font">
+          <font>
+           <pointsize>12</pointsize>
+          </font>
+         </property>
+         <property name="text">
+          <string>HCĐ</string>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="0">
+        <widget class="QLabel" name="label">
+         <property name="font">
+          <font>
+           <pointsize>12</pointsize>
+          </font>
+         </property>
+         <property name="text">
+          <string>C.ly</string>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="0">
+        <widget class="QDoubleSpinBox" name="doubleSpinBox_5"/>
+       </item>
+       <item row="3" column="0">
+        <widget class="QDoubleSpinBox" name="doubleSpinBox_6"/>
+       </item>
+       <item row="0" column="3">
+        <widget class="QLabel" name="label_5">
+         <property name="font">
+          <font>
+           <pointsize>12</pointsize>
+          </font>
+         </property>
+         <property name="text">
+          <string>T. độ</string>
+         </property>
+        </widget>
+       </item>
+       <item row="8" column="0">
+        <widget class="QDoubleSpinBox" name="doubleSpinBox_20"/>
+       </item>
+       <item row="2" column="1">
+        <widget class="QDoubleSpinBox" name="doubleSpinBox_21"/>
+       </item>
+       <item row="3" column="1">
+        <widget class="QDoubleSpinBox" name="doubleSpinBox_22"/>
+       </item>
+       <item row="4" column="1">
+        <widget class="QDoubleSpinBox" name="doubleSpinBox_23"/>
+       </item>
+       <item row="5" column="1">
+        <widget class="QDoubleSpinBox" name="doubleSpinBox_24"/>
+       </item>
+       <item row="6" column="1">
+        <widget class="QDoubleSpinBox" name="doubleSpinBox_25"/>
+       </item>
+       <item row="7" column="1">
+        <widget class="QDoubleSpinBox" name="doubleSpinBox_26"/>
+       </item>
+       <item row="8" column="1">
+        <widget class="QDoubleSpinBox" name="doubleSpinBox_27"/>
+       </item>
+       <item row="8" column="2">
+        <widget class="QDoubleSpinBox" name="doubleSpinBox_28"/>
+       </item>
+       <item row="7" column="2">
+        <widget class="QDoubleSpinBox" name="doubleSpinBox_29"/>
+       </item>
+       <item row="6" column="2">
+        <widget class="QDoubleSpinBox" name="doubleSpinBox_30"/>
+       </item>
+       <item row="5" column="2">
+        <widget class="QDoubleSpinBox" name="doubleSpinBox_31"/>
+       </item>
+       <item row="4" column="2">
+        <widget class="QDoubleSpinBox" name="doubleSpinBox_32"/>
+       </item>
+       <item row="3" column="2">
+        <widget class="QDoubleSpinBox" name="doubleSpinBox_33"/>
+       </item>
+       <item row="2" column="2">
+        <widget class="QDoubleSpinBox" name="doubleSpinBox_34"/>
+       </item>
+       <item row="2" column="3">
+        <widget class="QDoubleSpinBox" name="doubleSpinBox_35"/>
+       </item>
+       <item row="3" column="3">
+        <widget class="QDoubleSpinBox" name="doubleSpinBox_36"/>
+       </item>
+       <item row="4" column="3">
+        <widget class="QDoubleSpinBox" name="doubleSpinBox_37"/>
+       </item>
+       <item row="5" column="3">
+        <widget class="QDoubleSpinBox" name="doubleSpinBox_38"/>
+       </item>
+       <item row="6" column="3">
+        <widget class="QDoubleSpinBox" name="doubleSpinBox_39"/>
+       </item>
+       <item row="7" column="3">
+        <widget class="QDoubleSpinBox" name="doubleSpinBox_40"/>
+       </item>
+       <item row="8" column="3">
+        <widget class="QDoubleSpinBox" name="doubleSpinBox_41"/>
+       </item>
+      </layout>
+     </widget>
+    </widget>
    </widget>
    <widget class="QCustomTabWidget" name="tabWidget_menu_3">
     <property name="geometry">
@@ -31223,7 +31467,7 @@
       </column>
       <column>
        <property name="text">
-        <string>P.vị (bắc)</string>
+        <string>P.vị </string>
        </property>
       </column>
       <column>
@@ -36269,7 +36513,7 @@ background-color: rgba(255, 255, 255, 0);</string>
      </item>
     </layout>
    </widget>
-   <widget class="QFrame" name="">
+   <widget class="QFrame" name="frame">
     <property name="geometry">
      <rect>
       <x>10</x>
@@ -36280,6 +36524,7 @@ background-color: rgba(255, 255, 255, 0);</string>
     </property>
     <layout class="QHBoxLayout" name="horizontalLayout_4"/>
    </widget>
+   <zorder>frame</zorder>
    <zorder>groupBox_16</zorder>
    <zorder>toolButton_menu</zorder>
    <zorder>toolButton_head_up</zorder>
@@ -36291,11 +36536,7 @@ background-color: rgba(255, 255, 255, 0);</string>
    <zorder>tabWidget_menu_3</zorder>
    <zorder>groupBox_5</zorder>
    <zorder>groupBox_gps_2</zorder>
-   <zorder>label_azi_antenna_head_true</zorder>
-   <zorder>label_head_ship</zorder>
    <zorder>groupBox_15</zorder>
-   <zorder>label_head_ship_2</zorder>
-   <zorder>label_azi_antenna_head_true_2</zorder>
    <zorder>groupBox_25</zorder>
   </widget>
  </widget>

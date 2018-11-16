@@ -270,8 +270,8 @@ double track_t::LinearFitCost(object_t *myobj)
         //obj[i].ykm+=(y2[i]-obj[i].ykm)*i/float(nEle);
         //obj[i].xkmfit=y1[i];
         //obj[i].ykmfit=y2[i];
-        azRadfit[i] = ConvXYToAziRad  (y1[i],y2[i]);
-        rgKmfit[i]  = ConvXYToRange   (y1[i],y2[i]);
+        azRadfit[i] = ConvXYToAziRd  (y1[i],y2[i]);
+        rgKmfit[i]  = ConvXYToRg   (y1[i],y2[i]);
     }
     //    delete[] y1;
     //    delete[] y2;
@@ -310,7 +310,7 @@ double track_t::estimateScore(object_t *obj1)
     double distancekm = sqrt(dx*dx+dy*dy);
     double distanceCoeff = distancekm/(TARGET_MAX_SPEED_MARINE*dtime   + obj1->rgKm*AZI_ERROR_STD);
     if(distanceCoeff>1.0)return 0;
-    double dBearing = ConvXYToAziRad(dx,dy)-this->courseRad;
+    double dBearing = ConvXYToAziRd(dx,dy)-this->courseRad;
     double speedkmh = distancekm/(dtime);
     if(speedkmh>500.0)return 0;
     double dSpeed = speedkmh-(this->mSpeedkmh*cosFast(-dBearing));

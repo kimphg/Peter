@@ -115,9 +115,12 @@ public slots:
     void UpdateScale();
     void setCodeType(short index);
     void trackTableItemMenu(int row, int col);
-    void removeCurrTrack();
-    void addCurrTrackToTargets();
+    void removeTrack();
+    void addToTargets();
     void targetTableItemMenu(int row, int col);
+    void setEnemy();
+    void setFriend();
+    void removeTarget();
 private:
     void setRadarState(radarSate radarState);
     bool ProcDataAIS(BYTE *szBuff, int nLeng );
@@ -256,7 +259,7 @@ private slots:
 
    // void on_comboBox_radar_resolution_currentIndexChanged(int index);
 
-    void on_toolButton_create_zone_2_clicked(bool checked);
+//    void on_toolButton_create_zone_2_clicked(bool checked);
 
     void on_toolButton_measuring_clicked();
 
@@ -428,7 +431,7 @@ private slots:
     void Update100ms();
     void on_toolButton_dk_12_toggled(bool checked);
 
-    void on_toolButton_dk_14_toggled(bool checked);
+//    void on_toolButton_dk_14_toggled(bool checked);
 
     void on_toolButton_dk_13_toggled(bool checked);
 
@@ -565,6 +568,10 @@ private slots:
     void on_toolButton_del_tget_table_clicked();
 
     void on_toolButton_manual_tune_clicked(bool checked);
+
+//    void on_dial_valueChanged(int value);
+
+//    void on_horizontalSlider_valueChanged(int value);
 
 private:
 

@@ -8,8 +8,10 @@
 
 #define MAX_VIEW_RANGE_KM   50
 static QPen penTarget(Qt::darkMagenta);
-static QPen penSelTarget(Qt::darkMagenta);
-static QPen penTargetSelected(Qt::magenta);
+static QPen penTargetEnemy(Qt::darkMagenta);
+static QPen penTargetFriend(QBrush(QColor(0,200,200 ,255)),1);
+static QPen penTargetEnemySelected(Qt::magenta);
+static QPen penTargetFriendSelected(QBrush(QColor(50,255,255 ,255)),3);
 static QPen penBackground(QBrush(QColor(24 ,48 ,64,255)),200+SCR_BORDER_SIZE);
 static QPen penCyan(QBrush(QColor(50,255,255 ,255)),1);//xoay mui tau
 static QPen penYellow(QBrush(QColor(255,255,50 ,255)),2);
@@ -59,14 +61,14 @@ static QString         strDistanceUnit;
 //short selectedTargetIndex;
 static mouseMode mouse_mode = MouseNormal;
 static DialogCommandLog *cmLog;
-
+static unsigned char commandMay22[]={0xaa,0x55,0x02,0x0c,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00};
 static enum TargetType{
     RADAR,AIS,NOTARGET
 }selectedTargetType  = NOTARGET;
 //short config.getRangeView() = 1;
 static double ringStep = 1;
 static double curAziRad = 3;
-static TrackPointer* currTrackPt;
+//static TrackPointer* currTrackPt;
 class guard_zone_t
 {
 public:
@@ -933,7 +935,8 @@ void Mainwindow::DrawRadarTargetByPainter(QPainter* p)//draw radar target from p
         if(trackPt->selected)//selected
         {
             // draw history
-            p->setPen(penSelTarget);
+            if(trackPt->flag>=0)p->setPen(penTargetEnemySelected);
+            else  p->setPen(penTargetFriendSelected);
             for (int j = 0;j<track->objectHistory.size()-1;j++)
             {
                 object_t* obj1 = &(track->objectHistory[j]);
@@ -950,9 +953,13 @@ void Mainwindow::DrawRadarTargetByPainter(QPainter* p)//draw radar target from p
                 sy1   += radCtY;
                 p->drawLine(sx,sy,sx1,sy1);
             }
-            p->setPen(penTargetSelected);
         }
-        else p->setPen(penTarget);
+        else
+        {
+
+            if(trackPt->flag>=0)p->setPen(penTargetEnemy);
+            else  p->setPen(penTargetFriend);
+        }
         if(track->isLost())
         {
             if(blink)
@@ -1377,18 +1384,18 @@ void Mainwindow::targetTableItemMenu(int row,int col)
     QTableWidgetItem* item =  ui->tableWidgetTarget_2->item(row,0);
     if(!item)return;
     int selectedTrackID = item->text().toInt();
-    currTrackPt = mTargetMan.getTargetById(selectedTrackID);
-    if(currTrackPt)
+    mTargetMan.currTrackPt = mTargetMan.getTargetById(selectedTrackID);
+    if(mTargetMan.currTrackPt)
     {
         QMenu contextMenu(tr("Context menu"), this);
-        //add to target
-        /*QAction action0(QString::fromUtf8("Đặt chỉ thị"), this);
-        connect(&action0, SIGNAL(triggered()), this, SLOT(addCurrTrackToTargets()));
-        contextMenu.addAction(&action0);*/
-        //delete
-        QAction action1(QString::fromUtf8("Xóa"), this);
-        connect(&action1, SIGNAL(triggered()), this, SLOT(removeCurrTrack()));
+        QAction action1(QString::fromUtf8("Bỏ chỉ thị"), this);
+        connect(&action1, SIGNAL(triggered()), this, SLOT(removeTarget()));
         contextMenu.addAction(&action1);
+        contextMenu.exec((QCursor::pos()));
+        //delete
+        QAction action2(QString::fromUtf8("Xóa"), this);
+        connect(&action2, SIGNAL(triggered()), this, SLOT(removeTrack()));
+        contextMenu.addAction(&action2);
         contextMenu.exec((QCursor::pos()));
     }
 }
@@ -1397,50 +1404,73 @@ void Mainwindow::trackTableItemMenu(int row,int col)
     QTableWidgetItem* item =  ui->tableWidgetTarget->item(row,0);
     if(!item)return;
     int selectedTrackID = item->text().toInt();
-    currTrackPt = mTargetMan.getTrackById(selectedTrackID);
-    if(currTrackPt)
+    mTargetMan.currTrackPt = mTargetMan.getTrackById(selectedTrackID);
+    if(mTargetMan.currTrackPt)
     {
         QMenu contextMenu(tr("Context menu"), this);
+        QAction action2(QString::fromUtf8("Đặt cờ địch"), this);
+        connect(&action2, SIGNAL(triggered()), this, SLOT(setEnemy()));
+        contextMenu.addAction(&action2);
+        //
+        QAction action3(QString::fromUtf8("Đặt cờ ta"), this);
+        connect(&action3, SIGNAL(triggered()), this, SLOT(setFriend()));
+        contextMenu.addAction(&action3);
+        //
         //add to target
         QAction action0(QString::fromUtf8("Đặt chỉ thị"), this);
-        connect(&action0, SIGNAL(triggered()), this, SLOT(addCurrTrackToTargets()));
-        contextMenu.addAction(&action0);
+        connect(&action0, &QAction::triggered, this, &Mainwindow::addToTargets);
+        //
         //delete
         QAction action1(QString::fromUtf8("Xóa"), this);
-        connect(&action1, SIGNAL(triggered()), this, SLOT(removeCurrTrack()));
+        connect(&action1, &QAction::triggered, this, &Mainwindow::removeTrack);
         contextMenu.addAction(&action1);
         contextMenu.exec((QCursor::pos()));
     }
 }
-
-void Mainwindow::removeCurrTrack()
+void Mainwindow::setEnemy()
 {
-    if(currTrackPt)
+    mTargetMan.setCurToEnemy();
+}
+void Mainwindow::setFriend()
+{
+    mTargetMan.setCurToFriend();
+}
+void Mainwindow::removeTarget()
+{
+    if(mTargetMan.currTrackPt)
     {
-
-        currTrackPt->track = nullptr;
+        //mTargetMan.currTrackPt->track->Remove();
+        mTargetMan.currTrackPt->track = nullptr;
     }
 
 }
-void Mainwindow::addCurrTrackToTargets()
+void Mainwindow::removeTrack()
 {
-    if(currTrackPt)
+    if(mTargetMan.currTrackPt)
     {
-        if(!mTargetMan.addTarget(currTrackPt->track))
-        {
-            QMessageBox msgBox;
-            msgBox.setText(QString::fromUtf8("Chỉ được chỉ thị tối đa 6 mục tiêu"));
-            msgBox.exec();
-        }
+        mTargetMan.currTrackPt->track->Remove();
+        mTargetMan.currTrackPt->track = nullptr;
     }
+
+}
+void Mainwindow::addToTargets()
+{
+    QString error = mTargetMan.addCurrTrackToTargets();
+    if(error.size())
+    {
+        QMessageBox msgBox;
+        msgBox.setText(QString::fromUtf8("Lỗi:")+error);
+        msgBox.exec();
+    }
+
 
 }
 void Mainwindow::InitSetting()
 {
-    penTargetSelected.setWidth(3);
+    penTargetEnemySelected.setWidth(3);
     penTarget.setWidth(2);
-    penSelTarget.setWidth(2);
-    penSelTarget.setStyle(Qt::DashLine);
+    penTargetEnemy.setWidth(3);
+//    penTargetEnemy.setStyle(Qt::DashLine);
     ui->tableWidgetTarget->setStyleSheet("QTableView{gridline-color: gray;}"
                                          "QTableView::item{color:white; background:#000000; font-weight:900; }"
                                          "QHeaderView::section { color:white; background-color:rgb(24, 48, 64); }");
@@ -1863,7 +1893,6 @@ void Mainwindow::Update100ms()
             mTargetMan.addTrack(&pRadar->mTrackList[i]);
     }
     //smooth the heading
-
     ui->label_head_ship->setText(QString::number(CConfig::shipHeadingDeg,'f',1));
     ui->label_speed_ship->setText(QString::number(CConfig::shipSpeed,'f',1));
     double headingDiff = CConfig::shipHeadingDeg-mShipHeading;
@@ -3588,11 +3617,11 @@ void Mainwindow::on_toolButton_filter2of3_clicked(bool checked)
 
 //}
 
-void Mainwindow::on_toolButton_create_zone_2_clicked(bool checked)
-{
-    //    if(checked)
-    //        gz2.isActive = false;
-}
+//void Mainwindow::on_toolButton_create_zone_2_clicked(bool checked)
+//{
+//    //    if(checked)
+//    //        gz2.isActive = false;
+//}
 
 void Mainwindow::on_toolButton_measuring_clicked()
 {
@@ -4293,15 +4322,15 @@ void Mainwindow::on_toolButton_head_up_toggled(bool checked)
 //        sendToRadarHS(ba.data());
 //    }
 //}
-unsigned char commandMay22[]={0xaa,0x55,0x02,0x0c,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00};
+
 void Mainwindow::on_toolButton_dk_1_toggled(bool checked)
 {
     return;
-    if(checked)
+    /*if(checked)
     {
         commandMay22[4]=0x00;
         processing->sendCommand(commandMay22,12,false);
-    }
+    }*/
 
 }
 
@@ -4363,42 +4392,42 @@ void Mainwindow::on_toolButton_dk_8_toggled(bool checked)
 
 void Mainwindow::on_toolButton_dk_9_toggled(bool checked)
 {
-    if(checked)
+    /*if(checked)
     {
 
-    }
+    }*/
 }
 
 void Mainwindow::on_toolButton_dk_10_toggled(bool checked)
 {
     return;
-    if(checked)
+    /*if(checked)
     {
         commandMay22[8]=0x01;
         processing->sendCommand(commandMay22,12,false);
-    }
+    }*/
 
 }
 
 void Mainwindow::on_toolButton_dk_12_toggled(bool checked)
 {
     return;
-    if(checked)
+    /*if(checked)
     {
         commandMay22[4]=0x01;
         processing->sendCommand(commandMay22,12,false);
-    }
+    }*/
 }
 
-void Mainwindow::on_toolButton_dk_14_toggled(bool checked)
-{
-    return;
-    if(checked)
-    {
-        commandMay22[8]=0x02;
-        processing->sendCommand(commandMay22,12,false);
-    }
-}
+//void Mainwindow::on_toolButton_dk_14_toggled(bool checked)
+//{
+//    return;
+//    /*if(checked)
+//    {
+//        commandMay22[8]=0x02;
+//        processing->sendCommand(commandMay22,12,false);
+//    }*/
+//}
 
 void Mainwindow::on_toolButton_dk_13_toggled(bool checked)
 {
@@ -4908,3 +4937,15 @@ void Mainwindow::on_toolButton_manual_tune_clicked(bool checked)
         pRadar->isManualTune = false;
     }
 }
+
+//void Mainwindow::on_dial_valueChanged(int value)
+//{
+//    value+=180;
+//    if(value>360)value-=360;
+//    ui->label_dial_value_azi->setText(QString::fromUtf8("Hướng cđ:")+QString::number(value)+degreeSymbol);
+//}
+
+//void Mainwindow::on_horizontalSlider_valueChanged(int value)
+//{
+//    ui->label_dial_value_rg->setText(QString::fromUtf8("Tốc độ:")+QString::number(value/2.0,'f',1)+"Kn");
+//}
