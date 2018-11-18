@@ -156,10 +156,10 @@ enum class TrackState {newDetection=0,
                        confirmed=3,
                        lost = 2,
                        removed=1};
-class track_t
+class C_primary_track
 {
 public:
-    track_t()
+    C_primary_track()
     {
         mState=TrackState::removed;
         isUpdating = false;
@@ -199,7 +199,7 @@ public:
         mState = TrackState::newDetection;
         //        operatorID = 0;
     }
-    ~track_t()
+    ~C_primary_track()
     {
 
     }
@@ -350,7 +350,7 @@ public:
     short                       rotDir;
     double                      rotation_per_min ;
     double                      azi_er_rad;
-    std::vector<track_t>        mTrackList;
+    std::vector<C_primary_track>        mTrackList;
     std::vector<plot_t>         plot_list;
     std::vector<object_t>       mFreeObjList;
     unsigned     long int       mPeriodCount;
@@ -493,7 +493,7 @@ private:
     //    double estimateScore(object_t *obj1, track_t *track);
     void CreateTrack(object_t *obj1, object_t *obj2);
     //    void LinearFit(track_t *track);
-    void LeastSquareFit(track_t* track);
+    void LeastSquareFit(C_primary_track* track);
     //    double LinearFitCost(track_t *track, object_t *myobj);
     void ProcessGOData(unsigned char *data, short len, int azi);
 public:

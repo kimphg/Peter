@@ -900,7 +900,7 @@ void Mainwindow::DrawRadarTargetByPainter(QPainter* p)//draw radar target from p
     {
         TrackPointer* trackPt = mTargetMan.getTargetAt(i);
         if(!trackPt)continue;
-        track_t* track = trackPt->track;
+        C_primary_track* track = trackPt->track;
         sx1 = track->xkm*mScale ;
         sy1 = -track->ykm*mScale ;
         rotateVector(trueShiftDeg,&sx1,&sy1);
@@ -916,7 +916,7 @@ void Mainwindow::DrawRadarTargetByPainter(QPainter* p)//draw radar target from p
     {
         TrackPointer* trackPt = mTargetMan.getTrackAt(i);
         if(!trackPt)continue;
-        track_t* track = trackPt->track;
+        C_primary_track* track = trackPt->track;
         if(trackPt->selected)//selected
         {
             // draw history
@@ -950,18 +950,19 @@ void Mainwindow::DrawRadarTargetByPainter(QPainter* p)//draw radar target from p
         }
         if(track->isLost())
         {
+            sx = track->xkm*mScale ;
+            sy = -track->ykm*mScale ;
+            rotateVector(trueShiftDeg,&sx,&sy);
+            sx   += radCtX;
+            sy   += radCtY;
             if(blink)
             {
-                //object_t* obj1 = &(track->objectList.back());
-                sx = track->xkm*mScale ;
-                sy = -track->ykm*mScale ;
-                rotateVector(trueShiftDeg,&sx,&sy);
-                sx   += radCtX;
-                sy   += radCtY;
                 p->drawRect(sx-5,sy-5,10,10);
                 p->drawLine(sx-7,sy-3,sx+7,sy+3);
-                continue;
+
             }
+            p->drawText(sx+6,sy+6,100,50,0,QString::number(track->uniqId));
+            continue;
         }
         //nornal targets
         else
@@ -1372,14 +1373,19 @@ void Mainwindow::trackTableItemMenu(int row,int col)
 }
 void Mainwindow::changeID()
 {
-    int value;
-    DialogInputValue dlg(this,&value);
-    dlg.show();
+    int value=1;
+    DialogInputValue *dlg= new DialogInputValue(this,&value);
+    dlg->exec();
+    if(value<1)return;
     if(!mTargetMan.changeCurrTrackID(value))
     {
         QMessageBox msgBox;
         msgBox.setText(QString::fromUtf8("Số hiệu bị trùng!"));
         msgBox.exec();
+    }
+    else
+    {
+        if(C_primary_track::IDCounter<=value)C_primary_track::IDCounter = value+1;
     }
 }
 void Mainwindow::setEnemy()
@@ -1506,12 +1512,10 @@ void Mainwindow::InitSetting()
 
     }
 
-    dxMax = SCR_H/4-10;
-    dyMax = SCR_H/4-10;
+    dxMax = SCR_H/6-10;
+    dyMax = SCR_H/6-10;
     mZoomCenterx = scrCtX ;
     mZoomCentery = scrCtY ;
-
-
     //ui->horizontalSlider_2->setValue(config.m_config.cfarThresh);
 
     ui->horizontalSlider_brightness->setValue(ui->horizontalSlider_brightness->maximum()/3.5);
@@ -4905,20 +4909,42 @@ void Mainwindow::on_toolButton_sim_target_autogenerate_clicked()
     ui->doubleSpinBox_11->setValue((rand()%720)/2.0);
     ui->doubleSpinBox_21->setValue((rand()%720)/2.0);
     ui->doubleSpinBox_31->setValue((rand()%720)/2.0);
+    ui->doubleSpinBox_41->setValue((rand()%720)/2.0);
+    ui->doubleSpinBox_51->setValue((rand()%720)/2.0);
+    ui->doubleSpinBox_61->setValue((rand()%720)/2.0);
+    ui->doubleSpinBox_71->setValue((rand()%720)/2.0);
 
     ui->doubleSpinBox_2->setValue(5+(rand()%300)/2.0);
     ui->doubleSpinBox_12->setValue(5+(rand()%300)/2.0);
     ui->doubleSpinBox_22->setValue(5+(rand()%300)/2.0);
     ui->doubleSpinBox_32->setValue(5+(rand()%300)/2.0);
+    ui->doubleSpinBox_42->setValue((rand()%720)/2.0);
+    ui->doubleSpinBox_52->setValue((rand()%720)/2.0);
+    ui->doubleSpinBox_62->setValue((rand()%720)/2.0);
+    ui->doubleSpinBox_72->setValue((rand()%720)/2.0);
 
     ui->doubleSpinBox_3->setValue((rand()%720)/2.0);
     ui->doubleSpinBox_13->setValue((rand()%720)/2.0);
     ui->doubleSpinBox_23->setValue((rand()%720)/2.0);
     ui->doubleSpinBox_33->setValue((rand()%720)/2.0);
+    ui->doubleSpinBox_43->setValue((rand()%720)/2.0);
+    ui->doubleSpinBox_53->setValue((rand()%720)/2.0);
+    ui->doubleSpinBox_63->setValue((rand()%720)/2.0);
+    ui->doubleSpinBox_73->setValue((rand()%720)/2.0);
 
     ui->doubleSpinBox_4->setValue((rand()%60)/2.0);
     ui->doubleSpinBox_14->setValue((rand()%60)/2.0);
     ui->doubleSpinBox_24->setValue((rand()%60)/2.0);
     ui->doubleSpinBox_34->setValue((rand()%60)/2.0);
+    ui->doubleSpinBox_44->setValue((rand()%720)/2.0);
+    ui->doubleSpinBox_54->setValue((rand()%720)/2.0);
+    ui->doubleSpinBox_64->setValue((rand()%720)/2.0);
+    ui->doubleSpinBox_74->setValue((rand()%720)/2.0);
+    updateSimTargetStatus();
+
+}
+
+void Mainwindow::on_checkBox_clicked()
+{
 
 }

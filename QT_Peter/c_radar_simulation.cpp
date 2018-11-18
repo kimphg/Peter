@@ -150,7 +150,7 @@ bool target_t::getEnabled() const
 
 void target_t::setEnabled(bool value)
 {
-    eraseSIgnal();
+//    eraseSIgnal();
     enabled = value;
 }
 void c_radar_simulation::initTargets()

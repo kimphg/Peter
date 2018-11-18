@@ -19241,7 +19241,7 @@
      <bool>false</bool>
     </property>
     <property name="currentIndex">
-     <number>0</number>
+     <number>5</number>
     </property>
     <property name="elideMode">
      <enum>Qt::ElideNone</enum>
@@ -31147,10 +31147,10 @@
      <widget class="QFrame" name="frame">
       <property name="geometry">
        <rect>
-        <x>-1</x>
-        <y>-1</y>
-        <width>301</width>
-        <height>341</height>
+        <x>0</x>
+        <y>80</y>
+        <width>311</width>
+        <height>291</height>
        </rect>
       </property>
       <property name="font">
@@ -31171,14 +31171,14 @@
        <property name="bottomMargin">
         <number>10</number>
        </property>
-       <item row="3" column="6">
+       <item row="4" column="6">
         <widget class="QCheckBox" name="checkBox_3">
          <property name="text">
           <string/>
          </property>
         </widget>
        </item>
-       <item row="8" column="0">
+       <item row="9" column="0">
         <widget class="QDoubleSpinBox" name="doubleSpinBox_71">
          <property name="enabled">
           <bool>false</bool>
@@ -31202,7 +31202,7 @@
          </property>
         </widget>
        </item>
-       <item row="5" column="1">
+       <item row="6" column="1">
         <widget class="QDoubleSpinBox" name="doubleSpinBox_42">
          <property name="enabled">
           <bool>false</bool>
@@ -31229,7 +31229,7 @@
          </property>
         </widget>
        </item>
-       <item row="1" column="0">
+       <item row="2" column="0">
         <widget class="QDoubleSpinBox" name="doubleSpinBox_1">
          <property name="enabled">
           <bool>false</bool>
@@ -31253,7 +31253,7 @@
          </property>
         </widget>
        </item>
-       <item row="3" column="0">
+       <item row="4" column="0">
         <widget class="QDoubleSpinBox" name="doubleSpinBox_21">
          <property name="enabled">
           <bool>false</bool>
@@ -31277,7 +31277,7 @@
          </property>
         </widget>
        </item>
-       <item row="7" column="0">
+       <item row="8" column="0">
         <widget class="QDoubleSpinBox" name="doubleSpinBox_61">
          <property name="enabled">
           <bool>false</bool>
@@ -31301,7 +31301,7 @@
          </property>
         </widget>
        </item>
-       <item row="3" column="3">
+       <item row="4" column="3">
         <widget class="QDoubleSpinBox" name="doubleSpinBox_24">
          <property name="enabled">
           <bool>false</bool>
@@ -31328,7 +31328,7 @@
          </property>
         </widget>
        </item>
-       <item row="7" column="2">
+       <item row="8" column="2">
         <widget class="QDoubleSpinBox" name="doubleSpinBox_63">
          <property name="enabled">
           <bool>false</bool>
@@ -31352,7 +31352,7 @@
          </property>
         </widget>
        </item>
-       <item row="6" column="3">
+       <item row="7" column="3">
         <widget class="QDoubleSpinBox" name="doubleSpinBox_54">
          <property name="enabled">
           <bool>false</bool>
@@ -31379,7 +31379,7 @@
          </property>
         </widget>
        </item>
-       <item row="6" column="2">
+       <item row="7" column="2">
         <widget class="QDoubleSpinBox" name="doubleSpinBox_53">
          <property name="enabled">
           <bool>false</bool>
@@ -31403,7 +31403,7 @@
          </property>
         </widget>
        </item>
-       <item row="4" column="3">
+       <item row="5" column="3">
         <widget class="QDoubleSpinBox" name="doubleSpinBox_34">
          <property name="enabled">
           <bool>false</bool>
@@ -31430,7 +31430,7 @@
          </property>
         </widget>
        </item>
-       <item row="3" column="1">
+       <item row="4" column="1">
         <widget class="QDoubleSpinBox" name="doubleSpinBox_22">
          <property name="enabled">
           <bool>false</bool>
@@ -31457,21 +31457,21 @@
          </property>
         </widget>
        </item>
-       <item row="7" column="6">
+       <item row="8" column="6">
         <widget class="QCheckBox" name="checkBox_7">
          <property name="text">
           <string/>
          </property>
         </widget>
        </item>
-       <item row="8" column="6">
+       <item row="9" column="6">
         <widget class="QCheckBox" name="checkBox_8">
          <property name="text">
           <string/>
          </property>
         </widget>
        </item>
-       <item row="5" column="5">
+       <item row="6" column="5">
         <widget class="QCustomButton" name="toolButton_start_simulation_set_5">
          <property name="enabled">
           <bool>true</bool>
@@ -31498,7 +31498,7 @@
          </property>
         </widget>
        </item>
-       <item row="8" column="5">
+       <item row="9" column="5">
         <widget class="QCustomButton" name="toolButton_start_simulation_set_8">
          <property name="enabled">
           <bool>true</bool>
@@ -31525,7 +31525,7 @@
          </property>
         </widget>
        </item>
-       <item row="3" column="5">
+       <item row="4" column="5">
         <widget class="QCustomButton" name="toolButton_start_simulation_set_3">
          <property name="enabled">
           <bool>true</bool>
@@ -31552,7 +31552,7 @@
          </property>
         </widget>
        </item>
-       <item row="4" column="5">
+       <item row="5" column="5">
         <widget class="QCustomButton" name="toolButton_start_simulation_set_4">
          <property name="enabled">
           <bool>true</bool>
@@ -31579,7 +31579,7 @@
          </property>
         </widget>
        </item>
-       <item row="1" column="5">
+       <item row="2" column="5">
         <widget class="QCustomButton" name="toolButton_start_simulation_set">
          <property name="enabled">
           <bool>true</bool>
@@ -31606,7 +31606,7 @@
          </property>
         </widget>
        </item>
-       <item row="6" column="5">
+       <item row="7" column="5">
         <widget class="QCustomButton" name="toolButton_start_simulation_set_6">
          <property name="enabled">
           <bool>true</bool>
@@ -31633,7 +31633,7 @@
          </property>
         </widget>
        </item>
-       <item row="7" column="5">
+       <item row="8" column="5">
         <widget class="QCustomButton" name="toolButton_start_simulation_set_7">
          <property name="enabled">
           <bool>true</bool>
@@ -31660,7 +31660,7 @@
          </property>
         </widget>
        </item>
-       <item row="2" column="5">
+       <item row="3" column="5">
         <widget class="QCustomButton" name="toolButton_start_simulation_set_2">
          <property name="enabled">
           <bool>true</bool>
@@ -31687,7 +31687,7 @@
          </property>
         </widget>
        </item>
-       <item row="2" column="2">
+       <item row="3" column="2">
         <widget class="QDoubleSpinBox" name="doubleSpinBox_13">
          <property name="enabled">
           <bool>false</bool>
@@ -31711,7 +31711,7 @@
          </property>
         </widget>
        </item>
-       <item row="1" column="2">
+       <item row="2" column="2">
         <widget class="QDoubleSpinBox" name="doubleSpinBox_3">
          <property name="enabled">
           <bool>false</bool>
@@ -31735,14 +31735,14 @@
          </property>
         </widget>
        </item>
-       <item row="5" column="6">
+       <item row="6" column="6">
         <widget class="QCheckBox" name="checkBox_5">
          <property name="text">
           <string/>
          </property>
         </widget>
        </item>
-       <item row="7" column="3">
+       <item row="8" column="3">
         <widget class="QDoubleSpinBox" name="doubleSpinBox_64">
          <property name="enabled">
           <bool>false</bool>
@@ -31769,7 +31769,7 @@
          </property>
         </widget>
        </item>
-       <item row="2" column="3">
+       <item row="3" column="3">
         <widget class="QDoubleSpinBox" name="doubleSpinBox_14">
          <property name="enabled">
           <bool>false</bool>
@@ -31796,7 +31796,7 @@
          </property>
         </widget>
        </item>
-       <item row="4" column="2">
+       <item row="5" column="2">
         <widget class="QDoubleSpinBox" name="doubleSpinBox_33">
          <property name="enabled">
           <bool>false</bool>
@@ -31820,14 +31820,14 @@
          </property>
         </widget>
        </item>
-       <item row="1" column="6">
+       <item row="2" column="6">
         <widget class="QCheckBox" name="checkBox">
          <property name="text">
           <string/>
          </property>
         </widget>
        </item>
-       <item row="5" column="3">
+       <item row="6" column="3">
         <widget class="QDoubleSpinBox" name="doubleSpinBox_44">
          <property name="enabled">
           <bool>false</bool>
@@ -31854,7 +31854,7 @@
          </property>
         </widget>
        </item>
-       <item row="6" column="1">
+       <item row="7" column="1">
         <widget class="QDoubleSpinBox" name="doubleSpinBox_52">
          <property name="enabled">
           <bool>false</bool>
@@ -31881,7 +31881,7 @@
          </property>
         </widget>
        </item>
-       <item row="2" column="0">
+       <item row="3" column="0">
         <widget class="QDoubleSpinBox" name="doubleSpinBox_11">
          <property name="enabled">
           <bool>false</bool>
@@ -31905,7 +31905,7 @@
          </property>
         </widget>
        </item>
-       <item row="5" column="0">
+       <item row="6" column="0">
         <widget class="QDoubleSpinBox" name="doubleSpinBox_41">
          <property name="enabled">
           <bool>false</bool>
@@ -31918,15 +31918,18 @@
          <property name="decimals">
           <number>1</number>
          </property>
+         <property name="maximum">
+          <double>360.000000000000000</double>
+         </property>
          <property name="singleStep">
           <double>1.000000000000000</double>
          </property>
          <property name="value">
-          <double>100.000000000000000</double>
+          <double>180.000000000000000</double>
          </property>
         </widget>
        </item>
-       <item row="3" column="2">
+       <item row="4" column="2">
         <widget class="QDoubleSpinBox" name="doubleSpinBox_23">
          <property name="enabled">
           <bool>false</bool>
@@ -31953,7 +31956,7 @@
          </property>
         </widget>
        </item>
-       <item row="8" column="3">
+       <item row="9" column="3">
         <widget class="QDoubleSpinBox" name="doubleSpinBox_74">
          <property name="enabled">
           <bool>false</bool>
@@ -31980,7 +31983,7 @@
          </property>
         </widget>
        </item>
-       <item row="7" column="1">
+       <item row="8" column="1">
         <widget class="QDoubleSpinBox" name="doubleSpinBox_62">
          <property name="enabled">
           <bool>false</bool>
@@ -32007,7 +32010,7 @@
          </property>
         </widget>
        </item>
-       <item row="5" column="2">
+       <item row="6" column="2">
         <widget class="QDoubleSpinBox" name="doubleSpinBox_43">
          <property name="enabled">
           <bool>false</bool>
@@ -32034,14 +32037,14 @@
          </property>
         </widget>
        </item>
-       <item row="4" column="6">
+       <item row="5" column="6">
         <widget class="QCheckBox" name="checkBox_4">
          <property name="text">
           <string/>
          </property>
         </widget>
        </item>
-       <item row="2" column="1">
+       <item row="3" column="1">
         <widget class="QDoubleSpinBox" name="doubleSpinBox_12">
          <property name="enabled">
           <bool>false</bool>
@@ -32068,7 +32071,7 @@
          </property>
         </widget>
        </item>
-       <item row="4" column="1">
+       <item row="5" column="1">
         <widget class="QDoubleSpinBox" name="doubleSpinBox_32">
          <property name="enabled">
           <bool>false</bool>
@@ -32095,7 +32098,7 @@
          </property>
         </widget>
        </item>
-       <item row="1" column="3">
+       <item row="2" column="3">
         <widget class="QDoubleSpinBox" name="doubleSpinBox_4">
          <property name="enabled">
           <bool>false</bool>
@@ -32122,7 +32125,7 @@
          </property>
         </widget>
        </item>
-       <item row="6" column="0">
+       <item row="7" column="0">
         <widget class="QDoubleSpinBox" name="doubleSpinBox_51">
          <property name="enabled">
           <bool>false</bool>
@@ -32146,14 +32149,14 @@
          </property>
         </widget>
        </item>
-       <item row="6" column="6">
+       <item row="7" column="6">
         <widget class="QCheckBox" name="checkBox_6">
          <property name="text">
           <string/>
          </property>
         </widget>
        </item>
-       <item row="4" column="0">
+       <item row="5" column="0">
         <widget class="QDoubleSpinBox" name="doubleSpinBox_31">
          <property name="enabled">
           <bool>false</bool>
@@ -32177,7 +32180,7 @@
          </property>
         </widget>
        </item>
-       <item row="8" column="1">
+       <item row="9" column="1">
         <widget class="QDoubleSpinBox" name="doubleSpinBox_72">
          <property name="enabled">
           <bool>false</bool>
@@ -32204,14 +32207,14 @@
          </property>
         </widget>
        </item>
-       <item row="2" column="6">
+       <item row="3" column="6">
         <widget class="QCheckBox" name="checkBox_2">
          <property name="text">
           <string/>
          </property>
         </widget>
        </item>
-       <item row="8" column="2">
+       <item row="9" column="2">
         <widget class="QDoubleSpinBox" name="doubleSpinBox_73">
          <property name="enabled">
           <bool>false</bool>
@@ -32235,7 +32238,7 @@
          </property>
         </widget>
        </item>
-       <item row="1" column="1">
+       <item row="2" column="1">
         <widget class="QDoubleSpinBox" name="doubleSpinBox_2">
          <property name="enabled">
           <bool>false</bool>
@@ -32262,7 +32265,7 @@
          </property>
         </widget>
        </item>
-       <item row="0" column="0">
+       <item row="1" column="0">
         <widget class="QLabel" name="label_sim_target_param_1">
          <property name="palette">
           <palette>
@@ -32701,7 +32704,7 @@
          </property>
         </widget>
        </item>
-       <item row="0" column="1">
+       <item row="1" column="1">
         <widget class="QLabel" name="label_sim_target_param_2">
          <property name="palette">
           <palette>
@@ -33135,7 +33138,7 @@
          </property>
         </widget>
        </item>
-       <item row="0" column="2">
+       <item row="1" column="2">
         <widget class="QLabel" name="label_sim_target_param_3">
          <property name="palette">
           <palette>
@@ -33569,7 +33572,7 @@
          </property>
         </widget>
        </item>
-       <item row="0" column="3">
+       <item row="1" column="3">
         <widget class="QLabel" name="label_sim_target_param_4">
          <property name="palette">
           <palette>
@@ -34003,7 +34006,7 @@
          </property>
         </widget>
        </item>
-       <item row="0" column="5" colspan="2">
+       <item row="1" column="5" colspan="2">
         <widget class="QLabel" name="label_sim_target_param_5">
          <property name="palette">
           <palette>
@@ -34437,73 +34440,19 @@
          </property>
         </widget>
        </item>
-       <item row="9" column="0" colspan="4">
-        <widget class="QCustomButton" name="toolButton_sim_target_autogenerate">
-         <property name="enabled">
-          <bool>true</bool>
-         </property>
-         <property name="sizePolicy">
-          <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-           <horstretch>0</horstretch>
-           <verstretch>0</verstretch>
-          </sizepolicy>
-         </property>
-         <property name="font">
-          <font>
-           <pointsize>12</pointsize>
-          </font>
-         </property>
-         <property name="text">
-          <string>Tạo MT ngẫu nhiên</string>
-         </property>
-         <property name="checkable">
-          <bool>true</bool>
-         </property>
-         <property name="autoExclusive">
-          <bool>true</bool>
-         </property>
-        </widget>
-       </item>
       </layout>
      </widget>
      <widget class="QWidget" name="">
       <property name="geometry">
        <rect>
         <x>10</x>
-        <y>340</y>
-        <width>277</width>
-        <height>61</height>
+        <y>10</y>
+        <width>281</width>
+        <height>71</height>
        </rect>
       </property>
-      <layout class="QHBoxLayout" name="horizontalLayout_5">
-       <item>
-        <widget class="QCustomButton" name="toolButton_start_simulation_start">
-         <property name="enabled">
-          <bool>true</bool>
-         </property>
-         <property name="sizePolicy">
-          <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-           <horstretch>0</horstretch>
-           <verstretch>0</verstretch>
-          </sizepolicy>
-         </property>
-         <property name="font">
-          <font>
-           <pointsize>12</pointsize>
-          </font>
-         </property>
-         <property name="text">
-          <string>Chạy</string>
-         </property>
-         <property name="checkable">
-          <bool>true</bool>
-         </property>
-         <property name="autoExclusive">
-          <bool>true</bool>
-         </property>
-        </widget>
-       </item>
-       <item>
+      <layout class="QGridLayout" name="gridLayout_15">
+       <item row="0" column="1">
         <widget class="QCustomButton" name="toolButton_start_simulation_stop">
          <property name="enabled">
           <bool>true</bool>
@@ -34527,6 +34476,60 @@
          </property>
          <property name="autoExclusive">
           <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="0">
+        <widget class="QCustomButton" name="toolButton_start_simulation_start">
+         <property name="enabled">
+          <bool>true</bool>
+         </property>
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="font">
+          <font>
+           <pointsize>12</pointsize>
+          </font>
+         </property>
+         <property name="text">
+          <string>Quay</string>
+         </property>
+         <property name="checkable">
+          <bool>true</bool>
+         </property>
+         <property name="autoExclusive">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="0" colspan="2">
+        <widget class="QCustomButton" name="toolButton_sim_target_autogenerate">
+         <property name="enabled">
+          <bool>true</bool>
+         </property>
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="font">
+          <font>
+           <pointsize>12</pointsize>
+          </font>
+         </property>
+         <property name="text">
+          <string>Tạo MT ngẫu nhiên</string>
+         </property>
+         <property name="checkable">
+          <bool>false</bool>
+         </property>
+         <property name="autoExclusive">
+          <bool>false</bool>
          </property>
         </widget>
        </item>

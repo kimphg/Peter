@@ -618,6 +618,8 @@ private slots:
 
     void on_toolButton_sim_target_autogenerate_clicked();
 
+    void on_checkBox_clicked();
+
 private:
 
 //    bool mShowobjects,

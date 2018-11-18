@@ -20,7 +20,7 @@
 #define AZI_ERROR_STD 0.01746
 #define TARGET_OBSERV_PERIOD 6500//ENVAR max periods to save object in the memory
 static  FILE *logfile;
-int track_t::IDCounter =1;
+int C_primary_track::IDCounter =1;
 static int sumvar = 0;
 static int nNoiseCalculator = 0;
 static short lastProcessAzi = 0;
@@ -161,13 +161,13 @@ static qint64 cur_timeMSecs = 0;//QDateTime::currentMSecsSinceEpoch();
 static signal_map_t data_mem;
 static float                   rot_period_sec =0;
 static short histogram[256];
-void track_t::addPossible(object_t *obj,double score)
+void C_primary_track::addPossible(object_t *obj,double score)
 {
     possibleObj=(*obj);
     possibleMaxScore=score;
 }
 
-double track_t::estimateScore(object_t *obj1,object_t *obj2)
+double C_primary_track::estimateScore(object_t *obj1,object_t *obj2)
 {
     double dtime = (obj1->timeMs - obj2->timeMs);
     if(dtime<500)return -1;
@@ -211,7 +211,7 @@ double track_t::estimateScore(object_t *obj1,object_t *obj2)
 
 }
 #define FIT_ELEMENTS 3
-double track_t::LinearFitCost(object_t *myobj)
+double C_primary_track::LinearFitCost(object_t *myobj)
 {
     int nEle = FIT_ELEMENTS;
     //    if(this->objectList.size()<nEle-1)
@@ -294,7 +294,7 @@ inline double fastPow(double a, double b) {
     u.x[0] = 0;
     return u.d;
 }
-double track_t::estimateScore(object_t *obj1)
+double C_primary_track::estimateScore(object_t *obj1)
 {
     //return estimateScore(obj1,&(this->objectList.back()));
     if(objectList.size()<2)
@@ -303,7 +303,7 @@ double track_t::estimateScore(object_t *obj1)
     double dtime = (obj1->timeMs - obj2->timeMs);
     if(dtime<300)
         return -1;//ENVAR min time between plots in a line(1s)
-    if(dtime>80000)
+    if(dtime>120000)
         return -1;
     dtime/=3600000.0;
     double dx = obj1->xkm - obj2->xkm;
@@ -356,7 +356,7 @@ double track_t::estimateScore(object_t *obj1)
 
 
 }
-void track_t::LinearFit()
+void C_primary_track::LinearFit()
 {
     /*
 double xsum=0,x2sum=0,ysum=0,xysum=0;
@@ -430,8 +430,8 @@ double xsum=0,x2sum=0,ysum=0,xysum=0;
 
 C_radar_data::C_radar_data()
 {
-    track_t track;
-    mTrackList = std::vector<track_t>(MAX_TRACKS,track);
+    C_primary_track track;
+    mTrackList = std::vector<C_primary_track>(MAX_TRACKS,track);
     giaQuayPhanCung = false;
     //    mShipHeading = 0;
     isTrueHeading = true;
@@ -1407,7 +1407,7 @@ void C_radar_data::clearPPI()
 
 
 #define POLY_DEG 2
-void C_radar_data::LeastSquareFit(track_t* track)
+void C_radar_data::LeastSquareFit(C_primary_track* track)
 {
     /*
     uint  nElement = 6;
@@ -1497,7 +1497,7 @@ void C_radar_data::LeastSquareFit(track_t* track)
 ushort mulOf16Azi = 0;
 void C_radar_data::UpdateData()
 {
-    while(aziToProcess.size()>2)
+    while(aziToProcess.size()>3)
     {
 
         int azi = aziToProcess.front();
@@ -2316,7 +2316,7 @@ void C_radar_data::ProcessTracks()
 
     for (ushort j=0;j<mTrackList.size();j++)
     {
-        track_t* track = &(mTrackList[j]);
+        C_primary_track* track = &(mTrackList[j]);
         if(track->mState==TrackState::removed)continue;
         if(track->mState==TrackState::lost)continue;
         track->update(now_ms);
@@ -2356,11 +2356,11 @@ bool C_radar_data::ProcessObject(object_t *obj1)
 bool C_radar_data::checkBelongToTrack(object_t *obj1)
 {
     bool isBelongingToTrack = false;
-    track_t* chosenTrack =nullptr;
+    C_primary_track* chosenTrack =nullptr;
     double maxScore=0;
     for (ushort j=0;j<mTrackList.size();j++)
     {
-        track_t* track = &(mTrackList[j]);
+        C_primary_track* track = &(mTrackList[j]);
 
         if(track->mState==TrackState::removed||
                 track->mState==TrackState::lost)continue;
@@ -2432,7 +2432,7 @@ void C_radar_data::CreateTrack(object_t* obj1,object_t* obj2)
         }
     }
     if(!detectConfirmed)return;
-    int id = track_t::IDCounter++;
+    int id = C_primary_track::IDCounter++;
     for (ushort j=0;j<mTrackList.size();j++)
     {
         if(mTrackList[j].mState==TrackState::removed)
@@ -2477,7 +2477,7 @@ bool C_radar_data::checkBelongToObj(object_t* obj1)
         }
         //float rgSpeedkmh = (obj1->rgKm-obj2->rgKm)/(dtime/3600000.0);
         //if(rgSpeedkmh>85)continue;//ENVAR
-        double score = track_t::estimateScore(obj1,obj2);
+        double score = C_primary_track::estimateScore(obj1,obj2);
         if(score<=0)continue;
         if(score>maxScore)
         {

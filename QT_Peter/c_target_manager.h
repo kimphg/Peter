@@ -8,7 +8,7 @@
 #define KASU_DATA_SIZE 144
 
 typedef struct {
-    track_t* track;
+    C_primary_track* track;
     int trackUniqID;
     bool selected;
     int flag;
@@ -31,8 +31,8 @@ public:
     TrackPointer *getTrackById(int id);
     TrackPointer *getTargetById(int id);
     TrackPointer *getTrackAt(int i);
-    bool addTrack(track_t *);
-    bool addTarget(track_t *);
+    bool addTrack(C_primary_track *);
+    bool addTarget(C_primary_track *);
     bool checkIDExist(int id);
     bool changeCurrTrackID(int id);
     void setSelectedTrack(int uniqID);

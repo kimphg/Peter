@@ -77,7 +77,7 @@ TrackPointer* c_target_manager::getTrackAt(int i)
     return trackPt;
 }
 
-bool c_target_manager::addTarget(track_t * track)
+bool c_target_manager::addTarget(C_primary_track * track)
 {
     //search for duplication
     for (uint i = 0;i<TARGET_TABLE_SIZE;i++)
@@ -141,7 +141,7 @@ bool c_target_manager::changeCurrTrackID(int id)
     return true;
 
 }
-bool c_target_manager::addTrack(track_t* track)
+bool c_target_manager::addTrack(C_primary_track* track)
 {
     //search for empty slot
     for (uint i = 0;i<TRACK_TABLE_SIZE;i++)
@@ -161,7 +161,7 @@ bool c_target_manager::addTrack(track_t* track)
             if(trackTable[i].track->isRemoved()||(trackTable[i].trackUniqID!=trackTable[i].track->uniqId))
             {
                 trackTable[i].track = track;
-                track->uniqId = track_t::IDCounter++;
+                track->uniqId = C_primary_track::IDCounter++;
                 trackTable[i].trackUniqID = track->uniqId;
                 return true;
             }
@@ -349,7 +349,7 @@ void c_target_manager::OutputTargetToKasu()
     //targets:
     for(int i=0;i<6;i++)
     {
-        track_t* target = targetTable[i].track;
+        C_primary_track* target = targetTable[i].track;
         if(target==nullptr)continue;
         dataPacket[0] = (unsigned char)(i+1);
         //distance
