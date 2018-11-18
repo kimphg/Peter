@@ -358,6 +358,7 @@ public:
     qint64 time_start_ms;
     double sn_scale;
     bool isTrueHeading;
+    bool isDrawn;
     //    double mShipHeading;
     uint   now_ms ;
     //    bool                    isEncoderAzi;
@@ -444,7 +445,7 @@ public:
     void setIsVtorih(bool value);
 
     bool getIsSharpEye() const;
-    void setIsSharpEye(bool value);
+//    void setIsSharpEye(bool value);
 
     double getArcMaxAziRad() const;
     double getArcMinAziRad() const;
@@ -467,7 +468,7 @@ private:
     unsigned char command_feedback[8];
     void        polarToXY(float *x, float *y, float azi, float range);
     bool        isProcessing;
-    bool        isSharpEye;
+//    bool        isSharpEye;
     float       noiseAverage,rainLevel,noiseVar;
     void        getNoiseLevel();
     void        procPix(short proc_azi,short range);

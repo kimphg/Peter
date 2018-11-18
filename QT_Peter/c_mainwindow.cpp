@@ -7,14 +7,14 @@
 
 
 #define MAX_VIEW_RANGE_KM   50
-static QPen penTarget(Qt::darkMagenta);
-static QPen penTargetEnemy(Qt::darkMagenta);
-static QPen penTargetFriend(QBrush(QColor(0,200,200 ,255)),1);
-static QPen penTargetEnemySelected(Qt::magenta);
+static QPen penTargetHistory(QBrush(Qt::gray),1);
+static QPen penTargetEnemy(QBrush(Qt::darkMagenta),2);
+static QPen penTargetFriend(QBrush(QColor(0,200,200 ,255)),2);
+static QPen penTargetEnemySelected(QBrush(Qt::magenta),3);
 static QPen penTargetFriendSelected(QBrush(QColor(50,255,255 ,255)),3);
 static QPen penBackground(QBrush(QColor(24 ,48 ,64,255)),200+SCR_BORDER_SIZE);
 static QPen penCyan(QBrush(QColor(50,255,255 ,255)),1);//xoay mui tau
-static QPen penYellow(QBrush(QColor(255,255,50 ,255)),2);
+static QPen penYellow(QBrush(QColor(255,255,50 ,255)),1);
 static QPen mGridViewPen1(QBrush(QColor(150,150,150,255)),1);
 static clock_t clkBegin = clock();
 static clock_t clkEnd = clock();
@@ -27,7 +27,7 @@ static CMap *osmap ;
 static bool toolButton_grid_checked = true;
 static StatusWindow                *mstatWin;
 static double                      mHeadingT2,mHeadingT,mAziCorrecting;
-static int                         mRangeLevel = 0;
+static int                         mRangeIndex = 0;
 static int                         mDistanceUnit=0;//0:NM;1:KM
 static double                      mZoomSizeRg = 2;
 static double                      mZoomSizeAz = 10;
@@ -37,8 +37,9 @@ static bool                        isMapOutdated = true;
 static bool isHeadUp = false;
 static int   mMousex =0,mMousey=0;
 static dataProcessingThread        *processing;// thread xu ly du lieu radar
+static c_radar_simulation          *simulator;// thread tao gia tin hieu
 static C_radar_data                *pRadar;
-static QThread                     *t2,*t1;
+static QThread                     *tprocessing;
 static QPoint points[6];
 static double                      mMapOpacity;
 static int                         mMaxTapMayThu=18;
@@ -69,26 +70,6 @@ static enum TargetType{
 static double ringStep = 1;
 static double curAziRad = 3;
 //static TrackPointer* currTrackPt;
-class guard_zone_t
-{
-public:
-    guard_zone_t(){}
-    ~guard_zone_t(){}
-    short x1,y1,x2,y2;
-    float maxAzi,minAzi;
-    float maxR,minR;
-    char  isActive;
-    void update()
-    {
-        //float azi,rg;
-        //        C_radar_data::kmxyToPolar((x1 - radCtX)/mScale,-(y1 - radCtY)/mScale,&minAzi,&minR);
-        //        C_radar_data::kmxyToPolar((x2 - radCtX)/mScale,-(y2 - radCtY)/mScale,&maxAzi,&maxR);
-        //        if(minAzi<0)minAzi += PI_NHAN2;
-        //        minAzi = minAzi*DEG_RAD;
-        //        if(maxAzi<0)maxAzi += PI_NHAN2;
-        //        maxAzi = maxAzi*DEG_RAD;
-    }
-};
 //guard_zone_t gz1,gz2,gz3;
 //static unsigned short cur_object_index = 0;
 short lon2x(float lon)
@@ -115,6 +96,10 @@ inline QString demicalDegToDegMin(double demicalDeg)
     return QString::number( (short)demicalDeg) +
             QString::fromLocal8Bit("\260")+
             QString::number((demicalDeg-(short)demicalDeg)*60.0,'f',2);
+}
+void Mainwindow::ConvXYradar2XYscr()
+{
+
 }
 void Mainwindow::mouseDoubleClickEvent( QMouseEvent * e )
 {
@@ -910,7 +895,7 @@ void Mainwindow::DrawRadarTargetByPainter(QPainter* p)//draw radar target from p
 
     bool blink = (CConfig::time_now_ms/500)%2;
     //draw targeted tracks
-    p->setPen(penTarget);
+    p->setPen(penTargetEnemy);
     for (uint i = 0;i<TARGET_TABLE_SIZE;i++)
     {
         TrackPointer* trackPt = mTargetMan.getTargetAt(i);
@@ -935,14 +920,15 @@ void Mainwindow::DrawRadarTargetByPainter(QPainter* p)//draw radar target from p
         if(trackPt->selected)//selected
         {
             // draw history
-            if(trackPt->flag>=0)p->setPen(penTargetEnemySelected);
-            else  p->setPen(penTargetFriendSelected);
+            p->setPen(penTargetHistory);
+            //if(trackPt->flag>=0)p->setPen(penTargetEnemySelected);
+            //else  p->setPen(penTargetFriendSelected);
             for (int j = 0;j<track->objectHistory.size()-1;j++)
             {
                 object_t* obj1 = &(track->objectHistory[j]);
                 object_t* obj2 = &(track->objectHistory[j+1]);
-                sx = obj1->xkm*mScale ;//+ radCtX;
-                sy = -obj1->ykm*mScale ;//+ radCtY;
+                sx = obj1->xkm*mScale ;
+                sy = -obj1->ykm*mScale;
                 rotateVector(trueShiftDeg,&sx,&sy);
                 sx   += radCtX;
                 sy   += radCtY;
@@ -953,6 +939,8 @@ void Mainwindow::DrawRadarTargetByPainter(QPainter* p)//draw radar target from p
                 sy1   += radCtY;
                 p->drawLine(sx,sy,sx1,sy1);
             }
+            if(trackPt->flag>=0)p->setPen(penTargetEnemySelected);
+            else  p->setPen(penTargetFriendSelected);
         }
         else
         {
@@ -1109,56 +1097,7 @@ void Mainwindow::ConvKmToWGS(double x, double y, double *m_Long, double *m_Lat)
     *m_Long = (x)/(111.31949079327357*cos(refLat))+ mLon;
     //tinh toa do lat-lon khi biet xy km (truong hop coi trai dat hinh cau)
 }
-void Mainwindow::drawAisTarget2(QPainter *p)
-{
-    /*
-    //draw radar  target:
-    QPen penTargetRed(QColor(255,50,150));
-    penTargetRed.setWidth(0);
-    for(uint i=0;i<processing->m_AISList.size();i++)
-    {
-            p->setPen(penTargetRed);
-//            short j;
-            //draw track:
-            double fx,fy;
-//            float mlat = m_trackList.at(i).getLat();
-//            mlat =  mlat/bit23* 180.0f ;
-//            float mlon = m_trackList.at(i).mLong_double;
-//            mlon = mlon/bit23* 180.0f ;
-                ConvWGSToKm(&fx,&fy,processing->m_AISList.at(i).getLon(),processing->m_AISList.at(i).getLat());
 
-                short x = (fx*mScale)+radCtX;
-                short y = (fy*mScale)+radCtY;
-                //draw ais mark
-                QPolygon poly;
-                QPoint point;
-                float head = processing->m_AISList.at(i).m_Head*PI_NHAN2/(1<<16);
-                point.setX(x+8*sinFast(head));
-                point.setY(y-8*cosFast(head));
-                poly<<point;
-                point.setX(x+8*sinFast(head+2.3562f));
-                point.setY(y-8*cosFast(head+2.3562f));
-                poly<<point;
-                point.setX(x);
-                point.setY(y);
-                poly<<point;
-                point.setX(x+8*sinFast(head-2.3562f));
-                point.setY(y-8*cosFast(head-2.3562f));
-                poly<<point;
-                p->drawPolygon(poly);
-                //draw ais name
-                if(ui->toolButton_ais_name->isChecked())
-                {
-                    QFont font = p->font() ;
-                    font.setPointSize(6);
-                    p->setFont(font);
-                    p->drawText(x+5,y+10,(processing->m_AISList.at(i).m_szName));
-                }
-//                p->drawText(x+5,y+5,QString::fromAscii((char*)&m_trackList.at(i).m_MMSI[0],9));
-                //printf("\nj:%d,%d,%d,%f,%f",j,x,y,arpa_data.ais_track_list[i].object_list[j].mlong,arpa_data.ais_track_list[i].object_list[j].mlat);
-
-    }*/
-}
 void Mainwindow::UpdateMouseStat(QPainter *p)
 {
 
@@ -1282,7 +1221,7 @@ void Mainwindow::DrawIADArea(QPainter* p)
     {
         //C_radar_data *prad = pRadar;
         p->drawImage(rect,*pRadar->img_zoom_ppi,pRadar->img_zoom_ppi->rect());
-        if(mRangeLevel>2)
+        if(mRangeIndex>2)
         {
             short zoom_size = ui->tabWidget_iad->width()/pRadar->scale_zoom_ppi*pRadar->scale_ppi;
             p->setPen(QPen(QColor(255,255,255,200),0,Qt::DashLine));
@@ -1419,12 +1358,28 @@ void Mainwindow::trackTableItemMenu(int row,int col)
         //add to target
         QAction action0(QString::fromUtf8("Đặt chỉ thị"), this);
         connect(&action0, &QAction::triggered, this, &Mainwindow::addToTargets);
-        //
+        contextMenu.addAction(&action0);
+//        //change id
+        QAction action4(QString::fromUtf8("Đổi số hiệu"), this);
+        connect(&action4, &QAction::triggered, this, &Mainwindow::changeID);
+        contextMenu.addAction(&action4);
         //delete
         QAction action1(QString::fromUtf8("Xóa"), this);
         connect(&action1, &QAction::triggered, this, &Mainwindow::removeTrack);
         contextMenu.addAction(&action1);
         contextMenu.exec((QCursor::pos()));
+    }
+}
+void Mainwindow::changeID()
+{
+    int value;
+    DialogInputValue dlg(this,&value);
+    dlg.show();
+    if(!mTargetMan.changeCurrTrackID(value))
+    {
+        QMessageBox msgBox;
+        msgBox.setText(QString::fromUtf8("Số hiệu bị trùng!"));
+        msgBox.exec();
     }
 }
 void Mainwindow::setEnemy()
@@ -1467,9 +1422,10 @@ void Mainwindow::addToTargets()
 }
 void Mainwindow::InitSetting()
 {
-    penTargetEnemySelected.setWidth(3);
-    penTarget.setWidth(2);
-    penTargetEnemy.setWidth(3);
+    updateSimTargetStatus();
+    //penTargetEnemySelected.setWidth(3);
+    //penTarget.setWidth(2);
+    //penTargetEnemy.setWidth(3);
 //    penTargetEnemy.setStyle(Qt::DashLine);
     ui->tableWidgetTarget->setStyleSheet("QTableView{gridline-color: gray;}"
                                          "QTableView::item{color:white; background:#000000; font-weight:900; }"
@@ -1480,9 +1436,7 @@ void Mainwindow::InitSetting()
     ui->tableWidgetTarget->setEditTriggers(QAbstractItemView::NoEditTriggers);
     ui->tableWidgetTarget->setContextMenuPolicy(Qt::CustomContextMenu);
     connect(ui->tableWidgetTarget, SIGNAL(cellClicked(int ,int)), this, SLOT(trackTableItemMenu(int,int)));
-//    ui->tableWidgetTarget->setFocusPolicy(Qt::NoFocus);
     ui->tableWidgetTarget_2->setEditTriggers(QAbstractItemView::NoEditTriggers);
-//    ui->tableWidgetTarget_2->setFocusPolicy(Qt::NoFocus);
     ui->tableWidgetTarget_2->setContextMenuPolicy(Qt::CustomContextMenu);
     connect(ui->tableWidgetTarget_2, SIGNAL(cellClicked(int ,int)), this, SLOT(targetTableItemMenu(int,int)));
     on_toolButton_signal_type_2_clicked();
@@ -1494,7 +1448,7 @@ void Mainwindow::InitSetting()
         systemCommand= "start "+systemCommand;
         system((char*)systemCommand.toStdString().data());}
     mMaxTapMayThu = CConfig::getInt("mMaxTapMayThu");
-    mRangeLevel = CConfig::getInt("mRangeLevel");
+    mRangeIndex = CConfig::getInt("mRangeLevel");
     //assert(mRangeLevel>=0&&mRangeLevel<8);
     setDistanceUnit(CConfig::getInt("mDistanceUnit"));
     //assert(mDistanceUnit>=0&&mDistanceUnit<2);
@@ -1860,10 +1814,16 @@ void Mainwindow::readBuffer()
 }
 void Mainwindow::InitTimer()
 {
-    t2 = new QThread();
 
+
+    tprocessing = new QThread();
     processing = new dataProcessingThread();
     pRadar = processing->mRadarData;
+    //init simulator
+    simulator = new c_radar_simulation(processing->mRadarData);
+    connect(this,SIGNAL(destroyed()),simulator,SLOT(deleteLater()));
+    simulator->start(QThread::HighPriority);
+    //
     connect(&syncTimer1s, SIGNAL(timeout()), this, SLOT(sync1S()));
     syncTimer1s.start(1000);
     connect(&syncTimer5p, SIGNAL(timeout()), this, SLOT(sync5p()));
@@ -1878,7 +1838,7 @@ void Mainwindow::InitTimer()
     connect(this,SIGNAL(destroyed()),processing,SLOT(deleteLater()));
     connect(&dataPlaybackTimer,SIGNAL(timeout()),processing,SLOT(playbackRadarData()));
     processing->start(QThread::TimeCriticalPriority);
-    t2->start(QThread::HighPriority);
+    tprocessing->start(QThread::HighPriority);
 
     connect(&timerMetaUpdate, SIGNAL(timeout()), this, SLOT(Update100ms()));
     timerMetaUpdate.start(100);//ENVDEP
@@ -2859,14 +2819,17 @@ void Mainwindow::setScaleRange(double srange)
 }
 void Mainwindow::UpdateScale()
 {
+    if(simulator->getIsPlaying())
+    {
+        simulator->setRange(mRangeIndex);
+    }
     float oldScale = mScale;
     if(mDistanceUnit==0)//NM
     {
-        switch(mRangeLevel)
+        switch(mRangeIndex)
         {
         case 0:
             setScaleRange(2);
-
             break;
         case 1:
             setScaleRange(4);
@@ -2903,7 +2866,7 @@ void Mainwindow::UpdateScale()
     }
     else if(mDistanceUnit==1)
     {
-        switch(mRangeLevel)
+        switch(mRangeIndex)
         {
         case 0:
             setScaleRange(2.5);
@@ -3388,8 +3351,8 @@ void Mainwindow::on_toolButton_send_command_clicked()
 
 void Mainwindow::on_toolButton_zoom_in_clicked()
 {
-    if(mRangeLevel >0) mRangeLevel-=1;
-    CConfig::setValue("mRangeLevel",mRangeLevel);
+    if(mRangeIndex >0) mRangeIndex-=1;
+    CConfig::setValue("mRangeLevel",mRangeIndex);
 
     UpdateScale();
     SendScaleCommand();
@@ -3400,7 +3363,7 @@ void Mainwindow::SendScaleCommand()
 {
     if(!ui->toolButton_auto_adapt->isChecked())return;
     QString commandString;
-    switch(mRangeLevel)
+    switch(mRangeIndex)
     {
     case 0:
         commandString = (CConfig::getString("mR1Command"));
@@ -3440,8 +3403,8 @@ void Mainwindow::SendScaleCommand()
 }
 void Mainwindow::on_toolButton_zoom_out_clicked()
 {
-    if(mRangeLevel <7) mRangeLevel+=1;
-    CConfig::setValue("mRangeLevel",mRangeLevel);
+    if(mRangeIndex <7) mRangeIndex+=1;
+    CConfig::setValue("mRangeLevel",mRangeIndex);
     UpdateScale();
     isMapOutdated = true;
 }
@@ -3669,186 +3632,6 @@ void Mainwindow::on_toolButton_ais_reset_clicked()
 }
 
 
-
-//void Mainwindow::on_toolButton_2x_zoom_clicked(bool checked)
-//{
-//    if(checked)
-//    {
-//        pRadar->setScaleZoom(8);
-//    }
-//    else
-//    {
-//        pRadar->setScaleZoom(4);
-//    }
-//}
-
-void Mainwindow::on_toolButton_auto_adapt_clicked()
-{/*
-            if(config.getRangeView()<=2)
-            {
-                sendToRadarHS("1aab200100000000");// bat thich nghi
-                sendToRadarHS("14abff1100000000");// do trong
-                sendToRadarHS("08ab000000000000");//do phan giai
-                sendToRadarHS("01ab040000000000");//tin hieu dttt32
-                sendToRadarHS("aaab020000000000");//tat phat
-                sendToRadarHS("aaab020000000000");//tat phat
-                sendToRadarHS("aaab020000000000");//tat phat
-                sendToRadarHS("1aab200000000000");//tat thich nghi
-                sendToRadarHS("aaab020100000000");//bat phat
-                sendToRadarHS("aaab020100000000");//bat phat
-                sendToRadarHS("aaab020100000000");//bat phat
-                sendToRadarHS("aaab030500000000");//toc do quay
-                sendToRadarHS("aaab030500000000");//toc do quay
-                sendToRadarHS("aaab030500000000");//toc do quay
-
-            }
-            else if(config.getRangeView() ==3)
-            {
-                sendToRadarHS("1aab200100000000");// bat thich nghi
-                sendToRadarHS("08ab010000000000");//do phan giai
-                sendToRadarHS("14abff0100000000");// do trong
-                sendToRadarHS("01ab040100000000");//tin hieu dttt64
-                sendToRadarHS("aaab020000000000");//tat phat
-                sendToRadarHS("aaab020000000000");//tat phat
-                sendToRadarHS("aaab020000000000");//tat phat
-                sendToRadarHS("1aab200000000000");//tat thich nghi
-                sendToRadarHS("aaab020100000000");//bat phat
-                sendToRadarHS("aaab020100000000");//bat phat
-                sendToRadarHS("aaab020100000000");//bat phat
-                sendToRadarHS("aaab030400000000");//toc do quay
-                sendToRadarHS("aaab030400000000");//toc do quay
-                sendToRadarHS("aaab030400000000");//toc do quay
-            }
-            else if(config.getRangeView()==4)
-            {
-                sendToRadarHS("1aab200100000000");// bat thich nghi
-                sendToRadarHS("08ab020000000000");//do phan giai 30
-                sendToRadarHS("14abff0100000000");// do trong
-                sendToRadarHS("01ab040200000000");//tin hieu dttt128
-                sendToRadarHS("aaab020000000000");//tat phat
-                sendToRadarHS("aaab020000000000");//tat phat
-                sendToRadarHS("aaab020000000000");//tat phat
-                sendToRadarHS("1aab200000000000");//tat thich nghi
-                sendToRadarHS("aaab020100000000");//bat phat
-                sendToRadarHS("aaab020100000000");//bat phat
-                sendToRadarHS("aaab020100000000");//bat phat
-                sendToRadarHS("aaab030400000000");//toc do quay
-                sendToRadarHS("aaab030400000000");//toc do quay
-                sendToRadarHS("aaab030400000000");//toc do quay
-            }
-            else if(config.getRangeView()==5)
-            {
-                sendToRadarHS("1aab200100000000");// bat thich nghi
-                sendToRadarHS("08ab020000000000");//do phan giai 60
-                sendToRadarHS("14abff0100000000");// do trong
-                sendToRadarHS("01ab040300000000");//tin hieu dttt256
-                sendToRadarHS("aaab020000000000");//tat phat
-                sendToRadarHS("aaab020000000000");//tat phat
-                sendToRadarHS("aaab020000000000");//tat phat
-                sendToRadarHS("1aab200000000000");//tat thich nghi
-                sendToRadarHS("aaab020100000000");//bat phat
-                sendToRadarHS("aaab020100000000");//bat phat
-                sendToRadarHS("aaab020100000000");//bat phat
-                sendToRadarHS("aaab030300000000");//toc do quay
-                sendToRadarHS("aaab030300000000");//toc do quay
-                sendToRadarHS("aaab030300000000");//toc do quay
-            }
-            else if(config.getRangeView()==6)
-            {
-                sendToRadarHS("1aab200100000000");// bat thich nghi
-                sendToRadarHS("08ab030000000000");//do phan giai 90
-                sendToRadarHS("14abff0100000000");// do trong
-                sendToRadarHS("01ab040300000000");//tin hieu dttt256
-                sendToRadarHS("aaab020000000000");//tat phat
-                sendToRadarHS("aaab020000000000");//tat phat
-                sendToRadarHS("aaab020000000000");//tat phat
-                sendToRadarHS("1aab200000000000");//tat thich nghi
-                sendToRadarHS("aaab020100000000");//bat phat
-                sendToRadarHS("aaab020100000000");//bat phat
-                sendToRadarHS("aaab020100000000");//bat phat
-                sendToRadarHS("aaab030200000000");//toc do quay
-                sendToRadarHS("aaab030200000000");//toc do quay
-                sendToRadarHS("aaab030200000000");//toc do quay
-            }
-            else if(config.getRangeView()==7)
-            {
-                sendToRadarHS("1aab200100000000");// bat thich nghi
-                sendToRadarHS("08ab040000000000");//do phan giai 120
-                sendToRadarHS("14abff0100000000");// do trong
-                sendToRadarHS("01ab040300000000");//tin hieu dttt256
-                sendToRadarHS("aaab020000000000");//tat phat
-                sendToRadarHS("aaab020000000000");//tat phat
-                sendToRadarHS("aaab020000000000");//tat phat
-                sendToRadarHS("1aab200000000000");//tat thich nghi
-                sendToRadarHS("aaab020100000000");//bat phat
-                sendToRadarHS("aaab020100000000");//bat phat
-                sendToRadarHS("aaab020100000000");//bat phat
-                sendToRadarHS("aaab030100000000");//toc do quay
-                sendToRadarHS("aaab030100000000");//toc do quay
-                sendToRadarHS("aaab030100000000");//toc do quay
-            }
-            else if(config.getRangeView() ==8)
-            {
-                sendToRadarHS("1aab200100000000");// bat thich nghi
-                sendToRadarHS("08ab050000000000");//do phan giai 150
-                sendToRadarHS("14abff0100000000");// do trong
-                sendToRadarHS("01ab040300000000");//tin hieu dttt256
-                sendToRadarHS("aaab020000000000");//tat phat
-                sendToRadarHS("aaab020000000000");//tat phat
-                sendToRadarHS("aaab020000000000");//tat phat
-                sendToRadarHS("1aab200000000000");//tat thich nghi
-                sendToRadarHS("aaab020100000000");//bat phat
-                sendToRadarHS("aaab020100000000");//bat phat
-                sendToRadarHS("aaab020100000000");//bat phat
-                sendToRadarHS("aaab030100000000");//toc do quay
-                sendToRadarHS("aaab030100000000");//toc do quay
-                sendToRadarHS("aaab030100000000");//toc do quay
-            }
-            else if(config.getRangeView()==9)
-            {
-                sendToRadarHS("1aab200100000000");// bat thich nghi
-                sendToRadarHS("08ab060000000000");//do phan giai 180
-                sendToRadarHS("14abff0100000000");// do trong
-                sendToRadarHS("01ab040300000000");//tin hieu dttt256
-                sendToRadarHS("aaab020000000000");//tat phat
-                sendToRadarHS("aaab020000000000");//tat phat
-                sendToRadarHS("aaab020000000000");//tat phat
-                sendToRadarHS("1aab200000000000");//tat thich nghi
-                sendToRadarHS("aaab020100000000");//bat phat
-                sendToRadarHS("aaab020100000000");//bat phat
-                sendToRadarHS("aaab020100000000");//bat phat
-                sendToRadarHS("aaab030100000000");//toc do quay
-                sendToRadarHS("aaab030100000000");//toc do quay
-                sendToRadarHS("aaab030100000000");//toc do quay
-            }
-            pRadar->resetTrack();*/
-    //    for(short i = 0;i<targetDisplayList.size();i++)
-    //    {
-    //        targetDisplayList.at(i)->deleteLater();
-    //    }
-    //    targetDisplayList.clear();
-}
-
-void Mainwindow::on_toolButton_set_header_size_clicked()
-{
-    //    pRadar->SetHeaderLen(ui->textEdit_header_len->text().toInt());
-}
-
-void Mainwindow::on_toolButton_xl_nguong_clicked()
-{
-
-}
-
-void Mainwindow::on_toolButton_xl_nguong_clicked(bool checked)
-{
-
-}
-
-void Mainwindow::on_toolButton_filter2of3_2_clicked(bool checked)
-{
-    //pRadar->setDoubleFilter(checked);
-}
-
 void Mainwindow::on_toolButton_command_dopler_clicked()
 {
     ui->lineEdit_byte_1->setText("05");
@@ -3999,10 +3782,10 @@ void Mainwindow::on_toolButton_record_clicked()
 
 }
 
-void Mainwindow::on_toolButton_sharp_eye_toggled(bool checked)
-{
-    pRadar->setIsSharpEye(checked);
-}
+//void Mainwindow::on_toolButton_sharp_eye_toggled(bool checked)
+//{
+//    pRadar->setIsSharpEye(checked);
+//}
 
 void Mainwindow::on_toolButton_help_clicked()
 {
@@ -4140,10 +3923,6 @@ void Mainwindow::on_toolButton_advanced_control_clicked()
 
 }
 */
-void Mainwindow::on_toolButton_grid_clicked(bool checked)
-{
-
-}
 
 void Mainwindow::on_toolButton_auto_freq_toggled(bool checked)
 {
@@ -4240,15 +4019,12 @@ void Mainwindow::on_toolButton_selfRotation_2_toggled(bool checked)
         pRadar->SelfRotationOff();
 }
 
-void Mainwindow::on_toolButton_selfRotation_clicked()
-{
+//void Mainwindow::on_toolButton_selfRotation_clicked()
+//{
 
-}
+//}
 
-void Mainwindow::on_toolButton_tx_2_toggled(bool checked)
-{
 
-}
 
 void Mainwindow::on_toolButton_tx_2_clicked(bool checked)
 {
@@ -4302,10 +4078,10 @@ void Mainwindow::on_tabWidget_iad_tabBarClicked(int index)
     }
 }
 
-void Mainwindow::on_toolButton_xl_nguong_3_clicked()
-{
+//void Mainwindow::on_toolButton_xl_nguong_3_clicked()
+//{
 
-}
+//}
 
 void Mainwindow::on_toolButton_head_up_toggled(bool checked)
 {
@@ -4323,111 +4099,7 @@ void Mainwindow::on_toolButton_head_up_toggled(bool checked)
 //    }
 //}
 
-void Mainwindow::on_toolButton_dk_1_toggled(bool checked)
-{
-    return;
-    /*if(checked)
-    {
-        commandMay22[4]=0x00;
-        processing->sendCommand(commandMay22,12,false);
-    }*/
 
-}
-
-void Mainwindow::on_toolButton_dk_2_toggled(bool checked)
-{
-    if(checked)
-    {
-
-    }
-}
-
-void Mainwindow::on_toolButton_dk_3_toggled(bool checked)
-{
-    if(checked)
-    {
-
-    }
-}
-
-void Mainwindow::on_toolButton_dk_4_toggled(bool checked)
-{
-    if(checked)
-    {
-
-    }
-}
-
-void Mainwindow::on_toolButton_dk_5_toggled(bool checked)
-{
-    if(checked)
-    {
-
-    }
-}
-
-void Mainwindow::on_toolButton_dk_6_toggled(bool checked)
-{
-    if(checked)
-    {
-
-    }
-}
-
-void Mainwindow::on_toolButton_dk_7_toggled(bool checked)
-{
-    if(checked)
-    {
-
-    }
-}
-
-void Mainwindow::on_toolButton_dk_8_toggled(bool checked)
-{
-    if(checked)
-    {
-
-    }
-}
-
-void Mainwindow::on_toolButton_dk_9_toggled(bool checked)
-{
-    /*if(checked)
-    {
-
-    }*/
-}
-
-void Mainwindow::on_toolButton_dk_10_toggled(bool checked)
-{
-    return;
-    /*if(checked)
-    {
-        commandMay22[8]=0x01;
-        processing->sendCommand(commandMay22,12,false);
-    }*/
-
-}
-
-void Mainwindow::on_toolButton_dk_12_toggled(bool checked)
-{
-    return;
-    /*if(checked)
-    {
-        commandMay22[4]=0x01;
-        processing->sendCommand(commandMay22,12,false);
-    }*/
-}
-
-//void Mainwindow::on_toolButton_dk_14_toggled(bool checked)
-//{
-//    return;
-//    /*if(checked)
-//    {
-//        commandMay22[8]=0x02;
-//        processing->sendCommand(commandMay22,12,false);
-//    }*/
-//}
 
 void Mainwindow::on_toolButton_dk_13_toggled(bool checked)
 {
@@ -4640,8 +4312,8 @@ void Mainwindow::on_bt_rg_1_toggled(bool checked)
 {
     if(checked)
     {
-        mRangeLevel=0;
-        CConfig::setValue("mRangeLevel",mRangeLevel);
+        mRangeIndex=0;
+        CConfig::setValue("mRangeLevel",mRangeIndex);
         UpdateScale();
         SendScaleCommand();
         isMapOutdated = true;
@@ -4652,8 +4324,8 @@ void Mainwindow::on_bt_rg_2_toggled(bool checked)
 {
     if(checked)
     {
-        mRangeLevel=1;
-        CConfig::setValue("mRangeLevel",mRangeLevel);
+        mRangeIndex=1;
+        CConfig::setValue("mRangeLevel",mRangeIndex);
         UpdateScale();
         SendScaleCommand();
         isMapOutdated = true;
@@ -4664,8 +4336,8 @@ void Mainwindow::on_bt_rg_3_toggled(bool checked)
 {
     if(checked)
     {
-        mRangeLevel=2;
-        CConfig::setValue("mRangeLevel",mRangeLevel);
+        mRangeIndex=2;
+        CConfig::setValue("mRangeLevel",mRangeIndex);
         UpdateScale();
         SendScaleCommand();
         isMapOutdated = true;
@@ -4676,8 +4348,8 @@ void Mainwindow::on_bt_rg_4_toggled(bool checked)
 {
     if(checked)
     {
-        mRangeLevel=3;
-        CConfig::setValue("mRangeLevel",mRangeLevel);
+        mRangeIndex=3;
+        CConfig::setValue("mRangeLevel",mRangeIndex);
         UpdateScale();
         SendScaleCommand();
         isMapOutdated = true;
@@ -4688,8 +4360,8 @@ void Mainwindow::on_bt_rg_5_toggled(bool checked)
 {
     if(checked)
     {
-        mRangeLevel=4;
-        CConfig::setValue("mRangeLevel",mRangeLevel);
+        mRangeIndex=4;
+        CConfig::setValue("mRangeLevel",mRangeIndex);
         UpdateScale();
         SendScaleCommand();
         isMapOutdated = true;
@@ -4705,8 +4377,8 @@ void Mainwindow::on_bt_rg_8_toggled(bool checked)
 {
     if(checked)
     {
-        mRangeLevel=7;
-        CConfig::setValue("mRangeLevel",mRangeLevel);
+        mRangeIndex=7;
+        CConfig::setValue("mRangeLevel",mRangeIndex);
         UpdateScale();
         SendScaleCommand();
         isMapOutdated = true;
@@ -4717,8 +4389,8 @@ void Mainwindow::on_bt_rg_7_toggled(bool checked)
 {
     if(checked)
     {
-        mRangeLevel=6;
-        CConfig::setValue("mRangeLevel",mRangeLevel);
+        mRangeIndex=6;
+        CConfig::setValue("mRangeLevel",mRangeIndex);
         UpdateScale();
         SendScaleCommand();
         isMapOutdated = true;
@@ -4773,8 +4445,8 @@ void Mainwindow::on_toolButton_open_record_2_clicked()
 
 void Mainwindow::on_bt_rg_6_clicked()
 {
-    mRangeLevel=5;
-    CConfig::setValue("mRangeLevel",mRangeLevel);
+    mRangeIndex=5;
+    CConfig::setValue("mRangeLevel",mRangeIndex);
     UpdateScale();
     SendScaleCommand();
     isMapOutdated = true;
@@ -4782,8 +4454,8 @@ void Mainwindow::on_bt_rg_6_clicked()
 
 void Mainwindow::on_bt_rg_7_clicked()
 {
-    mRangeLevel=6;
-    CConfig::setValue("mRangeLevel",mRangeLevel);
+    mRangeIndex=6;
+    CConfig::setValue("mRangeLevel",mRangeIndex);
     UpdateScale();
     SendScaleCommand();
     isMapOutdated = true;
@@ -4791,8 +4463,8 @@ void Mainwindow::on_bt_rg_7_clicked()
 
 void Mainwindow::on_bt_rg_8_clicked()
 {
-    mRangeLevel=7;
-    CConfig::setValue("mRangeLevel",mRangeLevel);
+    mRangeIndex=7;
+    CConfig::setValue("mRangeLevel",mRangeIndex);
     UpdateScale();
     SendScaleCommand();
     isMapOutdated = true;
@@ -4800,8 +4472,8 @@ void Mainwindow::on_bt_rg_8_clicked()
 
 void Mainwindow::on_bt_rg_1_clicked()
 {
-    mRangeLevel=0;
-    CConfig::setValue("mRangeLevel",mRangeLevel);
+    mRangeIndex=0;
+    CConfig::setValue("mRangeLevel",mRangeIndex);
     UpdateScale();
     SendScaleCommand();
     isMapOutdated = true;
@@ -4809,8 +4481,8 @@ void Mainwindow::on_bt_rg_1_clicked()
 
 void Mainwindow::on_bt_rg_2_clicked()
 {
-    mRangeLevel=1;
-    CConfig::setValue("mRangeLevel",mRangeLevel);
+    mRangeIndex=1;
+    CConfig::setValue("mRangeLevel",mRangeIndex);
     UpdateScale();
     SendScaleCommand();
     isMapOutdated = true;
@@ -4818,8 +4490,8 @@ void Mainwindow::on_bt_rg_2_clicked()
 
 void Mainwindow::on_bt_rg_3_clicked()
 {
-    mRangeLevel=2;
-    CConfig::setValue("mRangeLevel",mRangeLevel);
+    mRangeIndex=2;
+    CConfig::setValue("mRangeLevel",mRangeIndex);
     UpdateScale();
     SendScaleCommand();
     isMapOutdated = true;
@@ -4827,8 +4499,8 @@ void Mainwindow::on_bt_rg_3_clicked()
 
 void Mainwindow::on_bt_rg_4_clicked()
 {
-    mRangeLevel=3;
-    CConfig::setValue("mRangeLevel",mRangeLevel);
+    mRangeIndex=3;
+    CConfig::setValue("mRangeLevel",mRangeIndex);
     UpdateScale();
     SendScaleCommand();
     isMapOutdated = true;
@@ -4836,8 +4508,8 @@ void Mainwindow::on_bt_rg_4_clicked()
 
 void Mainwindow::on_bt_rg_5_clicked()
 {
-    mRangeLevel=4;
-    CConfig::setValue("mRangeLevel",mRangeLevel);
+    mRangeIndex=4;
+    CConfig::setValue("mRangeLevel",mRangeIndex);
     UpdateScale();
     SendScaleCommand();
     isMapOutdated = true;
@@ -4949,3 +4621,304 @@ void Mainwindow::on_toolButton_manual_tune_clicked(bool checked)
 //{
 //    ui->label_dial_value_rg->setText(QString::fromUtf8("Tốc độ:")+QString::number(value/2.0,'f',1)+"Kn");
 //}
+
+void Mainwindow::on_toolButton_start_simulation_start_clicked(bool checked)
+{
+    if(checked)
+    {
+        simulator->play();
+    }
+}
+
+void Mainwindow::on_toolButton_start_simulation_set_clicked(bool checked)
+{
+
+    simulator->target[0].setIsManeuver(checked);
+
+}
+void Mainwindow::updateSimTargetStatus()
+{
+    if(ui->checkBox->isChecked())
+    {
+        ui->doubleSpinBox_1->setEnabled(false);
+        ui->doubleSpinBox_2->setEnabled(false);
+        ui->doubleSpinBox_3->setEnabled(false);
+        ui->doubleSpinBox_4->setEnabled(false);
+        simulator->setTarget(0
+                             ,ui->doubleSpinBox_1->value()
+                             ,ui->doubleSpinBox_2->value()
+                             ,ui->doubleSpinBox_3->value()
+                             ,ui->doubleSpinBox_4->value());
+    }
+    else
+    {
+        simulator->target[0].setEnabled(false);
+        ui->doubleSpinBox_1->setEnabled(true);
+        ui->doubleSpinBox_2->setEnabled(true);
+        ui->doubleSpinBox_3->setEnabled(true);
+        ui->doubleSpinBox_4->setEnabled(true);
+    }
+    //target 1
+    if(ui->checkBox_2->isChecked())
+    {
+        ui->doubleSpinBox_11->setEnabled(false);
+        ui->doubleSpinBox_12->setEnabled(false);
+        ui->doubleSpinBox_13->setEnabled(false);
+        ui->doubleSpinBox_14->setEnabled(false);
+        simulator->setTarget(1
+                             ,ui->doubleSpinBox_11->value()
+                             ,ui->doubleSpinBox_12->value()
+                             ,ui->doubleSpinBox_13->value()
+                             ,ui->doubleSpinBox_14->value());
+    }
+    else
+    {
+        simulator->target[1].setEnabled(false);
+        ui->doubleSpinBox_11->setEnabled(true);
+        ui->doubleSpinBox_12->setEnabled(true);
+        ui->doubleSpinBox_13->setEnabled(true);
+        ui->doubleSpinBox_14->setEnabled(true);
+    }
+    //target 2
+    if(ui->checkBox_3->isChecked())
+    {
+        ui->doubleSpinBox_21->setEnabled(false);
+        ui->doubleSpinBox_22->setEnabled(false);
+        ui->doubleSpinBox_23->setEnabled(false);
+        ui->doubleSpinBox_24->setEnabled(false);
+        simulator->setTarget(2
+                             ,ui->doubleSpinBox_21->value()
+                             ,ui->doubleSpinBox_22->value()
+                             ,ui->doubleSpinBox_23->value()
+                             ,ui->doubleSpinBox_24->value());
+    }
+    else
+    {
+        simulator->target[2].setEnabled(false);
+        ui->doubleSpinBox_21->setEnabled(true);
+        ui->doubleSpinBox_22->setEnabled(true);
+        ui->doubleSpinBox_23->setEnabled(true);
+        ui->doubleSpinBox_24->setEnabled(true);
+    }
+    //target 3
+    if(ui->checkBox_4->isChecked())
+    {
+        ui->doubleSpinBox_31->setEnabled(false);
+        ui->doubleSpinBox_32->setEnabled(false);
+        ui->doubleSpinBox_33->setEnabled(false);
+        ui->doubleSpinBox_34->setEnabled(false);
+        simulator->setTarget(3
+                             ,ui->doubleSpinBox_31->value()
+                             ,ui->doubleSpinBox_32->value()
+                             ,ui->doubleSpinBox_33->value()
+                             ,ui->doubleSpinBox_34->value());
+    }
+    else
+    {
+        simulator->target[3].setEnabled(false);
+        ui->doubleSpinBox_31->setEnabled(true);
+        ui->doubleSpinBox_32->setEnabled(true);
+        ui->doubleSpinBox_33->setEnabled(true);
+        ui->doubleSpinBox_34->setEnabled(true);
+    }
+    //target 4
+    if(ui->checkBox_5->isChecked())
+    {
+        ui->doubleSpinBox_41->setEnabled(false);
+        ui->doubleSpinBox_42->setEnabled(false);
+        ui->doubleSpinBox_43->setEnabled(false);
+        ui->doubleSpinBox_44->setEnabled(false);
+        simulator->setTarget(4
+                             ,ui->doubleSpinBox_41->value()
+                             ,ui->doubleSpinBox_42->value()
+                             ,ui->doubleSpinBox_43->value()
+                             ,ui->doubleSpinBox_44->value());
+    }
+    else
+    {
+        simulator->target[4].setEnabled(false);
+        ui->doubleSpinBox_41->setEnabled(true);
+        ui->doubleSpinBox_42->setEnabled(true);
+        ui->doubleSpinBox_43->setEnabled(true);
+        ui->doubleSpinBox_44->setEnabled(true);
+    }
+    //target 5
+    if(ui->checkBox_6->isChecked())
+    {
+        ui->doubleSpinBox_51->setEnabled(false);
+        ui->doubleSpinBox_52->setEnabled(false);
+        ui->doubleSpinBox_53->setEnabled(false);
+        ui->doubleSpinBox_54->setEnabled(false);
+        simulator->setTarget(5
+                             ,ui->doubleSpinBox_51->value()
+                             ,ui->doubleSpinBox_52->value()
+                             ,ui->doubleSpinBox_53->value()
+                             ,ui->doubleSpinBox_54->value());
+    }
+    else
+    {
+        simulator->target[5].setEnabled(false);
+        ui->doubleSpinBox_51->setEnabled(true);
+        ui->doubleSpinBox_52->setEnabled(true);
+        ui->doubleSpinBox_53->setEnabled(true);
+        ui->doubleSpinBox_54->setEnabled(true);
+    }
+    //target 6
+    if(ui->checkBox_7->isChecked())
+    {
+        ui->doubleSpinBox_61->setEnabled(false);
+        ui->doubleSpinBox_62->setEnabled(false);
+        ui->doubleSpinBox_63->setEnabled(false);
+        ui->doubleSpinBox_64->setEnabled(false);
+        simulator->setTarget(6
+                             ,ui->doubleSpinBox_61->value()
+                             ,ui->doubleSpinBox_62->value()
+                             ,ui->doubleSpinBox_63->value()
+                             ,ui->doubleSpinBox_64->value());
+    }
+    else
+    {
+        simulator->target[6].setEnabled(false);
+        ui->doubleSpinBox_61->setEnabled(true);
+        ui->doubleSpinBox_62->setEnabled(true);
+        ui->doubleSpinBox_63->setEnabled(true);
+        ui->doubleSpinBox_64->setEnabled(true);
+    }
+    //target 7
+    if(ui->checkBox_8->isChecked())
+    {
+        ui->doubleSpinBox_71->setEnabled(false);
+        ui->doubleSpinBox_72->setEnabled(false);
+        ui->doubleSpinBox_73->setEnabled(false);
+        ui->doubleSpinBox_74->setEnabled(false);
+        simulator->setTarget(7
+                             ,ui->doubleSpinBox_71->value()
+                             ,ui->doubleSpinBox_72->value()
+                             ,ui->doubleSpinBox_73->value()
+                             ,ui->doubleSpinBox_74->value());
+    }
+    else
+    {
+        simulator->target[7].setEnabled(false);
+        ui->doubleSpinBox_71->setEnabled(true);
+        ui->doubleSpinBox_72->setEnabled(true);
+        ui->doubleSpinBox_73->setEnabled(true);
+        ui->doubleSpinBox_74->setEnabled(true);
+    }
+}
+void Mainwindow::on_checkBox_stateChanged(int arg1)
+{
+    updateSimTargetStatus();
+}
+
+void Mainwindow::on_checkBox_2_stateChanged(int arg1)
+{
+    updateSimTargetStatus();
+}
+
+void Mainwindow::on_checkBox_3_stateChanged(int arg1)
+{
+    updateSimTargetStatus();
+}
+
+void Mainwindow::on_checkBox_4_stateChanged(int arg1)
+{
+    updateSimTargetStatus();
+}
+
+void Mainwindow::on_checkBox_5_stateChanged(int arg1)
+{
+    updateSimTargetStatus();
+}
+
+void Mainwindow::on_checkBox_6_stateChanged(int arg1)
+{
+    updateSimTargetStatus();
+}
+
+void Mainwindow::on_checkBox_7_stateChanged(int arg1)
+{
+    updateSimTargetStatus();
+}
+
+void Mainwindow::on_checkBox_8_stateChanged(int arg1)
+{
+    updateSimTargetStatus();
+}
+
+void Mainwindow::on_toolButton_start_simulation_set_2_clicked(bool checked)
+{
+    simulator->target[1].setIsManeuver(checked);
+}
+
+void Mainwindow::on_toolButton_start_simulation_set_3_clicked(bool checked)
+{
+    simulator->target[2].setIsManeuver(checked);
+}
+
+void Mainwindow::on_toolButton_start_simulation_set_4_clicked(bool checked)
+{
+    simulator->target[3].setIsManeuver(checked);
+}
+
+void Mainwindow::on_toolButton_start_simulation_set_5_clicked(bool checked)
+{
+    simulator->target[4].setIsManeuver(checked);
+}
+
+void Mainwindow::on_toolButton_start_simulation_set_6_clicked(bool checked)
+{
+    simulator->target[5].setIsManeuver(checked);
+}
+
+void Mainwindow::on_toolButton_start_simulation_set_7_clicked(bool checked)
+{
+    simulator->target[6].setIsManeuver(checked);
+}
+
+void Mainwindow::on_toolButton_start_simulation_set_8_clicked(bool checked)
+{
+    simulator->target[7].setIsManeuver(checked);
+}
+
+void Mainwindow::on_toolButton_start_simulation_stop_clicked()
+{
+
+}
+
+void Mainwindow::on_toolButton_start_simulation_stop_clicked(bool checked)
+{
+    if(checked)
+    {
+        simulator->pause();
+    }
+}
+
+void Mainwindow::on_bt_rg_1_clicked(bool checked)
+{
+
+}
+
+void Mainwindow::on_toolButton_sim_target_autogenerate_clicked()
+{
+    ui->doubleSpinBox_1->setValue((rand()%720)/2.0);
+    ui->doubleSpinBox_11->setValue((rand()%720)/2.0);
+    ui->doubleSpinBox_21->setValue((rand()%720)/2.0);
+    ui->doubleSpinBox_31->setValue((rand()%720)/2.0);
+
+    ui->doubleSpinBox_2->setValue(5+(rand()%300)/2.0);
+    ui->doubleSpinBox_12->setValue(5+(rand()%300)/2.0);
+    ui->doubleSpinBox_22->setValue(5+(rand()%300)/2.0);
+    ui->doubleSpinBox_32->setValue(5+(rand()%300)/2.0);
+
+    ui->doubleSpinBox_3->setValue((rand()%720)/2.0);
+    ui->doubleSpinBox_13->setValue((rand()%720)/2.0);
+    ui->doubleSpinBox_23->setValue((rand()%720)/2.0);
+    ui->doubleSpinBox_33->setValue((rand()%720)/2.0);
+
+    ui->doubleSpinBox_4->setValue((rand()%60)/2.0);
+    ui->doubleSpinBox_14->setValue((rand()%60)/2.0);
+    ui->doubleSpinBox_24->setValue((rand()%60)/2.0);
+    ui->doubleSpinBox_34->setValue((rand()%60)/2.0);
+
+}

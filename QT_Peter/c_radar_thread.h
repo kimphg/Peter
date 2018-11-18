@@ -18,8 +18,8 @@
 #include <QtSerialPort/QSerialPort>
 #include <QSerialPortInfo>
 #define MAX_COMMAND_QUEUE_SIZE 100
-#define HAVE_REMOTE// for pcap
-#include "pcap.h"
+//#define HAVE_REMOTE// for pcap
+//#include "pcap.h"
 
 #ifndef CONST_NM
 #define CONST_NM 1.852
@@ -138,7 +138,7 @@ private:
     double          mHeading ;
 
     unsigned char   failureCount;
-    bool  isDrawn;
+//    bool  isDrawn;
     bool isXuLyThuCap;
     RadarCommandQueue radarComQ;
     bool isRecording;

@@ -45,6 +45,8 @@ SOURCES += main.cpp\
     c_gps.cpp \
     c_target_manager.cpp \
 #    c_radar_simulation.cpp
+    c_radar_simulation.cpp \
+    dialoginputvalue.cpp
 
 
 HEADERS  += \
@@ -71,8 +73,10 @@ HEADERS  += \
 #    c_decision_tree.h
     c_gps.h \
     c_target_manager.h \
-    c_target.h \
-    c_radar_simulation.h
+    c_radar_simulation.h \
+    c_radar_simulation.h \
+    c_sim_target.h \
+    dialoginputvalue.h
 
 FORMS    += mainwindow.ui \
     dialogdocumentation.ui \
@@ -80,7 +84,8 @@ FORMS    += mainwindow.ui \
     dialogcommandlog.ui \
     statuswindow.ui \
     dialogcommandset.ui \
-    dialogmenudisplay.ui
+    dialogmenudisplay.ui \
+    dialoginputvalue.ui
 #win32:CONFIG(release, debug|release): LIBS += -L$$PWD/shapelib/ -lshapelib
 #else:unix: LIBS += -L$$PWD\shapelib\ -lshapelib
 #INCLUDEPATH += $$PWD/shapelib

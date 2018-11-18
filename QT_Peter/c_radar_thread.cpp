@@ -7,7 +7,7 @@
 DataBuff dataB[MAX_IREC];
 //uchar udpFrameBuffer[MAX_IREC][OUTPUT_FRAME_SIZE];
 short iRec=0,iRead=0;
-bool *pIsDrawn;
+//bool *pIsDrawn;
 bool *pIsPlaying;
 //CConfig         mGlobbalConfig;
 //QNmeaPositionInfoSource *geoLocation = NULL;
@@ -38,7 +38,6 @@ void dataProcessingThread::ReadDataBuffer()
             break;
         }
         uchar *pData = &(dataB[iRead].data[0]);
-        isDrawn = false;
         unsigned short dataLen = dataB[iRead].len;
         if(!isPlaying)
         {
@@ -95,8 +94,8 @@ dataProcessingThread::dataProcessingThread()
     dataBuff = &dataB[0];
     iRec=0;iRead=0;
     connect_timeout = 0;
-    pIsDrawn = &isDrawn;
-    isDrawn = true;
+//    pIsDrawn = &isDrawn;
+//    isDrawn = true;
     pIsPlaying = &isPlaying;
     playRate = 10;
 //    arpaData = new C_ARPA_data();
@@ -433,7 +432,7 @@ void dataProcessingThread::PushCommandQueue()
 void dataProcessingThread::playbackRadarData()
 {
     if(isPlaying) {
-        isDrawn = false;
+        //isDrawn = false;
         unsigned short len;
         if(!signRepFile.isOpen())return;
         for(unsigned short i=0;i<playRate;i++)
@@ -475,7 +474,7 @@ void dataProcessingThread::StopProcessing()
 }
 void dataProcessingThread::setIsDrawn(bool value)
 {
-    isDrawn = value;
+    //isDrawn = value;
 }
 
 void dataProcessingThread::SetRadarPort( unsigned short portNumber)
@@ -571,49 +570,8 @@ void dataProcessingThread::processRadarData()
 {
 
 }
-#define UDP_HEADER_LEN 42
-void packet_handler(u_char *param, const struct pcap_pkthdr *header, const u_char *pkt_data)
-{
-    //    struct tm ltime;
-    //    char timestr[16];
-    //    time_t local_tv_sec;
 
-    /*
-     * unused variables
-     */
-    //    (VOID)(param);
-    //    (VOID)(pkt_data);
-
-    /* convert the timestamp to readable format */
-    //    local_tv_sec = header->ts.tv_sec;
-    //    localtime_s(&ltime, &local_tv_sec);
-    //    strftime( timestr, sizeof timestr, "%H:%M:%S", &ltime);
-
-    if(*pIsPlaying)return;
-    if(header->len<1000)return;
-    if(((*(pkt_data+36)<<8)|(*(pkt_data+37)))!=HR2D_UDP_PORT)
-    {
-        //printf("\nport:%d",((*(pkt_data+36)<<8)|(*(pkt_data+37))));
-        return;
-    }
-    dataB[iRec].len = header->len - UDP_HEADER_LEN;
-    memcpy(&dataB[iRec].data[0],pkt_data+UDP_HEADER_LEN,dataB[iRec].len);
-    iRec++;
-    if(iRec>=MAX_IREC)iRec = 0;
-    *pIsDrawn = false;
-    //printf("nhan duoc:%x\n",dataB[iRec].data[0]);
-
-    return;
-    //    printf("len:%d\n", header->len);
-    //    //printf("%.6d len:%d\n", header->ts.tv_usec, header->len);
-    //    for(short i=0;i<dataB[iRec].len;i++)
-    //    {
-    //        printf("%x-",dataB[iRec].data[i]);
-    //    }
-    //    printf("\n");
-
-}
-uchar mReceiveBuff[502];
+static uchar mReceiveBuff[1000];
 void dataProcessingThread::run()
 {
 
@@ -643,9 +601,9 @@ void dataProcessingThread::run()
 
 bool dataProcessingThread::getIsDrawn()
 {
-
-    if(!isDrawn){isDrawn = true;return false;}
+    if(!mRadarData->isDrawn){mRadarData->isDrawn = true;return false;}
     else return true;
+
 
 }
 void dataProcessingThread::stopThread()

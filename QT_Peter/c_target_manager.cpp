@@ -124,6 +124,23 @@ bool c_target_manager::checkIDExist(int id)
     }
     return false;
 }
+
+bool c_target_manager::changeCurrTrackID(int id)
+{
+    //check if id exist
+    for (uint i = 0;i<TRACK_TABLE_SIZE;i++)
+    {
+        if(trackTable[i].track !=nullptr)
+        {
+            if(trackTable[i].trackUniqID==id)return false;
+        }
+    }
+    if(currTrackPt->track==nullptr)return false;
+    currTrackPt->trackUniqID = id;
+    currTrackPt->track->uniqId = id;
+    return true;
+
+}
 bool c_target_manager::addTrack(track_t* track)
 {
     //search for empty slot
@@ -156,6 +173,9 @@ TrackPointer* c_target_manager::getTargetById(int id)
 {
     for(int i=0;i<TARGET_TABLE_SIZE;i++)
     {
+        if(targetTable[i].track==nullptr)continue;
+        if(targetTable[i].trackUniqID!=targetTable[i].track->uniqId)
+            targetTable[i].trackUniqID = targetTable[i].track->uniqId;
         if(targetTable[i].trackUniqID==id)return getTargetAt(i);
     }
     return nullptr;
@@ -164,13 +184,15 @@ TrackPointer* c_target_manager::getTargetAt(int i)
 {
     TrackPointer* trackPt = &targetTable[i];
     if(!trackPt->track)return nullptr;
-    if(trackPt->track->isRemoved()||(trackPt->trackUniqID!=trackPt->track->uniqId))
+    if(trackPt->track->isRemoved())
     {
+
         trackPt->track = nullptr;
         trackPt->selected = false;
         trackPt->trackUniqID = 0;
         return nullptr;
     }
+    if(trackPt->trackUniqID!=trackPt->track->uniqId)trackPt->trackUniqID = trackPt->track->uniqId;
     return trackPt;
 }
 void c_target_manager::initDataGram()

@@ -8,33 +8,20 @@ double rResolution = 0.015070644;
 unsigned char outputFrame[MAX_AZI][OUTPUT_FRAME_SIZE];
 double ConvXYToR(double x, double y)
 {
-    double range;
-    if (!y)
-    {
-        range = abs(x);
-    }
-    else
-    {
-        //*azi = atanf(x / y);
-        //if (y<0)*azi += PI;
-        //if (*azi<0)*azi += PI_NHAN2;
-        range = sqrt(x*x + y*y);
-        //*azi = *azi*DEG_RAD;
-    }
-    return range;
+    return sqrt(x*x + y*y);
 
 }
 double ConvXYToAziRad(double x, double y)
 {
     double azi;
-    if (!y)
+    if (y==0)
     {
         azi = x>0 ? PI_CHIA2 : (PI_NHAN2 - PI_CHIA2);
 
     }
     else
     {
-        azi = atanf(x / y);
+        azi = atan(x / y);
         if (y<0)azi += PI;
         if (azi<0)azi += PI_NHAN2;
     }
@@ -54,21 +41,28 @@ void regenerate(int azi)
         dataPointer[i] = rand()%16;
     }
 }
-target_t::target_t(double tx, double ty, double tspeed, double tbearing, int dople)
+target_t::target_t()
 {
+    enabled = false;
+    isManeuver = false;
+}
+
+void target_t::init(double tx, double ty, double tspeed, double tbearing, int dople)
+{
+    enabled = true;
     speed = tspeed;
     x = tx;
     y = ty;
-    bearing = tbearing / 180.0*3.14159265359;
+    bearing = radians(tbearing);
     azi = ConvXYToAziRad(x, y) / 3.141592653589*1024.0;
     range = ConvXYToR(x, y);
     dopler = dople;
-    targetSize = 5;
+    targetSize = 10;
     nUpdates = 0;
-    timeLast = time(0);
+    timeLast = time(nullptr);
     rot = 0;
-}
 
+}
 void target_t::generateSignal()
 {
     if (range >= FRAME_LEN - 1)return;
@@ -93,6 +87,7 @@ void target_t::generateSignal()
 
 void target_t::eraseSIgnal()
 {
+    return;
     if (range >= FRAME_LEN - 1)return;
     int azimax = azi + targetSize; if (azimax >= 2048)azimax -= 2048;
     int azimin = azi - targetSize; if (azimin < 0)azimin += 2048;
@@ -114,35 +109,61 @@ void target_t::eraseSIgnal()
 
 void target_t::update()
 {
-    eraseSIgnal();
+    if(!enabled)return;
     //recalculate coodinates
     time_t timenow = time(nullptr);
     double elapsed_secs = difftime(timenow, timeLast);
     timeLast = timenow;
     nUpdates++;
-    if (nUpdates>5)
+    if(isManeuver)
     {
-        nUpdates = 0;
-        rot = distribRot(generator) / DEG_RAD - PI;
+        if (nUpdates%5==0)
+        {
+            if(isManeuver)rot = distribRot(generator) / DEG_RAD - PI;
 
+        }
+        bearing += rot*elapsed_secs;
     }
-    bearing += rot*elapsed_secs;
-    printf("\nbearing:%f", bearing);
     double distance = elapsed_secs / 3600.0*speed;
     x += distance*sin(bearing);
     y += distance*cos(bearing);
     //
     azi = ConvXYToAziRad(x, y) / 3.141592653589*1024.0;// +(distribAzi(generator));
     range	= ConvXYToR(x, y) / rResolution;
-
-
     generateSignal();
 }
 
-c_radar_simulation::c_radar_simulation()
+bool target_t::getIsManeuver() const
 {
+    return isManeuver;
+}
+
+void target_t::setIsManeuver(bool value)
+{
+    isManeuver = value;
+}
+
+bool target_t::getEnabled() const
+{
+    return enabled;
+}
+
+void target_t::setEnabled(bool value)
+{
+    eraseSIgnal();
+    enabled = value;
+}
+void c_radar_simulation::initTargets()
+{
+    //target[0] = new target_t(250, -300, 4, 100,4);
+    for (int i = 0; i < NUM_OF_TARG; i++)
+    {
+        target_t t;
+        target.push_back(t);
+    }
 
 }
+
 void c_radar_simulation::updateTargets()
 {
     for (uint i = 0; i < target.size(); i++)
@@ -154,61 +175,116 @@ void c_radar_simulation::socketInit()
 {
     radarSocket = new QUdpSocket(this);
 }
-void c_radar_simulation::addtarget(double tx, double ty, double tspeed, double tbearing, int dople)
+
+bool c_radar_simulation::getIsPlaying() const
 {
-    target_t newTarget(tx,ty,tspeed,tbearing,dople);
+    return isPlaying;
 }
-void c_radar_simulation::run()
+
+c_radar_simulation::c_radar_simulation(C_radar_data *radarData)//QObject *parent)
 {
-    socketInit();
-    int azi = 200;
     for (int i = 0; i < MAX_AZI; i++)
     {
         regenerate(i);
         outputFrame[i][2] = i >> 8;
         outputFrame[i][3] = i;
     }
-    int dazi = 1;
-    int nPeriod = 0;
-    n_clk_adc = 1;
+    for (int i = 0; i < NUM_OF_TARG; i++)
+    {
+        target_t t;
+        target.push_back(t);
+    }
+    setRange(2);
+    //socketInit();
+    mRadarData = radarData;
+    isPlaying = false;
+    //connect(&dataSendTimer, &QTimer::timeout, this, &c_radar_simulation::sendData);
+    //dataSendTimer.start(50);
+    azi = 200;
+}
+
+void c_radar_simulation::play()
+{
+    isPlaying = true;
+}
+
+void c_radar_simulation::pause()
+{
+    isPlaying = false;
+}
+void c_radar_simulation::setTarget(int id,double aziDeg, double rangeKm,  double tbearingDeg,double tspeed, int dople)
+{
+    //target_t newTarget(tx,ty,tspeed,tbearing,dople);
+    if(id>=target.size())return;
+    double tx,ty;
+    tx = rangeKm*CONST_NM*sin(radians(aziDeg));
+    ty = rangeKm*CONST_NM*cos(radians(aziDeg));
+    target[id].init(tx,ty,tspeed*CONST_NM,tbearingDeg,dople);
+}
+void c_radar_simulation::setRange(int clk_adc)
+{
+    //15 30 60 120 240
+    int nclk_adc = clk_adc-3;
+    if(nclk_adc<0)nclk_adc=0;
+    if(nclk_adc>4)nclk_adc=4;
+    n_clk_adc = nclk_adc;
     rResolution = 0.015070644 * pow(2, n_clk_adc);
+    updateTargets();
+}
+void c_radar_simulation::sendData()
+{
+    if(!isPlaying)
+    {
+        return;
+    }
+    int a=0;
+    while(true)
+    {
+        if(a++>10)break;
+        azi += 1;
+        if (azi >= 2048)
+        {
+            //nPeriod++;
+            //if (nPeriod > 50)nPeriod = 0;
+            azi = 0;
+            updateTargets();
+        }
+        outputFrame[azi][0] = 0x55;
+        outputFrame[azi][2] = (azi >> 8);
+        outputFrame[azi][3] = (azi);
+        outputFrame[azi][4] = n_clk_adc;
+        mRadarData->processSocketData((unsigned char*)(&outputFrame[azi][0]),OUTPUT_FRAME_SIZE);
+    }
+}
+void c_radar_simulation::run()
+{
     while (true)
     {
-        //            msleep(8);
-        azi += dazi;
-        if (azi >= 2048)
+        msleep(75);
+        if(!isPlaying)
+        {
+            msleep(500);
+            continue;
+        }
+        int a=0;
+        while(true)
+        {
+            if(a++>10)break;
+            azi += 1;
+            if (azi >= 2048)
             {
-                nPeriod++;
-                if (nPeriod > 50)nPeriod = 0;
+                //nPeriod++;
+                //if (nPeriod > 50)nPeriod = 0;
                 azi = 0;
                 updateTargets();
             }
-
-        /*if (azi>= 1000)
-        {
-            nPeriod++;
-            dazi = -1;
-            updateTargets();
-            msleep(500);
+            outputFrame[azi][0] = 0x55;
+            outputFrame[azi][2] = (azi >> 8);
+            outputFrame[azi][3] = (azi);
+            outputFrame[azi][4] = n_clk_adc;
+            mRadarData->processSocketData((unsigned char*)(&outputFrame[azi][0]),OUTPUT_FRAME_SIZE);
+            regenerate(azi);
         }
-        else
-            if (azi <= 2)
-            {
-                dazi = 1;
-                updateTargets();
-                msleep(500);
-            }*/
-        //if (rand() % 10 == 0)regenerate(azi);
-        /*if (rand() % 10 == 0)
-            {
-                memset((char*)(&outputFrame[azi][0]), 0, OUTPUT_FRAME_SIZE);
-            }*/
-        outputFrame[azi][0] = 0x55;
-        outputFrame[azi][2] = azi >> 8;
-        outputFrame[azi][3] = azi;
-        outputFrame[azi][4] = n_clk_adc;
-        radarSocket->writeDatagram((char*)(&outputFrame[azi][0]),QHostAddress("127.0.0.1"),31000);
-
     }
 }
 

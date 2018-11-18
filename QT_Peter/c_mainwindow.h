@@ -14,6 +14,8 @@
 //#include <qse>
 #include <c_config.h>
 #include "dialogdocumentation.h"
+
+#include "c_radar_simulation.h"
 #include <QtNetwork>
 #include <QMainWindow>
 #include <QtCore>
@@ -22,7 +24,7 @@
 #include <time.h>
 #include <dialogaisinfo.h>
 //#include <CLocal.h>
-
+#include "dialoginputvalue.h"
 #include <c_radar_thread.h>
 #include <QDesktopWidget>
 #include "c_radar_data.h"
@@ -47,7 +49,7 @@ class Mainwindow : public QMainWindow
     Q_OBJECT
 
 public:
-    explicit Mainwindow(QWidget *parent = 0);
+    explicit Mainwindow(QWidget *parent = nullptr);
     ~Mainwindow();
 protected:
     //void contextMenuEvent(QContextMenuEvent *event);
@@ -121,12 +123,13 @@ public slots:
     void setEnemy();
     void setFriend();
     void removeTarget();
+    void changeID();
 private:
     void setRadarState(radarSate radarState);
     bool ProcDataAIS(BYTE *szBuff, int nLeng );
-public:
+//public:
 //    void setScaleNM(unsigned short rangeNM);
-    void drawAisTarget2(QPainter *p);
+//    void drawAisTarget2(QPainter *p);
 private slots:
     void DrawMap();
     void readBuffer();
@@ -277,15 +280,15 @@ private slots:
 
     //void on_toolButton_2x_zoom_clicked(bool checked);
 
-    void on_toolButton_auto_adapt_clicked();
+//    void on_toolButton_auto_adapt_clicked();
 
-    void on_toolButton_set_header_size_clicked();
+//    void on_toolButton_set_header_size_clicked();
 
-    void on_toolButton_xl_nguong_clicked();
+//    void on_toolButton_xl_nguong_clicked();
 
-    void on_toolButton_xl_nguong_clicked(bool checked);
+//    void on_toolButton_xl_nguong_clicked(bool checked);
 
-    void on_toolButton_filter2of3_2_clicked(bool checked);
+//    void on_toolButton_filter2of3_2_clicked(bool checked);
 
     void on_toolButton_command_dopler_clicked();
 
@@ -322,7 +325,7 @@ private slots:
 
     void on_toolButton_record_clicked();
 
-    void on_toolButton_sharp_eye_toggled(bool checked);
+//    void on_toolButton_sharp_eye_toggled(bool checked);
 
     void on_toolButton_help_clicked();
 
@@ -354,7 +357,7 @@ private slots:
 
 //    void on_toolButton_set_command_clicked();
 
-    void on_toolButton_grid_clicked(bool checked);
+//    void on_toolButton_grid_clicked(bool checked);
 
     void on_toolButton_auto_freq_toggled(bool checked);
 
@@ -388,9 +391,9 @@ private slots:
 
     void on_toolButton_selfRotation_2_toggled(bool checked);
 
-    void on_toolButton_selfRotation_clicked();
+//    void on_toolButton_selfRotation_clicked();
 
-    void on_toolButton_tx_2_toggled(bool checked);
+//    void on_toolButton_tx_2_toggled(bool checked);
 
     void on_toolButton_tx_2_clicked(bool checked);
 
@@ -402,34 +405,34 @@ private slots:
 
     void on_tabWidget_iad_tabBarClicked(int index);
 
-    void on_toolButton_xl_nguong_3_clicked();
+//    void on_toolButton_xl_nguong_3_clicked();
 
     void on_toolButton_head_up_toggled(bool checked);
 
 //    void on_toolButton_delete_target_2_clicked();
 
-    void on_toolButton_dk_1_toggled(bool checked);
+//    void on_toolButton_dk_1_toggled(bool checked);
 
-    void on_toolButton_dk_2_toggled(bool checked);
+//    void on_toolButton_dk_2_toggled(bool checked);
 
-    void on_toolButton_dk_3_toggled(bool checked);
+//    void on_toolButton_dk_3_toggled(bool checked);
 
-    void on_toolButton_dk_4_toggled(bool checked);
+//    void on_toolButton_dk_4_toggled(bool checked);
 
-    void on_toolButton_dk_5_toggled(bool checked);
+//    void on_toolButton_dk_5_toggled(bool checked);
 
-    void on_toolButton_dk_6_toggled(bool checked);
+//    void on_toolButton_dk_6_toggled(bool checked);
 
-    void on_toolButton_dk_7_toggled(bool checked);
+//    void on_toolButton_dk_7_toggled(bool checked);
 
-    void on_toolButton_dk_8_toggled(bool checked);
+//    void on_toolButton_dk_8_toggled(bool checked);
 
-    void on_toolButton_dk_9_toggled(bool checked);
+//    void on_toolButton_dk_9_toggled(bool checked);
 
-    void on_toolButton_dk_10_toggled(bool checked);
+//    void on_toolButton_dk_10_toggled(bool checked);
 
     void Update100ms();
-    void on_toolButton_dk_12_toggled(bool checked);
+//    void on_toolButton_dk_12_toggled(bool checked);
 
 //    void on_toolButton_dk_14_toggled(bool checked);
 
@@ -573,6 +576,48 @@ private slots:
 
 //    void on_horizontalSlider_valueChanged(int value);
 
+    void on_toolButton_start_simulation_start_clicked(bool checked);
+
+    void on_toolButton_start_simulation_set_clicked(bool checked);
+
+    void on_checkBox_stateChanged(int arg1);
+
+    void on_checkBox_2_stateChanged(int arg1);
+
+    void on_checkBox_3_stateChanged(int arg1);
+
+    void on_checkBox_4_stateChanged(int arg1);
+
+    void on_checkBox_5_stateChanged(int arg1);
+
+    void on_checkBox_6_stateChanged(int arg1);
+
+    void on_checkBox_7_stateChanged(int arg1);
+
+    void on_checkBox_8_stateChanged(int arg1);
+
+    void on_toolButton_start_simulation_set_2_clicked(bool checked);
+
+    void on_toolButton_start_simulation_set_3_clicked(bool checked);
+
+    void on_toolButton_start_simulation_set_4_clicked(bool checked);
+
+    void on_toolButton_start_simulation_set_5_clicked(bool checked);
+
+    void on_toolButton_start_simulation_set_6_clicked(bool checked);
+
+    void on_toolButton_start_simulation_set_7_clicked(bool checked);
+
+    void on_toolButton_start_simulation_set_8_clicked(bool checked);
+
+    void on_toolButton_start_simulation_stop_clicked();
+
+    void on_toolButton_start_simulation_stop_clicked(bool checked);
+
+    void on_bt_rg_1_clicked(bool checked);
+
+    void on_toolButton_sim_target_autogenerate_clicked();
+
 private:
 
 //    bool mShowobjects,
@@ -604,6 +649,8 @@ private:
     void rotateVector(double angle, short *x, short *y);
     void SendScaleCommand();
     void DrawDetectZones(QPainter *p);
+    void updateSimTargetStatus();
+    void ConvXYradar2XYscr();
 };
 
 #endif // MAINWINDOW_H

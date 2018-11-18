@@ -13,7 +13,7 @@
 #include <QtWidgets/QAction>
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QButtonGroup>
-#include <QtWidgets/QDial>
+#include <QtWidgets/QDoubleSpinBox>
 #include <QtWidgets/QFormLayout>
 #include <QtWidgets/QFrame>
 #include <QtWidgets/QGridLayout>
@@ -309,12 +309,52 @@ public:
     QWidget *tab_7;
     QCustomButton *toolButton_start_simulation_start;
     QCustomButton *toolButton_start_simulation_stop;
-    QWidget *widget;
-    QGridLayout *gridLayout_24;
-    QSlider *horizontalSlider;
-    QDial *dial;
-    QLabel *label_dial_value_rg;
-    QLabel *label_dial_value_azi;
+    QFrame *frame;
+    QGridLayout *gridLayout_10;
+    QDoubleSpinBox *doubleSpinBox_8;
+    QDoubleSpinBox *doubleSpinBox_7;
+    QDoubleSpinBox *doubleSpinBox_9;
+    QDoubleSpinBox *doubleSpinBox_19;
+    QDoubleSpinBox *doubleSpinBox_4;
+    QDoubleSpinBox *doubleSpinBox_3;
+    QDoubleSpinBox *doubleSpinBox_2;
+    QLabel *label_3;
+    QDoubleSpinBox *doubleSpinBox;
+    QLabel *label_4;
+    QLabel *label;
+    QDoubleSpinBox *doubleSpinBox_5;
+    QDoubleSpinBox *doubleSpinBox_6;
+    QLabel *label_5;
+    QDoubleSpinBox *doubleSpinBox_20;
+    QDoubleSpinBox *doubleSpinBox_21;
+    QDoubleSpinBox *doubleSpinBox_22;
+    QDoubleSpinBox *doubleSpinBox_23;
+    QDoubleSpinBox *doubleSpinBox_24;
+    QDoubleSpinBox *doubleSpinBox_25;
+    QDoubleSpinBox *doubleSpinBox_26;
+    QDoubleSpinBox *doubleSpinBox_27;
+    QDoubleSpinBox *doubleSpinBox_28;
+    QDoubleSpinBox *doubleSpinBox_29;
+    QDoubleSpinBox *doubleSpinBox_30;
+    QDoubleSpinBox *doubleSpinBox_31;
+    QDoubleSpinBox *doubleSpinBox_32;
+    QDoubleSpinBox *doubleSpinBox_33;
+    QDoubleSpinBox *doubleSpinBox_34;
+    QDoubleSpinBox *doubleSpinBox_35;
+    QDoubleSpinBox *doubleSpinBox_36;
+    QDoubleSpinBox *doubleSpinBox_37;
+    QDoubleSpinBox *doubleSpinBox_38;
+    QDoubleSpinBox *doubleSpinBox_39;
+    QDoubleSpinBox *doubleSpinBox_40;
+    QDoubleSpinBox *doubleSpinBox_41;
+    QCustomButton *toolButton_start_simulation_set;
+    QCustomButton *toolButton_start_simulation_set_2;
+    QCustomButton *toolButton_start_simulation_set_3;
+    QCustomButton *toolButton_start_simulation_set_4;
+    QCustomButton *toolButton_start_simulation_set_5;
+    QCustomButton *toolButton_start_simulation_set_6;
+    QCustomButton *toolButton_start_simulation_set_7;
+    QCustomButton *toolButton_start_simulation_set_8;
     QCustomTabWidget *tabWidget_menu_3;
     QWidget *tab_24;
     QTableWidget *tableWidgetTarget_2;
@@ -353,7 +393,7 @@ public:
     QLabel *label_azi_antenna_head_true;
     QLabel *label_head_ship;
     QLabel *label_speed_ship;
-    QFrame *frame;
+    QFrame *frame1;
     QHBoxLayout *horizontalLayout_4;
     QButtonGroup *buttonGroup;
 
@@ -3343,8 +3383,8 @@ public:
 
         tabWidget_menu_2 = new QCustomTabWidget(centralWidget);
         tabWidget_menu_2->setObjectName(QStringLiteral("tabWidget_menu_2"));
-        tabWidget_menu_2->setGeometry(QRect(960, 10, 315, 700));
-        tabWidget_menu_2->setFont(font1);
+        tabWidget_menu_2->setGeometry(QRect(960, 10, 311, 711));
+        tabWidget_menu_2->setFont(font3);
         tabWidget_menu_2->setAutoFillBackground(false);
         tabWidget_menu_2->setElideMode(Qt::ElideNone);
         tabWidget_menu_2->setTabBarAutoHide(true);
@@ -5456,7 +5496,7 @@ public:
         toolButton_start_simulation_start = new QCustomButton(tab_7);
         toolButton_start_simulation_start->setObjectName(QStringLiteral("toolButton_start_simulation_start"));
         toolButton_start_simulation_start->setEnabled(true);
-        toolButton_start_simulation_start->setGeometry(QRect(90, 530, 85, 35));
+        toolButton_start_simulation_start->setGeometry(QRect(9, 358, 70, 25));
         sizePolicy1.setHeightForWidth(toolButton_start_simulation_start->sizePolicy().hasHeightForWidth());
         toolButton_start_simulation_start->setSizePolicy(sizePolicy1);
         toolButton_start_simulation_start->setFont(font3);
@@ -5465,143 +5505,292 @@ public:
         toolButton_start_simulation_stop = new QCustomButton(tab_7);
         toolButton_start_simulation_stop->setObjectName(QStringLiteral("toolButton_start_simulation_stop"));
         toolButton_start_simulation_stop->setEnabled(true);
-        toolButton_start_simulation_stop->setGeometry(QRect(190, 530, 85, 35));
+        toolButton_start_simulation_stop->setGeometry(QRect(231, 358, 56, 25));
         sizePolicy1.setHeightForWidth(toolButton_start_simulation_stop->sizePolicy().hasHeightForWidth());
         toolButton_start_simulation_stop->setSizePolicy(sizePolicy1);
         toolButton_start_simulation_stop->setFont(font3);
         toolButton_start_simulation_stop->setCheckable(true);
         toolButton_start_simulation_stop->setAutoExclusive(true);
-        widget = new QWidget(tab_7);
-        widget->setObjectName(QStringLiteral("widget"));
-        widget->setGeometry(QRect(20, 20, 271, 181));
-        gridLayout_24 = new QGridLayout(widget);
-        gridLayout_24->setSpacing(6);
-        gridLayout_24->setContentsMargins(11, 11, 11, 11);
-        gridLayout_24->setObjectName(QStringLiteral("gridLayout_24"));
-        gridLayout_24->setContentsMargins(0, 0, 0, 0);
-        horizontalSlider = new QSlider(widget);
-        horizontalSlider->setObjectName(QStringLiteral("horizontalSlider"));
-        horizontalSlider->setOrientation(Qt::Horizontal);
+        frame = new QFrame(tab_7);
+        frame->setObjectName(QStringLiteral("frame"));
+        frame->setGeometry(QRect(-1, -1, 301, 271));
+        frame->setFont(font3);
+        gridLayout_10 = new QGridLayout(frame);
+        gridLayout_10->setSpacing(6);
+        gridLayout_10->setContentsMargins(11, 11, 11, 11);
+        gridLayout_10->setObjectName(QStringLiteral("gridLayout_10"));
+        gridLayout_10->setContentsMargins(10, 10, 10, 10);
+        doubleSpinBox_8 = new QDoubleSpinBox(frame);
+        doubleSpinBox_8->setObjectName(QStringLiteral("doubleSpinBox_8"));
 
-        gridLayout_24->addWidget(horizontalSlider, 0, 0, 1, 1);
+        gridLayout_10->addWidget(doubleSpinBox_8, 5, 0, 1, 1);
 
-        dial = new QDial(widget);
-        dial->setObjectName(QStringLiteral("dial"));
-        dial->setMaximum(360);
+        doubleSpinBox_7 = new QDoubleSpinBox(frame);
+        doubleSpinBox_7->setObjectName(QStringLiteral("doubleSpinBox_7"));
 
-        gridLayout_24->addWidget(dial, 0, 1, 1, 1);
+        gridLayout_10->addWidget(doubleSpinBox_7, 4, 0, 1, 1);
 
-        label_dial_value_rg = new QLabel(widget);
-        label_dial_value_rg->setObjectName(QStringLiteral("label_dial_value_rg"));
-        QPalette palette66;
-        palette66.setBrush(QPalette::Active, QPalette::WindowText, brush);
-        palette66.setBrush(QPalette::Active, QPalette::Button, brush13);
-        palette66.setBrush(QPalette::Active, QPalette::Light, brush14);
-        palette66.setBrush(QPalette::Active, QPalette::Midlight, brush14);
-        palette66.setBrush(QPalette::Active, QPalette::Dark, brush14);
-        palette66.setBrush(QPalette::Active, QPalette::Mid, brush14);
-        palette66.setBrush(QPalette::Active, QPalette::Text, brush);
-        palette66.setBrush(QPalette::Active, QPalette::BrightText, brush);
-        palette66.setBrush(QPalette::Active, QPalette::ButtonText, brush);
-        palette66.setBrush(QPalette::Active, QPalette::Base, brush13);
-        palette66.setBrush(QPalette::Active, QPalette::Window, brush13);
-        palette66.setBrush(QPalette::Active, QPalette::Shadow, brush6);
-        palette66.setBrush(QPalette::Active, QPalette::AlternateBase, brush15);
-        palette66.setBrush(QPalette::Active, QPalette::ToolTipBase, brush7);
-        palette66.setBrush(QPalette::Active, QPalette::ToolTipText, brush6);
-        palette66.setBrush(QPalette::Inactive, QPalette::WindowText, brush);
-        palette66.setBrush(QPalette::Inactive, QPalette::Button, brush13);
-        palette66.setBrush(QPalette::Inactive, QPalette::Light, brush14);
-        palette66.setBrush(QPalette::Inactive, QPalette::Midlight, brush14);
-        palette66.setBrush(QPalette::Inactive, QPalette::Dark, brush14);
-        palette66.setBrush(QPalette::Inactive, QPalette::Mid, brush14);
-        palette66.setBrush(QPalette::Inactive, QPalette::Text, brush);
-        palette66.setBrush(QPalette::Inactive, QPalette::BrightText, brush);
-        palette66.setBrush(QPalette::Inactive, QPalette::ButtonText, brush);
-        palette66.setBrush(QPalette::Inactive, QPalette::Base, brush13);
-        palette66.setBrush(QPalette::Inactive, QPalette::Window, brush13);
-        palette66.setBrush(QPalette::Inactive, QPalette::Shadow, brush6);
-        palette66.setBrush(QPalette::Inactive, QPalette::AlternateBase, brush15);
-        palette66.setBrush(QPalette::Inactive, QPalette::ToolTipBase, brush7);
-        palette66.setBrush(QPalette::Inactive, QPalette::ToolTipText, brush6);
-        palette66.setBrush(QPalette::Disabled, QPalette::WindowText, brush14);
-        palette66.setBrush(QPalette::Disabled, QPalette::Button, brush13);
-        palette66.setBrush(QPalette::Disabled, QPalette::Light, brush14);
-        palette66.setBrush(QPalette::Disabled, QPalette::Midlight, brush14);
-        palette66.setBrush(QPalette::Disabled, QPalette::Dark, brush14);
-        palette66.setBrush(QPalette::Disabled, QPalette::Mid, brush14);
-        palette66.setBrush(QPalette::Disabled, QPalette::Text, brush14);
-        palette66.setBrush(QPalette::Disabled, QPalette::BrightText, brush);
-        palette66.setBrush(QPalette::Disabled, QPalette::ButtonText, brush14);
-        palette66.setBrush(QPalette::Disabled, QPalette::Base, brush13);
-        palette66.setBrush(QPalette::Disabled, QPalette::Window, brush13);
-        palette66.setBrush(QPalette::Disabled, QPalette::Shadow, brush6);
-        palette66.setBrush(QPalette::Disabled, QPalette::AlternateBase, brush14);
-        palette66.setBrush(QPalette::Disabled, QPalette::ToolTipBase, brush7);
-        palette66.setBrush(QPalette::Disabled, QPalette::ToolTipText, brush6);
-        label_dial_value_rg->setPalette(palette66);
-        label_dial_value_rg->setLayoutDirection(Qt::RightToLeft);
-        label_dial_value_rg->setAutoFillBackground(false);
-        label_dial_value_rg->setStyleSheet(QStringLiteral("background-color: rgb(16, 32, 64);"));
-        label_dial_value_rg->setAlignment(Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter);
+        doubleSpinBox_9 = new QDoubleSpinBox(frame);
+        doubleSpinBox_9->setObjectName(QStringLiteral("doubleSpinBox_9"));
 
-        gridLayout_24->addWidget(label_dial_value_rg, 1, 0, 1, 1);
+        gridLayout_10->addWidget(doubleSpinBox_9, 6, 0, 1, 1);
 
-        label_dial_value_azi = new QLabel(widget);
-        label_dial_value_azi->setObjectName(QStringLiteral("label_dial_value_azi"));
-        QPalette palette67;
-        palette67.setBrush(QPalette::Active, QPalette::WindowText, brush);
-        palette67.setBrush(QPalette::Active, QPalette::Button, brush13);
-        palette67.setBrush(QPalette::Active, QPalette::Light, brush14);
-        palette67.setBrush(QPalette::Active, QPalette::Midlight, brush14);
-        palette67.setBrush(QPalette::Active, QPalette::Dark, brush14);
-        palette67.setBrush(QPalette::Active, QPalette::Mid, brush14);
-        palette67.setBrush(QPalette::Active, QPalette::Text, brush);
-        palette67.setBrush(QPalette::Active, QPalette::BrightText, brush);
-        palette67.setBrush(QPalette::Active, QPalette::ButtonText, brush);
-        palette67.setBrush(QPalette::Active, QPalette::Base, brush13);
-        palette67.setBrush(QPalette::Active, QPalette::Window, brush13);
-        palette67.setBrush(QPalette::Active, QPalette::Shadow, brush6);
-        palette67.setBrush(QPalette::Active, QPalette::AlternateBase, brush15);
-        palette67.setBrush(QPalette::Active, QPalette::ToolTipBase, brush7);
-        palette67.setBrush(QPalette::Active, QPalette::ToolTipText, brush6);
-        palette67.setBrush(QPalette::Inactive, QPalette::WindowText, brush);
-        palette67.setBrush(QPalette::Inactive, QPalette::Button, brush13);
-        palette67.setBrush(QPalette::Inactive, QPalette::Light, brush14);
-        palette67.setBrush(QPalette::Inactive, QPalette::Midlight, brush14);
-        palette67.setBrush(QPalette::Inactive, QPalette::Dark, brush14);
-        palette67.setBrush(QPalette::Inactive, QPalette::Mid, brush14);
-        palette67.setBrush(QPalette::Inactive, QPalette::Text, brush);
-        palette67.setBrush(QPalette::Inactive, QPalette::BrightText, brush);
-        palette67.setBrush(QPalette::Inactive, QPalette::ButtonText, brush);
-        palette67.setBrush(QPalette::Inactive, QPalette::Base, brush13);
-        palette67.setBrush(QPalette::Inactive, QPalette::Window, brush13);
-        palette67.setBrush(QPalette::Inactive, QPalette::Shadow, brush6);
-        palette67.setBrush(QPalette::Inactive, QPalette::AlternateBase, brush15);
-        palette67.setBrush(QPalette::Inactive, QPalette::ToolTipBase, brush7);
-        palette67.setBrush(QPalette::Inactive, QPalette::ToolTipText, brush6);
-        palette67.setBrush(QPalette::Disabled, QPalette::WindowText, brush14);
-        palette67.setBrush(QPalette::Disabled, QPalette::Button, brush13);
-        palette67.setBrush(QPalette::Disabled, QPalette::Light, brush14);
-        palette67.setBrush(QPalette::Disabled, QPalette::Midlight, brush14);
-        palette67.setBrush(QPalette::Disabled, QPalette::Dark, brush14);
-        palette67.setBrush(QPalette::Disabled, QPalette::Mid, brush14);
-        palette67.setBrush(QPalette::Disabled, QPalette::Text, brush14);
-        palette67.setBrush(QPalette::Disabled, QPalette::BrightText, brush);
-        palette67.setBrush(QPalette::Disabled, QPalette::ButtonText, brush14);
-        palette67.setBrush(QPalette::Disabled, QPalette::Base, brush13);
-        palette67.setBrush(QPalette::Disabled, QPalette::Window, brush13);
-        palette67.setBrush(QPalette::Disabled, QPalette::Shadow, brush6);
-        palette67.setBrush(QPalette::Disabled, QPalette::AlternateBase, brush14);
-        palette67.setBrush(QPalette::Disabled, QPalette::ToolTipBase, brush7);
-        palette67.setBrush(QPalette::Disabled, QPalette::ToolTipText, brush6);
-        label_dial_value_azi->setPalette(palette67);
-        label_dial_value_azi->setLayoutDirection(Qt::RightToLeft);
-        label_dial_value_azi->setAutoFillBackground(false);
-        label_dial_value_azi->setStyleSheet(QStringLiteral("background-color: rgb(16, 32, 64);"));
-        label_dial_value_azi->setAlignment(Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter);
+        doubleSpinBox_19 = new QDoubleSpinBox(frame);
+        doubleSpinBox_19->setObjectName(QStringLiteral("doubleSpinBox_19"));
 
-        gridLayout_24->addWidget(label_dial_value_azi, 1, 1, 1, 1);
+        gridLayout_10->addWidget(doubleSpinBox_19, 7, 0, 1, 1);
+
+        doubleSpinBox_4 = new QDoubleSpinBox(frame);
+        doubleSpinBox_4->setObjectName(QStringLiteral("doubleSpinBox_4"));
+
+        gridLayout_10->addWidget(doubleSpinBox_4, 1, 3, 1, 1);
+
+        doubleSpinBox_3 = new QDoubleSpinBox(frame);
+        doubleSpinBox_3->setObjectName(QStringLiteral("doubleSpinBox_3"));
+
+        gridLayout_10->addWidget(doubleSpinBox_3, 1, 2, 1, 1);
+
+        doubleSpinBox_2 = new QDoubleSpinBox(frame);
+        doubleSpinBox_2->setObjectName(QStringLiteral("doubleSpinBox_2"));
+
+        gridLayout_10->addWidget(doubleSpinBox_2, 1, 1, 1, 1);
+
+        label_3 = new QLabel(frame);
+        label_3->setObjectName(QStringLiteral("label_3"));
+        label_3->setFont(font3);
+
+        gridLayout_10->addWidget(label_3, 0, 1, 1, 1);
+
+        doubleSpinBox = new QDoubleSpinBox(frame);
+        doubleSpinBox->setObjectName(QStringLiteral("doubleSpinBox"));
+
+        gridLayout_10->addWidget(doubleSpinBox, 1, 0, 1, 1);
+
+        label_4 = new QLabel(frame);
+        label_4->setObjectName(QStringLiteral("label_4"));
+        label_4->setFont(font3);
+
+        gridLayout_10->addWidget(label_4, 0, 2, 1, 1);
+
+        label = new QLabel(frame);
+        label->setObjectName(QStringLiteral("label"));
+        label->setFont(font3);
+
+        gridLayout_10->addWidget(label, 0, 0, 1, 1);
+
+        doubleSpinBox_5 = new QDoubleSpinBox(frame);
+        doubleSpinBox_5->setObjectName(QStringLiteral("doubleSpinBox_5"));
+
+        gridLayout_10->addWidget(doubleSpinBox_5, 2, 0, 1, 1);
+
+        doubleSpinBox_6 = new QDoubleSpinBox(frame);
+        doubleSpinBox_6->setObjectName(QStringLiteral("doubleSpinBox_6"));
+
+        gridLayout_10->addWidget(doubleSpinBox_6, 3, 0, 1, 1);
+
+        label_5 = new QLabel(frame);
+        label_5->setObjectName(QStringLiteral("label_5"));
+        label_5->setFont(font3);
+
+        gridLayout_10->addWidget(label_5, 0, 3, 1, 1);
+
+        doubleSpinBox_20 = new QDoubleSpinBox(frame);
+        doubleSpinBox_20->setObjectName(QStringLiteral("doubleSpinBox_20"));
+
+        gridLayout_10->addWidget(doubleSpinBox_20, 8, 0, 1, 1);
+
+        doubleSpinBox_21 = new QDoubleSpinBox(frame);
+        doubleSpinBox_21->setObjectName(QStringLiteral("doubleSpinBox_21"));
+
+        gridLayout_10->addWidget(doubleSpinBox_21, 2, 1, 1, 1);
+
+        doubleSpinBox_22 = new QDoubleSpinBox(frame);
+        doubleSpinBox_22->setObjectName(QStringLiteral("doubleSpinBox_22"));
+
+        gridLayout_10->addWidget(doubleSpinBox_22, 3, 1, 1, 1);
+
+        doubleSpinBox_23 = new QDoubleSpinBox(frame);
+        doubleSpinBox_23->setObjectName(QStringLiteral("doubleSpinBox_23"));
+
+        gridLayout_10->addWidget(doubleSpinBox_23, 4, 1, 1, 1);
+
+        doubleSpinBox_24 = new QDoubleSpinBox(frame);
+        doubleSpinBox_24->setObjectName(QStringLiteral("doubleSpinBox_24"));
+
+        gridLayout_10->addWidget(doubleSpinBox_24, 5, 1, 1, 1);
+
+        doubleSpinBox_25 = new QDoubleSpinBox(frame);
+        doubleSpinBox_25->setObjectName(QStringLiteral("doubleSpinBox_25"));
+
+        gridLayout_10->addWidget(doubleSpinBox_25, 6, 1, 1, 1);
+
+        doubleSpinBox_26 = new QDoubleSpinBox(frame);
+        doubleSpinBox_26->setObjectName(QStringLiteral("doubleSpinBox_26"));
+
+        gridLayout_10->addWidget(doubleSpinBox_26, 7, 1, 1, 1);
+
+        doubleSpinBox_27 = new QDoubleSpinBox(frame);
+        doubleSpinBox_27->setObjectName(QStringLiteral("doubleSpinBox_27"));
+
+        gridLayout_10->addWidget(doubleSpinBox_27, 8, 1, 1, 1);
+
+        doubleSpinBox_28 = new QDoubleSpinBox(frame);
+        doubleSpinBox_28->setObjectName(QStringLiteral("doubleSpinBox_28"));
+
+        gridLayout_10->addWidget(doubleSpinBox_28, 8, 2, 1, 1);
+
+        doubleSpinBox_29 = new QDoubleSpinBox(frame);
+        doubleSpinBox_29->setObjectName(QStringLiteral("doubleSpinBox_29"));
+
+        gridLayout_10->addWidget(doubleSpinBox_29, 7, 2, 1, 1);
+
+        doubleSpinBox_30 = new QDoubleSpinBox(frame);
+        doubleSpinBox_30->setObjectName(QStringLiteral("doubleSpinBox_30"));
+
+        gridLayout_10->addWidget(doubleSpinBox_30, 6, 2, 1, 1);
+
+        doubleSpinBox_31 = new QDoubleSpinBox(frame);
+        doubleSpinBox_31->setObjectName(QStringLiteral("doubleSpinBox_31"));
+
+        gridLayout_10->addWidget(doubleSpinBox_31, 5, 2, 1, 1);
+
+        doubleSpinBox_32 = new QDoubleSpinBox(frame);
+        doubleSpinBox_32->setObjectName(QStringLiteral("doubleSpinBox_32"));
+
+        gridLayout_10->addWidget(doubleSpinBox_32, 4, 2, 1, 1);
+
+        doubleSpinBox_33 = new QDoubleSpinBox(frame);
+        doubleSpinBox_33->setObjectName(QStringLiteral("doubleSpinBox_33"));
+
+        gridLayout_10->addWidget(doubleSpinBox_33, 3, 2, 1, 1);
+
+        doubleSpinBox_34 = new QDoubleSpinBox(frame);
+        doubleSpinBox_34->setObjectName(QStringLiteral("doubleSpinBox_34"));
+
+        gridLayout_10->addWidget(doubleSpinBox_34, 2, 2, 1, 1);
+
+        doubleSpinBox_35 = new QDoubleSpinBox(frame);
+        doubleSpinBox_35->setObjectName(QStringLiteral("doubleSpinBox_35"));
+
+        gridLayout_10->addWidget(doubleSpinBox_35, 2, 3, 1, 1);
+
+        doubleSpinBox_36 = new QDoubleSpinBox(frame);
+        doubleSpinBox_36->setObjectName(QStringLiteral("doubleSpinBox_36"));
+
+        gridLayout_10->addWidget(doubleSpinBox_36, 3, 3, 1, 1);
+
+        doubleSpinBox_37 = new QDoubleSpinBox(frame);
+        doubleSpinBox_37->setObjectName(QStringLiteral("doubleSpinBox_37"));
+
+        gridLayout_10->addWidget(doubleSpinBox_37, 4, 3, 1, 1);
+
+        doubleSpinBox_38 = new QDoubleSpinBox(frame);
+        doubleSpinBox_38->setObjectName(QStringLiteral("doubleSpinBox_38"));
+
+        gridLayout_10->addWidget(doubleSpinBox_38, 5, 3, 1, 1);
+
+        doubleSpinBox_39 = new QDoubleSpinBox(frame);
+        doubleSpinBox_39->setObjectName(QStringLiteral("doubleSpinBox_39"));
+
+        gridLayout_10->addWidget(doubleSpinBox_39, 6, 3, 1, 1);
+
+        doubleSpinBox_40 = new QDoubleSpinBox(frame);
+        doubleSpinBox_40->setObjectName(QStringLiteral("doubleSpinBox_40"));
+
+        gridLayout_10->addWidget(doubleSpinBox_40, 7, 3, 1, 1);
+
+        doubleSpinBox_41 = new QDoubleSpinBox(frame);
+        doubleSpinBox_41->setObjectName(QStringLiteral("doubleSpinBox_41"));
+
+        gridLayout_10->addWidget(doubleSpinBox_41, 8, 3, 1, 1);
+
+        toolButton_start_simulation_set = new QCustomButton(frame);
+        toolButton_start_simulation_set->setObjectName(QStringLiteral("toolButton_start_simulation_set"));
+        toolButton_start_simulation_set->setEnabled(true);
+        sizePolicy1.setHeightForWidth(toolButton_start_simulation_set->sizePolicy().hasHeightForWidth());
+        toolButton_start_simulation_set->setSizePolicy(sizePolicy1);
+        toolButton_start_simulation_set->setFont(font3);
+        toolButton_start_simulation_set->setCheckable(true);
+        toolButton_start_simulation_set->setAutoExclusive(false);
+
+        gridLayout_10->addWidget(toolButton_start_simulation_set, 1, 4, 1, 1);
+
+        toolButton_start_simulation_set_2 = new QCustomButton(frame);
+        toolButton_start_simulation_set_2->setObjectName(QStringLiteral("toolButton_start_simulation_set_2"));
+        toolButton_start_simulation_set_2->setEnabled(true);
+        sizePolicy1.setHeightForWidth(toolButton_start_simulation_set_2->sizePolicy().hasHeightForWidth());
+        toolButton_start_simulation_set_2->setSizePolicy(sizePolicy1);
+        toolButton_start_simulation_set_2->setFont(font3);
+        toolButton_start_simulation_set_2->setCheckable(true);
+        toolButton_start_simulation_set_2->setAutoExclusive(false);
+
+        gridLayout_10->addWidget(toolButton_start_simulation_set_2, 2, 4, 1, 1);
+
+        toolButton_start_simulation_set_3 = new QCustomButton(frame);
+        toolButton_start_simulation_set_3->setObjectName(QStringLiteral("toolButton_start_simulation_set_3"));
+        toolButton_start_simulation_set_3->setEnabled(true);
+        sizePolicy1.setHeightForWidth(toolButton_start_simulation_set_3->sizePolicy().hasHeightForWidth());
+        toolButton_start_simulation_set_3->setSizePolicy(sizePolicy1);
+        toolButton_start_simulation_set_3->setFont(font3);
+        toolButton_start_simulation_set_3->setCheckable(true);
+        toolButton_start_simulation_set_3->setAutoExclusive(false);
+
+        gridLayout_10->addWidget(toolButton_start_simulation_set_3, 3, 4, 1, 1);
+
+        toolButton_start_simulation_set_4 = new QCustomButton(frame);
+        toolButton_start_simulation_set_4->setObjectName(QStringLiteral("toolButton_start_simulation_set_4"));
+        toolButton_start_simulation_set_4->setEnabled(true);
+        sizePolicy1.setHeightForWidth(toolButton_start_simulation_set_4->sizePolicy().hasHeightForWidth());
+        toolButton_start_simulation_set_4->setSizePolicy(sizePolicy1);
+        toolButton_start_simulation_set_4->setFont(font3);
+        toolButton_start_simulation_set_4->setCheckable(true);
+        toolButton_start_simulation_set_4->setAutoExclusive(false);
+
+        gridLayout_10->addWidget(toolButton_start_simulation_set_4, 4, 4, 1, 1);
+
+        toolButton_start_simulation_set_5 = new QCustomButton(frame);
+        toolButton_start_simulation_set_5->setObjectName(QStringLiteral("toolButton_start_simulation_set_5"));
+        toolButton_start_simulation_set_5->setEnabled(true);
+        sizePolicy1.setHeightForWidth(toolButton_start_simulation_set_5->sizePolicy().hasHeightForWidth());
+        toolButton_start_simulation_set_5->setSizePolicy(sizePolicy1);
+        toolButton_start_simulation_set_5->setFont(font3);
+        toolButton_start_simulation_set_5->setCheckable(true);
+        toolButton_start_simulation_set_5->setAutoExclusive(false);
+
+        gridLayout_10->addWidget(toolButton_start_simulation_set_5, 5, 4, 1, 1);
+
+        toolButton_start_simulation_set_6 = new QCustomButton(frame);
+        toolButton_start_simulation_set_6->setObjectName(QStringLiteral("toolButton_start_simulation_set_6"));
+        toolButton_start_simulation_set_6->setEnabled(true);
+        sizePolicy1.setHeightForWidth(toolButton_start_simulation_set_6->sizePolicy().hasHeightForWidth());
+        toolButton_start_simulation_set_6->setSizePolicy(sizePolicy1);
+        toolButton_start_simulation_set_6->setFont(font3);
+        toolButton_start_simulation_set_6->setCheckable(true);
+        toolButton_start_simulation_set_6->setAutoExclusive(false);
+
+        gridLayout_10->addWidget(toolButton_start_simulation_set_6, 6, 4, 1, 1);
+
+        toolButton_start_simulation_set_7 = new QCustomButton(frame);
+        toolButton_start_simulation_set_7->setObjectName(QStringLiteral("toolButton_start_simulation_set_7"));
+        toolButton_start_simulation_set_7->setEnabled(true);
+        sizePolicy1.setHeightForWidth(toolButton_start_simulation_set_7->sizePolicy().hasHeightForWidth());
+        toolButton_start_simulation_set_7->setSizePolicy(sizePolicy1);
+        toolButton_start_simulation_set_7->setFont(font3);
+        toolButton_start_simulation_set_7->setCheckable(true);
+        toolButton_start_simulation_set_7->setAutoExclusive(false);
+
+        gridLayout_10->addWidget(toolButton_start_simulation_set_7, 7, 4, 1, 1);
+
+        toolButton_start_simulation_set_8 = new QCustomButton(frame);
+        toolButton_start_simulation_set_8->setObjectName(QStringLiteral("toolButton_start_simulation_set_8"));
+        toolButton_start_simulation_set_8->setEnabled(true);
+        sizePolicy1.setHeightForWidth(toolButton_start_simulation_set_8->sizePolicy().hasHeightForWidth());
+        toolButton_start_simulation_set_8->setSizePolicy(sizePolicy1);
+        toolButton_start_simulation_set_8->setFont(font3);
+        toolButton_start_simulation_set_8->setCheckable(true);
+        toolButton_start_simulation_set_8->setAutoExclusive(false);
+
+        gridLayout_10->addWidget(toolButton_start_simulation_set_8, 8, 4, 1, 1);
 
         tabWidget_menu_2->addTab(tab_7, QString());
         tabWidget_menu_3 = new QCustomTabWidget(centralWidget);
@@ -5704,6 +5893,130 @@ public:
 
         label_cursor_range = new QLabel(groupBox_5);
         label_cursor_range->setObjectName(QStringLiteral("label_cursor_range"));
+        QPalette palette66;
+        palette66.setBrush(QPalette::Active, QPalette::WindowText, brush);
+        palette66.setBrush(QPalette::Active, QPalette::Button, brush13);
+        palette66.setBrush(QPalette::Active, QPalette::Light, brush14);
+        palette66.setBrush(QPalette::Active, QPalette::Midlight, brush14);
+        palette66.setBrush(QPalette::Active, QPalette::Dark, brush14);
+        palette66.setBrush(QPalette::Active, QPalette::Mid, brush14);
+        palette66.setBrush(QPalette::Active, QPalette::Text, brush);
+        palette66.setBrush(QPalette::Active, QPalette::BrightText, brush);
+        palette66.setBrush(QPalette::Active, QPalette::ButtonText, brush);
+        palette66.setBrush(QPalette::Active, QPalette::Base, brush13);
+        palette66.setBrush(QPalette::Active, QPalette::Window, brush13);
+        palette66.setBrush(QPalette::Active, QPalette::Shadow, brush6);
+        palette66.setBrush(QPalette::Active, QPalette::AlternateBase, brush15);
+        palette66.setBrush(QPalette::Active, QPalette::ToolTipBase, brush7);
+        palette66.setBrush(QPalette::Active, QPalette::ToolTipText, brush6);
+        palette66.setBrush(QPalette::Inactive, QPalette::WindowText, brush);
+        palette66.setBrush(QPalette::Inactive, QPalette::Button, brush13);
+        palette66.setBrush(QPalette::Inactive, QPalette::Light, brush14);
+        palette66.setBrush(QPalette::Inactive, QPalette::Midlight, brush14);
+        palette66.setBrush(QPalette::Inactive, QPalette::Dark, brush14);
+        palette66.setBrush(QPalette::Inactive, QPalette::Mid, brush14);
+        palette66.setBrush(QPalette::Inactive, QPalette::Text, brush);
+        palette66.setBrush(QPalette::Inactive, QPalette::BrightText, brush);
+        palette66.setBrush(QPalette::Inactive, QPalette::ButtonText, brush);
+        palette66.setBrush(QPalette::Inactive, QPalette::Base, brush13);
+        palette66.setBrush(QPalette::Inactive, QPalette::Window, brush13);
+        palette66.setBrush(QPalette::Inactive, QPalette::Shadow, brush6);
+        palette66.setBrush(QPalette::Inactive, QPalette::AlternateBase, brush15);
+        palette66.setBrush(QPalette::Inactive, QPalette::ToolTipBase, brush7);
+        palette66.setBrush(QPalette::Inactive, QPalette::ToolTipText, brush6);
+        palette66.setBrush(QPalette::Disabled, QPalette::WindowText, brush14);
+        palette66.setBrush(QPalette::Disabled, QPalette::Button, brush13);
+        palette66.setBrush(QPalette::Disabled, QPalette::Light, brush14);
+        palette66.setBrush(QPalette::Disabled, QPalette::Midlight, brush14);
+        palette66.setBrush(QPalette::Disabled, QPalette::Dark, brush14);
+        palette66.setBrush(QPalette::Disabled, QPalette::Mid, brush14);
+        palette66.setBrush(QPalette::Disabled, QPalette::Text, brush14);
+        palette66.setBrush(QPalette::Disabled, QPalette::BrightText, brush);
+        palette66.setBrush(QPalette::Disabled, QPalette::ButtonText, brush14);
+        palette66.setBrush(QPalette::Disabled, QPalette::Base, brush13);
+        palette66.setBrush(QPalette::Disabled, QPalette::Window, brush13);
+        palette66.setBrush(QPalette::Disabled, QPalette::Shadow, brush6);
+        palette66.setBrush(QPalette::Disabled, QPalette::AlternateBase, brush14);
+        palette66.setBrush(QPalette::Disabled, QPalette::ToolTipBase, brush7);
+        palette66.setBrush(QPalette::Disabled, QPalette::ToolTipText, brush6);
+        label_cursor_range->setPalette(palette66);
+        label_cursor_range->setLayoutDirection(Qt::RightToLeft);
+        label_cursor_range->setAutoFillBackground(false);
+        label_cursor_range->setStyleSheet(QStringLiteral("background-color: rgb(16, 32, 64);"));
+        label_cursor_range->setAlignment(Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter);
+
+        gridLayout_7->addWidget(label_cursor_range, 1, 1, 1, 1);
+
+        label_10 = new QLabel(groupBox_5);
+        label_10->setObjectName(QStringLiteral("label_10"));
+        label_10->setFont(font3);
+
+        gridLayout_7->addWidget(label_10, 1, 0, 1, 1);
+
+        label_44 = new QLabel(groupBox_5);
+        label_44->setObjectName(QStringLiteral("label_44"));
+        label_44->setFont(font3);
+
+        gridLayout_7->addWidget(label_44, 3, 0, 1, 1);
+
+        label_cursor_long = new QLabel(groupBox_5);
+        label_cursor_long->setObjectName(QStringLiteral("label_cursor_long"));
+        QPalette palette67;
+        palette67.setBrush(QPalette::Active, QPalette::WindowText, brush);
+        palette67.setBrush(QPalette::Active, QPalette::Button, brush13);
+        palette67.setBrush(QPalette::Active, QPalette::Light, brush14);
+        palette67.setBrush(QPalette::Active, QPalette::Midlight, brush14);
+        palette67.setBrush(QPalette::Active, QPalette::Dark, brush14);
+        palette67.setBrush(QPalette::Active, QPalette::Mid, brush14);
+        palette67.setBrush(QPalette::Active, QPalette::Text, brush);
+        palette67.setBrush(QPalette::Active, QPalette::BrightText, brush);
+        palette67.setBrush(QPalette::Active, QPalette::ButtonText, brush);
+        palette67.setBrush(QPalette::Active, QPalette::Base, brush13);
+        palette67.setBrush(QPalette::Active, QPalette::Window, brush13);
+        palette67.setBrush(QPalette::Active, QPalette::Shadow, brush6);
+        palette67.setBrush(QPalette::Active, QPalette::AlternateBase, brush15);
+        palette67.setBrush(QPalette::Active, QPalette::ToolTipBase, brush7);
+        palette67.setBrush(QPalette::Active, QPalette::ToolTipText, brush6);
+        palette67.setBrush(QPalette::Inactive, QPalette::WindowText, brush);
+        palette67.setBrush(QPalette::Inactive, QPalette::Button, brush13);
+        palette67.setBrush(QPalette::Inactive, QPalette::Light, brush14);
+        palette67.setBrush(QPalette::Inactive, QPalette::Midlight, brush14);
+        palette67.setBrush(QPalette::Inactive, QPalette::Dark, brush14);
+        palette67.setBrush(QPalette::Inactive, QPalette::Mid, brush14);
+        palette67.setBrush(QPalette::Inactive, QPalette::Text, brush);
+        palette67.setBrush(QPalette::Inactive, QPalette::BrightText, brush);
+        palette67.setBrush(QPalette::Inactive, QPalette::ButtonText, brush);
+        palette67.setBrush(QPalette::Inactive, QPalette::Base, brush13);
+        palette67.setBrush(QPalette::Inactive, QPalette::Window, brush13);
+        palette67.setBrush(QPalette::Inactive, QPalette::Shadow, brush6);
+        palette67.setBrush(QPalette::Inactive, QPalette::AlternateBase, brush15);
+        palette67.setBrush(QPalette::Inactive, QPalette::ToolTipBase, brush7);
+        palette67.setBrush(QPalette::Inactive, QPalette::ToolTipText, brush6);
+        palette67.setBrush(QPalette::Disabled, QPalette::WindowText, brush14);
+        palette67.setBrush(QPalette::Disabled, QPalette::Button, brush13);
+        palette67.setBrush(QPalette::Disabled, QPalette::Light, brush14);
+        palette67.setBrush(QPalette::Disabled, QPalette::Midlight, brush14);
+        palette67.setBrush(QPalette::Disabled, QPalette::Dark, brush14);
+        palette67.setBrush(QPalette::Disabled, QPalette::Mid, brush14);
+        palette67.setBrush(QPalette::Disabled, QPalette::Text, brush14);
+        palette67.setBrush(QPalette::Disabled, QPalette::BrightText, brush);
+        palette67.setBrush(QPalette::Disabled, QPalette::ButtonText, brush14);
+        palette67.setBrush(QPalette::Disabled, QPalette::Base, brush13);
+        palette67.setBrush(QPalette::Disabled, QPalette::Window, brush13);
+        palette67.setBrush(QPalette::Disabled, QPalette::Shadow, brush6);
+        palette67.setBrush(QPalette::Disabled, QPalette::AlternateBase, brush14);
+        palette67.setBrush(QPalette::Disabled, QPalette::ToolTipBase, brush7);
+        palette67.setBrush(QPalette::Disabled, QPalette::ToolTipText, brush6);
+        label_cursor_long->setPalette(palette67);
+        label_cursor_long->setLayoutDirection(Qt::RightToLeft);
+        label_cursor_long->setAutoFillBackground(false);
+        label_cursor_long->setStyleSheet(QStringLiteral("background-color: rgb(16, 32, 64);"));
+        label_cursor_long->setAlignment(Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter);
+
+        gridLayout_7->addWidget(label_cursor_long, 2, 1, 1, 1);
+
+        label_cursor_lat = new QLabel(groupBox_5);
+        label_cursor_lat->setObjectName(QStringLiteral("label_cursor_lat"));
         QPalette palette68;
         palette68.setBrush(QPalette::Active, QPalette::WindowText, brush);
         palette68.setBrush(QPalette::Active, QPalette::Button, brush13);
@@ -5750,28 +6063,26 @@ public:
         palette68.setBrush(QPalette::Disabled, QPalette::AlternateBase, brush14);
         palette68.setBrush(QPalette::Disabled, QPalette::ToolTipBase, brush7);
         palette68.setBrush(QPalette::Disabled, QPalette::ToolTipText, brush6);
-        label_cursor_range->setPalette(palette68);
-        label_cursor_range->setLayoutDirection(Qt::RightToLeft);
-        label_cursor_range->setAutoFillBackground(false);
-        label_cursor_range->setStyleSheet(QStringLiteral("background-color: rgb(16, 32, 64);"));
-        label_cursor_range->setAlignment(Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter);
+        label_cursor_lat->setPalette(palette68);
+        label_cursor_lat->setLayoutDirection(Qt::RightToLeft);
+        label_cursor_lat->setAutoFillBackground(false);
+        label_cursor_lat->setStyleSheet(QStringLiteral("background-color: rgb(16, 32, 64);"));
+        label_cursor_lat->setAlignment(Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter);
 
-        gridLayout_7->addWidget(label_cursor_range, 1, 1, 1, 1);
+        gridLayout_7->addWidget(label_cursor_lat, 3, 1, 1, 1);
 
-        label_10 = new QLabel(groupBox_5);
-        label_10->setObjectName(QStringLiteral("label_10"));
-        label_10->setFont(font3);
-
-        gridLayout_7->addWidget(label_10, 1, 0, 1, 1);
-
-        label_44 = new QLabel(groupBox_5);
-        label_44->setObjectName(QStringLiteral("label_44"));
-        label_44->setFont(font3);
-
-        gridLayout_7->addWidget(label_44, 3, 0, 1, 1);
-
-        label_cursor_long = new QLabel(groupBox_5);
-        label_cursor_long->setObjectName(QStringLiteral("label_cursor_long"));
+        groupBox_gps_2 = new QFrame(centralWidget);
+        groupBox_gps_2->setObjectName(QStringLiteral("groupBox_gps_2"));
+        groupBox_gps_2->setGeometry(QRect(560, 990, 341, 31));
+        gridLayout_23 = new QGridLayout(groupBox_gps_2);
+        gridLayout_23->setSpacing(6);
+        gridLayout_23->setContentsMargins(11, 11, 11, 11);
+        gridLayout_23->setObjectName(QStringLiteral("gridLayout_23"));
+        gridLayout_23->setHorizontalSpacing(2);
+        gridLayout_23->setVerticalSpacing(1);
+        gridLayout_23->setContentsMargins(4, 4, 4, 4);
+        label_speed_2 = new QLabel(groupBox_gps_2);
+        label_speed_2->setObjectName(QStringLiteral("label_speed_2"));
         QPalette palette69;
         palette69.setBrush(QPalette::Active, QPalette::WindowText, brush);
         palette69.setBrush(QPalette::Active, QPalette::Button, brush13);
@@ -5818,16 +6129,16 @@ public:
         palette69.setBrush(QPalette::Disabled, QPalette::AlternateBase, brush14);
         palette69.setBrush(QPalette::Disabled, QPalette::ToolTipBase, brush7);
         palette69.setBrush(QPalette::Disabled, QPalette::ToolTipText, brush6);
-        label_cursor_long->setPalette(palette69);
-        label_cursor_long->setLayoutDirection(Qt::RightToLeft);
-        label_cursor_long->setAutoFillBackground(false);
-        label_cursor_long->setStyleSheet(QStringLiteral("background-color: rgb(16, 32, 64);"));
-        label_cursor_long->setAlignment(Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter);
+        label_speed_2->setPalette(palette69);
+        label_speed_2->setLayoutDirection(Qt::RightToLeft);
+        label_speed_2->setAutoFillBackground(false);
+        label_speed_2->setStyleSheet(QStringLiteral("background-color: rgb(16, 32, 64);"));
+        label_speed_2->setAlignment(Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter);
 
-        gridLayout_7->addWidget(label_cursor_long, 2, 1, 1, 1);
+        gridLayout_23->addWidget(label_speed_2, 0, 4, 1, 1);
 
-        label_cursor_lat = new QLabel(groupBox_5);
-        label_cursor_lat->setObjectName(QStringLiteral("label_cursor_lat"));
+        label_range_resolution = new QLabel(groupBox_gps_2);
+        label_range_resolution->setObjectName(QStringLiteral("label_range_resolution"));
         QPalette palette70;
         palette70.setBrush(QPalette::Active, QPalette::WindowText, brush);
         palette70.setBrush(QPalette::Active, QPalette::Button, brush13);
@@ -5874,26 +6185,14 @@ public:
         palette70.setBrush(QPalette::Disabled, QPalette::AlternateBase, brush14);
         palette70.setBrush(QPalette::Disabled, QPalette::ToolTipBase, brush7);
         palette70.setBrush(QPalette::Disabled, QPalette::ToolTipText, brush6);
-        label_cursor_lat->setPalette(palette70);
-        label_cursor_lat->setLayoutDirection(Qt::RightToLeft);
-        label_cursor_lat->setAutoFillBackground(false);
-        label_cursor_lat->setStyleSheet(QStringLiteral("background-color: rgb(16, 32, 64);"));
-        label_cursor_lat->setAlignment(Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter);
+        label_range_resolution->setPalette(palette70);
+        label_range_resolution->setStyleSheet(QStringLiteral("background-color: rgb(16, 32, 64);"));
+        label_range_resolution->setAlignment(Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter);
 
-        gridLayout_7->addWidget(label_cursor_lat, 3, 1, 1, 1);
+        gridLayout_23->addWidget(label_range_resolution, 0, 2, 1, 1);
 
-        groupBox_gps_2 = new QFrame(centralWidget);
-        groupBox_gps_2->setObjectName(QStringLiteral("groupBox_gps_2"));
-        groupBox_gps_2->setGeometry(QRect(560, 990, 341, 31));
-        gridLayout_23 = new QGridLayout(groupBox_gps_2);
-        gridLayout_23->setSpacing(6);
-        gridLayout_23->setContentsMargins(11, 11, 11, 11);
-        gridLayout_23->setObjectName(QStringLiteral("gridLayout_23"));
-        gridLayout_23->setHorizontalSpacing(2);
-        gridLayout_23->setVerticalSpacing(1);
-        gridLayout_23->setContentsMargins(4, 4, 4, 4);
-        label_speed_2 = new QLabel(groupBox_gps_2);
-        label_speed_2->setObjectName(QStringLiteral("label_speed_2"));
+        label_sn_type = new QLabel(groupBox_gps_2);
+        label_sn_type->setObjectName(QStringLiteral("label_sn_type"));
         QPalette palette71;
         palette71.setBrush(QPalette::Active, QPalette::WindowText, brush);
         palette71.setBrush(QPalette::Active, QPalette::Button, brush13);
@@ -5940,70 +6239,56 @@ public:
         palette71.setBrush(QPalette::Disabled, QPalette::AlternateBase, brush14);
         palette71.setBrush(QPalette::Disabled, QPalette::ToolTipBase, brush7);
         palette71.setBrush(QPalette::Disabled, QPalette::ToolTipText, brush6);
-        label_speed_2->setPalette(palette71);
-        label_speed_2->setLayoutDirection(Qt::RightToLeft);
-        label_speed_2->setAutoFillBackground(false);
-        label_speed_2->setStyleSheet(QStringLiteral("background-color: rgb(16, 32, 64);"));
-        label_speed_2->setAlignment(Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter);
+        label_sn_type->setPalette(palette71);
+        label_sn_type->setStyleSheet(QStringLiteral("background-color: rgb(16, 32, 64);"));
+        label_sn_type->setAlignment(Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter);
 
-        gridLayout_23->addWidget(label_speed_2, 0, 4, 1, 1);
+        gridLayout_23->addWidget(label_sn_type, 0, 0, 1, 1);
 
-        label_range_resolution = new QLabel(groupBox_gps_2);
-        label_range_resolution->setObjectName(QStringLiteral("label_range_resolution"));
+        label_sn_param = new QLabel(groupBox_gps_2);
+        label_sn_param->setObjectName(QStringLiteral("label_sn_param"));
         QPalette palette72;
         palette72.setBrush(QPalette::Active, QPalette::WindowText, brush);
         palette72.setBrush(QPalette::Active, QPalette::Button, brush13);
-        palette72.setBrush(QPalette::Active, QPalette::Light, brush14);
-        palette72.setBrush(QPalette::Active, QPalette::Midlight, brush14);
-        palette72.setBrush(QPalette::Active, QPalette::Dark, brush14);
-        palette72.setBrush(QPalette::Active, QPalette::Mid, brush14);
+        palette72.setBrush(QPalette::Active, QPalette::Light, brush23);
+        palette72.setBrush(QPalette::Active, QPalette::Midlight, brush24);
+        palette72.setBrush(QPalette::Active, QPalette::Dark, brush25);
+        palette72.setBrush(QPalette::Active, QPalette::Mid, brush26);
         palette72.setBrush(QPalette::Active, QPalette::Text, brush);
-        palette72.setBrush(QPalette::Active, QPalette::BrightText, brush);
         palette72.setBrush(QPalette::Active, QPalette::ButtonText, brush);
         palette72.setBrush(QPalette::Active, QPalette::Base, brush13);
         palette72.setBrush(QPalette::Active, QPalette::Window, brush13);
-        palette72.setBrush(QPalette::Active, QPalette::Shadow, brush6);
-        palette72.setBrush(QPalette::Active, QPalette::AlternateBase, brush15);
-        palette72.setBrush(QPalette::Active, QPalette::ToolTipBase, brush7);
-        palette72.setBrush(QPalette::Active, QPalette::ToolTipText, brush6);
+        palette72.setBrush(QPalette::Active, QPalette::AlternateBase, brush27);
         palette72.setBrush(QPalette::Inactive, QPalette::WindowText, brush);
         palette72.setBrush(QPalette::Inactive, QPalette::Button, brush13);
-        palette72.setBrush(QPalette::Inactive, QPalette::Light, brush14);
-        palette72.setBrush(QPalette::Inactive, QPalette::Midlight, brush14);
-        palette72.setBrush(QPalette::Inactive, QPalette::Dark, brush14);
-        palette72.setBrush(QPalette::Inactive, QPalette::Mid, brush14);
+        palette72.setBrush(QPalette::Inactive, QPalette::Light, brush23);
+        palette72.setBrush(QPalette::Inactive, QPalette::Midlight, brush24);
+        palette72.setBrush(QPalette::Inactive, QPalette::Dark, brush25);
+        palette72.setBrush(QPalette::Inactive, QPalette::Mid, brush26);
         palette72.setBrush(QPalette::Inactive, QPalette::Text, brush);
-        palette72.setBrush(QPalette::Inactive, QPalette::BrightText, brush);
         palette72.setBrush(QPalette::Inactive, QPalette::ButtonText, brush);
         palette72.setBrush(QPalette::Inactive, QPalette::Base, brush13);
         palette72.setBrush(QPalette::Inactive, QPalette::Window, brush13);
-        palette72.setBrush(QPalette::Inactive, QPalette::Shadow, brush6);
-        palette72.setBrush(QPalette::Inactive, QPalette::AlternateBase, brush15);
-        palette72.setBrush(QPalette::Inactive, QPalette::ToolTipBase, brush7);
-        palette72.setBrush(QPalette::Inactive, QPalette::ToolTipText, brush6);
-        palette72.setBrush(QPalette::Disabled, QPalette::WindowText, brush14);
+        palette72.setBrush(QPalette::Inactive, QPalette::AlternateBase, brush27);
+        palette72.setBrush(QPalette::Disabled, QPalette::WindowText, brush25);
         palette72.setBrush(QPalette::Disabled, QPalette::Button, brush13);
-        palette72.setBrush(QPalette::Disabled, QPalette::Light, brush14);
-        palette72.setBrush(QPalette::Disabled, QPalette::Midlight, brush14);
-        palette72.setBrush(QPalette::Disabled, QPalette::Dark, brush14);
-        palette72.setBrush(QPalette::Disabled, QPalette::Mid, brush14);
-        palette72.setBrush(QPalette::Disabled, QPalette::Text, brush14);
-        palette72.setBrush(QPalette::Disabled, QPalette::BrightText, brush);
-        palette72.setBrush(QPalette::Disabled, QPalette::ButtonText, brush14);
+        palette72.setBrush(QPalette::Disabled, QPalette::Light, brush23);
+        palette72.setBrush(QPalette::Disabled, QPalette::Midlight, brush24);
+        palette72.setBrush(QPalette::Disabled, QPalette::Dark, brush25);
+        palette72.setBrush(QPalette::Disabled, QPalette::Mid, brush26);
+        palette72.setBrush(QPalette::Disabled, QPalette::Text, brush25);
+        palette72.setBrush(QPalette::Disabled, QPalette::ButtonText, brush25);
         palette72.setBrush(QPalette::Disabled, QPalette::Base, brush13);
         palette72.setBrush(QPalette::Disabled, QPalette::Window, brush13);
-        palette72.setBrush(QPalette::Disabled, QPalette::Shadow, brush6);
-        palette72.setBrush(QPalette::Disabled, QPalette::AlternateBase, brush14);
-        palette72.setBrush(QPalette::Disabled, QPalette::ToolTipBase, brush7);
-        palette72.setBrush(QPalette::Disabled, QPalette::ToolTipText, brush6);
-        label_range_resolution->setPalette(palette72);
-        label_range_resolution->setStyleSheet(QStringLiteral("background-color: rgb(16, 32, 64);"));
-        label_range_resolution->setAlignment(Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter);
+        palette72.setBrush(QPalette::Disabled, QPalette::AlternateBase, brush28);
+        label_sn_param->setPalette(palette72);
+        label_sn_param->setStyleSheet(QStringLiteral("background-color: rgb(16, 32, 64);"));
+        label_sn_param->setAlignment(Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter);
 
-        gridLayout_23->addWidget(label_range_resolution, 0, 2, 1, 1);
+        gridLayout_23->addWidget(label_sn_param, 0, 3, 1, 1);
 
-        label_sn_type = new QLabel(groupBox_gps_2);
-        label_sn_type->setObjectName(QStringLiteral("label_sn_type"));
+        label_frame_rate = new QLabel(groupBox_gps_2);
+        label_frame_rate->setObjectName(QStringLiteral("label_frame_rate"));
         QPalette palette73;
         palette73.setBrush(QPalette::Active, QPalette::WindowText, brush);
         palette73.setBrush(QPalette::Active, QPalette::Button, brush13);
@@ -6050,103 +6335,7 @@ public:
         palette73.setBrush(QPalette::Disabled, QPalette::AlternateBase, brush14);
         palette73.setBrush(QPalette::Disabled, QPalette::ToolTipBase, brush7);
         palette73.setBrush(QPalette::Disabled, QPalette::ToolTipText, brush6);
-        label_sn_type->setPalette(palette73);
-        label_sn_type->setStyleSheet(QStringLiteral("background-color: rgb(16, 32, 64);"));
-        label_sn_type->setAlignment(Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter);
-
-        gridLayout_23->addWidget(label_sn_type, 0, 0, 1, 1);
-
-        label_sn_param = new QLabel(groupBox_gps_2);
-        label_sn_param->setObjectName(QStringLiteral("label_sn_param"));
-        QPalette palette74;
-        palette74.setBrush(QPalette::Active, QPalette::WindowText, brush);
-        palette74.setBrush(QPalette::Active, QPalette::Button, brush13);
-        palette74.setBrush(QPalette::Active, QPalette::Light, brush23);
-        palette74.setBrush(QPalette::Active, QPalette::Midlight, brush24);
-        palette74.setBrush(QPalette::Active, QPalette::Dark, brush25);
-        palette74.setBrush(QPalette::Active, QPalette::Mid, brush26);
-        palette74.setBrush(QPalette::Active, QPalette::Text, brush);
-        palette74.setBrush(QPalette::Active, QPalette::ButtonText, brush);
-        palette74.setBrush(QPalette::Active, QPalette::Base, brush13);
-        palette74.setBrush(QPalette::Active, QPalette::Window, brush13);
-        palette74.setBrush(QPalette::Active, QPalette::AlternateBase, brush27);
-        palette74.setBrush(QPalette::Inactive, QPalette::WindowText, brush);
-        palette74.setBrush(QPalette::Inactive, QPalette::Button, brush13);
-        palette74.setBrush(QPalette::Inactive, QPalette::Light, brush23);
-        palette74.setBrush(QPalette::Inactive, QPalette::Midlight, brush24);
-        palette74.setBrush(QPalette::Inactive, QPalette::Dark, brush25);
-        palette74.setBrush(QPalette::Inactive, QPalette::Mid, brush26);
-        palette74.setBrush(QPalette::Inactive, QPalette::Text, brush);
-        palette74.setBrush(QPalette::Inactive, QPalette::ButtonText, brush);
-        palette74.setBrush(QPalette::Inactive, QPalette::Base, brush13);
-        palette74.setBrush(QPalette::Inactive, QPalette::Window, brush13);
-        palette74.setBrush(QPalette::Inactive, QPalette::AlternateBase, brush27);
-        palette74.setBrush(QPalette::Disabled, QPalette::WindowText, brush25);
-        palette74.setBrush(QPalette::Disabled, QPalette::Button, brush13);
-        palette74.setBrush(QPalette::Disabled, QPalette::Light, brush23);
-        palette74.setBrush(QPalette::Disabled, QPalette::Midlight, brush24);
-        palette74.setBrush(QPalette::Disabled, QPalette::Dark, brush25);
-        palette74.setBrush(QPalette::Disabled, QPalette::Mid, brush26);
-        palette74.setBrush(QPalette::Disabled, QPalette::Text, brush25);
-        palette74.setBrush(QPalette::Disabled, QPalette::ButtonText, brush25);
-        palette74.setBrush(QPalette::Disabled, QPalette::Base, brush13);
-        palette74.setBrush(QPalette::Disabled, QPalette::Window, brush13);
-        palette74.setBrush(QPalette::Disabled, QPalette::AlternateBase, brush28);
-        label_sn_param->setPalette(palette74);
-        label_sn_param->setStyleSheet(QStringLiteral("background-color: rgb(16, 32, 64);"));
-        label_sn_param->setAlignment(Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter);
-
-        gridLayout_23->addWidget(label_sn_param, 0, 3, 1, 1);
-
-        label_frame_rate = new QLabel(groupBox_gps_2);
-        label_frame_rate->setObjectName(QStringLiteral("label_frame_rate"));
-        QPalette palette75;
-        palette75.setBrush(QPalette::Active, QPalette::WindowText, brush);
-        palette75.setBrush(QPalette::Active, QPalette::Button, brush13);
-        palette75.setBrush(QPalette::Active, QPalette::Light, brush14);
-        palette75.setBrush(QPalette::Active, QPalette::Midlight, brush14);
-        palette75.setBrush(QPalette::Active, QPalette::Dark, brush14);
-        palette75.setBrush(QPalette::Active, QPalette::Mid, brush14);
-        palette75.setBrush(QPalette::Active, QPalette::Text, brush);
-        palette75.setBrush(QPalette::Active, QPalette::BrightText, brush);
-        palette75.setBrush(QPalette::Active, QPalette::ButtonText, brush);
-        palette75.setBrush(QPalette::Active, QPalette::Base, brush13);
-        palette75.setBrush(QPalette::Active, QPalette::Window, brush13);
-        palette75.setBrush(QPalette::Active, QPalette::Shadow, brush6);
-        palette75.setBrush(QPalette::Active, QPalette::AlternateBase, brush15);
-        palette75.setBrush(QPalette::Active, QPalette::ToolTipBase, brush7);
-        palette75.setBrush(QPalette::Active, QPalette::ToolTipText, brush6);
-        palette75.setBrush(QPalette::Inactive, QPalette::WindowText, brush);
-        palette75.setBrush(QPalette::Inactive, QPalette::Button, brush13);
-        palette75.setBrush(QPalette::Inactive, QPalette::Light, brush14);
-        palette75.setBrush(QPalette::Inactive, QPalette::Midlight, brush14);
-        palette75.setBrush(QPalette::Inactive, QPalette::Dark, brush14);
-        palette75.setBrush(QPalette::Inactive, QPalette::Mid, brush14);
-        palette75.setBrush(QPalette::Inactive, QPalette::Text, brush);
-        palette75.setBrush(QPalette::Inactive, QPalette::BrightText, brush);
-        palette75.setBrush(QPalette::Inactive, QPalette::ButtonText, brush);
-        palette75.setBrush(QPalette::Inactive, QPalette::Base, brush13);
-        palette75.setBrush(QPalette::Inactive, QPalette::Window, brush13);
-        palette75.setBrush(QPalette::Inactive, QPalette::Shadow, brush6);
-        palette75.setBrush(QPalette::Inactive, QPalette::AlternateBase, brush15);
-        palette75.setBrush(QPalette::Inactive, QPalette::ToolTipBase, brush7);
-        palette75.setBrush(QPalette::Inactive, QPalette::ToolTipText, brush6);
-        palette75.setBrush(QPalette::Disabled, QPalette::WindowText, brush14);
-        palette75.setBrush(QPalette::Disabled, QPalette::Button, brush13);
-        palette75.setBrush(QPalette::Disabled, QPalette::Light, brush14);
-        palette75.setBrush(QPalette::Disabled, QPalette::Midlight, brush14);
-        palette75.setBrush(QPalette::Disabled, QPalette::Dark, brush14);
-        palette75.setBrush(QPalette::Disabled, QPalette::Mid, brush14);
-        palette75.setBrush(QPalette::Disabled, QPalette::Text, brush14);
-        palette75.setBrush(QPalette::Disabled, QPalette::BrightText, brush);
-        palette75.setBrush(QPalette::Disabled, QPalette::ButtonText, brush14);
-        palette75.setBrush(QPalette::Disabled, QPalette::Base, brush13);
-        palette75.setBrush(QPalette::Disabled, QPalette::Window, brush13);
-        palette75.setBrush(QPalette::Disabled, QPalette::Shadow, brush6);
-        palette75.setBrush(QPalette::Disabled, QPalette::AlternateBase, brush14);
-        palette75.setBrush(QPalette::Disabled, QPalette::ToolTipBase, brush7);
-        palette75.setBrush(QPalette::Disabled, QPalette::ToolTipText, brush6);
-        label_frame_rate->setPalette(palette75);
+        label_frame_rate->setPalette(palette73);
         label_frame_rate->setStyleSheet(QStringLiteral("background-color: rgb(16, 32, 64);"));
         label_frame_rate->setAlignment(Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter);
 
@@ -6226,57 +6415,57 @@ public:
 
         label_azi_antenna_head_true = new QLabel(groupBox_25);
         label_azi_antenna_head_true->setObjectName(QStringLiteral("label_azi_antenna_head_true"));
-        QPalette palette76;
+        QPalette palette74;
         QBrush brush29(QColor(255, 0, 0, 255));
         brush29.setStyle(Qt::SolidPattern);
-        palette76.setBrush(QPalette::Active, QPalette::WindowText, brush29);
+        palette74.setBrush(QPalette::Active, QPalette::WindowText, brush29);
         QBrush brush30(QColor(255, 255, 255, 0));
         brush30.setStyle(Qt::SolidPattern);
-        palette76.setBrush(QPalette::Active, QPalette::Button, brush30);
-        palette76.setBrush(QPalette::Active, QPalette::Light, brush6);
-        palette76.setBrush(QPalette::Active, QPalette::Midlight, brush6);
-        palette76.setBrush(QPalette::Active, QPalette::Dark, brush6);
-        palette76.setBrush(QPalette::Active, QPalette::Mid, brush6);
-        palette76.setBrush(QPalette::Active, QPalette::Text, brush29);
-        palette76.setBrush(QPalette::Active, QPalette::BrightText, brush);
-        palette76.setBrush(QPalette::Active, QPalette::ButtonText, brush29);
-        palette76.setBrush(QPalette::Active, QPalette::Base, brush30);
-        palette76.setBrush(QPalette::Active, QPalette::Window, brush30);
-        palette76.setBrush(QPalette::Active, QPalette::Shadow, brush6);
-        palette76.setBrush(QPalette::Active, QPalette::AlternateBase, brush6);
-        palette76.setBrush(QPalette::Active, QPalette::ToolTipBase, brush7);
-        palette76.setBrush(QPalette::Active, QPalette::ToolTipText, brush6);
-        palette76.setBrush(QPalette::Inactive, QPalette::WindowText, brush29);
-        palette76.setBrush(QPalette::Inactive, QPalette::Button, brush30);
-        palette76.setBrush(QPalette::Inactive, QPalette::Light, brush6);
-        palette76.setBrush(QPalette::Inactive, QPalette::Midlight, brush6);
-        palette76.setBrush(QPalette::Inactive, QPalette::Dark, brush6);
-        palette76.setBrush(QPalette::Inactive, QPalette::Mid, brush6);
-        palette76.setBrush(QPalette::Inactive, QPalette::Text, brush29);
-        palette76.setBrush(QPalette::Inactive, QPalette::BrightText, brush);
-        palette76.setBrush(QPalette::Inactive, QPalette::ButtonText, brush29);
-        palette76.setBrush(QPalette::Inactive, QPalette::Base, brush30);
-        palette76.setBrush(QPalette::Inactive, QPalette::Window, brush30);
-        palette76.setBrush(QPalette::Inactive, QPalette::Shadow, brush6);
-        palette76.setBrush(QPalette::Inactive, QPalette::AlternateBase, brush6);
-        palette76.setBrush(QPalette::Inactive, QPalette::ToolTipBase, brush7);
-        palette76.setBrush(QPalette::Inactive, QPalette::ToolTipText, brush6);
-        palette76.setBrush(QPalette::Disabled, QPalette::WindowText, brush29);
-        palette76.setBrush(QPalette::Disabled, QPalette::Button, brush30);
-        palette76.setBrush(QPalette::Disabled, QPalette::Light, brush6);
-        palette76.setBrush(QPalette::Disabled, QPalette::Midlight, brush6);
-        palette76.setBrush(QPalette::Disabled, QPalette::Dark, brush6);
-        palette76.setBrush(QPalette::Disabled, QPalette::Mid, brush6);
-        palette76.setBrush(QPalette::Disabled, QPalette::Text, brush29);
-        palette76.setBrush(QPalette::Disabled, QPalette::BrightText, brush);
-        palette76.setBrush(QPalette::Disabled, QPalette::ButtonText, brush29);
-        palette76.setBrush(QPalette::Disabled, QPalette::Base, brush30);
-        palette76.setBrush(QPalette::Disabled, QPalette::Window, brush30);
-        palette76.setBrush(QPalette::Disabled, QPalette::Shadow, brush6);
-        palette76.setBrush(QPalette::Disabled, QPalette::AlternateBase, brush6);
-        palette76.setBrush(QPalette::Disabled, QPalette::ToolTipBase, brush7);
-        palette76.setBrush(QPalette::Disabled, QPalette::ToolTipText, brush6);
-        label_azi_antenna_head_true->setPalette(palette76);
+        palette74.setBrush(QPalette::Active, QPalette::Button, brush30);
+        palette74.setBrush(QPalette::Active, QPalette::Light, brush6);
+        palette74.setBrush(QPalette::Active, QPalette::Midlight, brush6);
+        palette74.setBrush(QPalette::Active, QPalette::Dark, brush6);
+        palette74.setBrush(QPalette::Active, QPalette::Mid, brush6);
+        palette74.setBrush(QPalette::Active, QPalette::Text, brush29);
+        palette74.setBrush(QPalette::Active, QPalette::BrightText, brush);
+        palette74.setBrush(QPalette::Active, QPalette::ButtonText, brush29);
+        palette74.setBrush(QPalette::Active, QPalette::Base, brush30);
+        palette74.setBrush(QPalette::Active, QPalette::Window, brush30);
+        palette74.setBrush(QPalette::Active, QPalette::Shadow, brush6);
+        palette74.setBrush(QPalette::Active, QPalette::AlternateBase, brush6);
+        palette74.setBrush(QPalette::Active, QPalette::ToolTipBase, brush7);
+        palette74.setBrush(QPalette::Active, QPalette::ToolTipText, brush6);
+        palette74.setBrush(QPalette::Inactive, QPalette::WindowText, brush29);
+        palette74.setBrush(QPalette::Inactive, QPalette::Button, brush30);
+        palette74.setBrush(QPalette::Inactive, QPalette::Light, brush6);
+        palette74.setBrush(QPalette::Inactive, QPalette::Midlight, brush6);
+        palette74.setBrush(QPalette::Inactive, QPalette::Dark, brush6);
+        palette74.setBrush(QPalette::Inactive, QPalette::Mid, brush6);
+        palette74.setBrush(QPalette::Inactive, QPalette::Text, brush29);
+        palette74.setBrush(QPalette::Inactive, QPalette::BrightText, brush);
+        palette74.setBrush(QPalette::Inactive, QPalette::ButtonText, brush29);
+        palette74.setBrush(QPalette::Inactive, QPalette::Base, brush30);
+        palette74.setBrush(QPalette::Inactive, QPalette::Window, brush30);
+        palette74.setBrush(QPalette::Inactive, QPalette::Shadow, brush6);
+        palette74.setBrush(QPalette::Inactive, QPalette::AlternateBase, brush6);
+        palette74.setBrush(QPalette::Inactive, QPalette::ToolTipBase, brush7);
+        palette74.setBrush(QPalette::Inactive, QPalette::ToolTipText, brush6);
+        palette74.setBrush(QPalette::Disabled, QPalette::WindowText, brush29);
+        palette74.setBrush(QPalette::Disabled, QPalette::Button, brush30);
+        palette74.setBrush(QPalette::Disabled, QPalette::Light, brush6);
+        palette74.setBrush(QPalette::Disabled, QPalette::Midlight, brush6);
+        palette74.setBrush(QPalette::Disabled, QPalette::Dark, brush6);
+        palette74.setBrush(QPalette::Disabled, QPalette::Mid, brush6);
+        palette74.setBrush(QPalette::Disabled, QPalette::Text, brush29);
+        palette74.setBrush(QPalette::Disabled, QPalette::BrightText, brush);
+        palette74.setBrush(QPalette::Disabled, QPalette::ButtonText, brush29);
+        palette74.setBrush(QPalette::Disabled, QPalette::Base, brush30);
+        palette74.setBrush(QPalette::Disabled, QPalette::Window, brush30);
+        palette74.setBrush(QPalette::Disabled, QPalette::Shadow, brush6);
+        palette74.setBrush(QPalette::Disabled, QPalette::AlternateBase, brush6);
+        palette74.setBrush(QPalette::Disabled, QPalette::ToolTipBase, brush7);
+        palette74.setBrush(QPalette::Disabled, QPalette::ToolTipText, brush6);
+        label_azi_antenna_head_true->setPalette(palette74);
         label_azi_antenna_head_true->setFont(font3);
         label_azi_antenna_head_true->setStyleSheet(QLatin1String("background-color: rgba(255, 255, 255, 0);\n"
 "color: rgb(255, 0, 0);"));
@@ -6285,55 +6474,55 @@ public:
 
         label_head_ship = new QLabel(groupBox_25);
         label_head_ship->setObjectName(QStringLiteral("label_head_ship"));
-        QPalette palette77;
+        QPalette palette75;
         QBrush brush31(QColor(85, 255, 255, 255));
         brush31.setStyle(Qt::SolidPattern);
-        palette77.setBrush(QPalette::Active, QPalette::WindowText, brush31);
-        palette77.setBrush(QPalette::Active, QPalette::Button, brush30);
-        palette77.setBrush(QPalette::Active, QPalette::Light, brush6);
-        palette77.setBrush(QPalette::Active, QPalette::Midlight, brush6);
-        palette77.setBrush(QPalette::Active, QPalette::Dark, brush6);
-        palette77.setBrush(QPalette::Active, QPalette::Mid, brush6);
-        palette77.setBrush(QPalette::Active, QPalette::Text, brush31);
-        palette77.setBrush(QPalette::Active, QPalette::BrightText, brush);
-        palette77.setBrush(QPalette::Active, QPalette::ButtonText, brush31);
-        palette77.setBrush(QPalette::Active, QPalette::Base, brush30);
-        palette77.setBrush(QPalette::Active, QPalette::Window, brush30);
-        palette77.setBrush(QPalette::Active, QPalette::Shadow, brush6);
-        palette77.setBrush(QPalette::Active, QPalette::AlternateBase, brush6);
-        palette77.setBrush(QPalette::Active, QPalette::ToolTipBase, brush7);
-        palette77.setBrush(QPalette::Active, QPalette::ToolTipText, brush6);
-        palette77.setBrush(QPalette::Inactive, QPalette::WindowText, brush31);
-        palette77.setBrush(QPalette::Inactive, QPalette::Button, brush30);
-        palette77.setBrush(QPalette::Inactive, QPalette::Light, brush6);
-        palette77.setBrush(QPalette::Inactive, QPalette::Midlight, brush6);
-        palette77.setBrush(QPalette::Inactive, QPalette::Dark, brush6);
-        palette77.setBrush(QPalette::Inactive, QPalette::Mid, brush6);
-        palette77.setBrush(QPalette::Inactive, QPalette::Text, brush31);
-        palette77.setBrush(QPalette::Inactive, QPalette::BrightText, brush);
-        palette77.setBrush(QPalette::Inactive, QPalette::ButtonText, brush31);
-        palette77.setBrush(QPalette::Inactive, QPalette::Base, brush30);
-        palette77.setBrush(QPalette::Inactive, QPalette::Window, brush30);
-        palette77.setBrush(QPalette::Inactive, QPalette::Shadow, brush6);
-        palette77.setBrush(QPalette::Inactive, QPalette::AlternateBase, brush6);
-        palette77.setBrush(QPalette::Inactive, QPalette::ToolTipBase, brush7);
-        palette77.setBrush(QPalette::Inactive, QPalette::ToolTipText, brush6);
-        palette77.setBrush(QPalette::Disabled, QPalette::WindowText, brush31);
-        palette77.setBrush(QPalette::Disabled, QPalette::Button, brush30);
-        palette77.setBrush(QPalette::Disabled, QPalette::Light, brush6);
-        palette77.setBrush(QPalette::Disabled, QPalette::Midlight, brush6);
-        palette77.setBrush(QPalette::Disabled, QPalette::Dark, brush6);
-        palette77.setBrush(QPalette::Disabled, QPalette::Mid, brush6);
-        palette77.setBrush(QPalette::Disabled, QPalette::Text, brush31);
-        palette77.setBrush(QPalette::Disabled, QPalette::BrightText, brush);
-        palette77.setBrush(QPalette::Disabled, QPalette::ButtonText, brush31);
-        palette77.setBrush(QPalette::Disabled, QPalette::Base, brush30);
-        palette77.setBrush(QPalette::Disabled, QPalette::Window, brush30);
-        palette77.setBrush(QPalette::Disabled, QPalette::Shadow, brush6);
-        palette77.setBrush(QPalette::Disabled, QPalette::AlternateBase, brush6);
-        palette77.setBrush(QPalette::Disabled, QPalette::ToolTipBase, brush7);
-        palette77.setBrush(QPalette::Disabled, QPalette::ToolTipText, brush6);
-        label_head_ship->setPalette(palette77);
+        palette75.setBrush(QPalette::Active, QPalette::WindowText, brush31);
+        palette75.setBrush(QPalette::Active, QPalette::Button, brush30);
+        palette75.setBrush(QPalette::Active, QPalette::Light, brush6);
+        palette75.setBrush(QPalette::Active, QPalette::Midlight, brush6);
+        palette75.setBrush(QPalette::Active, QPalette::Dark, brush6);
+        palette75.setBrush(QPalette::Active, QPalette::Mid, brush6);
+        palette75.setBrush(QPalette::Active, QPalette::Text, brush31);
+        palette75.setBrush(QPalette::Active, QPalette::BrightText, brush);
+        palette75.setBrush(QPalette::Active, QPalette::ButtonText, brush31);
+        palette75.setBrush(QPalette::Active, QPalette::Base, brush30);
+        palette75.setBrush(QPalette::Active, QPalette::Window, brush30);
+        palette75.setBrush(QPalette::Active, QPalette::Shadow, brush6);
+        palette75.setBrush(QPalette::Active, QPalette::AlternateBase, brush6);
+        palette75.setBrush(QPalette::Active, QPalette::ToolTipBase, brush7);
+        palette75.setBrush(QPalette::Active, QPalette::ToolTipText, brush6);
+        palette75.setBrush(QPalette::Inactive, QPalette::WindowText, brush31);
+        palette75.setBrush(QPalette::Inactive, QPalette::Button, brush30);
+        palette75.setBrush(QPalette::Inactive, QPalette::Light, brush6);
+        palette75.setBrush(QPalette::Inactive, QPalette::Midlight, brush6);
+        palette75.setBrush(QPalette::Inactive, QPalette::Dark, brush6);
+        palette75.setBrush(QPalette::Inactive, QPalette::Mid, brush6);
+        palette75.setBrush(QPalette::Inactive, QPalette::Text, brush31);
+        palette75.setBrush(QPalette::Inactive, QPalette::BrightText, brush);
+        palette75.setBrush(QPalette::Inactive, QPalette::ButtonText, brush31);
+        palette75.setBrush(QPalette::Inactive, QPalette::Base, brush30);
+        palette75.setBrush(QPalette::Inactive, QPalette::Window, brush30);
+        palette75.setBrush(QPalette::Inactive, QPalette::Shadow, brush6);
+        palette75.setBrush(QPalette::Inactive, QPalette::AlternateBase, brush6);
+        palette75.setBrush(QPalette::Inactive, QPalette::ToolTipBase, brush7);
+        palette75.setBrush(QPalette::Inactive, QPalette::ToolTipText, brush6);
+        palette75.setBrush(QPalette::Disabled, QPalette::WindowText, brush31);
+        palette75.setBrush(QPalette::Disabled, QPalette::Button, brush30);
+        palette75.setBrush(QPalette::Disabled, QPalette::Light, brush6);
+        palette75.setBrush(QPalette::Disabled, QPalette::Midlight, brush6);
+        palette75.setBrush(QPalette::Disabled, QPalette::Dark, brush6);
+        palette75.setBrush(QPalette::Disabled, QPalette::Mid, brush6);
+        palette75.setBrush(QPalette::Disabled, QPalette::Text, brush31);
+        palette75.setBrush(QPalette::Disabled, QPalette::BrightText, brush);
+        palette75.setBrush(QPalette::Disabled, QPalette::ButtonText, brush31);
+        palette75.setBrush(QPalette::Disabled, QPalette::Base, brush30);
+        palette75.setBrush(QPalette::Disabled, QPalette::Window, brush30);
+        palette75.setBrush(QPalette::Disabled, QPalette::Shadow, brush6);
+        palette75.setBrush(QPalette::Disabled, QPalette::AlternateBase, brush6);
+        palette75.setBrush(QPalette::Disabled, QPalette::ToolTipBase, brush7);
+        palette75.setBrush(QPalette::Disabled, QPalette::ToolTipText, brush6);
+        label_head_ship->setPalette(palette75);
         label_head_ship->setFont(font3);
         label_head_ship->setStyleSheet(QLatin1String("color: rgb(85, 255, 255);\n"
 "background-color: rgba(255, 255, 255, 0);"));
@@ -6342,63 +6531,63 @@ public:
 
         label_speed_ship = new QLabel(groupBox_25);
         label_speed_ship->setObjectName(QStringLiteral("label_speed_ship"));
-        QPalette palette78;
-        palette78.setBrush(QPalette::Active, QPalette::WindowText, brush31);
-        palette78.setBrush(QPalette::Active, QPalette::Button, brush30);
-        palette78.setBrush(QPalette::Active, QPalette::Light, brush6);
-        palette78.setBrush(QPalette::Active, QPalette::Midlight, brush6);
-        palette78.setBrush(QPalette::Active, QPalette::Dark, brush6);
-        palette78.setBrush(QPalette::Active, QPalette::Mid, brush6);
-        palette78.setBrush(QPalette::Active, QPalette::Text, brush31);
-        palette78.setBrush(QPalette::Active, QPalette::BrightText, brush);
-        palette78.setBrush(QPalette::Active, QPalette::ButtonText, brush31);
-        palette78.setBrush(QPalette::Active, QPalette::Base, brush30);
-        palette78.setBrush(QPalette::Active, QPalette::Window, brush30);
-        palette78.setBrush(QPalette::Active, QPalette::Shadow, brush6);
-        palette78.setBrush(QPalette::Active, QPalette::AlternateBase, brush6);
-        palette78.setBrush(QPalette::Active, QPalette::ToolTipBase, brush7);
-        palette78.setBrush(QPalette::Active, QPalette::ToolTipText, brush6);
-        palette78.setBrush(QPalette::Inactive, QPalette::WindowText, brush31);
-        palette78.setBrush(QPalette::Inactive, QPalette::Button, brush30);
-        palette78.setBrush(QPalette::Inactive, QPalette::Light, brush6);
-        palette78.setBrush(QPalette::Inactive, QPalette::Midlight, brush6);
-        palette78.setBrush(QPalette::Inactive, QPalette::Dark, brush6);
-        palette78.setBrush(QPalette::Inactive, QPalette::Mid, brush6);
-        palette78.setBrush(QPalette::Inactive, QPalette::Text, brush31);
-        palette78.setBrush(QPalette::Inactive, QPalette::BrightText, brush);
-        palette78.setBrush(QPalette::Inactive, QPalette::ButtonText, brush31);
-        palette78.setBrush(QPalette::Inactive, QPalette::Base, brush30);
-        palette78.setBrush(QPalette::Inactive, QPalette::Window, brush30);
-        palette78.setBrush(QPalette::Inactive, QPalette::Shadow, brush6);
-        palette78.setBrush(QPalette::Inactive, QPalette::AlternateBase, brush6);
-        palette78.setBrush(QPalette::Inactive, QPalette::ToolTipBase, brush7);
-        palette78.setBrush(QPalette::Inactive, QPalette::ToolTipText, brush6);
-        palette78.setBrush(QPalette::Disabled, QPalette::WindowText, brush31);
-        palette78.setBrush(QPalette::Disabled, QPalette::Button, brush30);
-        palette78.setBrush(QPalette::Disabled, QPalette::Light, brush6);
-        palette78.setBrush(QPalette::Disabled, QPalette::Midlight, brush6);
-        palette78.setBrush(QPalette::Disabled, QPalette::Dark, brush6);
-        palette78.setBrush(QPalette::Disabled, QPalette::Mid, brush6);
-        palette78.setBrush(QPalette::Disabled, QPalette::Text, brush31);
-        palette78.setBrush(QPalette::Disabled, QPalette::BrightText, brush);
-        palette78.setBrush(QPalette::Disabled, QPalette::ButtonText, brush31);
-        palette78.setBrush(QPalette::Disabled, QPalette::Base, brush30);
-        palette78.setBrush(QPalette::Disabled, QPalette::Window, brush30);
-        palette78.setBrush(QPalette::Disabled, QPalette::Shadow, brush6);
-        palette78.setBrush(QPalette::Disabled, QPalette::AlternateBase, brush6);
-        palette78.setBrush(QPalette::Disabled, QPalette::ToolTipBase, brush7);
-        palette78.setBrush(QPalette::Disabled, QPalette::ToolTipText, brush6);
-        label_speed_ship->setPalette(palette78);
+        QPalette palette76;
+        palette76.setBrush(QPalette::Active, QPalette::WindowText, brush31);
+        palette76.setBrush(QPalette::Active, QPalette::Button, brush30);
+        palette76.setBrush(QPalette::Active, QPalette::Light, brush6);
+        palette76.setBrush(QPalette::Active, QPalette::Midlight, brush6);
+        palette76.setBrush(QPalette::Active, QPalette::Dark, brush6);
+        palette76.setBrush(QPalette::Active, QPalette::Mid, brush6);
+        palette76.setBrush(QPalette::Active, QPalette::Text, brush31);
+        palette76.setBrush(QPalette::Active, QPalette::BrightText, brush);
+        palette76.setBrush(QPalette::Active, QPalette::ButtonText, brush31);
+        palette76.setBrush(QPalette::Active, QPalette::Base, brush30);
+        palette76.setBrush(QPalette::Active, QPalette::Window, brush30);
+        palette76.setBrush(QPalette::Active, QPalette::Shadow, brush6);
+        palette76.setBrush(QPalette::Active, QPalette::AlternateBase, brush6);
+        palette76.setBrush(QPalette::Active, QPalette::ToolTipBase, brush7);
+        palette76.setBrush(QPalette::Active, QPalette::ToolTipText, brush6);
+        palette76.setBrush(QPalette::Inactive, QPalette::WindowText, brush31);
+        palette76.setBrush(QPalette::Inactive, QPalette::Button, brush30);
+        palette76.setBrush(QPalette::Inactive, QPalette::Light, brush6);
+        palette76.setBrush(QPalette::Inactive, QPalette::Midlight, brush6);
+        palette76.setBrush(QPalette::Inactive, QPalette::Dark, brush6);
+        palette76.setBrush(QPalette::Inactive, QPalette::Mid, brush6);
+        palette76.setBrush(QPalette::Inactive, QPalette::Text, brush31);
+        palette76.setBrush(QPalette::Inactive, QPalette::BrightText, brush);
+        palette76.setBrush(QPalette::Inactive, QPalette::ButtonText, brush31);
+        palette76.setBrush(QPalette::Inactive, QPalette::Base, brush30);
+        palette76.setBrush(QPalette::Inactive, QPalette::Window, brush30);
+        palette76.setBrush(QPalette::Inactive, QPalette::Shadow, brush6);
+        palette76.setBrush(QPalette::Inactive, QPalette::AlternateBase, brush6);
+        palette76.setBrush(QPalette::Inactive, QPalette::ToolTipBase, brush7);
+        palette76.setBrush(QPalette::Inactive, QPalette::ToolTipText, brush6);
+        palette76.setBrush(QPalette::Disabled, QPalette::WindowText, brush31);
+        palette76.setBrush(QPalette::Disabled, QPalette::Button, brush30);
+        palette76.setBrush(QPalette::Disabled, QPalette::Light, brush6);
+        palette76.setBrush(QPalette::Disabled, QPalette::Midlight, brush6);
+        palette76.setBrush(QPalette::Disabled, QPalette::Dark, brush6);
+        palette76.setBrush(QPalette::Disabled, QPalette::Mid, brush6);
+        palette76.setBrush(QPalette::Disabled, QPalette::Text, brush31);
+        palette76.setBrush(QPalette::Disabled, QPalette::BrightText, brush);
+        palette76.setBrush(QPalette::Disabled, QPalette::ButtonText, brush31);
+        palette76.setBrush(QPalette::Disabled, QPalette::Base, brush30);
+        palette76.setBrush(QPalette::Disabled, QPalette::Window, brush30);
+        palette76.setBrush(QPalette::Disabled, QPalette::Shadow, brush6);
+        palette76.setBrush(QPalette::Disabled, QPalette::AlternateBase, brush6);
+        palette76.setBrush(QPalette::Disabled, QPalette::ToolTipBase, brush7);
+        palette76.setBrush(QPalette::Disabled, QPalette::ToolTipText, brush6);
+        label_speed_ship->setPalette(palette76);
         label_speed_ship->setFont(font3);
         label_speed_ship->setStyleSheet(QLatin1String("color: rgb(85, 255, 255);\n"
 "background-color: rgba(255, 255, 255, 0);"));
 
         gridLayout_11->addWidget(label_speed_ship, 3, 1, 1, 1);
 
-        frame = new QFrame(centralWidget);
-        frame->setObjectName(QStringLiteral("frame"));
-        frame->setGeometry(QRect(10, 190, 121, 21));
-        horizontalLayout_4 = new QHBoxLayout(frame);
+        frame1 = new QFrame(centralWidget);
+        frame1->setObjectName(QStringLiteral("frame1"));
+        frame1->setGeometry(QRect(10, 190, 121, 21));
+        horizontalLayout_4 = new QHBoxLayout(frame1);
         horizontalLayout_4->setSpacing(6);
         horizontalLayout_4->setContentsMargins(11, 11, 11, 11);
         horizontalLayout_4->setObjectName(QStringLiteral("horizontalLayout_4"));
@@ -6781,7 +6970,7 @@ public:
         toolButton_measuring->setToolTip(QApplication::translate("MainWindow", "\304\220o t\341\273\215a \304\221\341\273\231 m\341\273\245c ti\303\252u so v\341\273\233i \304\221i\341\273\203m tham chi\341\272\277u", Q_NULLPTR));
 #endif // QT_NO_TOOLTIP
         toolButton_measuring->setText(QApplication::translate("MainWindow", "\304\220o tham chi\341\272\277u", Q_NULLPTR));
-        tabWidget_menu_2->setTabText(tabWidget_menu_2->indexOf(tab_27), QApplication::translate("MainWindow", "C\303\240i \304\221\341\272\267t", Q_NULLPTR));
+        tabWidget_menu_2->setTabText(tabWidget_menu_2->indexOf(tab_27), QApplication::translate("MainWindow", "C.\304\221\341\272\267t", Q_NULLPTR));
 #ifndef QT_NO_TOOLTIP
         toolButton_xl_dopler->setToolTip(QString());
 #endif // QT_NO_TOOLTIP
@@ -6807,16 +6996,26 @@ public:
         label_rain->setText(QApplication::translate("MainWindow", "Rain", Q_NULLPTR));
         toolButton_xl_dopler_2->setText(QApplication::translate("MainWindow", "B\341\273\217 b\304\203ng 0 dopler", Q_NULLPTR));
         toolButton_manual_tune->setText(QApplication::translate("MainWindow", "B\341\272\255t ch\341\273\211nh tay", Q_NULLPTR));
-        tabWidget_menu_2->setTabText(tabWidget_menu_2->indexOf(tab_9), QApplication::translate("MainWindow", "C.Nhi\341\273\205u", Q_NULLPTR));
+        tabWidget_menu_2->setTabText(tabWidget_menu_2->indexOf(tab_9), QApplication::translate("MainWindow", "CN", Q_NULLPTR));
         toolButton_start_simulation_start->setText(QApplication::translate("MainWindow", "B\341\272\257t \304\221\341\272\247u", Q_NULLPTR));
         toolButton_start_simulation_stop->setText(QApplication::translate("MainWindow", "D\341\273\253ng", Q_NULLPTR));
-        label_dial_value_rg->setText(QApplication::translate("MainWindow", "--", Q_NULLPTR));
-        label_dial_value_azi->setText(QApplication::translate("MainWindow", "--", Q_NULLPTR));
-        tabWidget_menu_2->setTabText(tabWidget_menu_2->indexOf(tab_7), QApplication::translate("MainWindow", "T\341\272\241o gi\341\272\243", Q_NULLPTR));
+        label_3->setText(QApplication::translate("MainWindow", "C.ly", Q_NULLPTR));
+        label_4->setText(QApplication::translate("MainWindow", "HC\304\220", Q_NULLPTR));
+        label->setText(QApplication::translate("MainWindow", "P.v\341\273\213", Q_NULLPTR));
+        label_5->setText(QApplication::translate("MainWindow", "T. \304\221\341\273\231", Q_NULLPTR));
+        toolButton_start_simulation_set->setText(QApplication::translate("MainWindow", "+", Q_NULLPTR));
+        toolButton_start_simulation_set_2->setText(QApplication::translate("MainWindow", "+", Q_NULLPTR));
+        toolButton_start_simulation_set_3->setText(QApplication::translate("MainWindow", "+", Q_NULLPTR));
+        toolButton_start_simulation_set_4->setText(QApplication::translate("MainWindow", "+", Q_NULLPTR));
+        toolButton_start_simulation_set_5->setText(QApplication::translate("MainWindow", "+", Q_NULLPTR));
+        toolButton_start_simulation_set_6->setText(QApplication::translate("MainWindow", "+", Q_NULLPTR));
+        toolButton_start_simulation_set_7->setText(QApplication::translate("MainWindow", "+", Q_NULLPTR));
+        toolButton_start_simulation_set_8->setText(QApplication::translate("MainWindow", "+", Q_NULLPTR));
+        tabWidget_menu_2->setTabText(tabWidget_menu_2->indexOf(tab_7), QApplication::translate("MainWindow", "T.gi\341\272\243", Q_NULLPTR));
         QTableWidgetItem *___qtablewidgetitem29 = tableWidgetTarget_2->horizontalHeaderItem(0);
         ___qtablewidgetitem29->setText(QApplication::translate("MainWindow", "SH", Q_NULLPTR));
         QTableWidgetItem *___qtablewidgetitem30 = tableWidgetTarget_2->horizontalHeaderItem(1);
-        ___qtablewidgetitem30->setText(QApplication::translate("MainWindow", "P.v\341\273\213 (b\341\272\257c)", Q_NULLPTR));
+        ___qtablewidgetitem30->setText(QApplication::translate("MainWindow", "P.v\341\273\213 ", Q_NULLPTR));
         QTableWidgetItem *___qtablewidgetitem31 = tableWidgetTarget_2->horizontalHeaderItem(2);
         ___qtablewidgetitem31->setText(QApplication::translate("MainWindow", "C\341\273\261 ly", Q_NULLPTR));
         QTableWidgetItem *___qtablewidgetitem32 = tableWidgetTarget_2->horizontalHeaderItem(3);

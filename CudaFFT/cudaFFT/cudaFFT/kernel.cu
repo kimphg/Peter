@@ -84,15 +84,7 @@ public:
 		ramSignalTL = new cufftComplex[FRAME_LEN*mTichLuySize];
 		// Allocate device memory for signal tich luy
 		cudaMalloc((void **)&dSignalTL, mMemSizeTL);
-		/*
-		if (cufftPlan1d(&planNenTH, frameLen, CUFFT_C2C, 1) != CUFFT_SUCCESS)printf("\nFFT planNenTH failed to init");
-		// Allocate device memory for signal nen
-		cudaMalloc((void **)&dSignalNen, mMemSizeNen);
-		cudaMalloc((void **)&dSignalNenRes, mMemSizeNen);
-		*/
-		//if (cufftPlan1d(&planImageFFT, frameLen, CUFFT_C2C, 1) != CUFFT_SUCCESS)printf("\nFFT planTL failed to init");
-		// Allocate device memory for image nen
-		//cudaMalloc((void **)&dImageNen, mMemSizeNen);
+		
 	}
 	void exeFFTTL(cufftComplex *h_signal)
 	{
@@ -350,75 +342,70 @@ DWORD WINAPI ProcessDataBuffer(LPVOID lpParam)
 	while (true)
 	{
 		Sleep(1);
-
-
 		while (iProcessing != iReady)
 		{
-			if (!isPaused)
+
+
+			for (int ir = 0; ir < FRAME_LEN; ir++)
 			{
 
-				for (int ir = 0; ir < FRAME_LEN; ir++)
-				{
-
-					//ramSignalNen[iProcessing][ir].x = sqrt(double(dataBuff[iProcessing].dataPM_I[ir] * dataBuff[iProcessing].dataPM_I[ir] + dataBuff[iProcessing].dataPM_Q[ir] * dataBuff[iProcessing].dataPM_Q[ir]));//int(dataBuff[iProcessing].dataPM_I[ir]);
-					ramSignalNen[iProcessing][ir].x = float(dataBuff[iProcessing].dataPM_I[ir]);
-					ramSignalNen[iProcessing][ir].y = float(dataBuff[iProcessing].dataPM_Q[ir]);//0;// 
-					//ramSignalNen[iProcessing][ir].y = 0;
-				}
-
-
-				if (!dataBuff[iProcessing].isToFFT)
-				{
-					//jump to next period
-					iProcessing++;
-					if (iProcessing >= MAX_IREC)iProcessing = 0;
-					continue;
-				}
-				int ia;
-				for (int ir = 0; ir < FRAME_LEN; ir++)
-				{
-					ia = iProcessing;
-					for (int i = 0; i < mFFTSize; i++)
-					{
-						ramSignalTL[ir*mFFTSize + i] = ramSignalNen[ia][ir];
-						ia--;
-						if (ia < 0)ia += MAX_IREC;
-					}
-				}
-				// perform fft
-				if (mFFT->isActive)mFFT->exeFFTTL((cufftComplex*)ramSignalTL);
-				//dataBuff[iProcessing].header[32] = gyroValue >> 8;
-				//dataBuff[iProcessing].header[33] = gyroValue;
-
-				memcpy(outputFrame, dataBuff[iProcessing].header, FRAME_HEADER_SIZE);
-
-				for (int i = 0; i < FRAME_LEN; i++)
-				{
-					float maxAmp = 0;
-					int indexMaxFFT = 0;
-					//for (int j = 0; j<FFT_SIZE_MAX; j++)
-					int fftSkip = BANG_KHONG*mFFTSize / 16;
-					for (int j = fftSkip; j < mFFTSize - fftSkip; j++)
-					{
-						float ampl = (ramSignalTL[i*mFFTSize + j].x * ramSignalTL[i*mFFTSize + j].x) + (ramSignalTL[i*mFFTSize + j].y * ramSignalTL[i*mFFTSize + j].y);
-						if (ampl>maxAmp)
-						{
-							maxAmp = ampl;
-							indexMaxFFT = j;
-						}
-					}
-					float res = sqrt(double(maxAmp) / double(mFFTSize));
-					if (res > 255)res = 255;
-					outputFrame[i + FRAME_HEADER_SIZE] = res;// u_char(sqrt(float(maxAmp)) / float(FFT_SIZE_MAX));
-					outputFrame[i + FRAME_LEN + FRAME_HEADER_SIZE] = u_char(indexMaxFFT*16.0 / (mFFTSize));
-				}
-				sendto(mSocket, (char*)outputFrame, OUTPUT_FRAME_SIZE, 0, (struct sockaddr *) &si_peter, sizeof(si_peter));
+				//ramSignalNen[iProcessing][ir].x = sqrt(double(dataBuff[iProcessing].dataPM_I[ir] * dataBuff[iProcessing].dataPM_I[ir] + dataBuff[iProcessing].dataPM_Q[ir] * dataBuff[iProcessing].dataPM_Q[ir]));//int(dataBuff[iProcessing].dataPM_I[ir]);
+				ramSignalNen[iProcessing][ir].x = float(dataBuff[iProcessing].dataPM_I[ir]);
+				ramSignalNen[iProcessing][ir].y = float(dataBuff[iProcessing].dataPM_Q[ir]);//0;// 
+				//ramSignalNen[iProcessing][ir].y = 0;
 			}
-			//jump to next period
-			iProcessing++;
-			if (iProcessing >= MAX_IREC)iProcessing = 0;
+			if (!dataBuff[iProcessing].isToFFT || isPaused)
+			{
+				//jump to next period
+				iProcessing++;
+				if (iProcessing >= MAX_IREC)iProcessing = 0;
+				continue;
+			}
+			int ia;
+			for (int ir = 0; ir < FRAME_LEN; ir++)
+			{
+				ia = iProcessing;
+				for (int i = 0; i < mFFTSize; i++)
+				{
+					ramSignalTL[ir*mFFTSize + i] = ramSignalNen[ia][ir];
+					ia--;
+					if (ia < 0)ia += MAX_IREC;
+				}
+			}
+			// perform fft
+			if (mFFT->isActive)mFFT->exeFFTTL((cufftComplex*)ramSignalTL);
+			//dataBuff[iProcessing].header[32] = gyroValue >> 8;
+			//dataBuff[iProcessing].header[33] = gyroValue;
 
+			memcpy(outputFrame, dataBuff[iProcessing].header, FRAME_HEADER_SIZE);
+
+			for (int i = 0; i < FRAME_LEN; i++)
+			{
+				float maxAmp = 0;
+				int indexMaxFFT = 0;
+				//for (int j = 0; j<FFT_SIZE_MAX; j++)
+				int fftSkip = BANG_KHONG*mFFTSize / 16;
+				for (int j = fftSkip; j < mFFTSize - fftSkip; j++)
+				{
+					float ampl = (ramSignalTL[i*mFFTSize + j].x * ramSignalTL[i*mFFTSize + j].x) + (ramSignalTL[i*mFFTSize + j].y * ramSignalTL[i*mFFTSize + j].y);
+					if (ampl>maxAmp)
+					{
+						maxAmp = ampl;
+						indexMaxFFT = j;
+					}
+				}
+				float res = sqrt(double(maxAmp) / double(mFFTSize));
+				if (res > 255)res = 255;
+				outputFrame[i + FRAME_HEADER_SIZE] = res;// u_char(sqrt(float(maxAmp)) / float(FFT_SIZE_MAX));
+				outputFrame[i + FRAME_LEN + FRAME_HEADER_SIZE] = u_char(indexMaxFFT*16.0 / (mFFTSize));
+			}
+			sendto(mSocket, (char*)outputFrame, OUTPUT_FRAME_SIZE, 0, (struct sockaddr *) &si_peter, sizeof(si_peter));
 		}
+		//jump to next period
+		iProcessing++;
+		if (iProcessing >= MAX_IREC)iProcessing = 0;
+
+
 	}
 
 

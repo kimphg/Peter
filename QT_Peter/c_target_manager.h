@@ -34,6 +34,7 @@ public:
     bool addTrack(track_t *);
     bool addTarget(track_t *);
     bool checkIDExist(int id);
+    bool changeCurrTrackID(int id);
     void setSelectedTrack(int uniqID);
     TrackPointer *getTargetAt(int i);
     TrackPointer* currTrackPt;

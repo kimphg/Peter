@@ -303,6 +303,8 @@ double track_t::estimateScore(object_t *obj1)
     double dtime = (obj1->timeMs - obj2->timeMs);
     if(dtime<300)
         return -1;//ENVAR min time between plots in a line(1s)
+    if(dtime>80000)
+        return -1;
     dtime/=3600000.0;
     double dx = obj1->xkm - obj2->xkm;
     double dy = obj1->ykm - obj2->ykm;
@@ -492,7 +494,7 @@ C_radar_data::C_radar_data()
     curAzir = 0;
     arcMaxAzi = 0;
     arcMinAzi = 0;
-    isSharpEye = false;
+//    isSharpEye = false;
     sn_scale = SIGNAL_SCALE_0;
     raw_map_init();
     raw_map_init_zoom();
@@ -1286,7 +1288,7 @@ void C_radar_data::processSocketData(unsigned char* data,short len)
         }
     }
 
-
+    isDrawn = false;
     return;
 }
 void C_radar_data::SelfRotationOn( double rate)
@@ -1950,15 +1952,15 @@ void C_radar_data::setNoiseAverage(float value)
     noiseAverage = value;
 }
 
-bool C_radar_data::getIsSharpEye() const
-{
-    return isSharpEye;
-}
+//bool C_radar_data::getIsSharpEye() const
+//{
+//    return isSharpEye;
+//}
 
-void C_radar_data::setIsSharpEye(bool value)
-{
-    isSharpEye = value;
-}
+//void C_radar_data::setIsSharpEye(bool value)
+//{
+//    isSharpEye = value;
+//}
 short zoomXmax,zoomYmax,zoomXmin,zoomYmin;
 short zoomCenterX=RAD_DISPLAY_RES,zoomCenterY=RAD_DISPLAY_RES;
 void C_radar_data::setZoomRectXY(float ctx, float cty)
